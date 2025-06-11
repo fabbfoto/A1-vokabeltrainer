@@ -15,17 +15,18 @@ document.addEventListener('DOMContentLoaded', () => {
     String.prototype.split_sentence_for_translation = function () { return this.match(/\S+/g) || []; };
 
     // GLOBALE VARIABLEN & ZUSTAND
-    let currentVocabularySet = [], shuffledVocabForMode = [], repeatTasksQueue = [];
+    let currentVocabularySet = [], shuffledVocabForMode = [];
     let currentWortgruppeName = "", currentMode = 'mc-de-en', currentWordData;
     let currentWordIndexInShuffled = -1, correctInRound = 0, attemptedInRound = 0;
-    let isRepeatModeActive = false;
+    
+    let globalProgress = {}; 
     let masteredWordsByMode = {};
+    let wordsToRepeatByMode = {};
+    let isRepeatSessionActive = false;
+
     const learningModes = ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de', 'type-land-adj'];
     const modeNames = { 'mc-de-en': "Bedeutung", 'type-de-adj': "Schreibweise", 'cloze-adj-de': "Lückentext", 'sentence-translation-en-de': "Satzübersetzung", 'type-land-adj': "Land → Adjektiv" };
-    learningModes.forEach(mode => { masteredWordsByMode[mode] = new Set(); });
-    let incorrectlyAnsweredTasks = {};
-    learningModes.forEach(mode => { incorrectlyAnsweredTasks[mode] = new Set(); });
-
+    
     // DOM-ELEMENTE
     const wortgruppenSelectorContainerEl = document.getElementById('wortgruppen-selector-container');
     const wortgruppenButtonsEl = document.getElementById('wortgruppen-buttons');
@@ -57,25 +58,126 @@ document.addEventListener('DOMContentLoaded', () => {
     const accuracyBarEl = document.getElementById('accuracy-bar');
     const messageBoxEl = document.getElementById('message-box');
     const categoryStatsContainerEl = document.getElementById('category-stats-container');
+    const landAdjColumnEl = document.getElementById('land-adj-column');
 
-    // SVG-Icon für die Audio-Buttons
     const SVG_SPEAKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.66 1.905H6.44l4.5 4.5c.944.945 2.56.276 2.56-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 01-1.06-1.06 8.25 8.25 0 000-11.668.75.75 0 010-1.06z" /><path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z" /></svg>`;
 
+    function saveGlobalProgress() {
+        const progressToStore = {};
+        for (const gruppe in globalProgress) {
+            progressToStore[gruppe] = {};
+            for (const mode in globalProgress[gruppe]) {
+                progressToStore[gruppe][mode] = Array.from(globalProgress[gruppe][mode]);
+            }
+        }
+        localStorage.setItem('goetheA1Progress', JSON.stringify(progressToStore));
+    }
+
+    function loadGlobalProgress() {
+        const storedProgress = localStorage.getItem('goetheA1Progress');
+        if (storedProgress) {
+            const parsedProgress = JSON.parse(storedProgress);
+            globalProgress = {};
+            for (const gruppe in parsedProgress) {
+                globalProgress[gruppe] = {};
+                for (const mode in parsedProgress[gruppe]) {
+                    globalProgress[gruppe][mode] = new Set(parsedProgress[gruppe][mode]);
+                }
+            }
+        }
+    }
+    
+    function updateErrorCounts() {
+        learningModes.forEach(mode => {
+            const repeatButton = document.getElementById(`mode-repeat-${mode}`);
+            if (repeatButton) {
+                const countSpan = repeatButton.querySelector('.count-display');
+                const errorCount = wordsToRepeatByMode[mode]?.size || 0;
+                if (countSpan) {
+                    countSpan.textContent = errorCount;
+                }
+                repeatButton.disabled = errorCount === 0;
+            }
+        });
+    }
+
+    function updateCategoryStats() {
+        categoryStatsContainerEl.innerHTML = '';
+        const totalItemsInWortgruppe = currentVocabularySet.length;
+        if (totalItemsInWortgruppe === 0) return;
+
+        const modesToDisplay = ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'];
+        modesToDisplay.forEach(mode => {
+            if (modeNames[mode]) {
+                const masteredCount = masteredWordsByMode[mode]?.size || 0;
+                const percentage = totalItemsInWortgruppe > 0 ? (masteredCount / totalItemsInWortgruppe) * 100 : 0;
+                
+                const item = document.createElement('div');
+                item.className = 'category-stat-item';
+                const text = document.createElement('span');
+                text.className = 'category-stat-text';
+                text.textContent = `${modeNames[mode]}: ${masteredCount} / ${totalItemsInWortgruppe}`;
+                const barBg = document.createElement('div');
+                barBg.className = 'category-progress-bar-bg';
+                const barFg = document.createElement('div');
+                barFg.className = 'category-progress-bar-fg';
+                barFg.style.width = `${percentage}%`;
+                barBg.appendChild(barFg);
+                item.appendChild(text);
+                item.appendChild(barBg);
+                categoryStatsContainerEl.appendChild(item);
+            }
+        });
+    }
+    
     function populateWortgruppenButtons() {
         wortgruppenButtonsEl.innerHTML = '';
-        alleWortgruppenNamen.forEach(name => {
+        alleWortgruppenNamen.forEach((name, index) => {
             const button = document.createElement('button');
             button.className = 'wortgruppe-button rounded-lg';
             button.onclick = () => showTrainerForWortgruppe(name);
+            
             const textLabel = document.createElement('span');
             textLabel.className = 'button-text-label';
             textLabel.textContent = name;
             button.appendChild(textLabel);
+            
             const progressContainer = document.createElement('div');
             progressContainer.className = 'progress-bar-container';
+            
             const progressBar = document.createElement('div');
             progressBar.className = 'progress-bar-fill';
-            progressBar.style.width = '0%';
+
+            const totalWordsInGroup = goetheA1Wortschatz[name]?.length || 0;
+            if (totalWordsInGroup > 0) {
+                const isLaenderGruppe = goetheA1Wortschatz[name].some(word => word.country);
+                const numberOfModes = isLaenderGruppe ? 5 : 4;
+                const totalTasks = totalWordsInGroup * numberOfModes;
+
+                const progressForGroup = globalProgress[name] || {};
+                let completedTasks = 0;
+                
+                Object.values(progressForGroup).forEach(masteredWordSet => {
+                    completedTasks += masteredWordSet.size;
+                });
+                
+                const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+                
+                progressBar.style.width = `${percentage}%`;
+            } else {
+                progressBar.style.width = '0%';
+            }
+
+            let barColor;
+            if (index < 6) {
+                barColor = '#000000';
+            } else if (index < 12) {
+                barColor = '#dd0000';
+            } else {
+                barColor = '#ffce00';
+            }
+            progressBar.style.backgroundColor = barColor;
+
             progressContainer.appendChild(progressBar);
             button.appendChild(progressContainer);
             wortgruppenButtonsEl.appendChild(button);
@@ -89,9 +191,12 @@ document.addEventListener('DOMContentLoaded', () => {
         questionDisplayEl.textContent = '';
         exampleSentenceDisplayEl.textContent = '';
         taskPromptEl.textContent = '';
+        wordLineContainerEl.style.display = 'none';
+        sentenceLineContainerEl.style.display = 'none';
     }
 
     function showWortgruppenSelector() {
+        populateWortgruppenButtons();
         wortgruppenSelectorContainerEl.classList.remove('hidden-view');
         trainerMainViewEl.classList.add('hidden-view');
     }
@@ -99,7 +204,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function showTrainerForWortgruppe(wortgruppeName) {
         currentWortgruppeName = wortgruppeName;
         currentVocabularySet = goetheA1Wortschatz[wortgruppeName] || [];
-        learningModes.forEach(mode => { masteredWordsByMode[mode] = new Set(); incorrectlyAnsweredTasks[mode] = new Set(); });
+        
+        masteredWordsByMode = {};
+        const progressForGroup = globalProgress[currentWortgruppeName] || {};
+        learningModes.forEach(mode => {
+            masteredWordsByMode[mode] = new Set(progressForGroup[mode] || []);
+        });
+
+        wordsToRepeatByMode = {};
+         learningModes.forEach(mode => {
+            wordsToRepeatByMode[mode] = new Set();
+        });
+
         if (currentVocabularySet.length === 0) {
             showMessage(`"${wortgruppeName}" ist leer.`, 'info');
             return;
@@ -107,30 +223,76 @@ document.addEventListener('DOMContentLoaded', () => {
         currentWortgruppeTitleEl.textContent = wortgruppeName;
         wortgruppenSelectorContainerEl.classList.add('hidden-view');
         trainerMainViewEl.classList.remove('hidden-view');
+        
+        updateCategoryStats();
+        updateErrorCounts();
         setMode('mc-de-en');
     }
 
-    function setMode(modeId) {
+    function setMode(modeId, isRepeat = false) {
         currentMode = modeId;
-        shuffledVocabForMode = shuffleArray([...currentVocabularySet]);
+        isRepeatSessionActive = isRepeat;
+
+        if (isRepeat) {
+            const wordsToRepeat = Array.from(wordsToRepeatByMode[modeId] || []);
+            if (wordsToRepeat.length === 0) {
+                showMessage('Keine Fehler zum Wiederholen in diesem Modus.', 'info');
+                isRepeatSessionActive = false;
+                return;
+            }
+            const repeatVocabularySet = currentVocabularySet.filter(word => {
+                const wordId = word.german || word.country;
+                return wordsToRepeat.includes(wordId);
+            });
+            shuffledVocabForMode = shuffleArray([...repeatVocabularySet]);
+        } else {
+            shuffledVocabForMode = shuffleArray([...currentVocabularySet]);
+        }
+        
         currentWordIndexInShuffled = -1;
-        document.querySelectorAll('#mode-selector .mode-button').forEach(btn => btn.classList.remove('active'));
+        correctInRound = 0;
+        attemptedInRound = 0;
+        
+        document.querySelectorAll('#mode-selector .mode-button').forEach(btn => btn.classList.remove('active', 'repeat-active'));
         document.getElementById(`mode-${modeId}`)?.classList.add('active');
+        if (isRepeat) {
+            document.getElementById(`mode-repeat-${modeId}`)?.classList.add('repeat-active');
+        }
+        
         loadNextTask();
     }
     
+    // ===== STARKE ÄNDERUNG: Logik für automatisches Fortfahren bei korrekter Antwort =====
     function processAnswer(isCorrect, correctAnswer) {
         attemptedInRound++;
         let feedbackText = '';
         let feedbackClass = '';
 
+        const wordId = currentWordData.german || currentWordData.country;
+
         if (isCorrect) {
             correctInRound++;
             feedbackText = 'Richtig!';
             feedbackClass = 'feedback-correct';
+            
+            if (wordId) {
+                if (!globalProgress[currentWortgruppeName]) globalProgress[currentWortgruppeName] = {};
+                if (!globalProgress[currentWortgruppeName][currentMode]) globalProgress[currentWortgruppeName][currentMode] = new Set();
+                globalProgress[currentWortgruppeName][currentMode].add(wordId);
+                masteredWordsByMode[currentMode].add(wordId);
+                saveGlobalProgress();
+                
+                if (wordsToRepeatByMode[currentMode]) {
+                    wordsToRepeatByMode[currentMode].delete(wordId);
+                }
+            }
         } else {
-            feedbackText = `Falsch. Richtig ist: <span class="font-bold">${correctAnswer}</span>`;
+            feedbackText = `<span class="font-bold">${correctAnswer}</span>`;
             feedbackClass = 'feedback-incorrect';
+             if (wordId) {
+                if (!wordsToRepeatByMode[currentMode]) wordsToRepeatByMode[currentMode] = new Set();
+                wordsToRepeatByMode[currentMode].add(wordId);
+            }
         }
 
         feedbackContainerEl.innerHTML = `<span class="${feedbackClass}">${feedbackText}</span>`;
@@ -141,36 +303,61 @@ document.addEventListener('DOMContentLoaded', () => {
         accuracyBarEl.style.width = `${accuracy}%`;
         accuracyBarEl.textContent = `${Math.round(accuracy)}%`;
 
-        continueButton.classList.remove('hidden');
+        updateCategoryStats();
+        updateErrorCounts();
+
+        // NEUE LOGIK:
+        if (isCorrect) {
+            // Bei korrekter Antwort, blende den "Weiter"-Button aus und starte einen Timer.
+            continueButton.classList.add('hidden');
+            setTimeout(() => {
+                loadNextTask();
+            }, 1200); // 1,2 Sekunden Verzögerung
+        } else {
+            // Bei falscher Antwort, zeige den "Weiter"-Button wie gewohnt an.
+            continueButton.classList.remove('hidden');
+        }
     }
 
     function loadNextTask() {
         hideAllUIs();
-        wordLineContainerEl.style.display = 'none';
-        sentenceLineContainerEl.style.display = 'none';
-
+    
         if (!currentVocabularySet || currentVocabularySet.length === 0) { return; }
-
+    
         currentWordIndexInShuffled++;
         if (currentWordIndexInShuffled >= shuffledVocabForMode.length) {
-            shuffledVocabForMode = shuffleArray([...currentVocabularySet]);
+            if (isRepeatSessionActive) {
+                showMessage('Alle Fehler wurden wiederholt!', 'success');
+                isRepeatSessionActive = false;
+                document.querySelector('.mode-button.repeat-active')?.classList.remove('repeat-active');
+                shuffledVocabForMode = shuffleArray([...currentVocabularySet]);
+            } else {
+                shuffledVocabForMode = shuffleArray([...shuffledVocabForMode]);
+            }
             currentWordIndexInShuffled = 0;
         }
-        currentWordData = shuffledVocabForMode[currentWordIndexInShuffled];
 
+        currentWordData = shuffledVocabForMode[currentWordIndexInShuffled];
+    
         if (!currentWordData) {
             console.error("Kein Wort gefunden, lade nächstes.");
             loadNextTask();
             return;
         }
-
+    
         const mainGermanWord = currentWordData.german || currentWordData.country;
-        const sentenceToSpeak = currentWordData.example_de;
-
-        if (mainGermanWord) {
+        
+        const isLaenderCategory = !!currentWordData.country;
+        if(landAdjColumnEl) landAdjColumnEl.style.display = isLaenderCategory ? 'flex' : 'none';
+        
+        document.querySelectorAll('#mode-selector .mode-button:not(.repeat-button):not(#mode-type-land-adj)')
+            .forEach(btn => btn.style.display = 'flex');
+        
+        if (currentMode === 'mc-de-en') {
+            mcUiEl.style.display = 'block';
             let displayGermanWord = mainGermanWord;
-            if (currentWordData.nomen_notation) {
-                const parsed = parseNounString(currentWordData.nomen_notation);
+            if (currentWordData.nomen_notation && typeof parseNounString === 'function') {
+                const parsed = parseNounString(currentWordData.nomen_notation); 
                 if (parsed && !parsed.isPluralOnly) {
                     const artikelMap = { 'r': 'der', 'e': 'die', 's': 'das' };
                     displayGermanWord = `${artikelMap[parsed.genus] || ''} ${parsed.singular}, ${parsed.pluralInfo}`;
@@ -179,31 +366,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             questionDisplayEl.textContent = displayGermanWord;
+            exampleSentenceDisplayEl.textContent = currentWordData.example_de;
             audioWordButtonEl.innerHTML = SVG_SPEAKER_ICON;
             audioWordButtonEl.onclick = () => speak(mainGermanWord);
-            wordLineContainerEl.style.display = 'flex';
-        }
-
-        if (sentenceToSpeak) {
-            exampleSentenceDisplayEl.textContent = sentenceToSpeak;
             audioSentenceButtonEl.innerHTML = SVG_SPEAKER_ICON;
-            audioSentenceButtonEl.onclick = () => speak(sentenceToSpeak, 'de-DE');
+            audioSentenceButtonEl.onclick = () => speak(currentWordData.example_de, 'de-DE');
+            wordLineContainerEl.style.display = 'flex';
             sentenceLineContainerEl.style.display = 'flex';
-        }
-
-        // KORRIGIERTE LOGIK FÜR DIE BUTTONS
-        const isLaenderCategory = !!currentWordData.country;
-        
-        // Zuerst alle "normalen" Buttons anzeigen
-        document.querySelectorAll('#mode-selector .mode-button:not(.repeat-button):not(#mode-type-land-adj)')
-            .forEach(btn => btn.style.display = 'flex');
-        
-        // Dann den speziellen Button je nach Kategorie ein- oder ausblenden
-        document.getElementById('mode-type-land-adj').style.display = isLaenderCategory ? 'flex' : 'none';
-
-
-        if (currentMode === 'mc-de-en') {
-            mcUiEl.style.display = 'block';
+            audioWordButtonEl.style.display = 'block';
+            audioSentenceButtonEl.style.display = 'block';
             const correctAnswerEN = (currentWordData.english || currentWordData.english_country || "??").split(',')[0].trim();
             let potentialDistractors = shuffleArray(alleVokabeln.map(v => (v.english || v.english_country || "??").split(',')[0].trim()).filter(e => e !== correctAnswerEN && e !== "??")).slice(0, 3);
             let options = shuffleArray([correctAnswerEN, ...potentialDistractors]);
@@ -215,25 +386,130 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.onclick = () => processAnswer(option === correctAnswerEN, correctAnswerEN);
                 mcAnswersContainerEl.appendChild(button);
             });
+    
         } else if (currentMode === 'type-de-adj') {
             typeUiEl.style.display = 'block';
-            taskPromptEl.textContent = (currentWordData.english || currentWordData.english_country || "Übersetze").split(',')[0].trim();
+            const englishWord = (currentWordData.english || currentWordData.english_country || "").split(',')[0].trim();
+            const englishSentence = currentWordData.example_en || "";
+            questionDisplayEl.textContent = englishWord;
+            exampleSentenceDisplayEl.textContent = englishSentence;
+            audioWordButtonEl.style.display = 'none';
+            audioSentenceButtonEl.style.display = 'none';
+            wordLineContainerEl.style.display = 'flex';
+            sentenceLineContainerEl.style.display = 'flex';
             typeInputEl.value = '';
             typeInputEl.disabled = false;
-            typeInputEl.focus();
             checkTypeButton.onclick = () => {
                 processAnswer(vergleicheAntwort(typeInputEl.value, mainGermanWord), mainGermanWord);
                 typeInputEl.disabled = true;
             };
+            setTimeout(() => typeInputEl.focus(), 100);
+
+            // ===== NEUE ÄNDERUNG: Enter-Taste zum Bestätigen =====
+            typeInputEl.onkeydown = (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    if (!checkTypeButton.disabled) checkTypeButton.click();
+                }
+            };
+
+        } else if (currentMode === 'cloze-adj-de') {
+            clozeUiEl.style.display = 'block';
+            wordLineContainerEl.style.display = 'none';
+            sentenceLineContainerEl.style.display = 'none';
+            const clozeParts = currentWordData.cloze_parts;
+            const correctAnswer = currentWordData.cloze_answers[0];
+            clozeSentenceContainerEl.innerHTML = '';
+            if (clozeParts && clozeParts.length === 2 && correctAnswer) {
+                const part1 = document.createElement('span');
+                part1.textContent = clozeParts[0];
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'cloze-input-field';
+                input.className = 'cloze-input inline-block w-48 text-center border-b-2 border-gray-400 focus:border-blue-500 outline-none';
+                input.autocapitalize = 'off';
+                input.autocorrect = 'off';
+                input.autocomplete = 'off';
+                input.spellcheck = 'false';
+                const part2 = document.createElement('span');
+                part2.textContent = clozeParts[1];
+                clozeSentenceContainerEl.append(part1, input, part2);
+                checkClozeButton.onclick = () => {
+                    processAnswer(vergleicheAntwort(input.value, correctAnswer), correctAnswer);
+                    input.disabled = true;
+                };
+                setTimeout(() => input.focus(), 100);
+
+                // ===== NEUE ÄNDERUNG: Enter-Taste zum Bestätigen =====
+                input.onkeydown = (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        if (!checkClozeButton.disabled) checkClozeButton.click();
+                    }
+                };
+
+            } else {
+                clozeSentenceContainerEl.textContent = 'Für dieses Wort ist kein Lückentext verfügbar.';
+                checkClozeButton.onclick = null;
+            }
+
+        } else if (currentMode === 'sentence-translation-en-de') {
+            sentenceUiEl.style.display = 'block';
+            questionDisplayEl.textContent = currentWordData.example_en;
+            wordLineContainerEl.style.display = 'flex';
+            sentenceLineContainerEl.style.display = 'none';
+            audioWordButtonEl.style.display = 'none';
+            audioSentenceButtonEl.style.display = 'none';
+            const germanSentence = currentWordData.example_de;
+            const words = germanSentence.split_sentence_for_translation();
+            sentenceWordInputContainerEl.innerHTML = '';
+            
+            // ===== NEUE ÄNDERUNG: Enter-Taste zum Bestätigen =====
+            const handleEnter = (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    if (!checkSentenceButton.disabled) checkSentenceButton.click();
+                }
+            };
+
+            words.forEach((word, index) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'word-input-box';
+                input.setAttribute('data-index', index);
+                input.style.width = `${Math.max(word.length, 3) + 2}ch`;
+                input.addEventListener('keydown', handleEnter); // Listener hinzufügen
+                sentenceWordInputContainerEl.appendChild(input);
+            });
+            checkSentenceButton.onclick = () => {
+                const inputs = sentenceWordInputContainerEl.querySelectorAll('input');
+                const userInputArray = Array.from(inputs).map(input => input.value);
+                const userInputSentence = userInputArray.join(' ');
+                processAnswer(vergleicheAntwort(userInputSentence, germanSentence), germanSentence);
+                inputs.forEach(input => input.disabled = true);
+            };
+            if (sentenceWordInputContainerEl.firstChild) {
+                setTimeout(() => sentenceWordInputContainerEl.firstChild.focus(), 100);
+            }
         }
     }
 
+    // App initialisieren
     backToWortgruppenButton.addEventListener('click', showWortgruppenSelector);
+    
     document.querySelectorAll('#mode-selector .mode-button:not(.repeat-button)').forEach(button => {
-        button.addEventListener('click', () => setMode(button.id.replace('mode-', '')));
+        button.addEventListener('click', () => setMode(button.id.replace('mode-', ''), false));
     });
+    
+    document.querySelectorAll('#mode-selector .mode-button.repeat-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const baseModeId = button.id.replace('mode-repeat-', '');
+            setMode(baseModeId, true);
+        });
+    });
+
     continueButton.addEventListener('click', loadNextTask);
 
-    populateWortgruppenButtons();
+    loadGlobalProgress();
     showWortgruppenSelector();
 });
