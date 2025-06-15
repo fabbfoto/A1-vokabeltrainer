@@ -46,7 +46,7 @@
                     <button id="mode-repeat-type-land-adj" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm"><span class="count-display">0</span></button>
                 </div>
             </div>
-            </div>
+        </div>
 
         <div class="card">
             <div id="word-line-container" class="audio-line-container">
@@ -62,12 +62,20 @@
             <div id="mc-de-en-ui" class="ui-mode my-4">
                 <div id="mc-answers-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4"></div>
             </div>
-            <div id="type-de-adj-ui" class="ui-mode my-4 space-y-3">
-                <div class="single-word-input-container">
-                    <input type="text" id="type-de-adj-input" class="single-word-input" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
+            
+            <div id="spelling-mode-ui" class="ui-mode my-4 space-y-3">
+                <div id="single-input-container">
+                    <input type="text" id="spelling-input-single" class="single-word-input" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
                 </div>
-                <button id="check-type-de-adj-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
+
+                <div id="noun-input-container" class="hidden flex items-center gap-2">
+                    <input type="text" id="spelling-input-noun-1" class="single-word-input flex-grow" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
+                    <input type="text" id="spelling-input-noun-2" class="single-word-input flex-grow" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
+                </div>
+                
+                <button id="check-spelling-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
             </div>
+
             <div id="cloze-adj-de-ui" class="ui-mode my-4 space-y-3">
                 <div id="cloze-sentence-container" class="text-center text-xl"></div>
                 <button id="check-cloze-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
@@ -104,8 +112,7 @@
     </div>
 
     <script src="vokabular.js" defer></script>
-    <script src="helfer.js" defer></script>
-    <script src="trainer.js" defer></script>
+    <script type="module" src="trainer.js"></script>
     
 </body>
 </html>
