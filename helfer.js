@@ -1,19 +1,16 @@
+// helfer.js - Jetzt als Modul mit exportierten Funktionen
+
 /**
  * Ruft die Netlify Function auf, um Text über die Google TTS API vorlesen zu lassen.
- * @param {string} text Der vorzulesende Text.
- * @param {string} lang Die Sprache (z.B. 'de-DE').
  */
-async function speak(text, lang = 'de-DE') {
-  // Der Pfad zu deiner Netlify Function. Netlify leitet dies automatisch an die richtige Funktion weiter.
+export async function speak(text, lang = 'de-DE') {
   const NETLIFY_FUNCTION_PATH = '/.netlify/functions/getGoogleVoice';
 
-  // Falls gerade eine andere Audiodatei abgespielt wird, stoppe sie.
   if (window.currentAudio) {
       window.currentAudio.pause();
   }
 
   try {
-      // Sende den Text an deine "Küchen"-Funktion auf Netlify
       const response = await fetch(NETLIFY_FUNCTION_PATH, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -32,10 +29,9 @@ async function speak(text, lang = 'de-DE') {
       
       const audioContent = data.audioContent;
 
-      // Erstelle eine abspielbare Audio-Quelle aus der Antwort und spiele sie ab
       const audioSource = `data:audio/mp3;base64,${audioContent}`;
       const audio = new Audio(audioSource);
-      window.currentAudio = audio; // Speichere die aktuelle Audio-Instanz global
+      window.currentAudio = audio;
       audio.play();
 
   } catch (error) {
@@ -44,11 +40,10 @@ async function speak(text, lang = 'de-DE') {
   }
 }
 
-
 /**
 * Zerlegt einen Nomen-String in seine Bestandteile.
 */
-function parseNounString(nounString) {
+export function parseNounString(nounString) {
   if (!nounString) return null;
   if (nounString.includes('(Pl.)')) {
       return {
@@ -79,7 +74,7 @@ function parseNounString(nounString) {
 /**
 * Vergleicht die Antwort des Nutzers mit der korrekten Antwort.
 */
-function vergleicheAntwort(userAnswer, correctAnswer, options = {}) {
+export function vergleicheAntwort(userAnswer, correctAnswer, options = {}) {
   const config = {
       caseSensitive: options.caseSensitive !== false,
       ignorePunctuation: options.ignorePunctuation === true,
@@ -96,4 +91,38 @@ function vergleicheAntwort(userAnswer, correctAnswer, options = {}) {
       processedCorrectAnswer = processedCorrectAnswer.toLowerCase();
   }
   return processedUserAnswer === processedCorrectAnswer;
+}
+
+/**
+ * Wandelt deutsche Umschreibungen (ae, oe, ue, sz) in Umlaute und ß um.
+ */
+// In der Datei: helfer.js
+
+export function konvertiereUmlaute(text) {
+  return text
+    // Zuerst die komplett großgeschriebenen Fälle (z.B. bei Caps-Lock)
+    .replace(/AE/g, 'Ä')
+    .replace(/OE/g, 'Ö')
+    .replace(/UE/g, 'Ü')
+    // Dann die gemischte Schreibweise (typisch am Wortanfang)
+    .replace(/Ae/g, 'Ä')
+    .replace(/Oe/g, 'Ö')
+    .replace(/Ue/g, 'Ü')
+    // Dann die normale Kleinschreibung
+    .replace(/ae/g, 'ä')
+    .replace(/oe/g, 'ö')
+    .replace(/ue/g, 'ü')
+    // Und zum Schluss der Sonderfall ß
+    .replace(/ss/g, 'ß');
+}
+
+/**
+ * Mischt die Elemente eines Arrays zufällig durch.
+ */
+export function shuffleArray(array) { 
+    for (let i = array.length - 1; i > 0; i--) { 
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]]; 
+    } 
+    return array; 
 }
