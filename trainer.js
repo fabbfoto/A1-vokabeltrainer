@@ -1,4 +1,4 @@
-// trainer.js - Vollständige Version mit Fix für die Endlosschleife im Wiederholungsmodus
+// trainer.js - Vollständige Version mit Fix für die Audio-Buttons
 
 import * as dom from './dom.js';
 import state from './state.js';
@@ -63,6 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.audioWordButtonEl.onclick = () => speak(germanWordForDisplay);
         dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
         dom.audioSentenceButtonEl.onclick = () => speak(state.currentWordData.example_de, 'de-DE');
+
+        // *** KORREKTUR: Buttons wieder sichtbar machen ***
+        dom.audioWordButtonEl.style.display = 'inline-flex';
+        dom.audioSentenceButtonEl.style.display = 'inline-flex';
+
         dom.wordLineContainerEl.style.display = 'flex';
         dom.sentenceLineContainerEl.style.display = 'flex';
 
