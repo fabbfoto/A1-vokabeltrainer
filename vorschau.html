@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vokabeltrainer - Vorschau Minimal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .wortgruppe-button {
+            background-color: #e9e9ed;
+            border: 1px solid #d1d5db;
+            min-height: 70px;
+            border-radius: 0.5rem;
+        }
+        .action-button {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 0.5rem;
+            transition: background-color 0.2s;
+        }
+        .action-button:hover:not(:disabled) {
+            background-color: #2563eb;
+        }
+        .action-button:disabled {
+            background-color: #93c5fd;
+            cursor: not-allowed;
+        }
+        .test-option-card {
+            border: 2px solid #e5e7eb;
+            padding: 1.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 500;
+            color: #374151;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .test-option-card.selected {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+        .hidden-view { display: none !important; }
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen">
+
+    <button id="open-preview-button" class="px-6 py-3 bg-white rounded-lg shadow-lg font-semibold">Test-Modal anzeigen</button>
+
+    <div id="test-selection-modal" class="hidden-view fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-40">
+        <div id="test-modal-content" class="w-full max-w-lg bg-white p-8 rounded-lg shadow-xl">
+            
+            <div id="test-options-grid" class="grid grid-cols-2 gap-4">
+                <div class="test-option-card" data-test-type="bedeutung">Bedeutung</div>
+                <div class="test-option-card" data-test-type="schreibweise">Schreibweise</div>
+                <div class="test-option-card" data-test-type="genus">Genus</div>
+                <div class="test-option-card" data-test-type="satzuebersetzung">Satzübersetzung</div>
+            </div>
+
+            <div class="mt-8 text-center">
+                <button id="confirm-test-start-button" class="action-button w-full sm:w-2/3 py-3 font-semibold" disabled>
+                    Test beginnen (36 Fragen)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('open-preview-button').addEventListener('click', () => {
+            document.getElementById('test-selection-modal').classList.remove('hidden-view');
+        });
+
+        const modal = document.getElementById('test-selection-modal');
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden-view');
+            }
+        });
+        
+        const cards = document.querySelectorAll('.test-option-card');
+        const confirmBtn = document.getElementById('confirm-test-start-button');
+
+        cards.forEach(card => {
+            card.addEventListener('click', () => {
+                cards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                confirmBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>

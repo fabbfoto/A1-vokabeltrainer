@@ -1,3 +1,4 @@
+/* style.css */
 body {
     font-family: 'Inter', sans-serif;
     display: flex;
@@ -23,7 +24,7 @@ body {
     background-color: #e9e9ed;
     color: #374151;
     border: 1px solid #d1d5db;
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     text-align: center;
     position: relative;
     min-height: 70px;
@@ -33,6 +34,7 @@ body {
     justify-content: center;
     padding-top: 0.5rem;
     padding-bottom: 0.5rem;
+    cursor: pointer;
 }
 
 .wortgruppe-button:not(:disabled):hover {
@@ -42,6 +44,15 @@ body {
 .wortgruppe-button:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* ===== NEU & WICHTIG ===== */
+/* Diese Regel sorgt dafür, dass der ausgewählte Button im Test-Modal hervorgehoben wird. */
+/* Sie nutzt denselben Stil wie die aktiven Modus-Buttons für ein konsistentes Design. */
+.wortgruppe-button.selected {
+    background-color: #3b82f6; /* Haupt-Akzentfarbe */
+    color: white;
+    border-color: #3b82f6;
 }
 
 .button-text-label {
@@ -299,3 +310,7 @@ body {
     width: 100%;
     height: 100%;
 }
+/* ===== ENTFERNT ===== */
+/* Die alten Klassen .test-start-button und .test-option-card wurden entfernt, */
+/* da das Styling jetzt über Tailwind-Klassen in trainer.js und die Wiederverwendung */
+/* von .wortgruppe-button in index.html realisiert wird. */

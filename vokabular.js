@@ -117,10 +117,66 @@ const goetheA1Wortschatz = {
         { "german": "Woche", "artikel": "die", "nomen_notation": "e Woche, -n", "plural": "Wochen", "english": "week", "example_de": "Nächste Woche hat er Geburtstag.", "example_en": "Next week is his birthday.", "cloze_parts": ["Nächste ", " hat er Geburtstag."], "cloze_answers": ["Woche"] },
         { "german": "Jahr", "artikel": "das", "nomen_notation": "s Jahr, -e", "plural": "Jahre", "english": "year", "example_de": "Das Jahr hat zwölf Monate.", "example_en": "The year has twelve months.", "cloze_parts": ["Das ", " hat zwölf Monate."], "cloze_answers": ["Jahr"] }
     ],
+    
     "Währungen": [
-        { "german": "Euro", "artikel": "der", "nomen_notation": "r Euro, -s", "plural": "Euros", "english": "Euro", "example_de": "Das Buch kostet zehn Euro.", "example_en": "The book costs ten euros.", "cloze_parts": ["Das Buch kostet zehn ", "."], "cloze_answers": ["Euro"] },
-        { "german": "Cent", "artikel": "der", "nomen_notation": "r Cent, -", "plural": "Cent", "english": "Cent", "example_de": "Ein Brötchen kostet 30 Cent.", "example_en": "A bread roll costs 30 cents.", "cloze_parts": ["Ein Brötchen kostet 30 ", "."], "cloze_answers": ["Cent"] }
+        { 
+            "german": "Euro", 
+            "artikel": "der", 
+            "nomen_notation": "r Euro, -", 
+            "plural": "Euro", 
+            "english": "Euro", 
+            "example_de": "Das Buch kostet zehn Euro.", 
+            "example_en": "The book costs ten euros.", 
+            "cloze_parts": ["Das Buch kostet zehn ", "."], 
+            "cloze_answers": ["Euro"] 
+        },
+        { 
+            "german": "Cent", 
+            "artikel": "der", 
+            "nomen_notation": "r Cent, -", 
+            "plural": "Cent", 
+            "english": "Cent", 
+            "example_de": "Ein Brötchen kostet 30 Cent.", 
+            "example_en": "A bread roll costs 30 cents.", 
+            "cloze_parts": ["Ein Brötchen kostet 30 ", "."], 
+            "cloze_answers": ["Cent"] 
+        },
+        { 
+            "german": "Geld", 
+            "artikel": "das", 
+            "nomen_notation": "s Geld, -er", 
+            "plural": "Gelder", 
+            "english": "money", 
+            "example_de": "Hast du genug Geld für das Ticket?", 
+            "example_en": "Do you have enough money for the ticket?", 
+            "cloze_parts": ["Hast du genug ", " für das Ticket?"], 
+            "cloze_answers": ["Geld"] 
+        },
+        { 
+            "german": "Münze", 
+            "artikel": "die", 
+            "nomen_notation": "e Münze, -n", 
+            "plural": "Münzen", 
+            "english": "coin", 
+            "example_de": "Ich brauche eine Münze für den Einkaufswagen.", 
+            "example_en": "I need a coin for the shopping cart.", 
+            "cloze_parts": ["Ich brauche eine ", " für den Einkaufswagen."], 
+            "cloze_answers": ["Münze"] 
+        },
+        { 
+            "german": "Schein", 
+            "artikel": "der", 
+            "nomen_notation": "r Schein, -e", 
+            "plural": "Scheine", 
+            "english": "bill/banknote", 
+            "example_de": "Er bezahlt mit einem großen Schein.", 
+            "example_en": "He pays with a large bill.", 
+            "cloze_parts": ["Er bezahlt mit einem großen ", "."], 
+            "cloze_answers": ["Schein"] 
+        }
     ],
+
+
     "Maße und Gewichte": [
         { "german": "Meter", "artikel": "der", "nomen_notation": "r Meter, -", "plural": "Meter", "english": "meter", "example_de": "Das Regal ist einen Meter breit.", "example_en": "The shelf is one meter wide.", "cloze_parts": ["Das Regal ist einen ", " breit."], "cloze_answers": ["Meter"] },
         { "german": "Kilometer", "artikel": "der", "nomen_notation": "r Kilometer, -", "plural": "Kilometer", "english": "kilometer", "example_de": "Wir fahren nur zwei Kilometer mit dem Auto.", "example_en": "We are only driving two kilometers by car.", "cloze_parts": ["Wir fahren nur zwei ", " mit dem Auto."], "cloze_answers": ["Kilometer"] },
