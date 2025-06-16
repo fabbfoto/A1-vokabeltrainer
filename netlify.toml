@@ -1,4 +1,11 @@
 [build]
-command = "echo 'No build needed'"
-publish = "public" # oder dein statisches Verzeichnis
-functions = "netlify/functions"
+  # Für unser Vanilla-JS-Projekt gibt es keinen Build-Befehl.
+  command = ""
+  
+  # Das ist die entscheidende Einstellung: Veröffentliche das Hauptverzeichnis (".").
+  publish = "."
+
+[functions]
+  # Der Ordner, in dem unsere Netlify Function liegt.
+  # Diese Zeile ist wichtig, damit Netlify deine Funktion findet.
+  directory = "netlify/functions"
