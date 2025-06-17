@@ -1,8 +1,14 @@
-// trainer.js - Vollständige, korrigierte und refaktorisierte Version
+// trainer.js - Angepasst für den Speicherort packages/trainer-basis/
 
-import state from './state.js';
-import { vergleicheAntwort, konvertiereUmlaute, shuffleArray } from './helfer.js';
-import * as uiModes from './ui-modes.js';
+// Import der Vokabeln aus dem gleichen Ordner
+import { goetheA1Wortschatz } from './vokabular.js';
+
+// Import des Zustands aus dem Hauptverzeichnis (zwei Ebenen nach oben)
+import state from '../../state.js';
+
+// Import der Helfer- und UI-Funktionen aus dem geteilten Ordner (zwei Ebenen nach oben, dann in /shared)
+import { vergleicheAntwort, konvertiereUmlaute, shuffleArray } from '../../shared/helfer.js';
+import * as uiModes from '../../shared/ui-modes.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -61,15 +67,15 @@ document.addEventListener('DOMContentLoaded', () => {
         testAccuracyBarEl = document.getElementById('test-accuracy-bar');
         SVG_SPEAKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 12H4a1 1 0 00-1 1v2a1 1 0 001 1h1.858l4.47 4.47A1 1 0 0012 20V4a1 1 0 00-1.672-.748L5.858 12z" /></svg>`;
     }
-    
+
     initializeDOMReferences();
-    
+
     if (typeof goetheA1Wortschatz === 'undefined' || typeof vergleicheAntwort === 'undefined') {
         console.error("KRITISCHER FEHLER: Wichtige Skript-Dateien (vokabular.js, helfer.js) fehlen oder sind fehlerhaft.");
         document.body.innerHTML = '<div style="padding: 2rem; text-align: center; font-family: sans-serif; background-color: #ffcccc; border: 2px solid red;"><h1>Fehler beim Laden</h1><p>Wichtige App-Daten konnten nicht geladen werden. Bitte überprüfe die Browser-Konsole (F12) für Details.</p></div>';
         return;
     }
-    
+
     const dom = {
         mcUiEl, mcAnswersContainerEl, questionDisplayEl, exampleSentenceDisplayEl, audioWordButtonEl,
         audioSentenceButtonEl, wordLineContainerEl, sentenceLineContainerEl, SVG_SPEAKER_ICON,
@@ -78,11 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
         clozeUiEl, clozeHintContainerEl, clozeSentenceContainerEl, checkClozeButton,
         sentenceUiEl, sentenceWordInputContainerEl, checkSentenceButton
     };
-    
+
     function showMessage(message, type = 'error', duration = 3000) { messageBoxEl.textContent = message; messageBoxEl.className = `fixed bottom-5 right-5 text-white p-3 rounded-lg shadow-xl ${type === 'success' ? 'bg-green-500' : type === 'info' ? 'bg-blue-500' : 'bg-red-500'}`; messageBoxEl.classList.remove('hidden'); setTimeout(() => messageBoxEl.classList.add('hidden'), duration); }
 
     const alleVokabeln = Object.values(goetheA1Wortschatz).flat();
-    
+
     const learningModes = {
         'mc-de-en': { name: "Bedeutung", setupFunc: () => uiModes.setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) },
         'type-de-adj': { name: "Schreibweise", setupFunc: () => uiModes.setupSpellingMode(dom, state, processAnswer) },
@@ -118,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleTestCompletion() {
         const accuracy = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) : 0;
-        
+
         if (!state.lastTestScores) state.lastTestScores = {};
         state.lastTestScores[state.currentMode] = {
             correct: state.correctInRound,
@@ -135,15 +141,15 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadNextTask() {
         hideAllUIs();
         if ((!state.currentVocabularySet || state.currentVocabularySet.length === 0) && state.shuffledVocabForMode.length === 0) return;
-        
+
         state.currentWordIndexInShuffled++;
 
         if (state.currentWordIndexInShuffled >= state.shuffledVocabForMode.length) {
             if (state.isTestModeActive) {
                 handleTestCompletion();
-                return; 
+                return;
             }
-            
+
             if (state.isRepeatSessionActive) {
                 showMessage('Alle Fehler wurden wiederholt!', 'success');
                 state.isRepeatSessionActive = false;
@@ -169,14 +175,14 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(`Keine Setup-Funktion für Modus "${state.currentMode}" gefunden.`);
         }
     }
-    
+
     function processAnswer(isCorrect, correctAnswer) {
         if (checkSpellingButton) checkSpellingButton.disabled = true;
         if (checkClozeButton) checkClozeButton.disabled = true;
         if (checkSentenceButton) checkSentenceButton.disabled = true;
 
         state.attemptedInRound++;
-        const wordId = `${state.currentWordData.german}-${state.currentWordData.english}`;
+        const wordId = `<span class="math-inline">\{state\.currentWordData\.german\}\-</span>{state.currentWordData.english}`;
         if (isCorrect) {
             state.correctInRound++;
             feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
@@ -197,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             continueButton.classList.remove('hidden');
         }
-        
+
         if (state.isTestModeActive) {
             updateTestStats();
         } else {
@@ -205,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         updateErrorCounts();
     }
-    
+
     function setMode(modeId, isRepeat = false) {
         state.currentMode = modeId;
         state.isTestModeActive = false;
@@ -218,13 +224,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.isRepeatSessionActive = false;
                 return;
             }
-            wordsForSession = alleVokabeln.filter(word => wordIdsToRepeat.has(`${word.german}-${word.english}`));
+            wordsForSession = alleVokabeln.filter(word => wordIdsToRepeat.has(`<span class="math-inline">\{word\.german\}\-</span>{word.english}`));
         } else {
             wordsForSession = [...state.currentVocabularySet];
         }
         state.shuffledVocabForMode = shuffleArray(wordsForSession);
         state.currentWordIndexInShuffled = -1;
-        state.correctInRound = 0; 
+        state.correctInRound = 0;
         state.attemptedInRound = 0;
         document.querySelectorAll('#mode-selector .mode-button').forEach(btn => btn.classList.remove('active', 'repeat-active'));
         document.getElementById(`mode-${modeId}`)?.classList.add('active');
@@ -261,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('goetheA1Progress');
         }
     }
-    
+
     function updateErrorCounts() {
         Object.keys(learningModes).forEach(mode => {
             const repeatButton = document.getElementById(`mode-repeat-${mode}`);
@@ -297,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         categoryStatsContainerEl.appendChild(itemsContainer);
     }
-    
+
     function populateWortgruppenButtons() {
         wortgruppenButtonsEl.innerHTML = '';
         const alleWortgruppenNamen = Object.keys(goetheA1Wortschatz);
@@ -339,7 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.currentWortgruppeName = wortgruppeName;
         state.isTestModeActive = false;
         state.currentVocabularySet = goetheA1Wortschatz[wortgruppeName] || [];
-        
+
         practiceStatsViewEl.classList.remove('hidden');
         testStatsViewEl.classList.add('hidden');
         modeButtonGridEl.classList.remove('hidden');
@@ -362,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateErrorCounts();
         setTimeout(() => setMode('mc-de-en'), 10);
     }
-    
+
     function updatePracticeStats() {
         correctInRoundPracticeEl.textContent = state.correctInRound;
         attemptedInRoundPracticeEl.textContent = state.attemptedInRound;
@@ -381,7 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const accuracyPercentage = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) * 100 : 0;
         testAccuracyBarEl.style.width = `${accuracyPercentage}%`;
     }
-    
+
     function erstelleTestAufgaben() {
         const alleWortgruppenNamen = Object.keys(goetheA1Wortschatz);
         let testAufgaben = [];
@@ -399,7 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function starteGesamtTest(modus) {
         const aufgaben = erstelleTestAufgaben();
         const anzahlAufgaben = aufgaben.length;
-        if (anzahlAufgaben < 1) { 
+        if (anzahlAufgaben < 1) {
             showMessage('Fehler: Es konnten nicht genügend Testaufgaben erstellt werden.', 'error');
             return;
         }
@@ -417,14 +423,14 @@ document.addEventListener('DOMContentLoaded', () => {
         hideAllUIs();
         const modusName = learningModes[modus]?.name || "Test";
         currentWortgruppeTitleEl.textContent = `Test - ${modusName}`;
-        
+
         practiceStatsViewEl.classList.add('hidden');
         testStatsViewEl.classList.remove('hidden');
         modeButtonGridEl.classList.add('hidden');
-        
+
         wortgruppenSelectorContainerEl.classList.add('hidden-view');
         trainerMainViewEl.classList.remove('hidden-view');
-        
+
         updateTestStats();
         updateErrorCounts();
         loadNextTask();
@@ -439,13 +445,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (score && progressBar) {
                 const percentage = score.accuracy * 100;
-                let barColor = '#374151'; 
+                let barColor = '#374151';
                 if (percentage > 66) {
-                    barColor = '#d69e2e'; 
+                    barColor = '#d69e2e';
                 } else if (percentage > 33) {
                     barColor = '#ef4444';
                 }
-                
+
                 progressBar.style.width = `${percentage}%`;
                 progressBar.style.backgroundColor = barColor;
             } else if (progressBar) {
@@ -458,7 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initTestModeListeners() {
         const testSelectionModalEl = document.getElementById('test-selection-modal');
         const testOptionsContainer = document.getElementById('test-options-grid');
-        
+
         wortgruppenButtonsEl.addEventListener('click', (event) => {
             const testButton = event.target.closest('#start-test-mode-btn');
             if (testButton) {
@@ -486,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.lastTestScores = {};
         loadGlobalProgress();
         loadLastTestScores();
-        
+
         dom.processAnswer = processAnswer;
 
         backToWortgruppenButton.addEventListener('click', showWortgruppenSelector);
@@ -502,6 +508,6 @@ document.addEventListener('DOMContentLoaded', () => {
         showWortgruppenSelector();
         initTestModeListeners();
     }
-    
+
     init();
 });

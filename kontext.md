@@ -54,22 +54,41 @@ Typische Fehlerquelle - Event-Listener: Wir haben einen Bug behoben, bei dem ein
 * Im Test-Auswahlfenster werden die letzten Ergebnisse als farbcodierte Fortschrittsbalken angezeigt.
 ☑️ Fehlerbehebung: Alle bekannten Bugs, inklusive des "hängenden" Auswerten-Buttons im Lückentext-Modus, wurden behoben.
 
-6. Nächster Meilenstein (Offene Punkte)
+Coding-Assistent
+Absolut. Basierend auf unseren letzten Gesprächen und deinem Einverständnis habe ich einen neuen Abschnitt für deine kontext.md formuliert.
 
-Die App ist voll funktionsfähig, aber die Präsentation des Testergebnisses kann deutlich verbessert werden.
+Dieser Abschnitt fasst unseren Plan für die nächste große Version deiner App zusammen und ersetzt den bisherigen Punkt 6. Du kannst den folgenden Text einfach kopieren und den bestehenden Abschnitt 6. Nächster Meilenstein (Offene Punkte) in deiner Datei damit ersetzen.
 
-Ziel: Eine dedizierte Test-Auswertungsseite.
+6. Nächster Meilenstein: Thematische Neustrukturierung (Version 2.0)
 
-Anforderungen:
+Ziel:
+Das Projekt wird zur Version 2.0 weiterentwickelt, um den gesamten A1-Wortschatz aus der Goethe-Zertifikat A1 Wortliste abzubilden. Ziel ist es, den Lernenden eine klar strukturierte, thematische Lernumgebung zu bieten, die über die ursprünglichen 18 Wortgruppen  hinausgeht. Die App wird eine neue, dreistufige Navigationslogik erhalten, um die Vokabeln in kleinen, didaktisch sinnvollen Lerneinheiten zu präsentieren.
 
-Nach der 36. Testfrage soll nicht nur eine kurze Nachricht erscheinen, sondern eine richtige Ergebnisseite (oder ein großes Modal).
-Diese Seite muss die Endpunktzahl prominent anzeigen (z.B. "32 / 36 richtig!").
-Sie muss klare Handlungsaufforderungen bieten:
-Einen Button "Test wiederholen", um einen neuen Test desselben Typs zu starten.
-Einen Button "Zurück zur Übersicht", um zum Startbildschirm zurückzukehren.
-Bonus-Feature: Eine scrollbare Liste der Wörter, die im Test falsch beantwortet wurden. Die dafür nötige Information (state.wordsToRepeatByMode) wird bereits gesammelt.
+
+
+Anforderungen & Struktur:
+
+Drei-Ebenen-Navigation: Die neue Hauptnavigation basiert auf den übergeordneten Themen von Seite 5 des Goethe-PDFs (z.B. "Person", "Wohnen", "Reisen/Verkehr").
+
+
+Ebene 1: Der Nutzer wählt ein Haupt-Thema.
+Ebene 2: Eine neue Menü-Ebene zeigt die zugehörigen Unter-Themen an (z.B. für "Person": "Name", "Adresse", "Geburtstag" etc.).
+Ebene 3: Die Auswahl eines Unter-Themas startet die jeweilige Trainingseinheit.
+Integrierte Grammatik ("Grammatik-Inseln"): Hochfrequente, grammatikalische Funktionswörter (sein, und, der etc.) werden nicht in einer separaten Kategorie isoliert. Stattdessen werden sie als spezielle, angereicherte Lerneinträge an den passendsten Stellen innerhalb der thematischen Blöcke platziert, um den Lernkontext zu wahren.
+
 Technische Umsetzung (TODOs):
 
-loadNextTask() anpassen: Die Funktion muss am Ende eines Tests nicht handleTestCompletion() aufrufen (welche zum Menü zurückkehrt), sondern eine neue Funktion showTestResults().
-HTML/CSS erstellen: Eine neue UI-Komponente für die Auswertung in index.html und style.css entwerfen.
-showTestResults() implementieren: Diese neue Funktion in trainer.js muss die Ergebnis-UI anzeigen, sie mit der Punktzahl und den falschen Wörtern befüllen und die Event-Listener für die neuen Buttons ("Wiederholen", "Zurück") einrichten.
+vokabular.js anpassen:
+
+Die Datenstruktur wird in ein verschachteltes JSON-Objekt überführt, das die Drei-Ebenen-Hierarchie abbildet: { "Haupt-Thema": { "Unter-Thema": [Array von Vokabel-Objekten] } }.
+Die Vokabel-Objekte werden detaillierter und enthalten explizite Felder für typ (Nomen, Verb), grammatikalische Eigenschaften (z.B. artikel, plural, partizip_ii, hilfsverb_perfekt) und Metadaten (z.B. is_grammar_focus: true für Grammatik-Inseln).
+trainer.js erweitern:
+
+Die Steuerungslogik muss um eine Funktion zur Darstellung und Verwaltung der neuen zweiten Menü-Ebene (Unter-Themen) erweitert werden.
+Die Logik zur Initialisierung des Trainings muss angepasst werden, um die Vokabeln aus der tieferen, verschachtelten Datenstruktur zu laden.
+ui-modes.js beibehalten:
+
+Die bestehenden Übungsmodi (setupClozeMode etc.) erfordern keine Änderungen. Sie sind abwärtskompatibel und können mit den neuen, reicheren Vokabel-Objekten arbeiten, indem sie die für sie unbekannten Felder einfach ignorieren.
+Entwicklungs-Workflow:
+
+Die gesamte Entwicklung für Version 2.0 findet auf einem dedizierten Feature-Branch (feature/drei-ebenen-struktur) statt, um die Stabilität des bestehenden, funktionierenden Deploy-Branches (v2.0-entwicklung) zu gewährleisten.
