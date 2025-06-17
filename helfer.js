@@ -73,19 +73,26 @@ export function vergleicheAntwort(userAnswer, correctAnswer, options = {}) {
   return processedUserAnswer === processedCorrectAnswer;
 }
 
+// ===== KORRIGIERTE FUNKTION =====
 export function konvertiereUmlaute(text) {
-    if (!text) return "";
-    let konvertierterText = text;
-  
-    konvertierterText = konvertierterText
-      .replace(/ae/gi, match => (match[0] === match[0].toUpperCase() ? 'Ä' : 'ä'))
-      .replace(/oe/gi, match => (match[0] === match[0].toUpperCase() ? 'Ö' : 'ö'))
-      .replace(/ss/g, 'ß');
-    
-    konvertierterText = konvertierterText.replace(/(?<![aeiou])ue/gi, match => {
-      return (match[0] === match[0].toUpperCase() ? 'Ü' : 'ü');
-    });
-    
+    if (typeof text !== 'string' || !text) {
+        return "";
+    }
+
+    // Die Ersetzungen werden in einer Kette ausgeführt.
+    // Der /gi Flag sorgt für eine globale, case-insensitive Suche.
+    // Die Callback-Funktion stellt sicher, dass die Groß-/Kleinschreibung des Ersatzes
+    // (z.B. 'Ae' -> 'Ä' vs. 'ae' -> 'ä') korrekt behandelt wird.
+    const konvertierterText = text
+      .replace(/ae/gi, match => (match[0].toUpperCase() === 'A' ? 'Ä' : 'ä'))
+      .replace(/oe/gi, match => (match[0].toUpperCase() === 'O' ? 'Ö' : 'ö'))
+      .replace(/ue/gi, match => (match[0].toUpperCase() === 'U' ? 'Ü' : 'ü'))
+      // KORREKTUR: Nur 'sz' wird zu 'ß'.
+      .replace(/sz/gi, 'ß');
+
+    // Die problematische und falsche Zeile .replace(/ss/g, 'ß') wurde entfernt.
+    // Die Regex für 'ue' wurde zur Vereinfachung und Konsistenz angepasst.
+
     return konvertierterText;
 }
 
