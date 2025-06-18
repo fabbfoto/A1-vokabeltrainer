@@ -13,8 +13,26 @@ export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
             displayGermanWord = parsed.isPluralOnly ? `die ${parsed.singular} (Pl.)` : `${{ 'r': 'der', 'e': 'die', 's': 'das' }[parsed.genus] || ''} ${parsed.singular}, ${parsed.pluralInfo}`;
         }
     }
+
+    // Anzeige des deutschen Wortes (Nomen mit Artikel)
     dom.questionDisplayEl.textContent = displayGermanWord;
-    dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_de;
+
+    // Anzeige des Beispielsatzes (ggf. mit Kasus-Farben)
+    dom.exampleSentenceDisplayEl.innerHTML = ''; // Vorherigen Inhalt löschen
+    if (Array.isArray(state.currentWordData.example_de)) {
+        state.currentWordData.example_de.forEach(part => {
+            const span = document.createElement('span');
+            span.textContent = part.text;
+            if (part.kasus && part.kasus !== 'none') {
+                span.className = `kasus-${part.kasus}`;
+            }
+            dom.exampleSentenceDisplayEl.appendChild(span);
+        });
+    } else {
+        dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_de;
+    }
+
+    // dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_de; // Diese Zeile ist redundant, wenn Array-Format verwendet wird
     dom.audioWordButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
     dom.audioWordButtonEl.onclick = () => speak(germanWordForDisplay);
     dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
@@ -39,8 +57,8 @@ export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
 
 export function setupSpellingMode(dom, state, processAnswer) {
     // ===== KORREKTUR =====
-    dom.checkSpellingButton.disabled = false;
-    
+    dom.checkSpellingButton.disabled = false ;
+
     if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
     dom.spellingModeUiEl.style.display = 'block';
     dom.questionDisplayEl.textContent = (state.currentWordData.english || "").split(',')[0].trim();
@@ -68,9 +86,9 @@ export function setupSpellingMode(dom, state, processAnswer) {
             const userInputPlural = dom.spellingInputNoun2El.value;
             const isSingularCorrect = vergleicheAntwort(userInputSingular, correctAnswerSingular);
             const isPluralCorrect = vergleicheAntwort(userInputPlural, correctAnswerPluralWord);
-            dom.spellingInputNoun1El.classList.add(isSingularCorrect ? 'correct-user-input' : 'incorrect-user-input');
+            dom.spellingInputNoun1El.classList.add(isSingularCorrect ? 'correct-user-input' : 'incorrect-user-input' );
             dom.spellingInputNoun2El.classList.add(isPluralCorrect ? 'correct-user-input' : 'incorrect-user-input');
-            const isOverallCorrect = isSingularCorrect && isPluralCorrect;
+            const isOverallCorrect = isSingularCorrect && isPluralCorrect ;
             const combinedCorrectAnswer = `${correctAnswerSingular} / ${correctAnswerPluralWord}`;
             processAnswer(isOverallCorrect, combinedCorrectAnswer);
             inputs.forEach(input => input.disabled = true);
@@ -83,7 +101,7 @@ export function setupSpellingMode(dom, state, processAnswer) {
         dom.singleInputContainerEl.classList.remove('hidden');
         dom.nounInputContainerEl.classList.add('hidden');
         const input = dom.spellingInputSingleEl;
-        input.value = ''; input.disabled = false;
+        input.value = ''; input.disabled = false ;
         input.addEventListener('focus', () => state.activeTextInput = input);
 
         dom.checkSpellingButton.onclick = () => {
@@ -103,7 +121,7 @@ export function setupSpellingMode(dom, state, processAnswer) {
 
 export function setupClozeAdjDeMode(dom, state, processAnswer) {
     // ===== KORREKTUR =====
-    dom.checkClozeButton.disabled = false;
+    dom.checkClozeButton.disabled = false ;
 
     if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
     dom.clozeUiEl.style.display = 'block';
@@ -141,7 +159,7 @@ export function setupClozeAdjDeMode(dom, state, processAnswer) {
 
 export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
     // ===== KORREKTUR =====
-    dom.checkSentenceButton.disabled = false;
+    dom.checkSentenceButton.disabled = false ;
     
     if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
     dom.sentenceUiEl.style.display = 'block';
@@ -149,13 +167,19 @@ export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
     dom.wordLineContainerEl.style.display = 'flex';
     dom.sentenceLineContainerEl.style.display = 'none';
     
-    const fullGermanSentence = state.currentWordData.example_de;
+    let fullGermanSentence = "";
+    if (Array.isArray(state.currentWordData.example_de)) {
+        // Rekonstruiere den Satz aus dem Array-Format
+        fullGermanSentence = state.currentWordData.example_de.map(part => part.text).join("");
+    } else {
+        fullGermanSentence = state.currentWordData.example_de || "";
+    }
     const correctWords = splitSentence(fullGermanSentence);
     
     dom.sentenceWordInputContainerEl.innerHTML = '';
-    
+
     const handleEnter = (event) => {
-        if (event.key === 'Enter' && !dom.checkSentenceButton.disabled) { event.preventDefault(); dom.checkSentenceButton.click(); }
+        if (event.key === 'Enter' && !dom.checkSentenceButton.disabled) { event.preventDefault(); dom.checkSentenceButton.click(); } 
     };
 
     const wordsForLayout = splitSentence(fullGermanSentence.replace(/[.!?]$/, ''));
@@ -163,7 +187,7 @@ export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
         const input = document.createElement('input');
         input.type = 'text';
         input.className = 'word-input-box input-field';
-        input.style.width = `${Math.max(word.length, 3) + 2}ch`;
+        input.style.width = `${Math.max(word.length, 3) + 2}ch` ;
         input.addEventListener('keydown', handleEnter);
         input.addEventListener('focus', () => state.activeTextInput = input);
         dom.sentenceWordInputContainerEl.appendChild(input);
@@ -178,7 +202,7 @@ export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
         }
 
         inputs.forEach((input, index) => {
-            const userAnswer = input.value;
+            const userAnswer = input.value ;
             const correctAnswer = correctWords[index] || ""; 
             const isWordCorrect = vergleicheAntwort(userAnswer, correctAnswer);
 

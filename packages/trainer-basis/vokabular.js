@@ -1,14 +1,115 @@
 export const goetheA1Wortschatz = {
     "Farben": [
-        { "id": "basis-1", german: "schwarz", english: "black", example_de: "Das Gegenteil von weiß ist schwarz.", example_en: "The opposite of white is black.", source_pdf_page: 21, cloze_parts: ["Das Gegenteil von weiß ist ", "."], cloze_answers: ["schwarz"]  },
-        { "id": "basis-2", german: "weiß", english: "white", example_de: "Der Sand ist so weiß wie Schnee.", example_en: "The sand is as white as snow.", source_pdf_page: 21, cloze_parts: ["Der Sand ist so ", " wie Schnee."], cloze_answers: ["weiß"]  },
-        { "id": "basis-3", german: "rot", english: "red", example_de: "Die Ampel ist rot.", example_en: "The traffic light is red.", _example_created: true, cloze_parts: ["Die Ampel ist ", "."], cloze_answers: ["rot"]  },
-        { "id": "basis-4", german: "gelb", english: "yellow", example_de: "Die Zitrone ist gelb.", example_en: "The lemon is yellow.", _example_created: true, cloze_parts: ["Die Zitrone ist ", "."], cloze_answers: ["gelb"]  },
-        { "id": "basis-5", german: "grün", english: "green", example_de: "Das Gras ist grün.", example_en: "The grass is green.", _example_created: true, cloze_parts: ["Das Gras ist ", "."], cloze_answers: ["grün"]  },
-        { "id": "basis-6", german: "blau", english: "blue", example_de: "Der Himmel ist blau.", example_en: "The sky is blue.", _example_created: true, cloze_parts: ["Der Himmel ist ", "."], cloze_answers: ["blau"]  },
-        { "id": "basis-7", german: "braun", english: "brown", example_de: "Der Bär ist braun.", example_en: "The bear is brown.", _example_created: true, cloze_parts: ["Der Bär ist ", "."], cloze_answers: ["braun"]  },
-        { "id": "basis-8", german: "grau", english: "grey", example_de: "Die Maus ist grau.", example_en: "The mouse is grey.", _example_created: true, cloze_parts: ["Die Maus ist ", "."], cloze_answers: ["grau"]  },
-        { "id": "basis-9", german: "blond", english: "blond", example_de: "Ihre Haare sind blond.", example_en: "Her hair is blond.", _example_created: true, cloze_parts: ["Ihre Haare sind ", "."], cloze_answers: ["blond"]  }
+        { 
+            "id": "basis-1", 
+            german: "schwarz", 
+            english: "black",
+            example_de: [
+                { "text": "Das Gegenteil", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "von weiß", "kasus": "dativ" }, // "von" regiert Dativ
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "schwarz", "kasus": "nominativ" }, // Prädikatsnomen
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The opposite of white is black.", 
+            source_pdf_page: 21, 
+            cloze_parts: ["Das Gegenteil von weiß ist ", "."], 
+            cloze_answers: ["schwarz"]  
+        },
+        { 
+            "id": "basis-2", 
+            german: "weiß", 
+            english: "white", 
+            example_de: [
+                { "text": "Der Sand", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "so", "kasus": "none" },
+                { "text": " ", "kasus": "none" },
+                { "text": "weiß", "kasus": "none" }, // Adjektiv als Teil des Prädikats
+                { "text": " ", "kasus": "none" },
+                { "text": "wie Schnee", "kasus": "nominativ" }, // Vergleich mit Nominativ
+                { "text": ".", "kasus": "none" }
+            ],
+            example_en: "The sand is as white as snow.", 
+            source_pdf_page: 21, 
+            cloze_parts: ["Der Sand ist so ", " wie Schnee."], 
+            cloze_answers: ["weiß"]  
+        },
+        { "id": "basis-3", german: "rot", english: "red", 
+          example_de: [
+                { "text": "Die Ampel", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "rot", "kasus": "none" }, // Adjektiv als Teil des Prädikats
+                { "text": ".", "kasus": "none" }
+            ],
+           example_en: "The traffic light is red.", _example_created: true, cloze_parts: ["Die Ampel ist ", "."], cloze_answers: ["rot"]  },
+        { "id": "basis-4", german: "gelb", english: "yellow", 
+            example_de: [
+                { "text": "Die Zitrone", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "gelb", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ],
+           example_en: "The lemon is yellow.", _example_created: true, cloze_parts: ["Die Zitrone ist ", "."], cloze_answers: ["gelb"]  },
+        { "id": "basis-5", german: "grün", english: "green", 
+            example_de: [
+                { "text": "Das Gras", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "grün", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The grass is green.", _example_created: true, cloze_parts: ["Das Gras ist ", "."], cloze_answers: ["grün"]  },
+        { "id": "basis-6", german: "blau", english: "blue", 
+            example_de: [
+                { "text": "Der Himmel", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "blau", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The sky is blue.", _example_created: true, cloze_parts: ["Der Himmel ist ", "."], cloze_answers: ["blau"]  },
+        { "id": "basis-7", german: "braun", english: "brown", 
+            example_de: [
+                { "text": "Der Bär", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "braun", "kasus": "none" }, // Kasus für "braun" hinzugefügt
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The bear is brown.", _example_created: true, cloze_parts: ["Der Bär ist ", "."], cloze_answers: ["braun"]  },
+        { "id": "basis-8", german: "grau", english: "grey", 
+            example_de: [
+                { "text": "Die Maus", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "grau", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The mouse is grey.", _example_created: true, cloze_parts: ["Die Maus ist ", "."], cloze_answers: ["grau"]  },
+        { "id": "basis-9", german: "blond", english: "blond", 
+            example_de: [
+                { "text": "Ihre Haare", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "sind", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "blond", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "Her hair is blond.", _example_created: true, cloze_parts: ["Ihre Haare sind ", "."], cloze_answers: ["blond"]  }
     ],
     "Monatsnamen": [
         { 
@@ -33,24 +134,163 @@ export const goetheA1Wortschatz = {
             example_en: "In January it is often cold.", 
             _example_created: true, 
             cloze_parts: ["Im ", " ist es oft kalt."], 
-            cloze_answers: ["Januar"] 
+            cloze_answers: ["Januar"]
         },
-        { "id": "basis-11", german: "Februar", artikel: "der", nomen_notation: "r Februar, -", plural: "Februare", english: "February", example_de: "Der Februar ist kurz.", example_en: "February is short.", _example_created: true, cloze_parts: ["Der ", " ist kurz."], cloze_answers: ["Februar"]  },
-        { "id": "basis-12", german: "März", artikel: "der", nomen_notation: "r März, -e", plural: "Märze", english: "March", example_de: "Im März beginnt der Frühling.", example_en: "In March spring begins.", _example_created: true, cloze_parts: ["Im ", " beginnt der Frühling."], cloze_answers: ["März"]  },
-        { "id": "basis-13", german: "April", artikel: "der", nomen_notation: "r April, -e", plural: "Aprile", english: "April", example_de: "Der April macht, was er will.", example_en: "April does what it wants.", _example_created: true, cloze_parts: ["Der ", " macht, was er will."], cloze_answers: ["April"]  },
-        { "id": "basis-14", german: "Mai", artikel: "der", nomen_notation: "r Mai, -e", plural: "Maie", english: "May", example_de: "Im Mai blühen viele Blumen.", example_en: "In May many flowers bloom.", _example_created: true, cloze_parts: ["Im ", " blühen viele Blumen."], cloze_answers: ["Mai"]  },
-        { "id": "basis-15", german: "Juni", artikel: "der", nomen_notation: "r Juni, -s", plural: "Junis", english: "June", example_de: "Der Juni hat lange Tage.", example_en: "June has long days.", _example_created: true, cloze_parts: ["Der ", " hat lange Tage."], cloze_answers: ["Juni"]  },
-        { "id": "basis-16", german: "Juli", artikel: "der", nomen_notation: "r Juli, -s", plural: "Julis", english: "July", example_de: "Im Juli ist es oft heiß.", example_en: "In July it is often hot.", _example_created: true, cloze_parts: ["Im ", " ist es oft heiß."], cloze_answers: ["Juli"]  },
-        { "id": "basis-17", german: "August", artikel: "der", nomen_notation: "r August, -e", plural: "Auguste", english: "August", example_de: "Viele Leute haben im August Urlaub.", example_en: "Many people have holidays in August.", _example_created: true, cloze_parts: ["Viele Leute haben im ", " Urlaub."], cloze_answers: ["August"]  },
-        { "id": "basis-18", german: "September", artikel: "der", nomen_notation: "r September, -", plural: "September", english: "September", example_de: "Im September beginnt die Schule.", example_en: "In September school begins.", _example_created: true, cloze_parts: ["Im ", " beginnt die Schule."], cloze_answers: ["September"]  },
-        { "id": "basis-19", german: "Oktober", artikel: "der", nomen_notation: "r Oktober, -", plural: "Oktober", english: "October", example_de: "Der Oktober ist oft golden.", example_en: "October is often golden.", _example_created: true, cloze_parts: ["Der ", " ist oft golden."], cloze_answers: ["Oktober"]  },
-        { "id": "basis-20", german: "November", artikel: "der", nomen_notation: "r November, -", plural: "November", english: "November", example_de: "Im November fallen die Blätter.", example_en: "In November the leaves fall.", _example_created: true, cloze_parts: ["Im ", " fallen die Blätter."], cloze_answers: ["November"]  },
-        { "id": "basis-21", german: "Dezember", artikel: "der", nomen_notation: "r Dezember, -", plural: "Dezember", english: "December", example_de: "Im Dezember ist Weihnachten.", example_en: "In December is Christmas.", _example_created: true, cloze_parts: ["Im ", " ist Weihnachten."], cloze_answers: ["Dezember"]  }
+        { "id": "basis-11", german: "Februar", artikel: "der", nomen_notation: "r Februar, -", plural: "Februare", english: "February", 
+            example_de: [
+                { "text": "Der Februar", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "kurz", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "February is short.", _example_created: true, cloze_parts: ["Der ", " ist kurz."], cloze_answers: ["Februar"]  },
+        { "id": "basis-12", german: "März", artikel: "der", nomen_notation: "r März, -e", plural: "Märze", english: "March", 
+            example_de: [
+                { "text": "Im März", "kasus": "dativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "beginnt", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "der Frühling", "kasus": "nominativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "In March spring begins.", _example_created: true, cloze_parts: ["Im ", " beginnt der Frühling."], cloze_answers: ["März"]  },
+        { "id": "basis-13", german: "April", artikel: "der", nomen_notation: "r April, -e", plural: "Aprile", english: "April", 
+            example_de: [
+                { "text": "Der April", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "macht", "kasus": "verb" },
+                { "text": ",", "kasus": "none" },
+                { "text": " ", "kasus": "none" },
+                { "text": "was", "kasus": "akkusativ" }, // Relativpronomen als Objekt
+                { "text": " ", "kasus": "none" },
+                { "text": "er", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "will", "kasus": "verb" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "April does what it wants.", _example_created: true, cloze_parts: ["Der ", " macht, was er will."], cloze_answers: ["April"]  },
+        { "id": "basis-14", german: "Mai", artikel: "der", nomen_notation: "r Mai, -e", plural: "Maie", english: "May", 
+            example_de: [
+                { "text": "Im Mai", "kasus": "dativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "blühen", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "viele Blumen", "kasus": "nominativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "In May many flowers bloom.", _example_created: true, cloze_parts: ["Im ", " blühen viele Blumen."], cloze_answers: ["Mai"]  },
+        { "id": "basis-15", german: "Juni", artikel: "der", nomen_notation: "r Juni, -s", plural: "Junis", english: "June", 
+            example_de: [
+                { "text": "Der Juni", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "hat", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "lange Tage", "kasus": "akkusativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "June has long days.", _example_created: true, cloze_parts: ["Der ", " hat lange Tage."], cloze_answers: ["Juni"]  },
+        { "id": "basis-16", german: "Juli", artikel: "der", nomen_notation: "r Juli, -s", plural: "Julis", english: "July", 
+            example_de: [
+                { "text": "Im Juli", "kasus": "dativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "es", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "oft", "kasus": "none" },
+                { "text": " ", "kasus": "none" },
+                { "text": "heiß", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "In July it is often hot.", _example_created: true, cloze_parts: ["Im ", " ist es oft heiß."], cloze_answers: ["Juli"]  },
+        { "id": "basis-17", german: "August", artikel: "der", nomen_notation: "r August, -e", plural: "Auguste", english: "August", 
+            example_de: [
+                { "text": "Viele Leute", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "haben", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "im August", "kasus": "dativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "Urlaub", "kasus": "akkusativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "Many people have holidays in August.", _example_created: true, cloze_parts: ["Viele Leute haben im ", " Urlaub."], cloze_answers: ["August"]  },
+        { "id": "basis-18", german: "September", artikel: "der", nomen_notation: "r September, -", plural: "September", english: "September", 
+            example_de: [
+                { "text": "Im September", "kasus": "dativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "beginnt", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "die Schule", "kasus": "nominativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "In September school begins.", _example_created: true, cloze_parts: ["Im ", " beginnt die Schule."], cloze_answers: ["September"]  },
+        { "id": "basis-19", german: "Oktober", artikel: "der", nomen_notation: "r Oktober, -", plural: "Oktober", english: "October", 
+            example_de: [
+                { "text": "Der Oktober", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "oft", "kasus": "none" },
+                { "text": " ", "kasus": "none" },
+                { "text": "golden", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "October is often golden.", _example_created: true, cloze_parts: ["Der ", " ist oft golden."], cloze_answers: ["Oktober"]  },
+        { "id": "basis-20", german: "November", artikel: "der", nomen_notation: "r November, -", plural: "November", english: "November", 
+            example_de: [
+                { "text": "Im November", "kasus": "dativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "fallen", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "die Blätter", "kasus": "nominativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "In November the leaves fall.", _example_created: true, cloze_parts: ["Im ", " fallen die Blätter."], cloze_answers: ["November"]  },
+        { "id": "basis-21", german: "Dezember", artikel: "der", nomen_notation: "r Dezember, -", plural: "Dezember", english: "December", 
+            example_de: [
+                { "text": "Im Dezember", "kasus": "dativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "Weihnachten", "kasus": "nominativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "In December is Christmas.", _example_created: true, cloze_parts: ["Im ", " ist Weihnachten."], cloze_answers: ["Dezember"]  }
     ],
     "Zahlen": [
-        { "id": "basis-22", german: "eins", english: "one", example_de: "Ich habe einen Apfel.", example_en: "I have one apple.", _example_created: true, cloze_parts: ["Ich habe ", " Apfel."], cloze_answers: ["einen"]  },
-        { "id": "basis-23", german: "zwei", english: "two", example_de: "Wir haben zwei Katzen.", example_en: "We have two cats.", _example_created: true, cloze_parts: ["Wir haben ", " Katzen."], cloze_answers: ["zwei"]  },
-        { "id": "basis-24", german: "drei", english: "three", example_de: "Drei Kinder spielen im Park.", example_en: "Three children are playing in the park.", _example_created: true, cloze_parts: ["", " Kinder spielen im Park."], cloze_answers: ["Drei"]  },
+        { "id": "basis-22", german: "eins", english: "one",
+            example_de: [
+                { "text": "Ich", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "habe", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "einen Apfel", "kasus": "akkusativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "I have one apple.", _example_created: true, cloze_parts: ["Ich habe ", " Apfel."], cloze_answers: ["einen"]  },
+        { "id": "basis-23", german: "zwei", english: "two", 
+            example_de: [
+                { "text": "Wir", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "haben", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "zwei Katzen", "kasus": "akkusativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "We have two cats.", _example_created: true, cloze_parts: ["Wir haben ", " Katzen."], cloze_answers: ["zwei"]  },
+        { "id": "basis-24", german: "drei", english: "three", 
+            example_de: [
+                { "text": "Drei Kinder", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "spielen", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "im Park", "kasus": "dativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "Three children are playing in the park.", _example_created: true, cloze_parts: ["", " Kinder spielen im Park."], cloze_answers: ["Drei"]  },
         { "id": "basis-25", german: "vier", english: "four", example_de: "Das Auto hat vier Räder.", example_en: "The car has four wheels.", _example_created: true, cloze_parts: ["Das Auto hat ", " Räder."], cloze_answers: ["vier"]  },
         { "id": "basis-26", german: "fünf", english: "five", example_de: "Eine Hand hat fünf Finger.", example_en: "A hand has five fingers.", _example_created: true, cloze_parts: ["Eine Hand hat ", " Finger."], cloze_answers: ["fünf"]  },
         { "id": "basis-27", german: "sechs", english: "six", example_de: "Er arbeitet sechs Tage die Woche.", example_en: "He works six days a week.", _example_created: true, cloze_parts: ["Er arbeitet ", " Tage die Woche."], cloze_answers: ["sechs"]  },
@@ -65,16 +305,86 @@ export const goetheA1Wortschatz = {
         { "id": "basis-36", german: "tausend", english: "thousand", example_de: "Die Stadt hat tausend Einwohner.", example_en: "The city has a thousand inhabitants.", _example_created: true, cloze_parts: ["Die Stadt hat ", " Einwohner."], cloze_answers: ["tausend"]  }
     ],
     "Uhrzeit": [
-        { "id": "basis-37", german: "sieben Uhr drei", english: "seven oh three (7:03)", example_de: "Es ist sieben Uhr drei.", example_en: "It is seven oh three.", _example_created: true, cloze_parts: ["Es ist ", "."], cloze_answers: ["sieben Uhr drei"]  },
-        { "id": "basis-38", german: "drei Uhr fünfzehn", english: "three fifteen (3:15)", example_de: "Der Zug fährt um drei Uhr fünfzehn.", example_en: "The train leaves at three fifteen.", _example_created: true, cloze_parts: ["Der Zug fährt um ", "."], cloze_answers: ["drei Uhr fünfzehn"]  },
-        { "id": "basis-39", german: "fünfzehn Uhr dreißig", english: "fifteen thirty (3:30 PM)", example_de: "Das Meeting ist um fünfzehn Uhr dreißig.", example_en: "The meeting is at fifteen thirty.", _example_created: true, cloze_parts: ["Das Meeting ist um ", "."], cloze_answers: ["fünfzehn Uhr dreißig"]  },
+        { "id": "basis-37", german: "sieben Uhr drei", english: "seven oh three (7:03)", 
+            example_de: [
+                { "text": "Es", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "sieben Uhr drei", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "It is seven oh three.", _example_created: true, cloze_parts: ["Es ist ", "."], cloze_answers: ["sieben Uhr drei"]  },
+        { "id": "basis-38", german: "drei Uhr fünfzehn", english: "three fifteen (3:15)", 
+            example_de: [
+                { "text": "Der Zug", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "fährt", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "um drei Uhr fünfzehn", "kasus": "none" }, // Zeitangabe
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The train leaves at three fifteen.", _example_created: true, cloze_parts: ["Der Zug fährt um ", "."], cloze_answers: ["drei Uhr fünfzehn"]  },
+        { "id": "basis-39", german: "fünfzehn Uhr dreißig", english: "fifteen thirty (3:30 PM)", 
+            example_de: [
+                { "text": "Das Meeting", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "um fünfzehn Uhr dreißig", "kasus": "none" }, // Zeitangabe
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The meeting is at fifteen thirty.", _example_created: true, cloze_parts: ["Das Meeting ist um ", "."], cloze_answers: ["fünfzehn Uhr dreißig"]  },
         { "id": "basis-40", german: "halb zwölf", english: "half past eleven (11:30)", example_de: "Wir treffen uns um halb zwölf.", example_en: "We meet at half past eleven.", _example_created: true, cloze_parts: ["Wir treffen uns um ", "."], cloze_answers: ["halb zwölf"]  },
         { "id": "basis-41", german: "ein Uhr", english: "one o'clock (13:00)", example_de: "Es ist jetzt genau ein Uhr.", example_en: "It is exactly one o'clock now.", _example_created: true, cloze_parts: ["Es ist jetzt genau ", "."], cloze_answers: ["ein Uhr"]  }
     ],
     "Berufe": [
-        { "id": "basis-42", "german": "Architekt", "artikel": "der", "nomen_notation": "r Architekt, -en", "plural": "Architekten", "english": "architect", "example_de": "Ich möchte Architekt werden.", "example_en": "I want to become an architect.", "cloze_parts": ["Ich möchte ", " werden."], "cloze_answers": ["Architekt"]  },
-        { "id": "basis-43", "german": "Hausmann", "artikel": "der", "nomen_notation": "r Hausmann, ä-er", "plural": "Hausmänner", "english": "house husband, stay-at-home dad", "example_de": "Sein Vater ist Hausmann und kümmert sich um die Kinder.", "example_en": "His father is a house husband and takes care of the children.", "cloze_parts": ["Sein Vater ist ", " und kümmert sich um die Kinder."], "cloze_answers": ["Hausmann"]  },
-        { "id": "basis-44", "german": "Hausfrau", "artikel": "die", "nomen_notation": "e Hausfrau, -en", "plural": "Hausfrauen", "english": "housewife", "example_de": "Ihre Mutter ist Hausfrau und arbeitet nicht im Büro.", "example_en": "Her mother is a housewife and does not work in an office.", "cloze_parts": ["Ihre Mutter ist ", " und arbeitet nicht im Büro."], "cloze_answers": ["Hausfrau"]  },
+        { "id": "basis-42", "german": "Architekt", "artikel": "der", "nomen_notation": "r Architekt, -en", "plural": "Architekten", "english": "architect", 
+            example_de: [
+                { "text": "Ich", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "möchte", "kasus": "verb" }, // Modalverb
+                { "text": " ", "kasus": "none" },
+                { "text": "Architekt", "kasus": "nominativ" }, // Prädikatsnomen
+                { "text": " ", "kasus": "none" },
+                { "text": "werden", "kasus": "verb" }, // Vollverb
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "I want to become an architect.", "cloze_parts": ["Ich möchte ", " werden."], "cloze_answers": ["Architekt"]  },
+        { "id": "basis-43", "german": "Hausmann", "artikel": "der", "nomen_notation": "r Hausmann, ä-er", "plural": "Hausmänner", "english": "house husband, stay-at-home dad", 
+            example_de: [
+                { "text": "Sein Vater", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "Hausmann", "kasus": "nominativ" }, // Prädikatsnomen
+                { "text": " ", "kasus": "none" },
+                { "text": "und", "kasus": "none" },
+                { "text": " ", "kasus": "none" },
+                { "text": "kümmert sich", "kasus": "verb" }, // Reflexives Verb
+                { "text": " ", "kasus": "none" },
+                { "text": "um die Kinder", "kasus": "akkusativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "His father is a house husband and takes care of the children.", "cloze_parts": ["Sein Vater ist ", " und kümmert sich um die Kinder."], "cloze_answers": ["Hausmann"]  },
+        { "id": "basis-44", "german": "Hausfrau", "artikel": "die", "nomen_notation": "e Hausfrau, -en", "plural": "Hausfrauen", "english": "housewife", 
+            example_de: [
+                { "text": "Ihre Mutter", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "Hausfrau", "kasus": "nominativ" }, // Prädikatsnomen
+                { "text": " ", "kasus": "none" },
+                { "text": "und", "kasus": "none" },
+                { "text": " ", "kasus": "none" },
+                { "text": "arbeitet", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "nicht", "kasus": "none" },
+                { "text": " ", "kasus": "none" },
+                { "text": "im Büro", "kasus": "dativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "Her mother is a housewife and does not work in an office.", "cloze_parts": ["Ihre Mutter ist ", " und arbeitet nicht im Büro."], "cloze_answers": ["Hausfrau"]  },
         { "id": "basis-45", "german": "Techniker", "artikel": "der", "nomen_notation": "r Techniker, -", "plural": "Techniker", "english": "technician", "example_de": "Ein Techniker repariert die kaputte Heizung.", "example_en": "A technician is repairing the broken heating.", "cloze_parts": ["Ein ", " repariert die kaputte Heizung."], "cloze_answers": ["Techniker"]  },
         { "id": "basis-46", "german": "Lehrer", "artikel": "der", "nomen_notation": "r Lehrer, -", "plural": "Lehrer", "english": "teacher", "example_de": "Sind Sie der neue Lehrer?", "example_en": "Are you the new teacher?", "cloze_parts": ["Sind Sie der neue ", "?"], "cloze_answers": ["Lehrer"]  },
         { "id": "basis-47", "german": "Künstler", "artikel": "der", "nomen_notation": "r Künstler, -", "plural": "Künstler", "english": "artist", "example_de": "Der Künstler malt ein Bild von der Stadt.", "example_en": "The artist is painting a picture of the city.", "cloze_parts": ["Der ", " malt ein Bild von der Stadt."], "cloze_answers": ["Künstler"]  },
@@ -85,23 +395,166 @@ export const goetheA1Wortschatz = {
         { "id": "basis-52", "german": "Sekretär", "artikel": "der", "nomen_notation": "r Sekretär, -e", "plural": "Sekretäre", "english": "secretary", "example_de": "Der Sekretär organisiert die Termine für seinen Chef.", "example_en": "The secretary organizes the appointments for his boss.", "cloze_parts": ["Der ", " organisiert die Termine für seinen Chef."], "cloze_answers": ["Sekretär"]  }
     ],
     "Familienmitglieder": [
-        { "id": "basis-53", "german": "Vater", "artikel": "der", "nomen_notation": "r Vater, ä-", "plural": "Väter", "english": "father", "example_de": "Mein Vater arbeitet bei einer Autofirma.", "example_en": "My father works at a car company.", "cloze_parts": ["Mein ", " arbeitet bei einer Autofirma."], "cloze_answers": ["Vater"]  },
-        { "id": "basis-54", "german": "Mutter", "artikel": "die", "nomen_notation": "e Mutter, ü-", "plural": "Mütter", "english": "mother", "example_de": "Meine Mutter ist arbeitslos.", "example_en": "My mother is unemployed.", "cloze_parts": ["Meine ", " ist arbeitslos."], "cloze_answers": ["Mutter"]  },
-        { "id": "basis-55", "german": "Eltern", "artikel": "die", "nomen_notation": "Eltern (Pl.)", "english": "parents", "example_de": "Meine Eltern leben in Spanien.", "example_en": "My parents live in Spain.", "cloze_parts": ["Meine ", " leben in Spanien."], "cloze_answers": ["Eltern"]  },
-        { "id": "basis-56", "german": "Kind", "artikel": "das", "nomen_notation": "s Kind, -er", "plural": "Kinder", "english": "child", "example_de": "Die Kinder sind noch in der Schule.", "example_en": "The children are still at school.", "cloze_parts": ["Die ", " sind noch in der Schule."], "cloze_answers": ["Kinder"]  },
-        { "id": "basis-57", "german": "Bruder", "artikel": "der", "nomen_notation": "r Bruder, ü-", "plural": "Brüder", "english": "brother", "example_de": "Das ist mein Bruder.", "example_en": "This is my brother.", "cloze_parts": ["Das ist mein ", "."], "cloze_answers": ["Bruder"]  },
-        { "id": "basis-58", "german": "Schwester", "artikel": "die", "nomen_notation": "e Schwester, -n", "plural": "Schwestern", "english": "sister", "example_de": "Nächste Woche heiratet meine Schwester.", "example_en": "Next week my sister is getting married.", "cloze_parts": ["Nächste Woche heiratet meine ", "."], "cloze_answers": ["Schwester"]  },
-        { "id": "basis-59", "german": "Geschwister", "artikel": "die", "nomen_notation": "Geschwister (Pl.)", "english": "siblings", "example_de": "Hast du Geschwister?", "example_en": "Do you have siblings?", "cloze_parts": ["Hast du ", "?"], "cloze_answers": ["Geschwister"]  },
-        { "id": "basis-60", "german": "Tante", "artikel": "die", "nomen_notation": "e Tante, -n", "plural": "Tanten", "english": "aunt", "example_de": "Ich will meine Tante besuchen.", "example_en": "I want to visit my aunt.", "cloze_parts": ["Ich will meine ", " besuchen."], "cloze_answers": ["Tante"]  },
-        { "id": "basis-61", "german": "Onkel", "artikel": "der", "nomen_notation": "r Onkel, -", "plural": "Onkel", "english": "uncle", "example_de": "Der Computer ist ein Geschenk von meinem Onkel.", "example_en": "The computer is a gift from my uncle.", "cloze_parts": ["Der Computer ist ein Geschenk von meinem ", "."], "cloze_answers": ["Onkel"]  },
-        { "id": "basis-62", "german": "Großmutter", "artikel": "die", "nomen_notation": "e Großmutter, ü-", "plural": "Großmütter", "english": "grandmother", "example_de": "Meine Großmutter erzählt die besten Geschichten.", "example_en": "My grandmother tells the best stories.", "cloze_parts": ["Meine ", " erzählt die besten Geschichten."], "cloze_answers": ["Großmutter"]  },
-        { "id": "basis-63", "german": "Großvater", "artikel": "der", "nomen_notation": "r Großvater, ä-", "plural": "Großväter", "english": "grandfather", "example_de": "Mein Großvater ist schon sehr alt.", "example_en": "My grandfather is already very old.", "cloze_parts": ["Mein ", " ist schon sehr alt."], "cloze_answers": ["Großvater"]  },
-        { "id": "basis-64", "german": "Großeltern", "artikel": "die", "nomen_notation": "Großeltern (Pl.)", "english": "grandparents", "example_de": "Meine Großeltern wohnen nicht bei uns.", "example_en": "My grandparents do not live with us.", "cloze_parts": ["Meine ", " wohnen nicht bei uns."], "cloze_answers": ["Großeltern"]  }
+        { "id": "basis-53", "german": "Vater", "artikel": "der", "nomen_notation": "r Vater, ä-", "plural": "Väter", "english": "father", 
+            example_de: [
+                { "text": "Mein Vater", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "arbeitet", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "bei einer Autofirma", "kasus": "dativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "My father works at a car company.", "cloze_parts": ["Mein ", " arbeitet bei einer Autofirma."], "cloze_answers": ["Vater"]  },
+        { "id": "basis-54", "german": "Mutter", "artikel": "die", "nomen_notation": "e Mutter, ü-", "plural": "Mütter", "english": "mother", 
+            example_de: [
+                { "text": "Meine Mutter", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "arbeitslos", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "My mother is unemployed.", "cloze_parts": ["Meine ", " ist arbeitslos."], "cloze_answers": ["Mutter"]  },
+        { "id": "basis-55", "german": "Eltern", "artikel": "die", "nomen_notation": "Eltern (Pl.)", "english": "parents", 
+            example_de: [
+                { "text": "Meine Eltern", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "leben", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "in Spanien", "kasus": "dativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "My parents live in Spain.", "cloze_parts": ["Meine ", " leben in Spanien."], "cloze_answers": ["Eltern"]  },
+        { "id": "basis-56", "german": "Kind", "artikel": "das", "nomen_notation": "s Kind, -er", "plural": "Kinder", "english": "child", 
+            example_de: [
+                { "text": "Die Kinder", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "sind", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "noch", "kasus": "none" },
+                { "text": " ", "kasus": "none" },
+                { "text": "in der Schule", "kasus": "dativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The children are still at school.", "cloze_parts": ["Die ", " sind noch in der Schule."], "cloze_answers": ["Kinder"]  },
+        { "id": "basis-57", "german": "Bruder", "artikel": "der", "nomen_notation": "r Bruder, ü-", "plural": "Brüder", "english": "brother", 
+            example_de: [
+                { "text": "Das", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "mein Bruder", "kasus": "nominativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "This is my brother.", "cloze_parts": ["Das ist mein ", "."], "cloze_answers": ["Bruder"]  },
+        { "id": "basis-58", "german": "Schwester", "artikel": "die", "nomen_notation": "e Schwester, -n", "plural": "Schwestern", "english": "sister", 
+            example_de: [
+                { "text": "Nächste Woche", "kasus": "akkusativ" }, // Zeitangabe im Akkusativ
+                { "text": " ", "kasus": "none" },
+                { "text": "heiratet", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "meine Schwester", "kasus": "nominativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "Next week my sister is getting married.", "cloze_parts": ["Nächste Woche heiratet meine ", "."], "cloze_answers": ["Schwester"]  },
+        { "id": "basis-59", "german": "Geschwister", "artikel": "die", "nomen_notation": "Geschwister (Pl.)", "english": "siblings", 
+            example_de: [
+                { "text": "Hast", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "du", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "Geschwister", "kasus": "akkusativ" },
+                { "text": "?", "kasus": "none" }
+            ], 
+            example_en: "Do you have siblings?", "cloze_parts": ["Hast du ", "?"], "cloze_answers": ["Geschwister"]  },
+        { "id": "basis-60", "german": "Tante", "artikel": "die", "nomen_notation": "e Tante, -n", "plural": "Tanten", "english": "aunt", 
+            example_de: [
+                { "text": "Ich", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "will", "kasus": "verb" }, // Modalverb
+                { "text": " ", "kasus": "none" },
+                { "text": "meine Tante", "kasus": "akkusativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "besuchen", "kasus": "verb" }, // Vollverb
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "I want to visit my aunt.", "cloze_parts": ["Ich will meine ", " besuchen."], "cloze_answers": ["Tante"]  },
+        { "id": "basis-61", "german": "Onkel", "artikel": "der", "nomen_notation": "r Onkel, -", "plural": "Onkel", "english": "uncle", 
+            example_de: [
+                { "text": "Der Computer", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ein Geschenk", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "von meinem Onkel", "kasus": "dativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The computer is a gift from my uncle.", "cloze_parts": ["Der Computer ist ein Geschenk von meinem ", "."], "cloze_answers": ["Onkel"]  },
+        { "id": "basis-62", "german": "Großmutter", "artikel": "die", "nomen_notation": "e Großmutter, ü-", "plural": "Großmütter", "english": "grandmother", 
+            example_de: [
+                { "text": "Meine Großmutter", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "erzählt", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "die besten Geschichten", "kasus": "akkusativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "My grandmother tells the best stories.", "cloze_parts": ["Meine ", " erzählt die besten Geschichten."], "cloze_answers": ["Großmutter"]  },
+        { "id": "basis-63", "german": "Großvater", "artikel": "der", "nomen_notation": "r Großvater, ä-", "plural": "Großväter", "english": "grandfather", 
+            example_de: [
+                { "text": "Mein Großvater", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "ist", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "schon", "kasus": "none" },
+                { "text": " ", "kasus": "none" },
+                { "text": "sehr alt", "kasus": "none" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "My grandfather is already very old.", "cloze_parts": ["Mein ", " ist schon sehr alt."], "cloze_answers": ["Großvater"]  },
+        { "id": "basis-64", "german": "Großeltern", "artikel": "die", "nomen_notation": "Großeltern (Pl.)", "english": "grandparents", 
+            example_de: [
+                { "text": "Meine Großeltern", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "wohnen", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "nicht", "kasus": "none" },
+                { "text": " ", "kasus": "none" },
+                { "text": "bei uns", "kasus": "dativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "My grandparents do not live with us.", "cloze_parts": ["Meine ", " wohnen nicht bei uns."], "cloze_answers": ["Großeltern"]  }
     ], 
     "Feiertage": [
-        { "id": "basis-65", "german": "Ostern", "artikel": "das", "nomen_notation": "s Ostern, -", "plural": "Ostern", "english": "Easter", "example_de": "Was machst du an Ostern?", "example_en": "What are you doing at Easter?", "cloze_parts": ["Was machst du an ", "?"], "cloze_answers": ["Ostern"]  },
-        { "id": "basis-66", "german": "Weihnachten", "artikel": "das", "nomen_notation": "s Weihnachten, -", "plural": "Weihnachten", "english": "Christmas", "example_de": "Frohe Weihnachten!", "example_en": "Merry Christmas!", "cloze_parts": ["Frohe ", "!"], "cloze_answers": ["Weihnachten"]  },
-        { "id": "basis-67", "german": "Karneval", "artikel": "der", "nomen_notation": "r Karneval, -e", "plural": "Karnevale", "english": "carnival", "example_de": "Zu Karneval verkleiden sich die Leute.", "example_en": "People dress up for carnival.", "cloze_parts": ["Zu ", " verkleiden sich die Leute."], "cloze_answers": ["Karneval"]  }
+        { "id": "basis-65", "german": "Ostern", "artikel": "das", "nomen_notation": "s Ostern, -", "plural": "Ostern", "english": "Easter", 
+            example_de: [
+                { "text": "Was", "kasus": "akkusativ" }, // Fragepronomen, hier als Akkusativobjekt zu "machst"
+                { "text": " ", "kasus": "none" },
+                { "text": "machst", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "du", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "an Ostern", "kasus": "dativ" }, // Präposition "an" mit Dativ bei Zeitangaben
+                { "text": "?", "kasus": "none" }
+            ], 
+            example_en: "What are you doing at Easter?", "cloze_parts": ["Was machst du an ", "?"], "cloze_answers": ["Ostern"]  },
+        { "id": "basis-66", "german": "Weihnachten", "artikel": "das", "nomen_notation": "s Weihnachten, -", "plural": "Weihnachten", "english": "Christmas", 
+            example_de: [
+                { "text": "Frohe Weihnachten", "kasus": "akkusativ" }, // Fester Ausdruck, Akkusativ der Ausdehnung/des Wunsches
+                { "text": "!", "kasus": "none" }
+            ], 
+            example_en: "Merry Christmas!", "cloze_parts": ["Frohe ", "!"], "cloze_answers": ["Weihnachten"]  },
+        { "id": "basis-67", "german": "Karneval", "artikel": "der", "nomen_notation": "r Karneval, -e", "plural": "Karnevale", "english": "carnival", 
+            example_de: [
+                { "text": "Zu Karneval", "kasus": "dativ" }, // Präposition "zu" mit Dativ
+                { "text": " ", "kasus": "none" },
+                { "text": "verkleiden sich", "kasus": "verb" }, // Reflexives Verb
+                { "text": " ", "kasus": "none" },
+                { "text": "die Leute", "kasus": "nominativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "People dress up for carnival.", "cloze_parts": ["Zu ", " verkleiden sich die Leute."], "cloze_answers": ["Karneval"]  }
     ],
     "Jahreszeiten": [
         { "id": "basis-68", "german": "Frühling", "artikel": "der", "nomen_notation": "r Frühling, -e", "plural": "Frühlinge", "english": "spring", "example_de": "Im Frühling wird es wieder wärmer.", "example_en": "In spring it gets warmer again.", "cloze_parts": ["Im ", " wird es wieder wärmer."], "cloze_answers": ["Frühling"]  },
@@ -134,11 +587,60 @@ export const goetheA1Wortschatz = {
         { "id": "basis-89", "german": "Nacht", "artikel": "die", "nomen_notation": "e Nacht, ä-e", "plural": "Nächte", "english": "night", "example_de": "In der Nacht sind alle Katzen grau.", "example_en": "At night all cats are grey.", "cloze_parts": ["In der ", " sind alle Katzen grau."], "cloze_answers": ["Nacht"]  }
     ],
     "Zeitangaben": [
-        { "id": "basis-90", "german": "Minute", "artikel": "die", "nomen_notation": "e Minute, -n", "plural": "Minuten", "english": "minute", "example_de": "Eine Stunde hat sechzig Minuten.", "example_en": "An hour has sixty minutes.", "cloze_parts": ["Eine Stunde hat sechzig ", "."], "cloze_answers": ["Minuten"]  },
-        { "id": "basis-91", "german": "Stunde", "artikel": "die", "nomen_notation": "e Stunde, -n", "plural": "Stunden", "english": "hour", "example_de": "Der Unterricht dauert eine Stunde.", "example_en": "The lesson lasts for one hour.", "cloze_parts": ["Der Unterricht dauert eine ", "."], "cloze_answers": ["Stunde"]  },
-        { "id": "basis-92", "german": "Tag", "artikel": "der", "nomen_notation": "r Tag, -e", "plural": "Tage", "english": "day", "example_de": "Erika schreibt mir jeden Tag.", "example_en": "Erika writes to me every day.", "cloze_parts": ["Erika schreibt mir jeden ", "."], "cloze_answers": ["Tag"]  },
-        { "id": "basis-93", "german": "Woche", "artikel": "die", "nomen_notation": "e Woche, -n", "plural": "Wochen", "english": "week", "example_de": "Nächste Woche hat er Geburtstag.", "example_en": "Next week is his birthday.", "cloze_parts": ["Nächste ", " hat er Geburtstag."], "cloze_answers": ["Woche"]  },
-        { "id": "basis-94", "german": "Jahr", "artikel": "das", "nomen_notation": "s Jahr, -e", "plural": "Jahre", "english": "year", "example_de": "Das Jahr hat zwölf Monate.", "example_en": "The year has twelve months.", "cloze_parts": ["Das ", " hat zwölf Monate."], "cloze_answers": ["Jahr"]  }
+        { "id": "basis-90", "german": "Minute", "artikel": "die", "nomen_notation": "e Minute, -n", "plural": "Minuten", "english": "minute", 
+            example_de: [
+                { "text": "Eine Stunde", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "hat", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "sechzig Minuten", "kasus": "akkusativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "An hour has sixty minutes.", "cloze_parts": ["Eine Stunde hat sechzig ", "."], "cloze_answers": ["Minuten"]  },
+        { "id": "basis-91", "german": "Stunde", "artikel": "die", "nomen_notation": "e Stunde, -n", "plural": "Stunden", "english": "hour", 
+            example_de: [
+                { "text": "Der Unterricht", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "dauert", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "eine Stunde", "kasus": "akkusativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The lesson lasts for one hour.", "cloze_parts": ["Der Unterricht dauert eine ", "."], "cloze_answers": ["Stunde"]  },
+        { "id": "basis-92", "german": "Tag", "artikel": "der", "nomen_notation": "r Tag, -e", "plural": "Tage", "english": "day", 
+            example_de: [
+                { "text": "Erika", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "schreibt", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "mir", "kasus": "dativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "jeden Tag", "kasus": "akkusativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "Erika writes to me every day.", "cloze_parts": ["Erika schreibt mir jeden ", "."], "cloze_answers": ["Tag"]  },
+        { "id": "basis-93", "german": "Woche", "artikel": "die", "nomen_notation": "e Woche, -n", "plural": "Wochen", "english": "week", 
+            example_de: [
+                { "text": "Nächste Woche", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "hat", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "er", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "Geburtstag", "kasus": "nominativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "Next week is his birthday.", "cloze_parts": ["Nächste ", " hat er Geburtstag."], "cloze_answers": ["Woche"]  },
+        { "id": "basis-94", "german": "Jahr", "artikel": "das", "nomen_notation": "s Jahr, -e", "plural": "Jahre", "english": "year", 
+            example_de: [
+                { "text": "Das Jahr", "kasus": "nominativ" },
+                { "text": " ", "kasus": "none" },
+                { "text": "hat", "kasus": "verb" },
+                { "text": " ", "kasus": "none" },
+                { "text": "zwölf Monate", "kasus": "akkusativ" },
+                { "text": ".", "kasus": "none" }
+            ], 
+            example_en: "The year has twelve months.", "cloze_parts": ["Das ", " hat zwölf Monate."], "cloze_answers": ["Jahr"]  }
     ],
     
     "Währungen": [
@@ -309,7 +811,7 @@ export const goetheA1Wortschatz = {
     ]
 };
 
-const alleWortgruppenNamen = [
+export const alleWortgruppenNamen = [
     "Farben", "Monatsnamen", "Zahlen", "Uhrzeit", "Berufe", "Familienmitglieder", 
     "Feiertage", "Jahreszeiten", "Himmelsrichtungen", "Wochentage", "Tageszeiten", 
     "Zeitangaben", "Währungen", "Maße und Gewichte", "Schulen und Schulfächer", 

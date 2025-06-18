@@ -11,6 +11,7 @@ import { vergleicheAntwort, shuffleArray, setUIMode } from '../../shared/helfer.
 import * as uiModes from '../../shared/ui-modes.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("[trainer.js] DOMContentLoaded Event ausgelöst. Starte Initialisierung..."); // NEUER LOG
 
     // NEU: Ein zentrales State-Objekt, um den Zustand der App zu verwalten (kopiert von trainer-themen).
     const state = {
@@ -43,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         testStatsViewEl, testProgressTextEl, testProgressEl, testAccuracyTextEl, testAccuracyBarEl;
 
     function initializeDOMReferences() {
-        wortgruppenSelectorContainerEl = document.getElementById('wortgruppen-selector-container');
+        wortgruppenSelectorContainerEl = document.getElementById('wortgruppen-selector'); // ID korrigiert
         trainerMainViewEl = document.getElementById('trainer-main-view');
         wortgruppenButtonsEl = document.getElementById('wortgruppen-buttons');
         backToWortgruppenButton = document.getElementById('back-to-wortgruppen');
@@ -344,6 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showWortgruppenSelector() {
         // Zeichnet die Buttons und ihre Fortschrittsbalken jedes Mal neu
         populateWortgruppenButtons();
+        setUIMode('wortgruppen-selector'); // Sicherstellen, dass diese Ansicht aktiviert wird
     }
 
     function showTrainerForWortgruppe(wortgruppeName) {
@@ -368,8 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         currentWortgruppeTitleEl.textContent = wortgruppeName;
-        wortgruppenSelectorContainerEl.classList.add('hidden-view');
-        trainerMainViewEl.classList.remove('hidden-view');
+        setUIMode('trainer-main-view'); // Zur Trainer-Ansicht wechseln
         updatePracticeStats();
         updateErrorCounts();
         setTimeout(() => setMode('mc-de-en'), 10);
@@ -456,9 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
         practiceStatsViewEl.classList.add('hidden');
         testStatsViewEl.classList.remove('hidden');
         modeButtonGridEl.classList.add('hidden');
-
-        wortgruppenSelectorContainerEl.classList.add('hidden-view');
-        trainerMainViewEl.classList.remove('hidden-view');
+        setUIMode('trainer-main-view'); // Korrekte UI-Steuerung
 
         updateTestStats();
         updateErrorCounts();

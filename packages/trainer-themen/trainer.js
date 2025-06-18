@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         activeTextInput: null, // NEU: Für Umlaut-Buttons
     };
 
-    // Direkte Zuweisung der DOM-Elemente zu Variablen
+    // Direkte Zuweisung der DOM-Elemente zu Variablen 
     const navigationViewEl = document.getElementById('navigation-view');
     const trainerMainViewEl = document.getElementById('trainer-main-view');
     const navigationContainerEl = document.getElementById('navigation-container');
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const SVG_SPEAKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 12H4a1 1 0 00-1 1v2a1 1 0 001 1h1.858l4.47 4.47A1 1 0 0012 20V4a1 1 0 00-1.672-.748L5.858 12z" /></svg>`;
 
     // DOM-Elemente für die UI-Module bündeln
-    const dom = {
+    const dom = { 
         mcUiEl, mcAnswersContainerEl, questionDisplayEl, exampleSentenceDisplayEl, audioWordButtonEl,
         audioSentenceButtonEl, wordLineContainerEl, sentenceLineContainerEl, SVG_SPEAKER_ICON,
         spellingModeUiEl, checkSpellingButton, singleInputContainerEl, nounInputContainerEl,
@@ -339,13 +339,12 @@ document.addEventListener('DOMContentLoaded', () => {
         state.correctInRound = 0;
         state.attemptedInRound = 0;
         hideAllUIs();
+        trainerMainViewEl.classList.remove('hidden-view');
         const modusName = learningModes[modus]?.name || "Test";
         currentTrainingTitleEl.textContent = `Test - ${modusName}`;
         practiceStatsViewEl.classList.add('hidden');
         testStatsViewEl.classList.remove('hidden');
         modeButtonGridEl.classList.add('hidden');
-        navigationViewEl.classList.add('hidden-view');
-        trainerMainViewEl.classList.remove('hidden-view');
         updateTestStats();
         updateErrorCounts();
         loadNextTask();
@@ -461,10 +460,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function initUmlautButtons() {
         if (dom.umlautButtonsContainerEl) {
             const buttons = dom.umlautButtonsContainerEl.querySelectorAll('.umlaut-button');
-            buttons.forEach(button => {
-                button.addEventListener('click', () => insertTextAtCursor(state.activeTextInput, button.textContent));
+             buttons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const charToInsert = event.shiftKey ? button.textContent.toUpperCase() : button.textContent;
+                    insertTextAtCursor(state.activeTextInput, charToInsert);
+                });
             });
-        }
+         }
     }
     function initTestModeListeners() {
         testSelectionModalEl.addEventListener('click', (event) => { if (event.target === testSelectionModalEl) { testSelectionModalEl.classList.add('hidden-view'); } });

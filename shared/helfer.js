@@ -88,16 +88,42 @@ export function shuffleArray(array) {
  * @param {string} modeId Die ID des anzuzeigenden Containers.
  */
 export function setUIMode(modeId) {
+    console.log(`[setUIMode] Aufgerufen mit modeId: ${modeId}`); // Log-Eintrag
     const uiModes = document.querySelectorAll('.ui-mode');
+    console.log(`[setUIMode] ${uiModes.length} Elemente mit Klasse .ui-mode gefunden.`);
+    
+    if (uiModes.length === 0) {
+        console.warn("[setUIMode] Keine Elemente mit der Klasse '.ui-mode' gefunden. UI-Umschaltung funktioniert nicht.");
+    }
+
     uiModes.forEach(modeEl => {
+        console.log(`[setUIMode] Verarbeite Element: #${modeEl.id}`);
         if (modeEl.id === modeId) {
-            // Setzt den display-Stil auf den Standard zurück (wird sichtbar)
-            modeEl.style.display = '';
+            console.log(`[setUIMode] Zeige Element #${modeEl.id}`);
+            modeEl.classList.remove('hidden-view'); // Wichtig, um `display: none !important` zu entfernen
+            // Setzt den display-Stil explizit, um Sichtbarkeit sicherzustellen
+            if (modeEl.id === 'trainer-main-view' || modeEl.id === 'navigation-view') { // navigation-view ist für trainer-themen
+                modeEl.style.display = 'flex';
+            } else { // Dies gilt für 'wortgruppen-selector'
+                modeEl.style.display = 'block';
+            }
+            console.log(`[setUIMode] Style für #${modeEl.id}: display=${modeEl.style.display}, Klassen=${modeEl.className}`);
         } else {
-            // Versteckt das Element
+            console.log(`[setUIMode] Verstecke Element #${modeEl.id}`);
+            // Andere .ui-mode Elemente ausblenden
             modeEl.style.display = 'none';
+            console.log(`[setUIMode] Style für #${modeEl.id}: display=${modeEl.style.display}, Klassen=${modeEl.className}`);
         }
     });
+    
+    const activeElement = document.getElementById(modeId);
+    if (activeElement && activeElement.style.display !== 'none') {
+        console.log(`[setUIMode] Element #${modeId} sollte jetzt sichtbar sein.`);
+    } else if (activeElement) {
+        console.error(`[setUIMode] FEHLER: Element #${modeId} ist nach dem Anzeigen immer noch versteckt! display: ${activeElement.style.display}`);
+    } else {
+        console.error(`[setUIMode] FEHLER: Element mit ID #${modeId} wurde nicht im DOM gefunden!`);
+    }
 }
 // ===== NEU HINZUGEFÜGT =====
 // Zerlegt einen Satz in ein Array von Wörtern.
