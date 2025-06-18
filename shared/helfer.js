@@ -81,6 +81,24 @@ export function shuffleArray(array) {
     return array; 
 }
 
+/**
+ * Steuert die Sichtbarkeit der Haupt-Container der Anwendung.
+ * Versteckt alle Elemente mit der Klasse '.ui-mode' und zeigt nur das
+ * Element an, dessen ID mit der übergebenen modeId übereinstimmt.
+ * @param {string} modeId Die ID des anzuzeigenden Containers.
+ */
+export function setUIMode(modeId) {
+    const uiModes = document.querySelectorAll('.ui-mode');
+    uiModes.forEach(modeEl => {
+        if (modeEl.id === modeId) {
+            // Setzt den display-Stil auf den Standard zurück (wird sichtbar)
+            modeEl.style.display = '';
+        } else {
+            // Versteckt das Element
+            modeEl.style.display = 'none';
+        }
+    });
+}
 // ===== NEU HINZUGEFÜGT =====
 // Zerlegt einen Satz in ein Array von Wörtern.
 export function splitSentence(sentence) {

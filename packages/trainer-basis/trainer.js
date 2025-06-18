@@ -7,7 +7,7 @@ import { goetheA1Wortschatz } from './vokabular.js';
 // import state from '../../state.js'; // ENTFERNT: Verwenden lokales State-Objekt
 
 // Import der Helfer- und UI-Funktionen aus dem geteilten Ordner (zwei Ebenen nach oben, dann in /shared)
-import { vergleicheAntwort, shuffleArray } from './shared/helfer.js'; // konvertiereUmlaute entfernt
+import { vergleicheAntwort, shuffleArray, setUIMode } from '../../shared/helfer.js'; // konvertiereUmlaute entfernt, setUIMode hinzugefügt
 import * as uiModes from '../../shared/ui-modes.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -187,6 +187,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.globalProgress[state.currentWortgruppeName][state.currentMode].add(wordId);
                 state.masteredWordsByMode[state.currentMode]?.add(wordId);
                 state.wordsToRepeatByMode[state.currentMode]?.delete(wordId);
+
+                // Stelle sicher, dass die verschachtelten Objekte für den Fortschritt existieren
+                if (!state.globalProgress[state.currentWortgruppeName]) {
+                    state.globalProgress[state.currentWortgruppeName] = {};
+                }
+                if (!state.globalProgress[state.currentWortgruppeName][state.currentMode]) {
+                    state.globalProgress[state.currentWortgruppeName][state.currentMode] = new Set();
+                }
+
+                // Füge das aktuell gelernte Wort zum Set hinzu.
+                // Passe ggf. 'aktuellesWort.deutsch' an die tatsächliche Variable für das Wort an.
+                state.globalProgress[state.currentWortgruppeName][state.currentMode].add(state.currentWordData.german);
                 saveGlobalProgress();
             }
             setTimeout(() => { loadNextTask(); }, 1200);
@@ -330,9 +342,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showWortgruppenSelector() {
+        // Zeichnet die Buttons und ihre Fortschrittsbalken jedes Mal neu
         populateWortgruppenButtons();
-        wortgruppenSelectorContainerEl.classList.remove('hidden-view');
-        trainerMainViewEl.classList.add('hidden-view');
     }
 
     function showTrainerForWortgruppe(wortgruppeName) {
@@ -563,4 +574,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Erst danach wird die "init()"-Funktion aufgerufen, die den Rest der Anwendung startet.
     init();
+    // HIER EINFÜGEN (vor der letzten `});` Klammer)
+
+function displaySentence(vokabel, sentenceContainer) {
+    // Vorherigen Satz löschen
+    sentenceContainer.innerHTML = '';
+
+    if (!vokabel.beispielsatz) {
+        return; // Nichts zu tun, wenn kein Satz vorhanden ist
+    }
+
+    // Prüfen, ob der Beispielsatz das neue Array-Format hat
+    if (Array.isArray(vokabel.beispielsatz)) {
+        vokabel.beispielsatz.forEach(part => {
+            const span = document.createElement('span');
+            span.textContent = part.text;
+
+            // CSS-Klasse nur hinzufügen, wenn ein Kasus definiert ist (und nicht 'none')
+            if (part.kasus && part.kasus !== 'none') {
+                span.className = `kasus-${part.kasus}`;
+            }
+            sentenceContainer.appendChild(span);
+        });
+    } else {
+        // Fallback für alte Sätze, die nur Text sind
+        sentenceContainer.textContent = vokabel.beispielsatz;
+    }
+}
+
+// Bis hierhin kopieren
 });

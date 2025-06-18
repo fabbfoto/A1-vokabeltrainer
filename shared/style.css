@@ -282,3 +282,19 @@ body {
     width: 100%;
     justify-content: center; 
 }
+
+/* Stil für die Fortschrittsbalken der Wortgruppen */
+.progress-bar-container {
+    width: 100%;
+    background-color: #e0e0e0; /* Hintergrund des leeren Balkens */
+    border-radius: 4px;
+    height: 8px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    transition: width 0.4s ease-in-out; /* Animation für den Fortschritt */
+    width: 0%;
+}
