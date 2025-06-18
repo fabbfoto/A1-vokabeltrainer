@@ -1,3 +1,6 @@
 [build]
-  command = "mkdir -p dist/shared && cp packages/trainer-basis/index.html packages/trainer-basis/trainer.js dist/ && cp shared/style.css shared/helfer.js dist/shared/"
+  # Dieser Befehl kopiert jetzt ALLE benötigten Dateien.
+  command = "mkdir -p dist/shared && cp packages/trainer-basis/*.js packages/trainer-basis/*.html packages/trainer-basis/*.json dist/ && cp shared/*.js shared/*.css dist/shared/"
+
+  # Das Veröffentlichungs-Verzeichnis bleibt dasselbe.
   publish = "dist"
