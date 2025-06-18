@@ -6,22 +6,28 @@
     <title>Goethe A1 Vokabeltrainer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
+    
+    <link rel="manifest" href="/packages/trainer-themen/manifest.json">
+    
     <meta name="theme-color" content="#3b82f6">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="/shared/style.css">
 </head>
-<body>
-    <div id="wortgruppen-selector-container">
-        <h1 class="text-2xl font-bold text-center mb-6 text-gray-700">Goethe A1 - Wortgruppen</h1>
-        <div id="wortgruppen-buttons" class="grid grid-cols-3 gap-3">
-        </div>
+<body class="bg-gray-50">
+
+    <div id="navigation-view" class="p-4 max-w-2xl mx-auto">
+        <header class="flex items-center mb-6">
+            <button id="back-to-main-topics" class="hidden mr-4 px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&larr; Zurück</button>
+            <h1 id="navigation-title" class="text-2xl font-bold text-gray-700">Themen</h1>
+        </header>
+        <div id="navigation-container" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            </div>
     </div>
 
-    <div id="trainer-main-view" class="hidden-view w-full flex flex-col items-center">
-        <div id="mode-selector" class="p-2 bg-white rounded-lg shadow-md mb-4">
+    <div id="trainer-main-view" class="hidden-view p-4 max-w-2xl mx-auto flex flex-col items-center">
+        <div class="p-2 bg-white rounded-lg shadow-md mb-4 w-full">
             <div class="flex justify-between items-center mb-2">
-                <button id="back-to-wortgruppen" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&leftarrow; Zurück</button>
-                <h2 id="current-wortgruppe-title" class="text-lg font-semibold text-gray-700">Wortgruppe</h2>
+                <button id="back-to-subtopics" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&larr; Zurück</button>
+                <h2 id="current-training-title" class="text-lg font-semibold text-gray-700">Training</h2>
             </div>
             
             <div id="mode-button-grid" class="button-grid">
@@ -32,16 +38,29 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card w-full">
             <div id="word-line-container" class="audio-line-container"><div id="question-display-area"></div><button id="audio-word-button" class="audio-button" title="Wort vorspielen"></button></div>
             <div id="sentence-line-container" class="audio-line-container"><div id="example-sentence-display"></div><button id="audio-sentence-button" class="audio-button" title="Satz vorspielen"></button></div>
             <div id="task-prompt-area"></div>
 
             <div id="mc-de-en-ui" class="ui-mode my-4"><div id="mc-answers-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4"></div></div>
+            
             <div id="spelling-mode-ui" class="ui-mode my-4 space-y-3">
-                <div id="single-input-container"><input type="text" id="spelling-input-single" class="single-word-input" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></div>
-                <div id="noun-input-container" class="hidden flex items-center gap-2"><input type="text" id="spelling-input-noun-1" class="single-word-input flex-grow" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"><input type="text" id="spelling-input-noun-2" class="single-word-input flex-grow" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></div>
+                <div id="single-input-container" class="w-full flex">
+                    <input type="text" id="spelling-input-single" class="single-word-input w-full" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
+                </div>
+                <div id="noun-input-container" class="hidden flex items-center gap-2">
+                    <input type="text" id="spelling-input-noun-1" class="single-word-input flex-grow" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
+                    <input type="text" id="spelling-input-noun-2" class="single-word-input flex-grow" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
+                </div>
                 <button id="check-spelling-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
+            </div>
+            <!-- HINWEIS: Der vorherige umlaut-buttons-container wurde durch den folgenden Block ersetzt -->
+            <div id="umlaut-buttons" class="umlaut-buttons">
+                <button class="umlaut-btn" data-char="ä">ä</button>
+                <button class="umlaut-btn" data-char="ö">ö</button>
+                <button class="umlaut-btn" data-char="ü">ü</button>
+                <button class="umlaut-btn" data-char="ß">ß</button>
             </div>
             <div id="cloze-adj-de-ui" class="ui-mode my-4 space-y-3">
                 <div id="cloze-hint-container" class="text-center text-lg text-gray-500 mb-2" style="display: none;"></div>
@@ -64,7 +83,6 @@
                     <p class="text-xs text-gray-500 text-center mb-1">Fortschritt pro Übungsmodus:</p>
                     <div id="category-stats-container" class="text-xs text-gray-600 space-y-1"></div>
                 </div>
-
                 <div id="test-stats-view" class="hidden">
                     <p class="text-sm text-gray-600 text-center">Gesamtfortschritt: <span id="test-progress-text">0 / 36</span></p>
                     <div class="stats-bar-container"><div id="test-progress-bar" class="stats-bar bg-green-500" style="width: 0%;"></div></div>
@@ -73,45 +91,16 @@
                     <div class="stats-bar-container"><div id="test-accuracy-bar" class="stats-bar bg-blue-500" style="width: 0%;"></div></div>
                 </div>
             </div>
-            
             <div id="message-box" class="fixed bottom-5 right-5 bg-red-500 text-white p-3 rounded-lg shadow-xl hidden animate-pulse"></div>
         </div>
     </div>
 
     <div id="reward-popup" class="fixed inset-0 flex justify-center items-center hidden z-50 pointer-events-none"><div id="reward-content" class="text-center p-6 bg-white rounded-xl shadow-2xl"><span id="reward-emoji" class="text-7xl block mb-2"></span><p id="reward-text" class="text-xl font-semibold text-gray-700"></p></div></div>
-
-    <script src="vokabular.js" defer></script>
-    <script type="module" src="trainer.js"></script>
-    
     <div id="test-selection-modal" class="hidden-view fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-40">
-        <div id="test-modal-content" class="w-full max-w-lg bg-white p-8 rounded-lg shadow-xl">
-            <div id="test-options-grid" class="grid grid-cols-2 gap-4">
-                <button class="wortgruppe-button rounded-lg" data-test-type="mc-de-en">
-                    <span class="button-text-label">Bedeutung</span>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill"></div>
-                    </div>
-                </button>
-                <button class="wortgruppe-button rounded-lg" data-test-type="type-de-adj">
-                    <span class="button-text-label">Schreibweise</span>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill"></div>
-                    </div>
-                </button>
-                <button class="wortgruppe-button rounded-lg" data-test-type="cloze-adj-de">
-                    <span class="button-text-label">Lückentext</span>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill"></div>
-                    </div>
-                </button>
-                <button class="wortgruppe-button rounded-lg" data-test-type="sentence-translation-en-de">
-                    <span class="button-text-label">Satzübersetzung</span>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill"></div>
-                    </div>
-                </button>
-            </div>
-        </div>
     </div>
+
+    <script type="module" src="vokabular.js"></script>
+    <script type="module" src="trainer.js"></script>
+
 </body>
 </html>

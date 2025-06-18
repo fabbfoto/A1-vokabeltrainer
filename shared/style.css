@@ -1,4 +1,4 @@
-/* style.css */
+/* style.css - Bereinigte Version */
 body {
     font-family: 'Inter', sans-serif;
     display: flex;
@@ -8,16 +8,6 @@ body {
     min-height: 100vh;
     background-color: #f3f4f6;
     padding: 1rem;
-}
-
-#wortgruppen-selector-container {
-    width: 100%;
-    max-width: 750px;
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    margin-bottom: 1rem;
 }
 
 .wortgruppe-button {
@@ -32,9 +22,9 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding: 1rem; /* Angepasst für besseres Padding */
     cursor: pointer;
+    font-weight: 500;
 }
 
 .wortgruppe-button:not(:disabled):hover {
@@ -46,41 +36,10 @@ body {
     cursor: not-allowed;
 }
 
-/* ===== NEU & WICHTIG ===== */
-/* Diese Regel sorgt dafür, dass der ausgewählte Button im Test-Modal hervorgehoben wird. */
-/* Sie nutzt denselben Stil wie die aktiven Modus-Buttons für ein konsistentes Design. */
 .wortgruppe-button.selected {
-    background-color: #3b82f6; /* Haupt-Akzentfarbe */
+    background-color: #3b82f6;
     color: white;
     border-color: #3b82f6;
-}
-
-.button-text-label {
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    line-height: 1.2;
-    color: #374151;
-}
-
-.progress-bar-container {
-    width: 85%;
-    background-color: #ffffff;
-    border: 1px solid #d1d5db;
-    border-radius: 9999px;
-    height: 0.625rem;
-    overflow: hidden;
-    margin-top: 0.2rem;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    border-radius: 9999px;
-    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out, background-image 0.3s ease-in-out;
-}
-
-#mode-selector {
-    width: 100%;
-    max-width: 750px;
 }
 
 .card {
@@ -204,11 +163,6 @@ body {
     flex-wrap: wrap;
 }
 
-.word-input-box {
-    min-width: 5ch;
-    max-width: 18ch;
-}
-
 #question-display-area {
     min-height: 2em;
     text-align: center;
@@ -231,22 +185,6 @@ body {
     margin-bottom: 1rem;
     text-align: center;
     min-height: 1.5em;
-}
-
-.button-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-    gap: 0.5rem;
-}
-
-.single-word-input-container {
-    display: flex;
-    justify-content: center;
-}
-
-#type-de-adj-input {
-    max-width: 250px;
-    width: 100%;
 }
 
 .category-stat-item {
@@ -310,7 +248,37 @@ body {
     width: 100%;
     height: 100%;
 }
-/* ===== ENTFERNT ===== */
-/* Die alten Klassen .test-start-button und .test-option-card wurden entfernt, */
-/* da das Styling jetzt über Tailwind-Klassen in trainer.js und die Wiederverwendung */
-/* von .wortgruppe-button in index.html realisiert wird. */
+
+/* =================================================== */
+/* RESPONSIVE LÖSUNG FÜR DAS LAYOUT DER MODUS-BUTTONS  */
+/* =================================================== */
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .button-grid {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  .button-grid > div {
+    flex: 1;
+  }
+}
+
+/* =================================================== */
+/* KORREKTUREN FÜR DEN SCHREIBWEISE-MODUS              */
+/* =================================================== */
+#spelling-mode-ui {
+    min-height: 150px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+#single-input-container,
+#noun-input-container {
+    width: 100%;
+    justify-content: center; 
+}

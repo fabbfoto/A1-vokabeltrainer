@@ -1,9 +1,10 @@
 // ui-modes.js - Bugfix für den deaktivierten "Auswerten"-Button
 
-import { vergleicheAntwort, aktiviereUmlautKonverter, shuffleArray, speak, parseNounString, splitSentence } from './helfer.js';
+import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence } from './helfer.js';
 
 export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
     dom.mcUiEl.style.display = 'block';
+    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'none'; // Umlaut-Buttons ausblenden
     const germanWordForDisplay = state.currentWordData.german || "";
     let displayGermanWord = germanWordForDisplay;
     if (state.currentWordData.nomen_notation && typeof parseNounString === 'function') {
@@ -40,6 +41,7 @@ export function setupSpellingMode(dom, state, processAnswer) {
     // ===== KORREKTUR =====
     dom.checkSpellingButton.disabled = false;
     
+    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
     dom.spellingModeUiEl.style.display = 'block';
     dom.questionDisplayEl.textContent = (state.currentWordData.english || "").split(',')[0].trim();
     dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_en || "";
@@ -52,9 +54,13 @@ export function setupSpellingMode(dom, state, processAnswer) {
         dom.nounInputContainerEl.classList.remove('hidden');
         dom.singleInputContainerEl.classList.add('hidden');
         const inputs = [dom.spellingInputNoun1El, dom.spellingInputNoun2El];
-        inputs.forEach(input => { input.value = ''; input.disabled = false; aktiviereUmlautKonverter(input); });
+        inputs.forEach(input => { 
+            input.value = ''; 
+            input.disabled = false; 
+            input.addEventListener('focus', () => state.activeTextInput = input);
+        });
         const handleEnter = (event) => { if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) { event.preventDefault(); dom.checkSpellingButton.click(); } };
-        inputs.forEach(input => input.addEventListener('keydown', handleEnter));
+        inputs.forEach(input => { input.addEventListener('keydown', handleEnter); });
         dom.checkSpellingButton.onclick = () => {
             const correctAnswerSingular = `${state.currentWordData.artikel} ${state.currentWordData.german}`;
             const correctAnswerPluralWord = state.currentWordData.plural;
@@ -69,13 +75,17 @@ export function setupSpellingMode(dom, state, processAnswer) {
             processAnswer(isOverallCorrect, combinedCorrectAnswer);
             inputs.forEach(input => input.disabled = true);
         };
-        setTimeout(() => dom.spellingInputNoun1El.focus(), 100);
+        setTimeout(() => {
+            dom.spellingInputNoun1El.focus();
+            state.activeTextInput = dom.spellingInputNoun1El;
+        }, 100);
     } else {
         dom.singleInputContainerEl.classList.remove('hidden');
         dom.nounInputContainerEl.classList.add('hidden');
         const input = dom.spellingInputSingleEl;
         input.value = ''; input.disabled = false;
-        aktiviereUmlautKonverter(input);
+        input.addEventListener('focus', () => state.activeTextInput = input);
+
         dom.checkSpellingButton.onclick = () => {
             const correctAnswer = state.currentWordData.german;
             const isCorrect = vergleicheAntwort(input.value, correctAnswer);
@@ -84,7 +94,10 @@ export function setupSpellingMode(dom, state, processAnswer) {
             input.disabled = true;
         };
         input.onkeydown = (event) => { if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) { event.preventDefault(); dom.checkSpellingButton.click(); } };
-        setTimeout(() => input.focus(), 100);
+        setTimeout(() => {
+            input.focus();
+            state.activeTextInput = input;
+        }, 100);
     }
 }
 
@@ -92,6 +105,7 @@ export function setupClozeAdjDeMode(dom, state, processAnswer) {
     // ===== KORREKTUR =====
     dom.checkClozeButton.disabled = false;
 
+    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
     dom.clozeUiEl.style.display = 'block';
     dom.wordLineContainerEl.style.display = 'none';
     dom.sentenceLineContainerEl.style.display = 'none';
@@ -106,7 +120,8 @@ export function setupClozeAdjDeMode(dom, state, processAnswer) {
         input.type = 'text';
         input.className = 'cloze-input inline-block w-48 text-center border-b-2 border-gray-400 focus:border-blue-500 outline-none';
         input.autocapitalize = 'off';
-        aktiviereUmlautKonverter(input);
+        input.addEventListener('focus', () => state.activeTextInput = input);
+
         dom.clozeSentenceContainerEl.append(input);
         dom.clozeSentenceContainerEl.append(document.createTextNode(cloze_parts[1]));
         dom.checkClozeButton.onclick = () => {
@@ -114,7 +129,10 @@ export function setupClozeAdjDeMode(dom, state, processAnswer) {
             input.disabled = true;
         };
         input.onkeydown = (event) => { if (event.key === 'Enter' && !dom.checkClozeButton.disabled) { event.preventDefault(); dom.checkClozeButton.click(); } };
-        setTimeout(() => input.focus(), 100);
+        setTimeout(() => {
+            input.focus();
+            state.activeTextInput = input;
+        }, 100);
     } else {
         dom.clozeSentenceContainerEl.textContent = 'Für dieses Wort ist kein Lückentext verfügbar.';
         dom.checkClozeButton.onclick = null;
@@ -125,6 +143,7 @@ export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
     // ===== KORREKTUR =====
     dom.checkSentenceButton.disabled = false;
     
+    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
     dom.sentenceUiEl.style.display = 'block';
     dom.questionDisplayEl.textContent = state.currentWordData.example_en;
     dom.wordLineContainerEl.style.display = 'flex';
@@ -146,7 +165,7 @@ export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
         input.className = 'word-input-box input-field';
         input.style.width = `${Math.max(word.length, 3) + 2}ch`;
         input.addEventListener('keydown', handleEnter);
-        aktiviereUmlautKonverter(input);
+        input.addEventListener('focus', () => state.activeTextInput = input);
         dom.sentenceWordInputContainerEl.appendChild(input);
     });
 
@@ -178,6 +197,9 @@ export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
     };
 
     if (dom.sentenceWordInputContainerEl.firstChild) {
-        setTimeout(() => dom.sentenceWordInputContainerEl.firstChild.focus(), 100);
+        setTimeout(() => {
+            dom.sentenceWordInputContainerEl.firstChild.focus();
+            state.activeTextInput = dom.sentenceWordInputContainerEl.firstChild;
+        }, 100);
     }
 }

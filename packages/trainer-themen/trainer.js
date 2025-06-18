@@ -1,87 +1,105 @@
-// trainer.js - Vollständige, korrigierte und refaktorisierte Version
+// trainer.js - Vollständig angepasst für die 3-Ebenen-Navigation des Themen-Trainers
 
-import state from './state.js';
-import { vergleicheAntwort, konvertiereUmlaute, shuffleArray } from './shared/helfer.js';
-import * as uiModes from './shared/ui-modes.js';
+// GEÄNDERT: 'vokabular' wird aus der neuen, thematischen Datei importiert.
+import { vokabular } from './vokabular.js'; 
+import { vergleicheAntwort, shuffleArray, speak } from '/shared/helfer.js';
+import * as uiModes from '/shared/ui-modes.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    let wortgruppenSelectorContainerEl, trainerMainViewEl, wortgruppenButtonsEl, backToWortgruppenButton,
-        currentWortgruppeTitleEl, modeButtonGridEl, questionDisplayEl, exampleSentenceDisplayEl,
-        mcUiEl, mcAnswersContainerEl, spellingModeUiEl, singleInputContainerEl, spellingInputSingleEl,
-        nounInputContainerEl, spellingInputNoun1El, spellingInputNoun2El, checkSpellingButton,
-        clozeUiEl, clozeHintContainerEl, clozeSentenceContainerEl, checkClozeButton, sentenceUiEl,
-        sentenceWordInputContainerEl, checkSentenceButton, feedbackContainerEl, continueButton,
-        messageBoxEl, wordLineContainerEl, sentenceLineContainerEl, audioWordButtonEl, audioSentenceButtonEl,
-        SVG_SPEAKER_ICON,
-        practiceStatsViewEl, correctInRoundPracticeEl, attemptedInRoundPracticeEl, accuracyBarEl, categoryStatsContainerEl,
-        testStatsViewEl, testProgressTextEl, testProgressEl, testAccuracyTextEl, testAccuracyBarEl;
+    // NEU: Ein zentrales State-Objekt, um den Zustand der App zu verwalten.
+    const state = {
+        currentMainTopic: null,
+        currentSubTopic: null,
+        currentVocabularySet: [],
+        shuffledVocabForMode: [],
+        currentWordIndexInShuffled: -1,
+        currentWordData: null,
+        currentMode: null,
+        isTestModeActive: false,
+        isRepeatSessionActive: false,
+        correctInRound: 0,
+        attemptedInRound: 0,
+        globalProgress: {},
+        masteredWordsByMode: {},
+        wordsToRepeatByMode: {},
+        lastTestScores: {},
+        activeTextInput: null, // NEU: Für Umlaut-Buttons
+    };
 
-    function initializeDOMReferences() {
-        wortgruppenSelectorContainerEl = document.getElementById('wortgruppen-selector-container');
-        trainerMainViewEl = document.getElementById('trainer-main-view');
-        wortgruppenButtonsEl = document.getElementById('wortgruppen-buttons');
-        backToWortgruppenButton = document.getElementById('back-to-wortgruppen');
-        currentWortgruppeTitleEl = document.getElementById('current-wortgruppe-title');
-        modeButtonGridEl = document.getElementById('mode-button-grid');
-        questionDisplayEl = document.getElementById('question-display-area');
-        exampleSentenceDisplayEl = document.getElementById('example-sentence-display');
-        mcUiEl = document.getElementById('mc-de-en-ui');
-        mcAnswersContainerEl = document.getElementById('mc-answers-container');
-        spellingModeUiEl = document.getElementById('spelling-mode-ui');
-        singleInputContainerEl = document.getElementById('single-input-container');
-        spellingInputSingleEl = document.getElementById('spelling-input-single');
-        nounInputContainerEl = document.getElementById('noun-input-container');
-        spellingInputNoun1El = document.getElementById('spelling-input-noun-1');
-        spellingInputNoun2El = document.getElementById('spelling-input-noun-2');
-        checkSpellingButton = document.getElementById('check-spelling-button');
-        clozeUiEl = document.getElementById('cloze-adj-de-ui');
-        clozeHintContainerEl = document.getElementById('cloze-hint-container');
-        clozeSentenceContainerEl = document.getElementById('cloze-sentence-container');
-        checkClozeButton = document.getElementById('check-cloze-button');
-        sentenceUiEl = document.getElementById('sentence-translation-en-de-ui');
-        sentenceWordInputContainerEl = document.getElementById('sentence-word-input-container');
-        checkSentenceButton = document.getElementById('check-sentence-translation-button');
-        feedbackContainerEl = document.getElementById('feedback-container');
-        continueButton = document.getElementById('continue-button');
-        messageBoxEl = document.getElementById('message-box');
-        wordLineContainerEl = document.getElementById('word-line-container');
-        sentenceLineContainerEl = document.getElementById('sentence-line-container');
-        audioWordButtonEl = document.getElementById('audio-word-button');
-        audioSentenceButtonEl = document.getElementById('audio-sentence-button');
-        practiceStatsViewEl = document.getElementById('practice-stats-view');
-        correctInRoundPracticeEl = document.getElementById('correct-in-round-practice');
-        attemptedInRoundPracticeEl = document.getElementById('attempted-in-round-practice');
-        accuracyBarEl = document.getElementById('accuracy-bar');
-        categoryStatsContainerEl = document.getElementById('category-stats-container');
-        testStatsViewEl = document.getElementById('test-stats-view');
-        testProgressTextEl = document.getElementById('test-progress-text');
-        testProgressEl = document.getElementById('test-progress-bar');
-        testAccuracyTextEl = document.getElementById('test-accuracy-text');
-        testAccuracyBarEl = document.getElementById('test-accuracy-bar');
-        SVG_SPEAKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 12H4a1 1 0 00-1 1v2a1 1 0 001 1h1.858l4.47 4.47A1 1 0 0012 20V4a1 1 0 00-1.672-.748L5.858 12z" /></svg>`;
-    }
-    
-    initializeDOMReferences();
-    
-    if (typeof goetheA1Wortschatz === 'undefined' || typeof vergleicheAntwort === 'undefined') {
-        console.error("KRITISCHER FEHLER: Wichtige Skript-Dateien (vokabular.js, helfer.js) fehlen oder sind fehlerhaft.");
-        document.body.innerHTML = '<div style="padding: 2rem; text-align: center; font-family: sans-serif; background-color: #ffcccc; border: 2px solid red;"><h1>Fehler beim Laden</h1><p>Wichtige App-Daten konnten nicht geladen werden. Bitte überprüfe die Browser-Konsole (F12) für Details.</p></div>';
-        return;
-    }
-    
+    // Direkte Zuweisung der DOM-Elemente zu Variablen
+    const navigationViewEl = document.getElementById('navigation-view');
+    const trainerMainViewEl = document.getElementById('trainer-main-view');
+    const navigationContainerEl = document.getElementById('navigation-container');
+    const backToMainTopicsButton = document.getElementById('back-to-main-topics');
+    const navigationTitleEl = document.getElementById('navigation-title');
+    const backToSubtopicsButton = document.getElementById('back-to-subtopics');
+    const currentTrainingTitleEl = document.getElementById('current-training-title');
+    const modeButtonGridEl = document.getElementById('mode-button-grid');
+    const questionDisplayEl = document.getElementById('question-display-area');
+    const exampleSentenceDisplayEl = document.getElementById('example-sentence-display');
+    const mcUiEl = document.getElementById('mc-de-en-ui');
+    const mcAnswersContainerEl = document.getElementById('mc-answers-container');
+    const spellingModeUiEl = document.getElementById('spelling-mode-ui');
+    const singleInputContainerEl = document.getElementById('single-input-container');
+    const spellingInputSingleEl = document.getElementById('spelling-input-single');
+    const nounInputContainerEl = document.getElementById('noun-input-container');
+    const spellingInputNoun1El = document.getElementById('spelling-input-noun-1');
+    const spellingInputNoun2El = document.getElementById('spelling-input-noun-2');
+    const checkSpellingButton = document.getElementById('check-spelling-button');
+    const clozeUiEl = document.getElementById('cloze-adj-de-ui');
+    const clozeHintContainerEl = document.getElementById('cloze-hint-container');
+    const clozeSentenceContainerEl = document.getElementById('cloze-sentence-container');
+    const checkClozeButton = document.getElementById('check-cloze-button');
+    const sentenceUiEl = document.getElementById('sentence-translation-en-de-ui');
+    const sentenceWordInputContainerEl = document.getElementById('sentence-word-input-container');
+    const checkSentenceButton = document.getElementById('check-sentence-translation-button');
+    const feedbackContainerEl = document.getElementById('feedback-container');
+    const continueButton = document.getElementById('continue-button');
+    const messageBoxEl = document.getElementById('message-box');
+    const wordLineContainerEl = document.getElementById('word-line-container');
+    const sentenceLineContainerEl = document.getElementById('sentence-line-container');
+    const audioWordButtonEl = document.getElementById('audio-word-button');
+    const audioSentenceButtonEl = document.getElementById('audio-sentence-button');
+    const practiceStatsViewEl = document.getElementById('practice-stats-view');
+    const correctInRoundPracticeEl = document.getElementById('correct-in-round-practice');
+    const attemptedInRoundPracticeEl = document.getElementById('attempted-in-round-practice');
+    const accuracyBarEl = document.getElementById('accuracy-bar');
+    const categoryStatsContainerEl = document.getElementById('category-stats-container');
+    const testStatsViewEl = document.getElementById('test-stats-view');
+    const testProgressTextEl = document.getElementById('test-progress-text');
+    const testProgressEl = document.getElementById('test-progress-bar');
+    const testAccuracyTextEl = document.getElementById('test-accuracy-text');
+    const testAccuracyBarEl = document.getElementById('test-accuracy-bar');
+    const testSelectionModalEl = document.getElementById('test-selection-modal');
+    const testOptionsGridEl = document.getElementById('test-options-grid');
+    const umlautButtonsContainerEl = document.getElementById('umlaut-buttons-container');
+
+    const SVG_SPEAKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 12H4a1 1 0 00-1 1v2a1 1 0 001 1h1.858l4.47 4.47A1 1 0 0012 20V4a1 1 0 00-1.672-.748L5.858 12z" /></svg>`;
+
+    // DOM-Elemente für die UI-Module bündeln
     const dom = {
         mcUiEl, mcAnswersContainerEl, questionDisplayEl, exampleSentenceDisplayEl, audioWordButtonEl,
         audioSentenceButtonEl, wordLineContainerEl, sentenceLineContainerEl, SVG_SPEAKER_ICON,
         spellingModeUiEl, checkSpellingButton, singleInputContainerEl, nounInputContainerEl,
         spellingInputSingleEl, spellingInputNoun1El, spellingInputNoun2El,
         clozeUiEl, clozeHintContainerEl, clozeSentenceContainerEl, checkClozeButton,
-        sentenceUiEl, sentenceWordInputContainerEl, checkSentenceButton
+        sentenceUiEl, sentenceWordInputContainerEl, checkSentenceButton, umlautButtonsContainerEl
     };
     
+    // Original-Funktionen, die erhalten bleiben
     function showMessage(message, type = 'error', duration = 3000) { messageBoxEl.textContent = message; messageBoxEl.className = `fixed bottom-5 right-5 text-white p-3 rounded-lg shadow-xl ${type === 'success' ? 'bg-green-500' : type === 'info' ? 'bg-blue-500' : 'bg-red-500'}`; messageBoxEl.classList.remove('hidden'); setTimeout(() => messageBoxEl.classList.add('hidden'), duration); }
 
-    const alleVokabeln = Object.values(goetheA1Wortschatz).flat();
+    function getAllWords(vocabularyObject) {
+        let allWords = [];
+        for (const mainTopic of Object.values(vocabularyObject)) {
+            for (const subTopic of Object.values(mainTopic)) {
+                allWords.push(...subTopic);
+            }
+        }
+        return allWords;
+    }
+    const alleVokabeln = getAllWords(vokabular);
     
     const learningModes = {
         'mc-de-en': { name: "Bedeutung", setupFunc: () => uiModes.setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) },
@@ -114,36 +132,25 @@ document.addEventListener('DOMContentLoaded', () => {
         questionDisplayEl.textContent = '';
         exampleSentenceDisplayEl.textContent = '';
         [audioWordButtonEl, audioSentenceButtonEl].forEach(btn => { if(btn) { btn.onclick = null; btn.style.display = 'none'; } });
+        if (umlautButtonsContainerEl) umlautButtonsContainerEl.style.display = 'none';
     }
-
+    
     function handleTestCompletion() {
         const accuracy = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) : 0;
-        
         if (!state.lastTestScores) state.lastTestScores = {};
-        state.lastTestScores[state.currentMode] = {
-            correct: state.correctInRound,
-            total: state.attemptedInRound,
-            accuracy: accuracy
-        };
+        state.lastTestScores[state.currentMode] = { correct: state.correctInRound, total: state.attemptedInRound, accuracy: accuracy };
         saveLastTestScores();
-
         showMessage(`Test beendet! Ergebnis: ${state.correctInRound} / ${state.attemptedInRound}`, 'success', 5000);
         state.isTestModeActive = false;
-        showWortgruppenSelector();
+        displayMainTopics();
     }
 
     function loadNextTask() {
         hideAllUIs();
         if ((!state.currentVocabularySet || state.currentVocabularySet.length === 0) && state.shuffledVocabForMode.length === 0) return;
-        
         state.currentWordIndexInShuffled++;
-
         if (state.currentWordIndexInShuffled >= state.shuffledVocabForMode.length) {
-            if (state.isTestModeActive) {
-                handleTestCompletion();
-                return; 
-            }
-            
+            if (state.isTestModeActive) { handleTestCompletion(); return; }
             if (state.isRepeatSessionActive) {
                 showMessage('Alle Fehler wurden wiederholt!', 'success');
                 state.isRepeatSessionActive = false;
@@ -154,15 +161,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             state.currentWordIndexInShuffled = 0;
         }
-
         state.currentWordData = state.shuffledVocabForMode[state.currentWordIndexInShuffled];
         if (!state.currentWordData) {
             console.error("Kein Wort gefunden, versuche nächstes.");
             if(state.shuffledVocabForMode.length > 0 && state.currentWordIndexInShuffled < state.shuffledVocabForMode.length) loadNextTask();
             return;
         }
-        const modeIdToRun = state.currentMode;
-        const modeInfo = learningModes[modeIdToRun];
+        const modeInfo = learningModes[state.currentMode];
         if (modeInfo && typeof modeInfo.setupFunc === 'function') {
             modeInfo.setupFunc();
         } else {
@@ -176,14 +181,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (checkSentenceButton) checkSentenceButton.disabled = true;
 
         state.attemptedInRound++;
-        const wordId = `${state.currentWordData.german}-${state.currentWordData.english}`;
+        const wordId = state.currentWordData.id;
         if (isCorrect) {
             state.correctInRound++;
             feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
             if (wordId && !state.isTestModeActive) {
-                if (!state.globalProgress[state.currentWortgruppeName]) state.globalProgress[state.currentWortgruppeName] = {};
-                if (!state.globalProgress[state.currentWortgruppeName][state.currentMode]) state.globalProgress[state.currentWortgruppeName][state.currentMode] = new Set();
-                state.globalProgress[state.currentWortgruppeName][state.currentMode].add(wordId);
+                const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+                if (!state.globalProgress[progressKey]) state.globalProgress[progressKey] = {};
+                if (!state.globalProgress[progressKey][state.currentMode]) state.globalProgress[progressKey][state.currentMode] = new Set();
+                state.globalProgress[progressKey][state.currentMode].add(wordId);
                 state.masteredWordsByMode[state.currentMode]?.add(wordId);
                 state.wordsToRepeatByMode[state.currentMode]?.delete(wordId);
                 saveGlobalProgress();
@@ -198,11 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
             continueButton.classList.remove('hidden');
         }
         
-        if (state.isTestModeActive) {
-            updateTestStats();
-        } else {
-            updatePracticeStats();
-        }
+        if (state.isTestModeActive) { updateTestStats(); } else { updatePracticeStats(); }
         updateErrorCounts();
     }
     
@@ -218,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.isRepeatSessionActive = false;
                 return;
             }
-            wordsForSession = alleVokabeln.filter(word => wordIdsToRepeat.has(`${word.german}-${word.english}`));
+            wordsForSession = alleVokabeln.filter(word => wordIdsToRepeat.has(word.id));
         } else {
             wordsForSession = [...state.currentVocabularySet];
         }
@@ -226,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
         state.currentWordIndexInShuffled = -1;
         state.correctInRound = 0; 
         state.attemptedInRound = 0;
-        document.querySelectorAll('#mode-selector .mode-button').forEach(btn => btn.classList.remove('active', 'repeat-active'));
+        document.querySelectorAll('#mode-button-grid .mode-button').forEach(btn => btn.classList.remove('active', 'repeat-active'));
         document.getElementById(`mode-${modeId}`)?.classList.add('active');
         if (isRepeat) document.getElementById(`mode-repeat-${modeId}`)?.classList.add('repeat-active');
         loadNextTask();
@@ -288,7 +290,8 @@ document.addEventListener('DOMContentLoaded', () => {
         itemsContainer.className = 'text-xs text-gray-600 space-y-1';
         Object.keys(learningModes).forEach(modeId => {
             const modeInfo = learningModes[modeId];
-            const masteredCount = state.masteredWordsByMode[modeId]?.size || 0;
+            const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+            const masteredCount = state.globalProgress[progressKey]?.[modeId]?.size || 0;
             const percentage = totalItemsInSet > 0 ? (masteredCount / totalItemsInSet) * 100 : 0;
             const item = document.createElement('div');
             item.className = 'category-stat-item';
@@ -296,71 +299,6 @@ document.addEventListener('DOMContentLoaded', () => {
             itemsContainer.appendChild(item);
         });
         categoryStatsContainerEl.appendChild(itemsContainer);
-    }
-    
-    function populateWortgruppenButtons() {
-        wortgruppenButtonsEl.innerHTML = '';
-        const alleWortgruppenNamen = Object.keys(goetheA1Wortschatz);
-        alleWortgruppenNamen.forEach((name, index) => {
-            const button = document.createElement('button');
-            button.className = 'wortgruppe-button rounded-lg';
-            button.onclick = () => showTrainerForWortgruppe(name);
-            const totalWordsInGroup = goetheA1Wortschatz[name]?.length || 0;
-            const numberOfModes = 4;
-            const totalTasks = totalWordsInGroup * numberOfModes;
-            let completedTasks = 0;
-            if (state.globalProgress[name]) {
-                completedTasks = Object.values(state.globalProgress[name]).reduce((sum, set) => sum + set.size, 0);
-            }
-            const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-            let barColor;
-            if (index < 6) barColor = '#4a5568';
-            else if (index < 12) barColor = '#c53030';
-            else barColor = '#d69e2e';
-            button.innerHTML = `<span class="button-text-label">${name}</span><div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${percentage}%; background-color: ${barColor};"></div></div>`;
-            wortgruppenButtonsEl.appendChild(button);
-        });
-
-        const testButton = document.createElement('button');
-        testButton.id = 'start-test-mode-btn';
-        testButton.className = 'col-span-3 rounded-lg py-2 font-semibold bg-gray-300 hover:bg-gray-500 hover:text-white transition-colors duration-200';
-        testButton.innerHTML = `Test`;
-        wortgruppenButtonsEl.appendChild(testButton);
-    }
-
-    function showWortgruppenSelector() {
-        populateWortgruppenButtons();
-        wortgruppenSelectorContainerEl.classList.remove('hidden-view');
-        trainerMainViewEl.classList.add('hidden-view');
-    }
-
-    function showTrainerForWortgruppe(wortgruppeName) {
-        hideAllUIs();
-        state.currentWortgruppeName = wortgruppeName;
-        state.isTestModeActive = false;
-        state.currentVocabularySet = goetheA1Wortschatz[wortgruppeName] || [];
-        
-        practiceStatsViewEl.classList.remove('hidden');
-        testStatsViewEl.classList.add('hidden');
-        modeButtonGridEl.classList.remove('hidden');
-
-        state.masteredWordsByMode = {};
-        state.wordsToRepeatByMode = {};
-        const progressForGroup = state.globalProgress[state.currentWortgruppeName] || {};
-        Object.keys(learningModes).forEach(mode => {
-            state.masteredWordsByMode[mode] = new Set(progressForGroup[mode] || []);
-            state.wordsToRepeatByMode[mode] = new Set();
-        });
-        if (state.currentVocabularySet.length === 0) {
-            showMessage(`"${wortgruppeName}" ist leer oder konnte nicht geladen werden.`, 'info');
-            return;
-        }
-        currentWortgruppeTitleEl.textContent = wortgruppeName;
-        wortgruppenSelectorContainerEl.classList.add('hidden-view');
-        trainerMainViewEl.classList.remove('hidden-view');
-        updatePracticeStats();
-        updateErrorCounts();
-        setTimeout(() => setMode('mc-de-en'), 10);
     }
     
     function updatePracticeStats() {
@@ -376,36 +314,23 @@ document.addEventListener('DOMContentLoaded', () => {
         testProgressTextEl.textContent = `${state.attemptedInRound} / ${totalQuestions}`;
         const progressPercentage = totalQuestions > 0 ? (state.attemptedInRound / totalQuestions) * 100 : 0;
         testProgressEl.style.width = `${progressPercentage}%`;
-
         testAccuracyTextEl.textContent = `${state.correctInRound} / ${state.attemptedInRound}`;
         const accuracyPercentage = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) * 100 : 0;
         testAccuracyBarEl.style.width = `${accuracyPercentage}%`;
     }
     
     function erstelleTestAufgaben() {
-        const alleWortgruppenNamen = Object.keys(goetheA1Wortschatz);
-        let testAufgaben = [];
-        alleWortgruppenNamen.forEach(gruppenName => {
-            const gruppenVokabeln = goetheA1Wortschatz[gruppenName];
-            if (gruppenVokabeln && gruppenVokabeln.length > 0) {
-                const shuffledGruppe = shuffleArray([...gruppenVokabeln]);
-                const ausgewaehlteAufgaben = shuffledGruppe.slice(0, 2);
-                testAufgaben.push(...ausgewaehlteAufgaben);
-            }
-        });
-        return shuffleArray(testAufgaben);
+        return shuffleArray([...alleVokabeln]).slice(0, 36);
     }
 
     function starteGesamtTest(modus) {
         const aufgaben = erstelleTestAufgaben();
         const anzahlAufgaben = aufgaben.length;
-        if (anzahlAufgaben < 1) { 
-            showMessage('Fehler: Es konnten nicht genügend Testaufgaben erstellt werden.', 'error');
-            return;
-        }
+        if (anzahlAufgaben < 1) { showMessage('Fehler: Es konnten nicht genügend Testaufgaben erstellt werden.', 'error'); return; }
         state.isTestModeActive = true;
         state.currentMode = modus;
-        state.currentWortgruppeName = "Gesamttest";
+        state.currentMainTopic = "Gesamttest"; // Angepasst
+        state.currentSubTopic = modus; // Angepasst
         state.currentVocabularySet = aufgaben;
         state.shuffledVocabForMode = aufgaben;
         state.masteredWordsByMode = {};
@@ -413,18 +338,14 @@ document.addEventListener('DOMContentLoaded', () => {
         state.currentWordIndexInShuffled = -1;
         state.correctInRound = 0;
         state.attemptedInRound = 0;
-
         hideAllUIs();
         const modusName = learningModes[modus]?.name || "Test";
-        currentWortgruppeTitleEl.textContent = `Test - ${modusName}`;
-        
+        currentTrainingTitleEl.textContent = `Test - ${modusName}`;
         practiceStatsViewEl.classList.add('hidden');
         testStatsViewEl.classList.remove('hidden');
         modeButtonGridEl.classList.add('hidden');
-        
-        wortgruppenSelectorContainerEl.classList.add('hidden-view');
+        navigationViewEl.classList.add('hidden-view');
         trainerMainViewEl.classList.remove('hidden-view');
-        
         updateTestStats();
         updateErrorCounts();
         loadNextTask();
@@ -436,16 +357,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const testType = button.dataset.testType;
             const score = state.lastTestScores ? state.lastTestScores[testType] : null;
             const progressBar = button.querySelector('.progress-bar-fill');
-
             if (score && progressBar) {
                 const percentage = score.accuracy * 100;
                 let barColor = '#374151'; 
-                if (percentage > 66) {
-                    barColor = '#d69e2e'; 
-                } else if (percentage > 33) {
-                    barColor = '#ef4444';
-                }
-                
+                if (percentage > 66) { barColor = '#d69e2e'; } else if (percentage > 33) { barColor = '#ef4444'; }
                 progressBar.style.width = `${percentage}%`;
                 progressBar.style.backgroundColor = barColor;
             } else if (progressBar) {
@@ -455,31 +370,107 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function initTestModeListeners() {
-        const testSelectionModalEl = document.getElementById('test-selection-modal');
-        const testOptionsContainer = document.getElementById('test-options-grid');
+    // =========================================================================
+    // NEUE NAVIGATIONS-LOGIK
+    // =========================================================================
+    
+    function displayMainTopics() {
+        navigationViewEl.classList.remove('hidden-view');
+        trainerMainViewEl.classList.add('hidden-view');
+        navigationTitleEl.textContent = 'Themenübersicht';
+        backToMainTopicsButton.classList.add('hidden');
+        navigationContainerEl.innerHTML = '';
+
+        Object.keys(vokabular).forEach(topicName => {
+            const button = document.createElement('button');
+            button.className = 'wortgruppe-button rounded-lg';
+            button.textContent = topicName;
+            button.dataset.mainTopic = topicName;
+            navigationContainerEl.appendChild(button);
+        });
+
+        const testButton = document.createElement('button');
+        testButton.id = 'start-test-mode-btn';
+        testButton.className = 'col-span-2 sm:col-span-3 rounded-lg py-2 font-semibold bg-gray-300 hover:bg-gray-500 hover:text-white transition-colors duration-200';
+        testButton.textContent = `Gesamttest starten`;
+        navigationContainerEl.appendChild(testButton);
+    }
+
+    function displaySubTopics(mainTopicName) {
+        state.currentMainTopic = mainTopicName;
+        navigationTitleEl.textContent = mainTopicName;
+        backToMainTopicsButton.classList.remove('hidden');
+        navigationContainerEl.innerHTML = '';
+        Object.keys(vokabular[mainTopicName]).forEach(subTopicName => {
+            const button = document.createElement('button');
+            button.className = 'wortgruppe-button rounded-lg';
+            button.textContent = subTopicName;
+            button.dataset.subTopic = subTopicName;
+            navigationContainerEl.appendChild(button);
+        });
+    }
+
+    function startTraining(subTopicName) {
+        state.currentSubTopic = subTopicName;
+        const vocabularySet = vokabular[state.currentMainTopic][subTopicName];
+        if (!vocabularySet || vocabularySet.length === 0) { showMessage(`Keine Vokabeln für "${subTopicName}" gefunden.`, 'info'); return; }
         
-        wortgruppenButtonsEl.addEventListener('click', (event) => {
-            const testButton = event.target.closest('#start-test-mode-btn');
-            if (testButton) {
-                updateTestModeProgressBars();
-                testSelectionModalEl.classList.remove('hidden-view');
-            }
-        });
-        testSelectionModalEl.addEventListener('click', (event) => {
-            if (event.target === testSelectionModalEl) {
-                testSelectionModalEl.classList.add('hidden-view');
-            }
-        });
-        testOptionsContainer.addEventListener('click', (event) => {
-            const selectedButton = event.target.closest('.wortgruppe-button');
-            if (!selectedButton) return;
-            const selectedTestType = selectedButton.dataset.testType;
-            if (selectedTestType) {
-                testSelectionModalEl.classList.add('hidden-view');
-                starteGesamtTest(selectedTestType);
-            }
-        });
+        hideAllUIs();
+        state.isTestModeActive = false;
+        state.currentVocabularySet = vocabularySet;
+        const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+        const progressForGroup = state.globalProgress[progressKey] || {};
+        Object.keys(learningModes).forEach(mode => { state.masteredWordsByMode[mode] = new Set(progressForGroup[mode] || []); state.wordsToRepeatByMode[mode] = new Set(); });
+        
+        practiceStatsViewEl.classList.remove('hidden');
+        testStatsViewEl.classList.add('hidden');
+        modeButtonGridEl.classList.remove('hidden');
+        currentTrainingTitleEl.textContent = subTopicName;
+        navigationViewEl.classList.add('hidden-view');
+        trainerMainViewEl.classList.remove('hidden-view');
+        updatePracticeStats();
+        updateErrorCounts();
+        setTimeout(() => setMode('mc-de-en'), 10);
+    }
+
+    function handleNavigation(event) {
+        const mainTopicButton = event.target.closest('[data-main-topic]');
+        const subTopicButton = event.target.closest('[data-sub-topic]');
+        const testButton = event.target.closest('#start-test-mode-btn');
+
+        if (mainTopicButton) { displaySubTopics(mainTopicButton.dataset.mainTopic); } 
+        else if (subTopicButton) { startTraining(subTopicButton.dataset.subTopic); }
+        else if (testButton) { updateTestModeProgressBars(); testSelectionModalEl.classList.remove('hidden-view'); }
+    }
+    
+    // NEU: Funktion zum Einfügen von Text an der Cursorposition
+    function insertTextAtCursor(inputElement, text) {
+        if (!inputElement) return;
+        const start = inputElement.selectionStart;
+        const end = inputElement.selectionEnd;
+        const oldValue = inputElement.value;
+        inputElement.value = oldValue.substring(0, start) + text + oldValue.substring(end);
+        inputElement.selectionStart = inputElement.selectionEnd = start + text.length;
+        inputElement.focus(); // Wichtig, um den Fokus zu behalten/wiederherzustellen
+        // Manuell ein 'input'-Event auslösen, falls andere Logik darauf hört
+        const event = new Event('input', { bubbles: true, cancelable: true });
+        inputElement.dispatchEvent(event);
+    }
+
+    // NEU: Initialisiert die Umlaut-Buttons
+    function initUmlautButtons() {
+        if (dom.umlautButtonsContainerEl) {
+            const buttons = dom.umlautButtonsContainerEl.querySelectorAll('.umlaut-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => insertTextAtCursor(state.activeTextInput, button.textContent));
+            });
+        }
+    }
+    function initTestModeListeners() {
+        testSelectionModalEl.addEventListener('click', (event) => { if (event.target === testSelectionModalEl) { testSelectionModalEl.classList.add('hidden-view'); } });
+        if (testOptionsGridEl) {
+            testOptionsGridEl.addEventListener('click', (event) => { const selectedButton = event.target.closest('.wortgruppe-button'); if (!selectedButton) return; const selectedTestType = selectedButton.dataset.testType; if (selectedTestType) { testSelectionModalEl.classList.add('hidden-view'); starteGesamtTest(selectedTestType); } });
+        }
     }
 
     function init() {
@@ -487,20 +478,16 @@ document.addEventListener('DOMContentLoaded', () => {
         loadGlobalProgress();
         loadLastTestScores();
         
-        dom.processAnswer = processAnswer;
-
-        backToWortgruppenButton.addEventListener('click', showWortgruppenSelector);
-        Object.keys(learningModes).forEach(modeId => {
-            const button = document.getElementById(`mode-${modeId}`);
-            const repeatButton = document.getElementById(`mode-repeat-${modeId}`);
-            if (button) button.addEventListener('click', () => setMode(modeId, false));
-            if (repeatButton) repeatButton.addEventListener('click', () => setMode(modeId, true));
-        });
-        continueButton.addEventListener('click', () => {
-            loadNextTask();
-        });
-        showWortgruppenSelector();
+        navigationContainerEl.addEventListener('click', handleNavigation);
+        backToMainTopicsButton.addEventListener('click', displayMainTopics);
+        backToSubtopicsButton.addEventListener('click', () => { if (state.currentMainTopic) { displaySubTopics(state.currentMainTopic); } else { displayMainTopics(); } navigationViewEl.classList.remove('hidden-view'); trainerMainViewEl.classList.add('hidden-view'); });
+        
+        Object.keys(learningModes).forEach(modeId => { const button = document.getElementById(`mode-${modeId}`); const repeatButton = document.getElementById(`mode-repeat-${modeId}`); if (button) button.addEventListener('click', () => setMode(modeId, false)); if (repeatButton) repeatButton.addEventListener('click', () => setMode(modeId, true)); });
+        continueButton.addEventListener('click', loadNextTask);
+        
+        initUmlautButtons(); // NEU: Umlaut-Buttons initialisieren
         initTestModeListeners();
+        displayMainTopics();
     }
     
     init();

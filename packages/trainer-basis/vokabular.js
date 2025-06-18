@@ -1,4 +1,4 @@
-const goetheA1Wortschatz = {
+export const goetheA1Wortschatz = {
     "Farben": [
         { german: "schwarz", english: "black", example_de: "Das Gegenteil von weiß ist schwarz.", example_en: "The opposite of white is black.", source_pdf_page: 21, cloze_parts: ["Das Gegenteil von weiß ist ", "."], cloze_answers: ["schwarz"] },
         { german: "weiß", english: "white", example_de: "Der Sand ist so weiß wie Schnee.", example_en: "The sand is as white as snow.", source_pdf_page: 21, cloze_parts: ["Der Sand ist so ", " wie Schnee."], cloze_answers: ["weiß"] },

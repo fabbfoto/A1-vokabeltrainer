@@ -4,13 +4,32 @@
 import { goetheA1Wortschatz } from './vokabular.js';
 
 // Import des Zustands aus dem Hauptverzeichnis (zwei Ebenen nach oben)
-import state from '../../state.js';
+// import state from '../../state.js'; // ENTFERNT: Verwenden lokales State-Objekt
 
 // Import der Helfer- und UI-Funktionen aus dem geteilten Ordner (zwei Ebenen nach oben, dann in /shared)
-import { vergleicheAntwort, konvertiereUmlaute, shuffleArray } from '../../shared/helfer.js';
+import { vergleicheAntwort, shuffleArray } from '../../shared/helfer.js'; // konvertiereUmlaute entfernt
 import * as uiModes from '../../shared/ui-modes.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // NEU: Ein zentrales State-Objekt, um den Zustand der App zu verwalten (kopiert von trainer-themen).
+    const state = {
+        currentWortgruppeName: null, // Angepasst für Basis-Trainer
+        currentVocabularySet: [],
+        shuffledVocabForMode: [],
+        currentWordIndexInShuffled: -1,
+        currentWordData: null,
+        currentMode: null,
+        isTestModeActive: false,
+        isRepeatSessionActive: false,
+        correctInRound: 0,
+        attemptedInRound: 0,
+        globalProgress: {},
+        masteredWordsByMode: {},
+        wordsToRepeatByMode: {},
+        lastTestScores: {},
+        activeTextInput: null, // NEU: Für Umlaut-Buttons
+    };
 
     let wortgruppenSelectorContainerEl, trainerMainViewEl, wortgruppenButtonsEl, backToWortgruppenButton,
         currentWortgruppeTitleEl, modeButtonGridEl, questionDisplayEl, exampleSentenceDisplayEl,
@@ -18,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
         nounInputContainerEl, spellingInputNoun1El, spellingInputNoun2El, checkSpellingButton,
         clozeUiEl, clozeHintContainerEl, clozeSentenceContainerEl, checkClozeButton, sentenceUiEl,
         sentenceWordInputContainerEl, checkSentenceButton, feedbackContainerEl, continueButton,
-        messageBoxEl, wordLineContainerEl, sentenceLineContainerEl, audioWordButtonEl, audioSentenceButtonEl,
+        messageBoxEl, wordLineContainerEl, sentenceLineContainerEl, audioWordButtonEl, audioSentenceButtonEl, umlautButtonsContainerEl, // umlautButtonsContainerEl HINZUGEFÜGT
         SVG_SPEAKER_ICON,
         practiceStatsViewEl, correctInRoundPracticeEl, attemptedInRoundPracticeEl, accuracyBarEl, categoryStatsContainerEl,
         testStatsViewEl, testProgressTextEl, testProgressEl, testAccuracyTextEl, testAccuracyBarEl;
@@ -65,36 +84,11 @@ document.addEventListener('DOMContentLoaded', () => {
         testProgressEl = document.getElementById('test-progress-bar');
         testAccuracyTextEl = document.getElementById('test-accuracy-text');
         testAccuracyBarEl = document.getElementById('test-accuracy-bar');
+        umlautButtonsContainerEl = document.getElementById('umlaut-buttons-container'); // GEÄNDERT: Direkte Zuweisung zur let-Variable
         SVG_SPEAKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 12H4a1 1 0 00-1 1v2a1 1 0 001 1h1.858l4.47 4.47A1 1 0 0012 20V4a1 1 0 00-1.672-.748L5.858 12z" /></svg>`;
     }
 
-    initializeDOMReferences();
-
-    if (typeof goetheA1Wortschatz === 'undefined' || typeof vergleicheAntwort === 'undefined') {
-        console.error("KRITISCHER FEHLER: Wichtige Skript-Dateien (vokabular.js, helfer.js) fehlen oder sind fehlerhaft.");
-        document.body.innerHTML = '<div style="padding: 2rem; text-align: center; font-family: sans-serif; background-color: #ffcccc; border: 2px solid red;"><h1>Fehler beim Laden</h1><p>Wichtige App-Daten konnten nicht geladen werden. Bitte überprüfe die Browser-Konsole (F12) für Details.</p></div>';
-        return;
-    }
-
-    const dom = {
-        mcUiEl, mcAnswersContainerEl, questionDisplayEl, exampleSentenceDisplayEl, audioWordButtonEl,
-        audioSentenceButtonEl, wordLineContainerEl, sentenceLineContainerEl, SVG_SPEAKER_ICON,
-        spellingModeUiEl, checkSpellingButton, singleInputContainerEl, nounInputContainerEl,
-        spellingInputSingleEl, spellingInputNoun1El, spellingInputNoun2El,
-        clozeUiEl, clozeHintContainerEl, clozeSentenceContainerEl, checkClozeButton,
-        sentenceUiEl, sentenceWordInputContainerEl, checkSentenceButton
-    };
-
     function showMessage(message, type = 'error', duration = 3000) { messageBoxEl.textContent = message; messageBoxEl.className = `fixed bottom-5 right-5 text-white p-3 rounded-lg shadow-xl ${type === 'success' ? 'bg-green-500' : type === 'info' ? 'bg-blue-500' : 'bg-red-500'}`; messageBoxEl.classList.remove('hidden'); setTimeout(() => messageBoxEl.classList.add('hidden'), duration); }
-
-    const alleVokabeln = Object.values(goetheA1Wortschatz).flat();
-
-    const learningModes = {
-        'mc-de-en': { name: "Bedeutung", setupFunc: () => uiModes.setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) },
-        'type-de-adj': { name: "Schreibweise", setupFunc: () => uiModes.setupSpellingMode(dom, state, processAnswer) },
-        'cloze-adj-de': { name: "Lückentext", setupFunc: () => uiModes.setupClozeAdjDeMode(dom, state, processAnswer) },
-        'sentence-translation-en-de': { name: "Satzübersetzung", setupFunc: () => uiModes.setupSentenceTranslationEnDeMode(dom, state, processAnswer) },
-    };
 
     function saveLastTestScores() {
         localStorage.setItem('goetheA1LastTestScores', JSON.stringify(state.lastTestScores));
@@ -120,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         questionDisplayEl.textContent = '';
         exampleSentenceDisplayEl.textContent = '';
         [audioWordButtonEl, audioSentenceButtonEl].forEach(btn => { if(btn) { btn.onclick = null; btn.style.display = 'none'; } });
+        if (umlautButtonsContainerEl) umlautButtonsContainerEl.style.display = 'none'; // GEÄNDERT: Direkter Zugriff auf Variable
     }
 
     function handleTestCompletion() {
@@ -388,6 +383,29 @@ document.addEventListener('DOMContentLoaded', () => {
         testAccuracyBarEl.style.width = `${accuracyPercentage}%`;
     }
 
+    // NEU: Funktion zum Einfügen von Text an der Cursorposition (kopiert von trainer-themen)
+    function insertTextAtCursor(inputElement, text) {
+        if (!inputElement) return;
+        const start = inputElement.selectionStart;
+        const end = inputElement.selectionEnd;
+        const oldValue = inputElement.value;
+        inputElement.value = oldValue.substring(0, start) + text + oldValue.substring(end);
+        inputElement.selectionStart = inputElement.selectionEnd = start + text.length;
+        inputElement.focus(); // Wichtig, um den Fokus zu behalten/wiederherstellen
+        // Manuell ein 'input'-Event auslösen, falls andere Logik darauf hört
+        const event = new Event('input', { bubbles: true, cancelable: true });
+        inputElement.dispatchEvent(event);
+    }
+
+    // NEU: Initialisiert die Umlaut-Buttons (kopiert von trainer-themen)
+    function initUmlautButtons() {
+        if (dom.umlautButtonsContainerEl) {
+            const buttons = dom.umlautButtonsContainerEl.querySelectorAll('.umlaut-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', () => insertTextAtCursor(state.activeTextInput, button.textContent));
+            });
+        }
+    }
     function erstelleTestAufgaben() {
         const alleWortgruppenNamen = Object.keys(goetheA1Wortschatz);
         let testAufgaben = [];
@@ -505,9 +523,44 @@ document.addEventListener('DOMContentLoaded', () => {
         continueButton.addEventListener('click', () => {
             loadNextTask();
         });
+        initUmlautButtons(); // NEU: Umlaut-Buttons initialisieren
         showWortgruppenSelector();
         initTestModeListeners();
     }
 
+    // ===== START DER INITIALISIERUNGSSEQUENZ =====
+
+    // 1. Die Funktion "initializeDOMReferences()" wird aufgerufen.
+    initializeDOMReferences();
+
+    // Früher Fehlercheck für kritische Abhängigkeiten
+    if (typeof goetheA1Wortschatz === 'undefined' || typeof vergleicheAntwort === 'undefined') {
+        console.error("KRITISCHER FEHLER: Wichtige Skript-Dateien (vokabular.js, helfer.js) fehlen oder sind fehlerhaft.");
+        document.body.innerHTML = '<div style="padding: 2rem; text-align: center; font-family: sans-serif; background-color: #ffcccc; border: 2px solid red;"><h1>Fehler beim Laden</h1><p>Wichtige App-Daten konnten nicht geladen werden. Bitte überprüfe die Browser-Konsole (F12) für Details.</p></div>';
+        return; // Stoppt weitere Ausführung
+    }
+
+    // 2. Das "dom"-Objekt, das die DOM-Referenzen bündelt, wird erstellt.
+    const dom = {
+        mcUiEl, mcAnswersContainerEl, questionDisplayEl, exampleSentenceDisplayEl, audioWordButtonEl,
+        audioSentenceButtonEl, wordLineContainerEl, sentenceLineContainerEl, SVG_SPEAKER_ICON,
+        spellingModeUiEl, checkSpellingButton, singleInputContainerEl, nounInputContainerEl,
+        spellingInputSingleEl, spellingInputNoun1El, spellingInputNoun2El,
+        clozeUiEl, clozeHintContainerEl, clozeSentenceContainerEl, checkClozeButton,
+        sentenceUiEl, sentenceWordInputContainerEl, checkSentenceButton, 
+        umlautButtonsContainerEl // GEÄNDERT: Verwendet die initialisierte Variable
+    };
+
+    const alleVokabeln = Object.values(goetheA1Wortschatz).flat();
+
+    // 3. Das "learningModes"-Objekt wird erstellt, da es vom "dom"-Objekt abhängt.
+    const learningModes = {
+        'mc-de-en': { name: "Bedeutung", setupFunc: () => uiModes.setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) },
+        'type-de-adj': { name: "Schreibweise", setupFunc: () => uiModes.setupSpellingMode(dom, state, processAnswer) },
+        'cloze-adj-de': { name: "Lückentext", setupFunc: () => uiModes.setupClozeAdjDeMode(dom, state, processAnswer) },
+        'sentence-translation-en-de': { name: "Satzübersetzung", setupFunc: () => uiModes.setupSentenceTranslationEnDeMode(dom, state, processAnswer) },
+    };
+
+    // 4. Erst danach wird die "init()"-Funktion aufgerufen, die den Rest der Anwendung startet.
     init();
 });
