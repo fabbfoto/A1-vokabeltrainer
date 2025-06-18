@@ -1,19 +1,16 @@
 [build]
-  # Dieser Befehl kopiert jetzt ALLE benötigten Dateien.
   # Dieser Befehl ist jetzt explizit und listet jede Datei einzeln auf,
   # um Fehler durch nicht gefundene Platzhalter zu vermeiden.
   # Die `\` am Ende jeder Zeile verbinden alles zu einem einzigen Befehl.
+  # Dieser Befehl hat jetzt den KORREKTEN Pfad zur manifest.json.
   command = """
-  mkdir -p dist/shared && \
+  mkdir -p dist && \
   cp packages/trainer-basis/index.html \
      packages/trainer-basis/trainer.js \
      packages/trainer-basis/vokabular.js \
-     packages/trainer-basis/manifest.json \
+     packages/trainer-themen/manifest.json \
      dist/ && \
-  cp shared/style.css \
-     shared/helfer.js \
-     shared/ui-modes.js \
-     dist/shared/
+  cp -r shared dist/
   """
 
   # Das Veröffentlichungs-Verzeichnis bleibt dasselbe.
