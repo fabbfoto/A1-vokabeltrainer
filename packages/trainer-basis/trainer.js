@@ -413,8 +413,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function initUmlautButtons() {
         if (dom.umlautButtonsContainerEl) {
             const buttons = dom.umlautButtonsContainerEl.querySelectorAll('.umlaut-button');
-            buttons.forEach(button => {
-                button.addEventListener('click', () => insertTextAtCursor(state.activeTextInput, button.textContent));
+            buttons.forEach(button => { // Korrigierte Event-Listener-Logik
+                button.addEventListener('click', (event) => { // event-Parameter hinzugefügt
+                    const charToInsert = event.shiftKey ? button.textContent.toUpperCase() : button.textContent;
+                    // Für 'ß': toUpperCase() ergibt 'SS', was meistens das gewünschte Verhalten ist.
+                    insertTextAtCursor(state.activeTextInput, charToInsert);
+                });
             });
         }
     }
