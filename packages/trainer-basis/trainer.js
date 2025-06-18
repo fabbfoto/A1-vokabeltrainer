@@ -7,7 +7,7 @@ import { goetheA1Wortschatz } from './vokabular.js';
 // import state from '../../state.js'; // ENTFERNT: Verwenden lokales State-Objekt
 
 // Import der Helfer- und UI-Funktionen aus dem geteilten Ordner (zwei Ebenen nach oben, dann in /shared)
-import { vergleicheAntwort, shuffleArray } from '../../shared/helfer.js'; // konvertiereUmlaute entfernt
+import { vergleicheAntwort, shuffleArray } from './shared/helfer.js'; // konvertiereUmlaute entfernt
 import * as uiModes from '../../shared/ui-modes.js';
 
 document.addEventListener('DOMContentLoaded', () => {

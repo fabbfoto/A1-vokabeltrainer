@@ -1,2 +1,3 @@
 [build]
-  publish = "packages/trainer-basis"
+  command = "mkdir -p dist/shared && cp packages/trainer-basis/index.html packages/trainer-basis/trainer.js dist/ && cp shared/style.css shared/helfer.js dist/shared/"
+  publish = "dist"
