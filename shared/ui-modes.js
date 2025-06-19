@@ -36,7 +36,12 @@ export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
     dom.audioWordButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
     dom.audioWordButtonEl.onclick = () => speak(germanWordForDisplay);
     dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
-    dom.audioSentenceButtonEl.onclick = () => speak(state.currentWordData.example_de, 'de-DE');
+    // KORREKTUR: Stelle sicher, dass ein String an speak übergeben wird
+    const sentenceForSpeech = Array.isArray(state.currentWordData.example_de)
+        ? state.currentWordData.example_de.map(part => part.text).join('')
+        : state.currentWordData.example_de;
+    dom.audioSentenceButtonEl.onclick = () => speak(sentenceForSpeech, 'de-DE');
+
     dom.audioWordButtonEl.style.display = 'inline-flex';
     dom.audioSentenceButtonEl.style.display = 'inline-flex';
     dom.wordLineContainerEl.style.display = 'flex';

@@ -178,7 +178,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (checkSentenceButton) checkSentenceButton.disabled = true;
 
         state.attemptedInRound++;
-        const wordId = `<span class="math-inline">\{state\.currentWordData\.german\}\-</span>{state.currentWordData.english}`;
+        // KORREKTUR: Verwende die eindeutige ID der Vokabel
+        const wordId = state.currentWordData.id; 
         if (isCorrect) {
             state.correctInRound++;
             feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
@@ -186,15 +187,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!state.globalProgress[state.currentWortgruppeName]) state.globalProgress[state.currentWortgruppeName] = {};
                 if (!state.globalProgress[state.currentWortgruppeName][state.currentMode]) state.globalProgress[state.currentWortgruppeName][state.currentMode] = new Set();
                 state.globalProgress[state.currentWortgruppeName][state.currentMode].add(wordId);
-                state.masteredWordsByMode[state.currentMode]?.add(wordId);
-                state.wordsToRepeatByMode[state.currentMode]?.delete(wordId);
+                if(state.masteredWordsByMode[state.currentMode]) state.masteredWordsByMode[state.currentMode].add(wordId);
+                if(state.wordsToRepeatByMode[state.currentMode]) state.wordsToRepeatByMode[state.currentMode].delete(wordId);
 
                 // Stelle sicher, dass die verschachtelten Objekte für den Fortschritt existieren
                 if (!state.globalProgress[state.currentWortgruppeName]) {
                     state.globalProgress[state.currentWortgruppeName] = {};
                 }
                 if (!state.globalProgress[state.currentWortgruppeName][state.currentMode]) {
-                    state.globalProgress[state.currentWortgruppeName][state.currentMode] = new Set();
                 }
 
                 // Füge das aktuell gelernte Wort zum Set hinzu.
@@ -232,7 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.isRepeatSessionActive = false;
                 return;
             }
-            wordsForSession = alleVokabeln.filter(word => wordIdsToRepeat.has(`<span class="math-inline">\{word\.german\}\-</span>{word.english}`));
+            // KORREKTUR: Filtere basierend auf der Vokabel-ID
+            wordsForSession = alleVokabeln.filter(word => word.id && wordIdsToRepeat.has(word.id));
         } else {
             wordsForSession = [...state.currentVocabularySet];
         }
