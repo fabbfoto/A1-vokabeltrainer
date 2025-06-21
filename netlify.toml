@@ -1,7 +1,29 @@
 [build]
-  # Für Themen-Trainer standalone - alle Dateien sind bereits im Root
-  command = "echo 'No build needed - files are in root'"
-  publish = "."
+  # Dieser Befehl ist jetzt explizit und listet jede Datei einzeln auf,
+  # um Fehler durch nicht gefundene Platzhalter zu vermeiden.
+  # Die `\` am Ende jeder Zeile verbinden alles zu einem einzigen Befehl.
+  command = """
+  mkdir -p dist/shared && \
+  cp packages/trainer-themen/index.html dist/index.html && \
+  cp packages/trainer-themen/trainer.js dist/trainer.js && \
+  cp packages/trainer-themen/dom.js dist/dom.js && \
+  cp packages/trainer-themen/ui.js dist/ui.js && \
+  cp packages/trainer-themen/vokabular.js dist/vokabular.js && \
+  cp packages/trainer-themen/vokabular_person.js dist/vokabular_person.js && \
+  cp packages/trainer-themen/vokabular_persoenliche_beziehungen.js dist/vokabular_persoenliche_beziehungen.js && \
+  cp packages/trainer-themen/vokabular_menschlicher_koerper_gesundheit.js dist/vokabular_menschlicher_koerper_gesundheit.js && \
+  cp packages/trainer-themen/vokabular_wohnen.js dist/vokabular_wohnen.js && \
+  cp packages/trainer-themen/vokabular_umwelt.js dist/vokabular_umwelt.js && \
+  cp packages/trainer-themen/vokabular_essen_trinken.js dist/vokabular_essen_trinken.js && \
+  cp packages/trainer-themen/vokabular_reisen_verkehr.js dist/vokabular_reisen_verkehr.js && \
+  cp packages/trainer-themen/vokabular_einkaufen.js dist/vokabular_einkaufen.js && \
+  cp packages/trainer-themen/vokabular_lernen.js dist/vokabular_lernen.js && \
+  cp packages/trainer-themen/vokabular_freizeit_unterhaltung.js dist/vokabular_freizeit_unterhaltung.js && \
+  cp packages/trainer-themen/manifest.json dist/manifest.json && \
+  cp sw.js dist/sw.js && \
+  cp -r shared/* dist/shared/
+  """
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
