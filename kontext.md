@@ -65,11 +65,8 @@ A1-VOKABELTRAINER/
 - **Hosting:** Netlify
 - **Production Branch:** `v2.0-entwicklung` (Änderungen auf diesem Branch werden automatisch live geschaltet).
 - **Build-Konfiguration:** Gesteuert durch `netlify.toml`.
-  - **Build Command:** `mkdir -p dist && cp packages/trainer-basis/index.html packages/trainer-basis/trainer.js packages/trainer-basis/vokabular.js packages/trainer-themen/manifest.json dist/ && cp -r shared dist/`
-    - Erstellt einen `dist`-Ordner.
-    - Kopiert die relevanten Dateien des `trainer-basis` und das `manifest.json` des `trainer-themen` in den `dist`-Ordner.
-    - Kopiert den gesamten `shared`-Ordner in den `dist`-Ordner.
-  - **Publish Directory:** `dist`
+  - **Build Command:** Abhängig vom Branch. Für den Haupt-Branch (`v2.0-entwicklung`) werden die Dateien aus den `packages/` Ordnern in ein `dist`-Verzeichnis kopiert. Für den speziellen Themen-Trainer-Branch wird eine vereinfachte Struktur verwendet, bei der die Dateien direkt aus dem Root-Verzeichnis veröffentlicht werden (`command = "echo 'No build needed...'", publish = "."`).
+  - **Publish Directory:** `dist` für den Haupt-Branch, `.` für den speziellen Themen-Trainer-Branch.
 - **Serverless Functions:** Die Sprachausgabe-Funktion (`netlify/functions/getGoogleVoice.js`) wird von Netlify automatisch deployed.
 - **Test-Veröffentlichungen (Deploy Previews):** Sollen für Pull Requests auf den `v2.0-entwicklung`-Branch aktiviert werden, um Änderungen vor dem Livegang zu prüfen.
 
