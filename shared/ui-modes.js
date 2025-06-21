@@ -1,40 +1,22 @@
 // ui-modes.js - Bugfix für den deaktivierten "Auswerten"-Button
 
-import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence } from './helfer.js';
+import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence, formatGermanNoun, displayFormattedSentence } from './helfer.js';
 
 export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
     dom.mcUiEl.style.display = 'block';
     if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'none'; // Umlaut-Buttons ausblenden
-    const germanWordForDisplay = state.currentWordData.german || "";
-    let displayGermanWord = germanWordForDisplay;
-    if (state.currentWordData.nomen_notation && typeof parseNounString === 'function') {
-        const parsed = parseNounString(state.currentWordData.nomen_notation); 
-        if (parsed) {
-            displayGermanWord = parsed.isPluralOnly ? `die ${parsed.singular} (Pl.)` : `${{ 'r': 'der', 'e': 'die', 's': 'das' }[parsed.genus] || ''} ${parsed.singular}, ${parsed.pluralInfo}`;
-        }
-    }
 
     // Anzeige des deutschen Wortes (Nomen mit Artikel)
-    dom.questionDisplayEl.textContent = displayGermanWord;
+    // Die neue Helferfunktion kümmert sich um die korrekte Formatierung für beide Trainer
+    dom.questionDisplayEl.textContent = formatGermanNoun(state.currentWordData);
 
     // Anzeige des Beispielsatzes (ggf. mit Kasus-Farben)
-    dom.exampleSentenceDisplayEl.innerHTML = ''; // Vorherigen Inhalt löschen
-    if (Array.isArray(state.currentWordData.example_de)) {
-        state.currentWordData.example_de.forEach(part => {
-            const span = document.createElement('span');
-            span.textContent = part.text;
-            if (part.kasus && part.kasus !== 'none') {
-                span.className = `kasus-${part.kasus}`;
-            }
-            dom.exampleSentenceDisplayEl.appendChild(span);
-        });
-    } else {
-        dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_de;
-    }
+    // Die neue Helferfunktion kümmert sich um die korrekte Anzeige und Kasus-Hervorhebung
+    displayFormattedSentence(state.currentWordData.example_de, dom.exampleSentenceDisplayEl);
 
     // dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_de; // Diese Zeile ist redundant, wenn Array-Format verwendet wird
     dom.audioWordButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
-    dom.audioWordButtonEl.onclick = () => speak(germanWordForDisplay);
+    dom.audioWordButtonEl.onclick = () => speak(state.currentWordData.german);
     dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
     // KORREKTUR: Stelle sicher, dass ein String an speak übergeben wird
     const sentenceForSpeech = Array.isArray(state.currentWordData.example_de)

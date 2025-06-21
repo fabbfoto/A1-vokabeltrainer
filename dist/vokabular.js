@@ -4,11 +4,11 @@ export const goetheA1Wortschatz = {
         { "id": "basis-2", german: "weiß", english: "white", example_de: "Der Sand ist so weiß wie Schnee.", example_en: "The sand is as white as snow.", source_pdf_page: 21, cloze_parts: ["Der Sand ist so ", " wie Schnee."], cloze_answers: ["weiß"]  },
         { "id": "basis-3", german: "rot", english: "red", example_de: "Die Ampel ist rot.", example_en: "The traffic light is red.", _example_created: true, cloze_parts: ["Die Ampel ist ", "."], cloze_answers: ["rot"]  },
         { "id": "basis-4", german: "gelb", english: "yellow", example_de: "Die Zitrone ist gelb.", example_en: "The lemon is yellow.", _example_created: true, cloze_parts: ["Die Zitrone ist ", "."], cloze_answers: ["gelb"]  },
-        { "id": "basis-5", german: "grün", english: "green", example_de: "Das Gras ist grün.", example_en: "The grass is green.", _example_created: true, cloze_parts: ["Das Gras ist ", "."], cloze_answers: ["grün"]  },
-        { "id": "basis-6", german: "blau", english: "blue", example_de: "Der Himmel ist blau.", example_en: "The sky is blue.", _example_created: true, cloze_parts: ["Der Himmel ist ", "."], cloze_answers: ["blau"]  },
-        { "id": "basis-7", german: "braun", english: "brown", example_de: "Der Bär ist braun.", example_en: "The bear is brown.", _example_created: true, cloze_parts: ["Der Bär ist ", "."], cloze_answers: ["braun"]  },
-        { "id": "basis-8", german: "grau", english: "grey", example_de: "Die Maus ist grau.", example_en: "The mouse is grey.", _example_created: true, cloze_parts: ["Die Maus ist ", "."], cloze_answers: ["grau"]  },
-        { "id": "basis-9", german: "blond", english: "blond", example_de: "Ihre Haare sind blond.", example_en: "Her hair is blond.", _example_created: true, cloze_parts: ["Ihre Haare sind ", "."], cloze_answers: ["blond"]  }
+        { "id": "basis-5", german: "grün", english: "green", example_de: "Das Gras ist grün.", example_en: "The grass is green.", "_example_created": true, cloze_parts: ["Das Gras ist ", "."], cloze_answers: ["grün"]  },
+        { "id": "basis-6", german: "blau", english: "blue", example_de: "Der Himmel ist blau.", example_en: "The sky is blue.", "_example_created": true, cloze_parts: ["Der Himmel ist ", "."], cloze_answers: ["blau"]  },
+        { "id": "basis-7", german: "braun", english: "brown", example_de: "Der Bär ist braun.", example_en: "The bear is brown.", "_example_created": true, cloze_parts: ["Der Bär ist ", "."], cloze_answers: ["braun"]  },
+        { "id": "basis-8", german: "grau", english: "grey", example_de: "Die Maus ist grau.", example_en: "The mouse is grey.", "_example_created": true, cloze_parts: ["Die Maus ist ", "."], cloze_answers: ["grau"]  },
+        { "id": "basis-9", german: "blond", english: "blond", example_de: "Ihre Haare sind blond.", example_en: "Her hair is blond.", "_example_created": true, cloze_parts: ["Ihre Haare sind ", "."], "cloze_answers": ["blond"]  }
     ],
     "Monatsnamen": [
         { 
@@ -220,71 +220,42 @@ export const goetheA1Wortschatz = {
         { "id": "basis-109", "german": "Geschichte", "artikel": "die", "nomen_notation": "e Geschichte, -n", "plural": "Geschichten", "english": "history", "example_de": "In Geschichte hat er eine Eins.", "example_en": "He has an 'A' grade in history.", "cloze_parts": ["In ", " hat er eine Eins."], "cloze_answers": ["Geschichte"]  }
     ],
    "Länder und Nationalitäten": [
-        { 
-            "id": "basis-110", 
+        {
+            "id": "basis-110",
+            "wortart": "Eigenname (Land)",
             "german": "Deutschland",
-            "english": "Germany", 
-            "example_de": "Ich komme aus Deutschland.", 
-            "example_en": "I come from Germany.", 
-            "cloze_parts": ["Ich komme aus ", "."], 
-            "cloze_answers": ["Deutschland"] 
+            "english": "Germany",
+            "adjektiv": "deutsch",
+            "einwohner_m": "der Deutsche",
+            "einwohner_f": "die Deutsche",
+            "example_de": "Ich komme aus Deutschland.",
+            "example_en": "I come from Germany.",
+            "cloze_parts": ["Ich komme aus ", "."],
+            "cloze_answers": ["Deutschland"]
         },
-        { 
-            "id": "basis-111", 
-            "german": "deutsch", 
-            "english": "German (adjective)", 
-            "example_de": "Ich lerne die deutsche Sprache.", 
-            "example_en": "I am learning the German language.", 
-            "cloze_parts": ["Ich lerne die ", "e Sprache."], 
-            "cloze_answers": ["deutsch"] 
-        },
-        { 
-            "id": "basis-112", 
-            "german": "der Deutsche", 
-            "artikel": "der", 
-            "nomen_notation": "r Deutsche, -n", 
-            "plural": "Deutschen",
-            "english": "the German (male citizen)", 
-            "example_de": "Ein Deutscher gewinnt das Rennen.", 
-            "example_en": "A German wins the race.", 
-            "cloze_parts": ["Ein ", " gewinnt das Rennen."], 
-            "cloze_answers": ["Deutscher"] 
-        },
-        { 
-            "id": "basis-113", 
-            "german": "Europa",
-            "english": "Europe", 
-            "example_de": "Wir machen eine Reise durch Europa.", 
-            "example_en": "We are taking a trip through Europe.", 
-            "cloze_parts": ["Wir machen eine Reise durch ", "."], 
-            "cloze_answers": ["Europa"] 
-        },
-        { 
-            "id": "basis-114", 
-            "german": "europäisch", 
-            "english": "European (adjective)", 
-            "example_de": "Das ist eine europäische Stadt.", 
-            "example_en": "This is a European city.", 
-            "cloze_parts": ["Das ist eine ", "e Stadt."], 
-            "cloze_answers": ["europäisch"] 
-        },
-        { 
-            "id": "basis-115", 
+        {
+            "id": "basis-115",
+            "wortart": "Eigenname (Land)",
             "german": "Italien",
-            "english": "Italy", 
-            "example_de": "Heute kommt meine Freundin aus Italien.", 
-            "example_en": "My friend from Italy is arriving today.", 
-            "cloze_parts": ["Heute kommt meine Freundin aus ", "."], 
-            "cloze_answers": ["Italien"] 
+            "english": "Italy",
+            "adjektiv": "italienisch",
+            "einwohner_m": "der Italiener",
+            "einwohner_f": "die Italienerin",
+            "example_de": "Heute kommt meine Freundin aus Italien.",
+            "example_en": "My friend from Italy is arriving today.",
+            "cloze_parts": ["Heute kommt meine Freundin aus ", "."],
+            "cloze_answers": ["Italien"]
         },
-        { 
-            "id": "basis-116", 
-            "german": "italienisch", 
-            "english": "Italian (adjective)", 
-            "example_de": "Ich liebe italienisches Essen.", 
-            "example_en": "I love Italian food.", 
-            "cloze_parts": ["Ich liebe ", "es Essen."], 
-            "cloze_answers": ["italienisch"] 
+        {
+            "id": "basis-113",
+            "wortart": "Eigenname (Kontinent)",
+            "german": "Europa",
+            "english": "Europe",
+            "adjektiv": "europäisch",
+            "example_de": "Wir machen eine Reise durch Europa.",
+            "example_en": "We are taking a trip through Europe.",
+            "cloze_parts": ["Wir machen eine Reise durch ", "."],
+            "cloze_answers": ["Europa"]
         }
     ],
     "Anglizismen": [
@@ -307,18 +278,4 @@ export const goetheA1Wortschatz = {
         { "id": "basis-131", "german": "Text", "artikel": "der", "nomen_notation": "r Text, -e", "plural": "Texte", "english": "text", "example_de": "Lesen Sie den Text und beantworten Sie die Fragen.", "example_en": "Read the text and answer the questions.", "cloze_parts": ["Lesen Sie den ", " und beantworten Sie die Fragen."], "cloze_answers": ["Text"]  },
         { "id": "basis-132", "german": "Wörterbuch", "artikel": "das", "nomen_notation": "s Wörterbuch, ü-er", "plural": "Wörterbücher", "english": "dictionary", "example_de": "In dieser Prüfung dürfen Sie kein Wörterbuch benutzen.", "example_en": "In this exam you are not allowed to use a dictionary.", "cloze_parts": ["In dieser Prüfung dürfen Sie kein ", " benutzen."], "cloze_answers": ["Wörterbuch"]  }
     ]
-};
-
-const alleWortgruppenNamen = [
-    "Farben", "Monatsnamen", "Zahlen", "Uhrzeit", "Berufe", "Familienmitglieder", 
-    "Feiertage", "Jahreszeiten", "Himmelsrichtungen", "Wochentage", "Tageszeiten", 
-    "Zeitangaben", "Währungen", "Maße und Gewichte", "Schulen und Schulfächer", 
-    "Länder und Nationalitäten", "Anglizismen", "Anweisungssprache zur Prüfung"
-];
-
-// NEUE DATENSTRUKTUR für LÄNDER, um die Logik zu vereinfachen
-const laenderSpezialBehandlung = {
-    "Deutschland": { adjektiv: "deutsch", einwohner_m: "der Deutsche", einwohner_f: "die Deutsche" },
-    "Italien": { adjektiv: "italienisch", einwohner_m: "der Italiener", einwohner_f: "die Italienerin" },
-    //... weitere Länder hier
 };

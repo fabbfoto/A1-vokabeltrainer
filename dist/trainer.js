@@ -7,7 +7,7 @@ import { goetheA1Wortschatz } from './vokabular.js';
 // import state from '../../state.js'; // ENTFERNT: Verwenden lokales State-Objekt
 
 // Import der Helfer- und UI-Funktionen aus dem geteilten Ordner (zwei Ebenen nach oben, dann in /shared)
-import { vergleicheAntwort, shuffleArray } from './shared/helfer.js'; // konvertiereUmlaute entfernt
+import { vergleicheAntwort, shuffleArray, insertTextAtCursor, calculateProgressPercentage } from '../../shared/helfer.js';
 import * as uiModes from '../../shared/ui-modes.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
         testProgressEl = document.getElementById('test-progress-bar');
         testAccuracyTextEl = document.getElementById('test-accuracy-text');
         testAccuracyBarEl = document.getElementById('test-accuracy-bar');
-        umlautButtonsContainerEl = document.getElementById('umlaut-buttons-container'); // GEÄNDERT: Direkte Zuweisung zur let-Variable
+        umlautButtonsContainerEl = document.getElementById('umlaut-buttons-container');
         SVG_SPEAKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 12H4a1 1 0 00-1 1v2a1 1 0 001 1h1.858l4.47 4.47A1 1 0 0012 20V4a1 1 0 00-1.672-.748L5.858 12z" /></svg>`;
     }
 
@@ -175,9 +175,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (checkSpellingButton) checkSpellingButton.disabled = true;
         if (checkClozeButton) checkClozeButton.disabled = true;
         if (checkSentenceButton) checkSentenceButton.disabled = true;
-
+        
         state.attemptedInRound++;
-        const wordId = `<span class="math-inline">\{state\.currentWordData\.german\}\-</span>{state.currentWordData.english}`;
+        const wordId = `${state.currentWordData.german}-${state.currentWordData.english}`;
         if (isCorrect) {
             state.correctInRound++;
             feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
@@ -313,11 +313,16 @@ document.addEventListener('DOMContentLoaded', () => {
             if (state.globalProgress[name]) {
                 completedTasks = Object.values(state.globalProgress[name]).reduce((sum, set) => sum + set.size, 0);
             }
-            const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-            let barColor;
-            if (index < 6) barColor = '#4a5568';
-            else if (index < 12) barColor = '#c53030';
-            else barColor = '#d69e2e';
+            const percentage = calculateProgressPercentage(completedTasks, totalTasks);
+
+            let barColor; // Schwarz-Rot-Gold Logik
+            if (percentage < 34) {
+                barColor = '#374151'; // Schwarz (dunkelgrau)
+            } else if (percentage < 67) {
+                barColor = '#ef4444'; // Rot
+            } else {
+                barColor = '#d69e2e'; // Gold
+            }
             button.innerHTML = `<span class="button-text-label">${name}</span><div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${percentage}%; background-color: ${barColor};"></div></div>`;
             wortgruppenButtonsEl.appendChild(button);
         });
@@ -368,7 +373,17 @@ document.addEventListener('DOMContentLoaded', () => {
         correctInRoundPracticeEl.textContent = state.correctInRound;
         attemptedInRoundPracticeEl.textContent = state.attemptedInRound;
         const accuracy = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) * 100 : 0;
-        accuracyBarEl.style.width = `${accuracy}%`;
+        const accuracyPercentage = calculateProgressPercentage(state.correctInRound, state.attemptedInRound);
+        let practiceAccuracyColor; // Schwarz-Rot-Gold Logik
+        if (accuracy < 34) {
+            practiceAccuracyColor = '#374151'; // Schwarz (dunkelgrau)
+        } else if (accuracy < 67) {
+            practiceAccuracyColor = '#ef4444'; // Rot
+        } else {
+            practiceAccuracyColor = '#d69e2e'; // Gold
+        }
+        accuracyBarEl.style.width = `${accuracyPercentage}%`;
+        accuracyBarEl.style.backgroundColor = practiceAccuracyColor;
         updateCategoryStats();
     }
 
@@ -376,31 +391,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalQuestions = state.currentVocabularySet.length;
         testProgressTextEl.textContent = `${state.attemptedInRound} / ${totalQuestions}`;
         const progressPercentage = totalQuestions > 0 ? (state.attemptedInRound / totalQuestions) * 100 : 0;
-        testProgressEl.style.width = `${progressPercentage}%`;
+        const progressPercentageCalc = calculateProgressPercentage(state.attemptedInRound, totalQuestions);let progressColor; // Schwarz-Rot-Gold Logik
+        if (progressPercentage < 34) {
+            progressColor = '#374151'; // Schwarz (dunkelgrau)
+        } else if (progressPercentage < 67) {
+            progressColor = '#ef4444'; // Rot
+        } else {
+            progressColor = '#d69e2e'; // Gold
+        }
+        testProgressEl.style.width = `${progressPercentageCalc}%`;
+        testProgressEl.style.backgroundColor = progressColor;
 
         testAccuracyTextEl.textContent = `${state.correctInRound} / ${state.attemptedInRound}`;
         const accuracyPercentage = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) * 100 : 0;
+        const accuracyPercentageCalc = calculateProgressPercentage(state.correctInRound, state.attemptedInRound);
         testAccuracyBarEl.style.width = `${accuracyPercentage}%`;
     }
 
     // NEU: Funktion zum Einfügen von Text an der Cursorposition (kopiert von trainer-themen)
-    function insertTextAtCursor(inputElement, text) {
-        if (!inputElement) return;
-        const start = inputElement.selectionStart;
-        const end = inputElement.selectionEnd;
-        const oldValue = inputElement.value;
-        inputElement.value = oldValue.substring(0, start) + text + oldValue.substring(end);
-        inputElement.selectionStart = inputElement.selectionEnd = start + text.length;
-        inputElement.focus(); // Wichtig, um den Fokus zu behalten/wiederherstellen
-        // Manuell ein 'input'-Event auslösen, falls andere Logik darauf hört
-        const event = new Event('input', { bubbles: true, cancelable: true });
-        inputElement.dispatchEvent(event);
-    }
+    // Diese Funktion wird nun aus helfer.js importiert und muss hier nicht mehr definiert werden.
+    // function insertTextAtCursor(inputElement, text) {
+    //     if (!inputElement) return;
+    //     const start = inputElement.selectionStart;
+    //     const end = inputElement.selectionEnd;
+    //     const oldValue = inputElement.value;
+    //     inputElement.value = oldValue.substring(0, start) + text + oldValue.substring(end);
+    //     inputElement.selectionStart = inputElement.selectionEnd = start + text.length;
+    //     inputElement.focus();
+    //     const event = new Event('input', { bubbles: true, cancelable: true }); inputElement.dispatchEvent(event); }
 
     // NEU: Initialisiert die Umlaut-Buttons (kopiert von trainer-themen)
     function initUmlautButtons() {
-        if (dom.umlautButtonsContainerEl) {
-            const buttons = dom.umlautButtonsContainerEl.querySelectorAll('.umlaut-button');
+        if (umlautButtonsContainerEl) { // Direkter Zugriff auf die Variable, nicht über 'dom'
+            const buttons = umlautButtonsContainerEl.querySelectorAll('.umlaut-button');
             buttons.forEach(button => {
                 button.addEventListener('click', () => insertTextAtCursor(state.activeTextInput, button.textContent));
             });
@@ -459,22 +482,24 @@ document.addEventListener('DOMContentLoaded', () => {
         testOptionsButtons.forEach(button => {
             const testType = button.dataset.testType;
             const score = state.lastTestScores ? state.lastTestScores[testType] : null;
-            const progressBar = button.querySelector('.progress-bar-fill');
+            const progressBarFill = button.querySelector('.progress-bar-fill');
 
-            if (score && progressBar) {
+            if (score && progressBarFill) {
                 const percentage = score.accuracy * 100;
-                let barColor = '#374151';
-                if (percentage > 66) {
-                    barColor = '#d69e2e';
-                } else if (percentage > 33) {
-                    barColor = '#ef4444';
+                const accuracyPercentageCalc = calculateProgressPercentage(score.accuracy * 100, 100);let barColor; // Schwarz-Rot-Gold Logik
+                if (percentage < 34) {
+                    barColor = '#374151'; // Schwarz (dunkelgrau)
+                } else if (percentage < 67) {
+                    barColor = '#ef4444'; // Rot
+                } else {
+                    barColor = '#d69e2e'; // Gold
                 }
 
-                progressBar.style.width = `${percentage}%`;
-                progressBar.style.backgroundColor = barColor;
-            } else if (progressBar) {
-                progressBar.style.width = '0%';
-                progressBar.style.backgroundColor = '#374151';
+                progressBarFill.style.width = `${accuracyPercentageCalc}%`;
+                progressBarFill.style.backgroundColor = barColor;
+            } else if (progressBarFill) {
+                progressBarFill.style.width = '0%';
+                progressBarFill.style.backgroundColor = '#374151'; // Standardfarbe, wenn keine Daten vorhanden
             }
         });
     }
@@ -548,7 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
         spellingInputSingleEl, spellingInputNoun1El, spellingInputNoun2El,
         clozeUiEl, clozeHintContainerEl, clozeSentenceContainerEl, checkClozeButton,
         sentenceUiEl, sentenceWordInputContainerEl, checkSentenceButton, 
-        umlautButtonsContainerEl // GEÄNDERT: Verwendet die initialisierte Variable
+        // umlautButtonsContainerEl ist jetzt direkt zugänglich und muss nicht im dom-Objekt sein
     };
 
     const alleVokabeln = Object.values(goetheA1Wortschatz).flat();
@@ -563,33 +588,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 4. Erst danach wird die "init()"-Funktion aufgerufen, die den Rest der Anwendung startet.
     init();
-    // HIER EINFÜGEN (vor der letzten `});` Klammer)
-
-function displaySentence(vokabel, sentenceContainer) {
-    // Vorherigen Satz löschen
-    sentenceContainer.innerHTML = '';
-
-    if (!vokabel.beispielsatz) {
-        return; // Nichts zu tun, wenn kein Satz vorhanden ist
-    }
-
-    // Prüfen, ob der Beispielsatz das neue Array-Format hat
-    if (Array.isArray(vokabel.beispielsatz)) {
-        vokabel.beispielsatz.forEach(part => {
-            const span = document.createElement('span');
-            span.textContent = part.text;
-
-            // CSS-Klasse nur hinzufügen, wenn ein Kasus definiert ist (und nicht 'none')
-            if (part.kasus && part.kasus !== 'none') {
-                span.className = `kasus-${part.kasus}`;
-            }
-            sentenceContainer.appendChild(span);
-        });
-    } else {
-        // Fallback für alte Sätze, die nur Text sind
-        sentenceContainer.textContent = vokabel.beispielsatz;
-    }
-}
-
-// Bis hierhin kopieren
 });

@@ -24,6 +24,9 @@ body {
     justify-content: center;
     padding: 1rem; /* Angepasst für besseres Padding */
     cursor: pointer ;
+    white-space: normal; /* Stellt sicher, dass Text umbrechen kann */
+    overflow-wrap: break-word; /* Versucht, an sinnvollen Stellen umzubrechen */
+    /* word-break: break-all; */ /* Entfernt, um unschöne Trennungen zu vermeiden */
     font-weight: 500;
 }
 
@@ -166,17 +169,20 @@ body {
 #question-display-area {
     min-height: 2em;
     text-align: center;
-    font-size: 1.75rem;
-    font-weight: 600;
+    font-size: 1.5rem; /* Etwas kleiner als zuvor */
+    font-weight: 500;  /* Weniger fett als zuvor */
     color: #1f2937;
 }
 
 #example-sentence-display {
+    font-family: 'Times New Roman', Times, serif; /* Serifenschrift */
     font-style: italic;
     color: #4b5563;
     text-align: center;
     min-height: 1.5em;
-    font-size: 1.125rem;
+    font-size: 2rem; /* Deutlich größer, um die Hierarchie umzukehren */
+    font-weight: 600; /* Fett, um die Betonung zu verstärken */
+    line-height: 1.4; /* Optional: Etwas mehr Zeilenabstand für bessere Lesbarkeit bei größerer Schrift */
 }
 
 #task-prompt-area {
@@ -309,7 +315,7 @@ body {
 }
 
 .kasus-dativ {
-    color: red; /* Rot für Dativ */
+    color: #FF0000; /* Kräftigeres Rot (Flaggenrot-ähnlich) für Dativ */
 }
 
 .kasus-genitiv {
@@ -317,4 +323,45 @@ body {
 }
 .kasus-verb {
     color: magenta; /* Magenta für Verben (kräftiger als Pink) */
+}
+
+/* Schwarz-Rot-Gold Farben für Fortschrittsbalken */
+.color-black-sr {
+    background-color: #1f2937; /* Dunkleres Schwarz für besseren Kontrast */
+}
+
+.color-red-sr {
+    background-color: #dc2626; /* Deutsches Flaggen-Rot */
+}
+
+.color-gold-sr {
+    background-color: #f59e0b; /* Kräftiges Gold */
+    position: relative;
+}
+
+/* Optional: Glanz-Effekt für Gold-Balken */
+.color-gold-sr::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    animation: shine 3s infinite;
+}
+
+@keyframes shine {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+}
+
+.color-original {
+    background-color: #3b82f6; /* Dein ursprüngliches Blau */
 }
