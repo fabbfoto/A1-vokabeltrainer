@@ -6,19 +6,23 @@
     <title>Goethe A1 Vokabeltrainer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- <link rel="manifest" href="./manifest.json"> -->
+
     <meta name="theme-color" content="#3b82f6">
    <link rel="stylesheet" href="../../shared/style.css">
 </head>
-<body class="flex flex-col items-center p-4 bg-gray-50"> <!-- bg-gray-50 hinzugefügt für Konsistenz -->
-    <div id="wortgruppen-selector" class="ui-mode w-full max-w-2xl"> <!-- ID ist 'wortgruppen-selector', Klasse 'ui-mode' ist wichtig -->
+
+
+<body class="flex flex-col items-center p-4 bg-gray-50">
+    <div id="wortgruppen-selector" class="ui-mode w-full max-w-2xl">
         <h1 class="text-2xl font-bold text-center mb-6 text-gray-700">Goethe A1 - Wortgruppen</h1>
         <div id="wortgruppen-buttons" class="grid grid-cols-3 gap-3">
         </div>
     </div>
 
-    <div id="trainer-main-view" class="ui-mode hidden-view w-full max-w-2xl flex flex-col items-center"> <!-- max-w-2xl für Konsistenz -->
-        <div id="mode-selector" class="w-full max-w-[600px] mx-auto p-2 bg-white rounded-lg shadow-md mb-4"> <!-- max-width und mx-auto für Zentrierung -->
+
+
+    <div id="trainer-main-view" class="ui-mode hidden-view w-full max-w-2xl flex flex-col items-center">
+        <div id="mode-selector" class="w-full max-w-[600px] mx-auto p-2 bg-white rounded-lg shadow-md mb-4">
             <div class="flex justify-between items-center mb-2">
                 <button id="back-to-wortgruppen" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&leftarrow; Zurück</button>
                 <h2 id="current-wortgruppe-title" class="text-lg font-semibold text-gray-700">Wortgruppe</h2>
@@ -32,7 +36,8 @@
             </div>
         </div>
 
-        <div class="card w-full"> <!-- w-full hinzugefügt -->
+
+        <div class="card w-full">
             <div id="word-line-container" class="audio-line-container"><div id="question-display-area"></div><button id="audio-word-button" class="audio-button" title="Wort vorspielen"></button></div>
             <div id="sentence-line-container" class="audio-line-container"><div id="example-sentence-display"></div><button id="audio-sentence-button" class="audio-button" title="Satz vorspielen"></button></div>
             <div id="task-prompt-area"></div>
@@ -43,14 +48,14 @@
                 <div id="noun-input-container" class="hidden flex items-center gap-2"><input type="text" id="spelling-input-noun-1" class="single-word-input flex-grow" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"><input type="text" id="spelling-input-noun-2" class="single-word-input flex-grow" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false"></div>
                 <button id="check-spelling-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
             </div>
-            <!-- NEU: Container für Umlaut-Buttons -->
+
             <div id="umlaut-buttons-container" class="mt-4 flex justify-center space-x-2" style="display: none;">
                 <button class="umlaut-button" title="Shift für Caps">ä</button>
                 <button class="umlaut-button" title="Shift für Caps">ö</button>
                 <button class="umlaut-button" title="Shift für Caps">ü</button>
                 <button class="umlaut-button" title="Shift für Caps">ß</button>
             </div>
-            <!-- ENDE NEU -->
+
             <div id="cloze-adj-de-ui" class="my-4 space-y-3" style="display: none;">
                 <div id="cloze-hint-container" class="text-center text-lg text-gray-500 mb-2" style="display: none;"></div>
                 <div id="cloze-sentence-container" class="text-center text-xl"></div>
@@ -121,5 +126,80 @@
             </div>
         </div>
     </div>
+
+    <footer class="copyright-footer">
+        <div class="footer-content">
+            <p class="copyright-text">© 2025 Frank Burkert - A1 Vokabeltrainer</p>
+            <p class="footer-links">
+                <a href="../../LICENSE.md" target="_blank" class="footer-link">
+                    📄 Nutzungsbedingungen & Copyright
+                </a>
+                <span class="separator">|</span>
+                <span class="educational-note">🎓 Nur für Bildungszwecke</span>
+            </p>
+            <p class="version-info">Basis-Trainer v2.0</p>
+        </div>
+    </footer>
+    <style>
+    .copyright-footer {
+        margin-top: 40px;
+        padding: 24px 20px;
+        border-top: 2px solid #e5e5e5;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        text-align: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .footer-content {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .copyright-text {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0 0 12px 0;
+    }
+    .footer-links {
+        font-size: 0.95em;
+        color: #4a5568;
+        margin: 0 0 8px 0;
+    }
+    .footer-link {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+    .footer-link:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+    .separator {
+        margin: 0 12px;
+        color: #a0aec0;
+    }
+    .educational-note {
+        color: #059669;
+        font-weight: 500;
+    }
+    .version-info {
+        font-size: 0.85em;
+        color: #6b7280;
+        margin: 8px 0 0 0;
+        font-style: italic;
+    }
+    @media (max-width: 640px) {
+        .copyright-footer {
+            padding: 20px 16px;
+        }
+        .footer-links {
+            font-size: 0.9em;
+        }
+        .separator {
+            display: block;
+            margin: 8px 0;
+        }
+    }
+    </style>
 </body>
 </html>
