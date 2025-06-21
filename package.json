@@ -1,0 +1,11 @@
+{
+  "name": "a1-themen-trainer",
+  "version": "1.0.0",
+  "description": "A1 Themen-Vokabeltrainer für Deutsch als Fremdsprache",
+  "dependencies": {
+    "@google-cloud/text-to-speech": "^5.0.0"
+  },
+  "engines": {
+    "node": "18"
+  }
+}
