@@ -1,7 +1,22 @@
 [build]
-  # Alle Dateien sind bereits im Root - kein Build nötig
-  command = "echo 'No build needed - files are in root'"
+  # Dateien sind im Root, aber LICENSE.md muss sichtbar sein
+  command = "echo 'Files ready in root - LICENSE.md available'"
   publish = "."
 
 [build.environment]
   NODE_VERSION = "18"
+
+# Headers für bessere Sicherheit
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# LICENSE.md als statische Datei verfügbar machen
+[[headers]]
+  for = "/LICENSE.md"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
