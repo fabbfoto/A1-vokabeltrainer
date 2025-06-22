@@ -318,3 +318,27 @@ body {
 .kasus-verb {
     color: magenta; /* Magenta für Verben (kräftiger als Pink) */
 }
+
+/* SCHWARZ-ROT-GOLD FARBSCHEMA */
+.color-black-sr { background-color: #1f2937 !important; }
+.color-red-sr { background-color: #dc2626 !important; }
+.color-gold-sr { background-color: #f59e0b !important; }
+.color-original { background-color: #3b82f6 !important; }
+
+.stats-bar.color-black-sr,
+.category-progress-bar-fg.color-black-sr,
+.progress-bar-fill.color-black-sr {
+    background-color: #1f2937 !important;
+}
+
+.stats-bar.color-red-sr,
+.category-progress-bar-fg.color-red-sr,
+.progress-bar-fill.color-red-sr {
+    background-color: #dc2626 !important;
+}
+
+.stats-bar.color-gold-sr,
+.category-progress-bar-fg.color-gold-sr,
+.progress-bar-fill.color-gold-sr {
+    background-color: #f59e0b !important;
+}

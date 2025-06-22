@@ -3,11 +3,8 @@
 // Import der Vokabeln aus dem gleichen Ordner
 import { goetheA1Wortschatz } from './vokabular.js';
 
-// Import des Zustands aus dem Hauptverzeichnis (zwei Ebenen nach oben)
-// import state from '../../state.js'; // ENTFERNT: Verwenden lokales State-Objekt
-
 // Import der Helfer- und UI-Funktionen aus dem geteilten Ordner (zwei Ebenen nach oben, dann in /shared)
-import { vergleicheAntwort, shuffleArray, setUIMode } from '../../shared/helfer.js'; // konvertiereUmlaute entfernt, setUIMode hinzugefügt
+import { vergleicheAntwort, shuffleArray, setUIMode, calculateProgressPercentage, getProgressColorClass, insertTextAtCursor } from '../../shared/helfer.js';
 import * as uiModes from '../../shared/ui-modes.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,13 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
         nounInputContainerEl, spellingInputNoun1El, spellingInputNoun2El, checkSpellingButton,
         clozeUiEl, clozeHintContainerEl, clozeSentenceContainerEl, checkClozeButton, sentenceUiEl,
         sentenceWordInputContainerEl, checkSentenceButton, feedbackContainerEl, continueButton,
-        messageBoxEl, wordLineContainerEl, sentenceLineContainerEl, audioWordButtonEl, audioSentenceButtonEl, umlautButtonsContainerEl, // umlautButtonsContainerEl HINZUGEFÜGT
+        messageBoxEl, wordLineContainerEl, sentenceLineContainerEl, audioWordButtonEl, audioSentenceButtonEl, umlautButtonsContainerEl,
         SVG_SPEAKER_ICON,
         practiceStatsViewEl, correctInRoundPracticeEl, attemptedInRoundPracticeEl, accuracyBarEl, categoryStatsContainerEl,
         testStatsViewEl, testProgressTextEl, testProgressEl, testAccuracyTextEl, testAccuracyBarEl;
 
     function initializeDOMReferences() {
-        wortgruppenSelectorContainerEl = document.getElementById('wortgruppen-selector'); // ID korrigiert
+        wortgruppenSelectorContainerEl = document.getElementById('wortgruppen-selector');
         trainerMainViewEl = document.getElementById('trainer-main-view');
         wortgruppenButtonsEl = document.getElementById('wortgruppen-buttons');
         backToWortgruppenButton = document.getElementById('back-to-wortgruppen');
@@ -85,11 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
         testProgressEl = document.getElementById('test-progress-bar');
         testAccuracyTextEl = document.getElementById('test-accuracy-text');
         testAccuracyBarEl = document.getElementById('test-accuracy-bar');
-        umlautButtonsContainerEl = document.getElementById('umlaut-buttons-container'); // GEÄNDERT: Direkte Zuweisung zur let-Variable
+        umlautButtonsContainerEl = document.getElementById('umlaut-buttons-container');
         SVG_SPEAKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 12H4a1 1 0 00-1 1v2a1 1 0 001 1h1.858l4.47 4.47A1 1 0 0012 20V4a1 1 0 00-1.672-.748L5.858 12z" /></svg>`;
     }
 
-    function showMessage(message, type = 'error', duration = 3000) { messageBoxEl.textContent = message; messageBoxEl.className = `fixed bottom-5 right-5 text-white p-3 rounded-lg shadow-xl ${type === 'success' ? 'bg-green-500' : type === 'info' ? 'bg-blue-500' : 'bg-red-500'}`; messageBoxEl.classList.remove('hidden'); setTimeout(() => messageBoxEl.classList.add('hidden'), duration); }
+    function showMessage(message, type = 'error', duration = 3000) { 
+        messageBoxEl.textContent = message; 
+        messageBoxEl.className = `fixed bottom-5 right-5 text-white p-3 rounded-lg shadow-xl ${type === 'success' ? 'bg-green-500' : type === 'info' ? 'bg-blue-500' : 'bg-red-500'}`; 
+        messageBoxEl.classList.remove('hidden'); 
+        setTimeout(() => messageBoxEl.classList.add('hidden'), duration); 
+    }
 
     function saveLastTestScores() {
         localStorage.setItem('goetheA1LastTestScores', JSON.stringify(state.lastTestScores));
@@ -115,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
         questionDisplayEl.textContent = '';
         exampleSentenceDisplayEl.textContent = '';
         [audioWordButtonEl, audioSentenceButtonEl].forEach(btn => { if(btn) { btn.onclick = null; btn.style.display = 'none'; } });
-        if (umlautButtonsContainerEl) umlautButtonsContainerEl.style.display = 'none'; // GEÄNDERT: Direkter Zugriff auf Variable
+        if (umlautButtonsContainerEl) umlautButtonsContainerEl.style.display = 'none';
     }
 
     function handleTestCompletion() {
@@ -178,7 +180,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (checkSentenceButton) checkSentenceButton.disabled = true;
 
         state.attemptedInRound++;
-        // KORREKTUR: Verwende die eindeutige ID der Vokabel
         const wordId = state.currentWordData.id; 
         if (isCorrect) {
             state.correctInRound++;
@@ -190,16 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(state.masteredWordsByMode[state.currentMode]) state.masteredWordsByMode[state.currentMode].add(wordId);
                 if(state.wordsToRepeatByMode[state.currentMode]) state.wordsToRepeatByMode[state.currentMode].delete(wordId);
 
-                // Stelle sicher, dass die verschachtelten Objekte für den Fortschritt existieren
-                if (!state.globalProgress[state.currentWortgruppeName]) {
-                    state.globalProgress[state.currentWortgruppeName] = {};
-                }
-                if (!state.globalProgress[state.currentWortgruppeName][state.currentMode]) {
-                }
-
-                // Füge das aktuell gelernte Wort zum Set hinzu.
-                // Passe ggf. 'aktuellesWort.deutsch' an die tatsächliche Variable für das Wort an.
-                state.globalProgress[state.currentWortgruppeName][state.currentMode].add(state.currentWordData.german);
                 saveGlobalProgress();
             }
             setTimeout(() => { loadNextTask(); }, 1200);
@@ -232,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.isRepeatSessionActive = false;
                 return;
             }
-            // KORREKTUR: Filtere basierend auf der Vokabel-ID
             wordsForSession = alleVokabeln.filter(word => word.id && wordIdsToRepeat.has(word.id));
         } else {
             wordsForSession = [...state.currentVocabularySet];
@@ -305,9 +295,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const modeInfo = learningModes[modeId];
             const masteredCount = state.masteredWordsByMode[modeId]?.size || 0;
             const percentage = totalItemsInSet > 0 ? (masteredCount / totalItemsInSet) * 100 : 0;
+            // NEU: Deutschland-Farben verwenden
+            const colorClass = getProgressColorClass(masteredCount, totalItemsInSet);
             const item = document.createElement('div');
             item.className = 'category-stat-item';
-            item.innerHTML = `<span class="category-stat-text">${modeInfo.name}: ${masteredCount} / ${totalItemsInSet}</span><div class="category-progress-bar-bg"><div class="category-progress-bar-fg" style="width: ${percentage}%;"></div></div>`;
+            item.innerHTML = `<span class="category-stat-text">${modeInfo.name}: ${masteredCount} / ${totalItemsInSet}</span><div class="category-progress-bar-bg"><div class="category-progress-bar-fg ${colorClass}" style="width: ${percentage}%;"></div></div>`;
             itemsContainer.appendChild(item);
         });
         categoryStatsContainerEl.appendChild(itemsContainer);
@@ -327,12 +319,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (state.globalProgress[name]) {
                 completedTasks = Object.values(state.globalProgress[name]).reduce((sum, set) => sum + set.size, 0);
             }
-            const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-            let barColor;
-            if (index < 6) barColor = '#4a5568';
-            else if (index < 12) barColor = '#c53030';
-            else barColor = '#d69e2e';
-            button.innerHTML = `<span class="button-text-label">${name}</span><div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${percentage}%; background-color: ${barColor};"></div></div>`;
+            const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0; // Behalte diese Zeile, da sie für percentage benötigt wird
+            const colorClass = getProgressColorClass(completedTasks, totalTasks);
+            button.innerHTML = `<span class="button-text-label">${name}</span><div class="progress-bar-container"><div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%;"></div></div>`;
             wortgruppenButtonsEl.appendChild(button);
         });
 
@@ -344,9 +333,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function showWortgruppenSelector() {
-        // Zeichnet die Buttons und ihre Fortschrittsbalken jedes Mal neu
         populateWortgruppenButtons();
-        setUIMode('wortgruppen-selector'); // Sicherstellen, dass diese Ansicht aktiviert wird
+        setUIMode('wortgruppen-selector');
     }
 
     function showTrainerForWortgruppe(wortgruppeName) {
@@ -371,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         currentWortgruppeTitleEl.textContent = wortgruppeName;
-        setUIMode('trainer-main-view'); // Zur Trainer-Ansicht wechseln
+        setUIMode('trainer-main-view');
         updatePracticeStats();
         updateErrorCounts();
         setTimeout(() => setMode('mc-de-en'), 10);
@@ -381,7 +369,10 @@ document.addEventListener('DOMContentLoaded', () => {
         correctInRoundPracticeEl.textContent = state.correctInRound;
         attemptedInRoundPracticeEl.textContent = state.attemptedInRound;
         const accuracy = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) * 100 : 0;
+        // NEU: Deutschland-Farben für Accuracy-Bar verwenden
+        const colorClass = getProgressColorClass(accuracy, 100);
         accuracyBarEl.style.width = `${accuracy}%`;
+        accuracyBarEl.className = `stats-bar ${colorClass}`;
         updateCategoryStats();
     }
 
@@ -396,33 +387,18 @@ document.addEventListener('DOMContentLoaded', () => {
         testAccuracyBarEl.style.width = `${accuracyPercentage}%`;
     }
 
-    // NEU: Funktion zum Einfügen von Text an der Cursorposition (kopiert von trainer-themen)
-    function insertTextAtCursor(inputElement, text) {
-        if (!inputElement) return;
-        const start = inputElement.selectionStart;
-        const end = inputElement.selectionEnd;
-        const oldValue = inputElement.value;
-        inputElement.value = oldValue.substring(0, start) + text + oldValue.substring(end);
-        inputElement.selectionStart = inputElement.selectionEnd = start + text.length;
-        inputElement.focus(); // Wichtig, um den Fokus zu behalten/wiederherstellen
-        // Manuell ein 'input'-Event auslösen, falls andere Logik darauf hört
-        const event = new Event('input', { bubbles: true, cancelable: true });
-        inputElement.dispatchEvent(event);
-    }
-
-    // NEU: Initialisiert die Umlaut-Buttons (kopiert von trainer-themen)
     function initUmlautButtons() {
-        if (dom.umlautButtonsContainerEl) {
-            const buttons = dom.umlautButtonsContainerEl.querySelectorAll('.umlaut-button');
-            buttons.forEach(button => { // Korrigierte Event-Listener-Logik
-                button.addEventListener('click', (event) => { // event-Parameter hinzugefügt
+        if (umlautButtonsContainerEl) {
+            const buttons = umlautButtonsContainerEl.querySelectorAll('.umlaut-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', (event) => {
                     const charToInsert = event.shiftKey ? button.textContent.toUpperCase() : button.textContent;
-                    // Für 'ß': toUpperCase() ergibt 'SS', was meistens das gewünschte Verhalten ist.
                     insertTextAtCursor(state.activeTextInput, charToInsert);
                 });
             });
         }
     }
+
     function erstelleTestAufgaben() {
         const alleWortgruppenNamen = Object.keys(goetheA1Wortschatz);
         let testAufgaben = [];
@@ -462,7 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
         practiceStatsViewEl.classList.add('hidden');
         testStatsViewEl.classList.remove('hidden');
         modeButtonGridEl.classList.add('hidden');
-        setUIMode('trainer-main-view'); // Korrekte UI-Steuerung
+        setUIMode('trainer-main-view');
 
         updateTestStats();
         updateErrorCounts();
@@ -526,8 +502,6 @@ document.addEventListener('DOMContentLoaded', () => {
         loadGlobalProgress();
         loadLastTestScores();
 
-        dom.processAnswer = processAnswer;
-
         backToWortgruppenButton.addEventListener('click', showWortgruppenSelector);
         Object.keys(learningModes).forEach(modeId => {
             const button = document.getElementById(`mode-${modeId}`);
@@ -538,24 +512,21 @@ document.addEventListener('DOMContentLoaded', () => {
         continueButton.addEventListener('click', () => {
             loadNextTask();
         });
-        initUmlautButtons(); // NEU: Umlaut-Buttons initialisieren
+        initUmlautButtons();
         showWortgruppenSelector();
         initTestModeListeners();
     }
 
     // ===== START DER INITIALISIERUNGSSEQUENZ =====
 
-    // 1. Die Funktion "initializeDOMReferences()" wird aufgerufen.
     initializeDOMReferences();
 
-    // Früher Fehlercheck für kritische Abhängigkeiten
     if (typeof goetheA1Wortschatz === 'undefined' || typeof vergleicheAntwort === 'undefined') {
         console.error("KRITISCHER FEHLER: Wichtige Skript-Dateien (vokabular.js, helfer.js) fehlen oder sind fehlerhaft.");
         document.body.innerHTML = '<div style="padding: 2rem; text-align: center; font-family: sans-serif; background-color: #ffcccc; border: 2px solid red;"><h1>Fehler beim Laden</h1><p>Wichtige App-Daten konnten nicht geladen werden. Bitte überprüfe die Browser-Konsole (F12) für Details.</p></div>';
-        return; // Stoppt weitere Ausführung
+        return;
     }
 
-    // 2. Das "dom"-Objekt, das die DOM-Referenzen bündelt, wird erstellt.
     const dom = {
         mcUiEl, mcAnswersContainerEl, questionDisplayEl, exampleSentenceDisplayEl, audioWordButtonEl,
         audioSentenceButtonEl, wordLineContainerEl, sentenceLineContainerEl, SVG_SPEAKER_ICON,
@@ -563,12 +534,11 @@ document.addEventListener('DOMContentLoaded', () => {
         spellingInputSingleEl, spellingInputNoun1El, spellingInputNoun2El,
         clozeUiEl, clozeHintContainerEl, clozeSentenceContainerEl, checkClozeButton,
         sentenceUiEl, sentenceWordInputContainerEl, checkSentenceButton, 
-        umlautButtonsContainerEl // GEÄNDERT: Verwendet die initialisierte Variable
+        umlautButtonsContainerEl
     };
 
     const alleVokabeln = Object.values(goetheA1Wortschatz).flat();
 
-    // 3. Das "learningModes"-Objekt wird erstellt, da es vom "dom"-Objekt abhängt.
     const learningModes = {
         'mc-de-en': { name: "Bedeutung", setupFunc: () => uiModes.setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) },
         'type-de-adj': { name: "Schreibweise", setupFunc: () => uiModes.setupSpellingMode(dom, state, processAnswer) },
@@ -576,35 +546,28 @@ document.addEventListener('DOMContentLoaded', () => {
         'sentence-translation-en-de': { name: "Satzübersetzung", setupFunc: () => uiModes.setupSentenceTranslationEnDeMode(dom, state, processAnswer) },
     };
 
-    // 4. Erst danach wird die "init()"-Funktion aufgerufen, die den Rest der Anwendung startet.
     init();
-    // HIER EINFÜGEN (vor der letzten `});` Klammer)
 
-function displaySentence(vokabel, sentenceContainer) {
-    // Vorherigen Satz löschen
-    sentenceContainer.innerHTML = '';
+    function displaySentence(vokabel, sentenceContainer) {
+        sentenceContainer.innerHTML = '';
 
-    if (!vokabel.beispielsatz) {
-        return; // Nichts zu tun, wenn kein Satz vorhanden ist
+        if (!vokabel.beispielsatz) {
+            return;
+        }
+
+        if (Array.isArray(vokabel.beispielsatz)) {
+            vokabel.beispielsatz.forEach(part => {
+                const span = document.createElement('span');
+                span.textContent = part.text;
+
+                if (part.kasus && part.kasus !== 'none') {
+                    span.className = `kasus-${part.kasus}`;
+                }
+                sentenceContainer.appendChild(span);
+            });
+        } else {
+            sentenceContainer.textContent = vokabel.beispielsatz;
+        }
     }
 
-    // Prüfen, ob der Beispielsatz das neue Array-Format hat
-    if (Array.isArray(vokabel.beispielsatz)) {
-        vokabel.beispielsatz.forEach(part => {
-            const span = document.createElement('span');
-            span.textContent = part.text;
-
-            // CSS-Klasse nur hinzufügen, wenn ein Kasus definiert ist (und nicht 'none')
-            if (part.kasus && part.kasus !== 'none') {
-                span.className = `kasus-${part.kasus}`;
-            }
-            sentenceContainer.appendChild(span);
-        });
-    } else {
-        // Fallback für alte Sätze, die nur Text sind
-        sentenceContainer.textContent = vokabel.beispielsatz;
-    }
-}
-
-// Bis hierhin kopieren
 });

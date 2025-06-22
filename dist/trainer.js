@@ -313,12 +313,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (state.globalProgress[name]) {
                 completedTasks = Object.values(state.globalProgress[name]).reduce((sum, set) => sum + set.size, 0);
             }
-            const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
-            let barColor;
-            if (index < 6) barColor = '#4a5568';
-            else if (index < 12) barColor = '#c53030';
-            else barColor = '#d69e2e';
-            button.innerHTML = `<span class="button-text-label">${name}</span><div class="progress-bar-container"><div class="progress-bar-fill" style="width: ${percentage}%; background-color: ${barColor};"></div></div>`;
+            const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0; // Behalte diese Zeile, da sie für percentage benötigt wird
+            const colorClass = getProgressColorClass(completedTasks, totalTasks);
+            button.innerHTML = `<span class="button-text-label">${name}</span><div class="progress-bar-container"><div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%;"></div></div>`;
             wortgruppenButtonsEl.appendChild(button);
         });
 

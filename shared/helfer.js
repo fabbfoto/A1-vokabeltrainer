@@ -131,3 +131,34 @@ export function splitSentence(sentence) {
     if (typeof sentence !== 'string') return [];
     return sentence.match(/\S+/g) || [];
 }
+// ===== SCHWARZ-ROT-GOLD FARBSCHEMA-SYSTEM =====
+let currentColorTheme = localStorage.getItem('vokabeltrainer-theme') || 'german';
+
+export function calculateProgressPercentage(completed, total) {
+    if (total === 0) return 0;
+    return Math.round((completed / total) * 100);
+}
+
+export function getProgressColorClass(completed, total) {
+    const percentage = calculateProgressPercentage(completed, total);
+    
+    if (currentColorTheme === 'german') {
+        if (percentage < 34) return 'color-black-sr';
+        if (percentage < 67) return 'color-red-sr';
+        return 'color-gold-sr';
+    }
+    
+    return 'color-original';
+}
+
+export function insertTextAtCursor(inputElement, text) {
+    if (!inputElement) return;
+    const start = inputElement.selectionStart;
+    const end = inputElement.selectionEnd;
+    const oldValue = inputElement.value;
+    inputElement.value = oldValue.substring(0, start) + text + oldValue.substring(end);
+    inputElement.selectionStart = inputElement.selectionEnd = start + text.length;
+    inputElement.focus();
+    const event = new Event('input', { bubbles: true, cancelable: true });
+    inputElement.dispatchEvent(event);
+}
