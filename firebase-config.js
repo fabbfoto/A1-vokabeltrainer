@@ -70,16 +70,6 @@ export async function initializeAuth() {
     });
   });
 }
-// ===== DEINE BESTEHENDE firebase-config.js =====
-// (alles bleibt wie es ist)
-
-const firebaseConfig = { ... };
-const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-// ... all dein bestehender Code ...
-
-// ===== HIER FÜGST DU NUR DAS HINZU =====
 // Device Sync Management
 let deviceSyncService = null;
 
