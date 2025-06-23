@@ -402,15 +402,29 @@ class DeviceSyncUI {
    * Behandelt Eingabe in Code-Feldern
    */
   moveToNext(input, index) {
+    // Konvertiere zu Großbuchstaben
+    input.value = input.value.toUpperCase();
+    
+    // Springe zum nächsten Feld nur wenn aktuelles Feld ausgefüllt ist
     if (input.value.length === 1 && index < 5) {
       const nextInput = input.parentNode.children[index + 1];
       if (nextInput) {
         nextInput.focus();
+        nextInput.select();
       }
     }
     
-    // Prüfe ob alle Felder ausgefüllt sind
+    // Prüfe ob alle Felder ausgefüllt sind (ohne Seiteneffekte)
+    this.checkCodeComplete();
+  }
+
+  /**
+   * Prüft ob Code vollständig eingegeben wurde
+   */
+  checkCodeComplete() {
     const inputs = document.querySelectorAll('.code-digit-input');
+    if (!inputs.length) return;
+    
     const allFilled = Array.from(inputs).every(inp => inp.value.length === 1);
     
     if (allFilled) {
@@ -423,10 +437,33 @@ class DeviceSyncUI {
    * Behandelt Tastatureingaben in Code-Feldern
    */
   handleKeyDown(event, index) {
-    if (event.key === 'Backspace' && !event.target.value && index > 0) {
+    // Backspace: Gehe zum vorherigen Feld
+    if (event.key === 'Backspace') {
+      if (!event.target.value && index > 0) {
+        const prevInput = event.target.parentNode.children[index - 1];
+        if (prevInput) {
+          prevInput.focus();
+          prevInput.select();
+        }
+      }
+    }
+    
+    // Pfeiltasten: Navigation
+    if (event.key === 'ArrowLeft' && index > 0) {
+      event.preventDefault();
       const prevInput = event.target.parentNode.children[index - 1];
       if (prevInput) {
         prevInput.focus();
+        prevInput.select();
+      }
+    }
+    
+    if (event.key === 'ArrowRight' && index < 5) {
+      event.preventDefault();
+      const nextInput = event.target.parentNode.children[index + 1];
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
       }
     }
   }
