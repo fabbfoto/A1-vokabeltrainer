@@ -154,8 +154,8 @@ class DeviceSyncUI {
         <div class="sync-modal-container">
           <div class="sync-modal-header">
             <button class="sync-modal-close">×</button>
-            <h2 class="sync-modal-title">🔗 Geräte verbinden</h2>
-            <p class="sync-modal-subtitle">Synchronisiere deinen Fortschritt zwischen allen Geräten</p>
+            <h2 class="sync-modal-title">🔗 Gerät hinzufügen</h2>
+            <p class="sync-modal-subtitle">Teile den Link mit deinem anderen Gerät</p>
           </div>
           <div class="sync-modal-body">
             <div class="current-device-info" id="current-device-info">
@@ -195,38 +195,12 @@ class DeviceSyncUI {
     const optionsContainer = this.modal.querySelector('#sync-options');
     
     const optionsHTML = `
-      <div class="sync-option" data-option="qr">
-        <div class="sync-option-header">
-          <div class="sync-option-icon qr">📱</div>
-          <div>
-            <h3 class="sync-option-title">QR-Code scannen</h3>
-            <p class="sync-option-description">Am einfachsten für Smartphone</p>
-          </div>
-        </div>
-        <div class="content-display" id="qr-content">
-          <!-- QR-Code Content wird hier eingefügt -->
-        </div>
-      </div>
-
-      <div class="sync-option" data-option="code">
-        <div class="sync-option-header">
-          <div class="sync-option-icon code">#️⃣</div>
-          <div>
-            <h3 class="sync-option-title">6-stelliger Code</h3>
-            <p class="sync-option-description">Code eingeben oder teilen</p>
-          </div>
-        </div>
-        <div class="content-display" id="code-content">
-          <!-- Code Content wird hier eingefügt -->
-        </div>
-      </div>
-
       <div class="sync-option" data-option="link">
         <div class="sync-option-header">
           <div class="sync-option-icon link">🔗</div>
           <div>
             <h3 class="sync-option-title">Link teilen</h3>
-            <p class="sync-option-description">Per WhatsApp, E-Mail, etc.</p>
+            <p class="sync-option-description">Teile den Link mit deinem anderen Gerät</p>
           </div>
         </div>
         <div class="content-display" id="link-content">
@@ -237,12 +211,9 @@ class DeviceSyncUI {
 
     optionsContainer.innerHTML = optionsHTML;
 
-    // Event Listeners für Optionen
-    optionsContainer.querySelectorAll('.sync-option').forEach(option => {
-      option.addEventListener('click', (e) => {
-        const optionType = option.getAttribute('data-option');
-        this.selectSyncOption(optionType);
-      });
+    // Event Listener für Link-Option
+    optionsContainer.querySelector('.sync-option').addEventListener('click', (e) => {
+      this.selectSyncOption('link');
     });
   }
 
@@ -250,6 +221,8 @@ class DeviceSyncUI {
    * Wählt eine Sync-Option aus
    */
   async selectSyncOption(option) {
+    if (option !== 'link') return;
+    
     try {
       // Deaktiviere alle Optionen
       this.modal.querySelectorAll('.sync-option').forEach(opt => {
@@ -259,26 +232,26 @@ class DeviceSyncUI {
         content.classList.remove('active');
       });
 
-      // Aktiviere gewählte Option
-      const selectedOption = this.modal.querySelector(`[data-option="${option}"]`);
+      // Aktiviere Link-Option
+      const selectedOption = this.modal.querySelector(`[data-option="link"]`);
       selectedOption.classList.add('active');
       
-      const contentDiv = document.getElementById(option + '-content');
+      const contentDiv = document.getElementById('link-content');
       contentDiv.classList.add('active');
 
-      this.currentSyncType = option;
+      this.currentSyncType = 'link';
 
       // Erstelle Sync-Session
-      this.showStatusMessage('info', 'Erstelle Sync-Session...');
+      this.showStatusMessage('info', '🔄 Erstelle Sync-Link...');
       this.currentSyncCode = await firebaseSyncService.createSyncSession();
       
-      // Befülle Content basierend auf gewählter Option
-      this.populateOptionContent(option, contentDiv);
+      // Befülle Link-Content
+      this.populateOptionContent('link', contentDiv);
       
-      this.showStatusMessage('success', `${this.getOptionName(option)} bereit`);
+      this.showStatusMessage('success', '✅ Sync-Link bereit zum Teilen!');
       
     } catch (error) {
-      this.showStatusMessage('error', `Fehler: ${error.message}`);
+      this.showStatusMessage('error', `❌ Fehler: ${error.message}`);
     }
   }
 
@@ -289,210 +262,33 @@ class DeviceSyncUI {
     const syncCode = this.currentSyncCode;
     const syncLink = firebaseSyncService.generateSyncLink(syncCode);
 
-    switch (option) {
-      case 'qr':
-        contentDiv.innerHTML = `
-          <div class="qr-code-display">
-            <div class="qr-code-placeholder" id="qrCodePlaceholder">
-              <div style="width: 160px; height: 160px; background: #f3f4f6; border: 2px dashed #d1d5db; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 48px;">
-                📱
-              </div>
-            </div>
-            <p><strong>Scanne diesen Code mit deinem Smartphone</strong></p>
-            <p style="font-size: 12px; color: #6b7280;">
-              Öffne die Kamera-App und richte sie auf den QR-Code
-            </p>
-            <p style="font-size: 10px; color: #9ca3af; font-family: monospace;">
-              Link: ${syncLink}
-            </p>
-          </div>
-          <div class="sync-action-buttons">
-            <button class="sync-btn sync-btn-primary" onclick="deviceSyncUI.generateQRCode()">
-              QR-Code erstellen
-            </button>
-            <button class="sync-btn sync-btn-secondary" onclick="deviceSyncUI.refreshSync()">
-              Neuer Code
-            </button>
-          </div>
-        `;
-        break;
-
-      case 'code':
-        contentDiv.innerHTML = `
-          <div class="sync-code-display">
-            <p><strong>Dein Sync-Code:</strong></p>
-            <div class="sync-code-large">${syncCode}</div>
-            <p style="font-size: 14px; color: #6b7280;">
-              Gib diesen Code auf deinem anderen Gerät ein
-            </p>
-          </div>
-          <div class="code-input-section">
-            <p><strong>Code von anderem Gerät eingeben:</strong></p>
-            <div class="sync-code-input" id="codeInputContainer">
-              ${Array.from({length: 6}, (_, i) => 
-                `<input type="text" class="code-digit-input" maxlength="1" 
-                 oninput="deviceSyncUI.moveToNext(this, ${i})" 
-                 onkeydown="deviceSyncUI.handleKeyDown(event, ${i})">`
-              ).join('')}
-            </div>
-            <div class="sync-action-buttons">
-              <button class="sync-btn sync-btn-primary" onclick="deviceSyncUI.connectWithCode()">
-                Verbinden
-              </button>
-              <button class="sync-btn sync-btn-secondary" onclick="deviceSyncUI.refreshSync()">
-                Neuer Code
-              </button>
-            </div>
-          </div>
-        `;
-        break;
-
-      case 'link':
-        contentDiv.innerHTML = `
-          <div class="sync-link-display">
-            <p><strong>Sync-Link:</strong></p>
+    if (option === 'link') {
+      contentDiv.innerHTML = `
+        <div class="sync-link-display">
+          <p><strong>🔗 Dein Sync-Link:</strong></p>
+          <div class="sync-link-container">
             <input type="text" class="sync-link-input" id="syncLinkInput"
                    value="${syncLink}" readonly>
-            <p style="font-size: 14px; color: #6b7280;">
-              Teile diesen Link mit deinem anderen Gerät
-            </p>
-          </div>
-          <div class="sync-action-buttons">
-            <button class="sync-btn sync-btn-success" onclick="deviceSyncUI.copyLink()">
-              📋 Link kopieren
-            </button>
-            <button class="sync-btn sync-btn-primary" onclick="deviceSyncUI.shareLink()">
-              📤 Teilen
-            </button>
-            <button class="sync-btn sync-btn-secondary" onclick="deviceSyncUI.refreshSync()">
-              Neuer Link
+            <button class="sync-link-copy-btn" onclick="deviceSyncUI.copyLink()" title="Kopieren">
+              📋
             </button>
           </div>
-        `;
-        break;
-    }
-  }
-
-  /**
-   * Generiert QR-Code (Platzhalter)
-   */
-  generateQRCode() {
-    const qrPlaceholder = document.getElementById('qrCodePlaceholder');
-    if (!qrPlaceholder) return;
-
-    this.showStatusMessage('info', '📱 QR-Code wird erstellt...');
-    
-    // Simuliere QR-Code Erstellung
-    setTimeout(() => {
-      qrPlaceholder.innerHTML = `
-        <div style="width: 160px; height: 160px; background: 
-        repeating-linear-gradient(0deg, #000, #000 3px, #fff 3px, #fff 6px),
-        repeating-linear-gradient(90deg, #000, #000 3px, #fff 3px, #fff 6px);
-        border-radius: 8px; position: relative;">
-          <div style="position: absolute; top: 10px; left: 10px; width: 20px; height: 20px; background: #000;"></div>
-          <div style="position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; background: #000;"></div>
-          <div style="position: absolute; bottom: 10px; left: 10px; width: 20px; height: 20px; background: #000;"></div>
+          <p class="sync-link-description">
+            Öffne diesen Link auf deinem anderen Gerät und die Synchronisation startet automatisch
+          </p>
+        </div>
+        <div class="sync-action-buttons">
+          <button class="sync-btn sync-btn-germany" onclick="deviceSyncUI.copyLink()">
+            📋 Link kopieren
+          </button>
+          <button class="sync-btn sync-btn-germany" onclick="deviceSyncUI.shareLink()">
+            📤 Link teilen
+          </button>
+          <button class="sync-btn sync-btn-secondary" onclick="deviceSyncUI.refreshSync()">
+            🔄 Neuer Link
+          </button>
         </div>
       `;
-      this.showStatusMessage('success', '✅ QR-Code erstellt! Bereit zum Scannen');
-    }, 1000);
-  }
-
-  /**
-   * Behandelt Eingabe in Code-Feldern
-   */
-  moveToNext(input, index) {
-    // Konvertiere zu Großbuchstaben
-    input.value = input.value.toUpperCase();
-    
-    // Springe zum nächsten Feld nur wenn aktuelles Feld ausgefüllt ist
-    if (input.value.length === 1 && index < 5) {
-      const nextInput = input.parentNode.children[index + 1];
-      if (nextInput) {
-        nextInput.focus();
-        nextInput.select();
-      }
-    }
-    
-    // Prüfe ob alle Felder ausgefüllt sind (ohne Seiteneffekte)
-    this.checkCodeComplete();
-  }
-
-  /**
-   * Prüft ob Code vollständig eingegeben wurde
-   */
-  checkCodeComplete() {
-    const inputs = document.querySelectorAll('.code-digit-input');
-    if (!inputs.length) return;
-    
-    const allFilled = Array.from(inputs).every(inp => inp.value.length === 1);
-    
-    if (allFilled) {
-      const enteredCode = Array.from(inputs).map(inp => inp.value.toUpperCase()).join('');
-      this.showStatusMessage('info', `Code eingegeben: ${enteredCode}`);
-    }
-  }
-
-  /**
-   * Behandelt Tastatureingaben in Code-Feldern
-   */
-  handleKeyDown(event, index) {
-    // Backspace: Gehe zum vorherigen Feld
-    if (event.key === 'Backspace') {
-      if (!event.target.value && index > 0) {
-        const prevInput = event.target.parentNode.children[index - 1];
-        if (prevInput) {
-          prevInput.focus();
-          prevInput.select();
-        }
-      }
-    }
-    
-    // Pfeiltasten: Navigation
-    if (event.key === 'ArrowLeft' && index > 0) {
-      event.preventDefault();
-      const prevInput = event.target.parentNode.children[index - 1];
-      if (prevInput) {
-        prevInput.focus();
-        prevInput.select();
-      }
-    }
-    
-    if (event.key === 'ArrowRight' && index < 5) {
-      event.preventDefault();
-      const nextInput = event.target.parentNode.children[index + 1];
-      if (nextInput) {
-        nextInput.focus();
-        nextInput.select();
-      }
-    }
-  }
-
-  /**
-   * Verbindet mit eingegebenem Code
-   */
-  async connectWithCode() {
-    const inputs = document.querySelectorAll('.code-digit-input');
-    const enteredCode = Array.from(inputs).map(inp => inp.value.toUpperCase()).join('');
-    
-    if (enteredCode.length !== 6) {
-      this.showStatusMessage('error', '❌ Bitte gib einen vollständigen 6-stelligen Code ein');
-      return;
-    }
-
-    try {
-      this.showStatusMessage('info', '🔄 Verbinde mit anderem Gerät...');
-      
-      await firebaseSyncService.joinSyncSession(enteredCode);
-      
-      this.showStatusMessage('success', '✅ Erfolgreich verbunden! Synchronisation läuft...');
-      
-      setTimeout(() => {
-        this.closeModal();
-      }, 3000);
-      
-    } catch (error) {
-      this.showStatusMessage('error', `❌ ${error.message}`);
     }
   }
 
@@ -557,7 +353,7 @@ class DeviceSyncUI {
       const contentDiv = document.getElementById(this.currentSyncType + '-content');
       this.populateOptionContent(this.currentSyncType, contentDiv);
       
-      this.showStatusMessage('success', `✅ Neuer ${this.getOptionName(this.currentSyncType)} erstellt`);
+      this.showStatusMessage('success', `✅ Neuer Link erstellt`);
       
     } catch (error) {
       this.showStatusMessage('error', `❌ ${error.message}`);
@@ -616,12 +412,7 @@ class DeviceSyncUI {
    * Hilfsfunktionen
    */
   getOptionName(option) {
-    const names = {
-      'qr': 'QR-Code',
-      'code': '6-stelliger Code',
-      'link': 'Link'
-    };
-    return names[option] || option;
+    return 'Link';
   }
 
   updateCurrentDeviceInfo() {
