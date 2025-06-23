@@ -12,9 +12,10 @@ import * as ui from './ui.js';
 // === FIREBASE IMPORTS ===
 import { firebaseSyncService } from './firebase-sync.js';
 import { initializeAuth } from './firebase-config.js';
+import { deviceSyncUI } from './device-sync-ui.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-
+document.addEventListener('DOMContentLoaded', async () => {
+    
     // Zentrales State-Objekt zur Verwaltung des Anwendungszustands - ERWEITERT.
     const state = {
         currentMainTopic: null,
@@ -580,5 +581,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // === FIREBASE-ERWEITERTE INITIALISIERUNG ===
-    initWithFirebase();
+    await initWithFirebase();
+    
+    // NEU: Device-Sync UI aktivieren
+    try {
+        await deviceSyncUI.initialize();
+        console.log('✅ Device-Sync UI erfolgreich gestartet');
+    } catch (error) {
+        console.error('❌ Fehler beim Starten der Device-Sync UI:', error);
+    }
 });
