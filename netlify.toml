@@ -20,3 +20,6 @@
   for = "/LICENSE.md"
   [headers.values]
     Content-Type = "text/plain; charset=utf-8"
+    [build]
+  publish = "/"
+  command = "" # Oder entferne diese Zeile, wenn du keinen Build-Befehl benötigst.
