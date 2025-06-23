@@ -69,6 +69,11 @@ export function vergleicheAntwort(userAnswer, correctAnswer, options = {}) {
       processedUserAnswer = processedUserAnswer.replace(punctuationRegex, "");
       processedCorrectAnswer = processedCorrectAnswer.replace(punctuationRegex, "");
   }
+
+  console.log("User Answer:", processedUserAnswer); // Debugging
+  console.log("Correct Answer:", processedCorrectAnswer); // Debugging
+
+
   
   return processedUserAnswer === processedCorrectAnswer;
 }

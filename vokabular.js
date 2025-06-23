@@ -6,6 +6,7 @@ import { vokabularMenschlicherKoerperGesundheit } from './vokabular_menschlicher
 import { vokabularWohnen } from './vokabular_wohnen.js'; // NEU: Import für Wohnen
 import { vokabularUmwelt } from './vokabular_umwelt.js'; // NEU: Import für Umwelt
 import { vokabularEssenTrinken } from './vokabular_essen_trinken.js';
+import { vokabularKommunikationsmittel } from './vokabular_kommunikationsmittel.js'; // NEU: Import für Kommunikationsmittel
 import { vokabularReisenVerkehr } from './vokabular_reisen_verkehr.js'; // NEU: Import für Reisen und Verkehr
 import { vokabularEinkaufen } from './vokabular_einkaufen.js'; // NEU: Import für Einkaufen
 import { vokabularLernen } from './vokabular_lernen.js'; // NEU: Import für Lernen
@@ -18,6 +19,7 @@ export const vokabular = {
     ...vokabularWohnen,
     ...vokabularUmwelt,
     ...vokabularEssenTrinken,
+    ...vokabularKommunikationsmittel, // NEU: Hinzufügen des Themas Kommunikationsmittel
     ...vokabularReisenVerkehr,
     ...vokabularEinkaufen,
     ...vokabularLernen,

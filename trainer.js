@@ -1,4 +1,4 @@
-// packages/trainer-themen/trainer.js
+// trainer.js - ERWEITERTE VERSION mit vollständiger Test-Funktionalität
 // Steuerungslogik für den Themen-Trainer.
 // Diese Datei orchestriert den Anwendungszustand (State) und die UI-Interaktionen,
 // indem sie Funktionen aus den Modulen 'ui.js' und 'ui-modes.js' aufruft.
@@ -11,7 +11,7 @@ import * as ui from './ui.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Zentrales State-Objekt zur Verwaltung des Anwendungszustands.
+    // Zentrales State-Objekt zur Verwaltung des Anwendungszustands - ERWEITERT.
     const state = {
         currentMainTopic: null,
         currentSubTopic: null,
@@ -29,6 +29,12 @@ document.addEventListener('DOMContentLoaded', () => {
         wordsToRepeatByMode: {},
         lastTestScores: {},
         activeTextInput: null,
+        // NEU für erweiterte Test-Funktionalität:
+        testType: null, // 'subtopic', 'mainTopic', oder 'global'
+        testKey: null, // Eindeutiger Schlüssel für Test-Ergebnis-Speicherung
+        // NEU: Für Zurück-Navigation im Test
+        previousMainTopic: null,
+        previousSubTopic: null,
     };
 
     // Hilfsfunktion, um alle Vokabeln aus der verschachtelten Struktur zu extrahieren.
@@ -209,26 +215,154 @@ document.addEventListener('DOMContentLoaded', () => {
         loadNextTask();
     }
 
+    // NEU: Gemeinsame Test-UI Startfunktion
+    function startTestUI(testTitle, modus) {
+        ui.hideAllUIs(dom);
+        dom.trainerMainViewEl.classList.remove('hidden-view');
+        dom.navigationViewEl.classList.add('hidden-view');
+        
+        const modusName = learningModes[modus]?.name || "Test";
+        dom.currentTrainingTitleEl.textContent = `${testTitle} - ${modusName}`;
+        dom.practiceStatsViewEl.classList.add('hidden');
+        dom.testStatsViewEl.classList.remove('hidden');
+        dom.modeButtonGridEl.classList.add('hidden');
+
+        ui.updateTestStats(dom, state);
+        ui.updateErrorCounts(dom, state, learningModes);
+        loadNextTask();
+    }
+
+    // VERBESSERT: Test-Completion mit erweiterten Scores
     function handleTestCompletion() {
         const accuracy = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) : 0;
+        
         if (!state.lastTestScores) state.lastTestScores = {};
-        state.lastTestScores[state.currentMode] = { correct: state.correctInRound, total: state.attemptedInRound, accuracy: accuracy };
+        
+        // Speichere Test-Ergebnis mit erweitertem Schlüssel
+        if (state.testKey) {
+            state.lastTestScores[state.testKey] = { 
+                correct: state.correctInRound, 
+                total: state.attemptedInRound, 
+                accuracy: accuracy,
+                timestamp: Date.now(),
+                testType: state.testType,
+                topic: state.currentMainTopic,
+                subtopic: state.currentSubTopic
+            };
+        }
+        
+        // Speichere auch den alten Schlüssel für Rückwärtskompatibilität
+        state.lastTestScores[state.currentMode] = { 
+            correct: state.correctInRound, 
+            total: state.attemptedInRound, 
+            accuracy: accuracy 
+        };
+        
         saveLastTestScores();
-        ui.showMessage(dom, `Test beendet! Ergebnis: ${state.correctInRound} / ${state.attemptedInRound}`, 'success', 5000);
+        
+        // Test-spezifische Erfolgsmeldung
+        let testTypeName = "Test";
+        switch(state.testType) {
+            case 'subtopic':
+                testTypeName = `${state.currentSubTopic} Test`;
+                break;
+            case 'mainTopic':
+                testTypeName = `${state.currentMainTopic} Gesamttest`;
+                break;
+            case 'global':
+                testTypeName = 'Globaler Gesamttest';
+                break;
+        }
+        
+        // Deutschland-Farben Feedback basierend auf Accuracy
+        const accuracyPercent = Math.round(accuracy * 100);
+        let feedbackColor = 'info';
+        if (accuracyPercent >= 67) feedbackColor = 'success';
+        else if (accuracyPercent >= 34) feedbackColor = 'info';
+        else feedbackColor = 'error';
+        
+        ui.showMessage(dom, 
+            `${testTypeName} beendet! Ergebnis: ${state.correctInRound} / ${state.attemptedInRound} (${accuracyPercent}%)`, 
+            feedbackColor, 5000);
+        
         state.isTestModeActive = false;
-        ui.displayMainTopics(dom, state, vokabular, learningModes);
+        
+        // Zurück zur entsprechenden Ansicht
+        if (state.testType === 'subtopic' && state.currentMainTopic) {
+            // Zurück zur Unterthemen-Ansicht
+            ui.displaySubTopics(dom, state, vokabular, state.currentMainTopic, learningModes);
+        } else {
+            // Zurück zur Hauptthemen-Ansicht
+            ui.displayMainTopics(dom, state, vokabular, learningModes);
+        }
     }
 
     function erstelleTestAufgaben() {
         return shuffleArray([...alleVokabeln]).slice(0, 36);
     }
 
+    // NEU: Hauptthema-Test starten (alle Unterfelder eines Hauptthemas)
+    function starteHauptthemaTest(modus, mainTopicName) {
+        const hauptthema = vokabular[mainTopicName];
+        if (!hauptthema) {
+            ui.showMessage(dom, `Hauptthema "${mainTopicName}" nicht gefunden.`, 'error');
+            return;
+        }
+
+        // Alle Vokabeln aus allen Unterfeldern sammeln
+        let alleVokabelnImHauptthema = [];
+        Object.values(hauptthema).forEach(subtopic => {
+            if (Array.isArray(subtopic)) {
+                alleVokabelnImHauptthema.push(...subtopic);
+            }
+        });
+
+        if (alleVokabelnImHauptthema.length === 0) {
+            ui.showMessage(dom, `Keine Vokabeln in "${mainTopicName}" gefunden.`, 'error');
+            return;
+        }
+
+        // Zufällige Auswahl: 1-3 Aufgaben pro Unterfeld, maximal 30 insgesamt
+        const maxAufgaben = Math.min(30, alleVokabelnImHauptthema.length);
+        const minAufgabenProUnterfeld = 1;
+        const anzahlUnterfelder = Object.keys(hauptthema).length;
+        const aufgabenProUnterfeld = Math.max(minAufgabenProUnterfeld, Math.floor(maxAufgaben / anzahlUnterfelder));
+
+        let aufgaben = [];
+        Object.values(hauptthema).forEach(subtopic => {
+            if (Array.isArray(subtopic)) {
+                const shuffledSubtopic = shuffleArray([...subtopic]);
+                aufgaben.push(...shuffledSubtopic.slice(0, aufgabenProUnterfeld));
+            }
+        });
+
+        const finalAufgaben = shuffleArray(aufgaben).slice(0, maxAufgaben);
+
+        state.isTestModeActive = true;
+        state.currentMode = modus;
+        state.currentMainTopic = mainTopicName;
+        state.currentSubTopic = "Gesamttest";
+        state.currentVocabularySet = finalAufgaben;
+        state.shuffledVocabForMode = finalAufgaben;
+        state.masteredWordsByMode = {};
+        state.wordsToRepeatByMode = {};
+        state.currentWordIndexInShuffled = -1;
+        state.correctInRound = 0;
+        state.attemptedInRound = 0;
+        state.testType = 'mainTopic';
+        state.testKey = `mainTopic-${mainTopicName}-${modus}`;
+
+        startTestUI(`${mainTopicName} Gesamttest`, modus);
+    }
+
+    // VERBESSERT: Globaler Gesamttest (bestehende Funktion erweitert)
     function starteGesamtTest(modus) {
         const aufgaben = erstelleTestAufgaben();
         if (aufgaben.length < 1) {
             ui.showMessage(dom, 'Fehler: Es konnten nicht genügend Testaufgaben erstellt werden.', 'error');
             return;
         }
+
         state.isTestModeActive = true;
         state.currentMode = modus;
         state.currentMainTopic = "Gesamttest";
@@ -240,18 +374,10 @@ document.addEventListener('DOMContentLoaded', () => {
         state.currentWordIndexInShuffled = -1;
         state.correctInRound = 0;
         state.attemptedInRound = 0;
+        state.testType = 'global';
+        state.testKey = `global-${modus}`;
 
-        ui.hideAllUIs(dom);
-        dom.trainerMainViewEl.classList.remove('hidden-view');
-        const modusName = learningModes[modus]?.name || "Test";
-        dom.currentTrainingTitleEl.textContent = `Test - ${modusName}`;
-        dom.practiceStatsViewEl.classList.add('hidden');
-        dom.testStatsViewEl.classList.remove('hidden');
-        dom.modeButtonGridEl.classList.add('hidden');
-
-        ui.updateTestStats(dom, state);
-        ui.updateErrorCounts(dom, state, learningModes);
-        loadNextTask();
+        startTestUI("Globaler Gesamttest", modus);
     }
 
     // --- NAVIGATIONSLOGIK ---
@@ -307,12 +433,14 @@ document.addEventListener('DOMContentLoaded', () => {
         loadGlobalProgress();
         loadLastTestScores();
 
-        // Callbacks für die UI-Schicht, um auf Logikfunktionen zuzugreifen.
+        // Erweiterte Callbacks für die UI-Schicht
         const callbacks = {
             handleNavigation,
-            starteGesamtTest,
+            starteGesamtTest,           // Globaler Test
+            starteHauptthemaTest,       // Hauptthema Test (EINZIGER Test pro Hauptthema)
             getVokabular: () => vokabular
         };
+        
         ui.initEventListeners(dom, state, callbacks, learningModes);
 
         // Event-Listener, die direkt die Kernlogik triggern.

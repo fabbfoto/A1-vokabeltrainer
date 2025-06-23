@@ -1,274 +1,292 @@
-# Kontext-Dokumentation: A1-Vokabeltrainer
+# Kontext: Themen-Trainer - Vollumfängliche Dokumentation
 
-## 1. Projektziel
+## 📋 **Projektübersicht**
 
-Eine erweiterbare Vokabeltrainer-Plattform für Deutsch als Fremdsprache (DaF) auf dem Goethe A1-Niveau. Die App besteht aus zwei eigenständigen Trainer-Anwendungen, die sich eine gemeinsame Code-Basis für Helferfunktionen und Styling teilen:
+Der **Themen-Trainer** ist eine moderne, webbasierte Vokabel-Lernapplikation für Deutsch als Fremdsprache (Goethe A1 Niveau). Die Anwendung verwendet eine **3-Ebenen-Navigation** (Hauptthemen → Unterthemen → Lernmodi) und bietet sowohl Übungs- als auch Test-Funktionalitäten.
 
--   **`Basis-Trainer` (`packages/trainer-basis/`):** Fokussiert auf grundlegenden Wortschatz, unterteilt in Wortgruppen (z.B. Farben, Zahlen, Monate). Bietet verschiedene Lernmodi (Bedeutung, Schreibweise, Lückentext, Satzübersetzung) und einen Gesamttestmodus. Implementiert eine farbliche Kasus-Hervorhebung in Beispielsätzen.
--   **`Themen-Trainer` (`packages/trainer-themen/`):** Strukturiert Vokabeln thematisch (z.B. Person, Reisen) mit Unterthemen. Bietet ebenfalls verschiedene Lernmodi und einen Testmodus. Nutzt eine detailliertere Vokabularstruktur mit grammatischen Informationen (Wortart, Konjugation etc.).
+## 🏗️ **Architektur & Dateistruktur**
 
-**NEU: Schwarz-Rot-Gold Fortschrittssystem** - Alle Fortschrittsbalken verwenden die deutschen Nationalfarben zur Motivation und thematischen Passung.
-
-Ziel ist es, eine robuste und benutzerfreundliche Lernumgebung zu schaffen, die leicht mit neuen Vokabeln und potenziell weiteren Funktionen erweitert werden kann.
-
-## 2. Architektur & Dateistruktur
-
-Das Projekt nutzt einen Monorepo-ähnlichen Ansatz mit geteilten Ressourcen. Die wichtigsten Pfade sind:
-
+### **Hauptdateien:**
 ```
-A1-VOKABELTRAINER/
-│
-├── .gitignore
-├── kontext.md
-├── netlify.toml # Enthält den Build-Befehl für Netlify
-├── package.json
-├── sw.js # Service Worker für PWA
-│
-├── packages/
-│   ├── trainer-basis/
-│   │   ├── index.html
-│   │   ├── trainer.js
-│   │   └── vokabular.js
-│   │
-│   └── trainer-themen/
-│       ├── index.html
-│       ├── manifest.json # Einzige Manifest-Datei des Projekts
-│       ├── trainer.js
-│       ├── dom.js # Zentralisiert DOM-Referenzen
-│       ├── ui.js # UI-Manipulation und Darstellung
-│       ├── vokabular.js # Hauptvokabular-Import
-│       └── vokabular_*.js # Aufgeteilte Themenbereiche
-│
-├── shared/
-│   ├── helfer.js # Allgemeine Hilfsfunktionen + Farbschema-System
-│   ├── style.css # Geteilte CSS-Stile + Schwarz-Rot-Gold Farben
-│   ├── ui-modes.js # Logik für die einzelnen Lernmodi-Setups
-│   └── assets/
-│       └── (z.B. icon-192.png, icon-512.png)
-│
-└── netlify/
-    └── functions/
-        └── getGoogleVoice.js # Serverless Function für Sprachausgabe
+├── trainer.js           # Kernlogik, State-Management, Koordination
+├── ui.js               # DOM-Manipulation, UI-Darstellung
+├── dom.js              # Zentrale DOM-Element-Referenzen
+├── vokabular.js        # Vokabeldaten (verschachtelte Struktur)
+└── /shared/
+    ├── helfer.js       # Utility-Funktionen
+    └── ui-modes.js     # Lernmodus-spezifische UI-Logik
 ```
 
-## 3. Technologie-Stack
+### **Architektur-Prinzip:**
+- **trainer.js**: Orchestriert den Anwendungszustand und ruft UI-Funktionen auf
+- **ui.js**: Reine DOM-Manipulation und Darstellungslogik
+- **Modulare Trennung**: Klare Separation of Concerns
+- **Callback-System**: ui.js kommuniziert über Callbacks mit trainer.js
 
--   **Frontend:** Vanilla JavaScript (ES6+), HTML5, CSS3
--   **Architektur:** Modulare Code-Basis mit ES6-Modulen (`import`/`export`).
--   **Styling:** TailwindCSS (via CDN in den jeweiligen `index.html`-Dateien) und eine zentrale, geteilte `shared/style.css` für projektspezifische Stile.
--   **Farbschema:** Schwarz-Rot-Gold Fortschrittssystem mit dynamischer Farbzuweisung basierend auf Lernfortschritt.
--   **Sprachausgabe:** Nutzt Google Cloud Text-to-Speech über eine Netlify Serverless Function (`/.netlify/functions/getGoogleVoice`).
--   **Besonderheiten:** Progressive Web App (PWA) mit Service Worker (`sw.js`) für Offline-Fähigkeiten (hauptsächlich für den `trainer-themen`).
+## 🎯 **Funktionale Struktur**
 
-## 4. Build- & Deployment-Prozess
+### **3-Ebenen-Navigation:**
+1. **Hauptthemen** (z.B. "Person", "Umwelt", "Essen und Trinken")
+2. **Unterthemen** (z.B. "Familie", "Aussehen", "Beruf")
+3. **Lernmodi** (4 verschiedene Übungstypen)
 
-- **Hosting:** Netlify
-- **Production Branch:** `v2.0-entwicklung` (Änderungen auf diesem Branch werden automatisch live geschaltet).
-- **Build-Konfiguration:** Gesteuert durch `netlify.toml`.
-  - **Build Command:** Abhängig vom Branch. Für den Haupt-Branch (`v2.0-entwicklung`) werden die Dateien aus den `packages/` Ordnern in ein `dist`-Verzeichnis kopiert. Für den speziellen Themen-Trainer-Branch wird eine vereinfachte Struktur verwendet, bei der die Dateien direkt aus dem Root-Verzeichnis veröffentlicht werden (`command = "echo 'No build needed...'", publish = "."`).
-  - **Publish Directory:** `dist` für den Haupt-Branch, `.` für den speziellen Themen-Trainer-Branch.
-- **Serverless Functions:** Die Sprachausgabe-Funktion (`netlify/functions/getGoogleVoice.js`) wird von Netlify automatisch deployed.
-- **Test-Veröffentlichungen (Deploy Previews):** Sollen für Pull Requests auf den `v2.0-entwicklung`-Branch aktiviert werden, um Änderungen vor dem Livegang zu prüfen.
+### **Lernmodi:**
+1. **mc-de-en** (Bedeutung): Multiple Choice - Deutsche Wörter → Englische Bedeutung
+2. **type-de-adj** (Schreibweise): Rechtschreibung mit Artikel-Erkennung
+3. **cloze-adj-de** (Lückentext): Lückentexte mit Hinweisen
+4. **sentence-translation-en-de** (Satzübersetzung): English → Deutsch
 
-## 5. Wichtige Konzepte & Logik
+### **Test-System:**
+- **Hauptthema-Test**: Alle Unterthemen eines Hauptthemas (max. 30 Aufgaben)
+- **Globaler Test**: Zufällige Aufgaben aus allen Themen (36 Aufgaben)
+- **Erweiterte Test-Schlüssel**: Separate Speicherung für verschiedene Test-Typen
 
-### 5.1. Allgemeine Konzepte
--   **UI-Steuerung (`setUIMode`):**
-    -   Die Sichtbarkeit der Haupt-UI-Bereiche (z.B. Wortgruppen-Auswahl, Trainer-Ansicht) wird durch die zentrale Funktion `setUIMode(modeId)` in `shared/helfer.js` gesteuert.
-    -   Diese Funktion manipuliert die `display`-Eigenschaft von HTML-Containern, die die Klasse `.ui-mode` und eine eindeutige ID besitzen (z.B. `id="wortgruppen-selector"`, `id="trainer-main-view"`).
-    -   Die Klasse `hidden-view` (`display: none !important;`) wird ebenfalls berücksichtigt und bei Bedarf entfernt.
+## 🎨 **Design-System**
 
--   **Schwarz-Rot-Gold Farbschema-System (NEU):**
-    -   Zentralisiert in `shared/helfer.js` durch die Funktion `getProgressColorClass(completed, total)`
-    -   Automatische Farbzuweisung basierend auf Fortschritt: 0-33% Schwarz, 34-66% Rot, 67-100% Gold
-    -   Unterstützt Fallback auf ursprüngliches Blau-System (`color-original`)
-    -   CSS-Klassen: `.color-black-sr`, `.color-red-sr`, `.color-gold-sr` mit optionalem Glanz-Effekt für Gold
-    -   Motivationsfaktor durch thematische Verbindung zu Deutschland/Deutsch lernen
+### **Deutschland-Farben-Schema:**
+- **Schwarz/Grau** (0-33%): Wenig Fortschritt - `color-black-sr`
+- **Rot** (34-66%): Mittlerer Fortschritt - `color-red-sr`  
+- **Gold** (67-100%): Hoher Fortschritt - `color-gold-sr`
 
--   **State Management:**
-    -   Jeder Trainer (`trainer-basis/trainer.js`, `trainer-themen/trainer.js`) verwaltet seinen eigenen lokalen `state`-Objekt.
-    -   Dieses Objekt enthält den aktuellen Zustand der Anwendung, wie z.B. die ausgewählte Wortgruppe/Thema, das aktuelle Wort, den Lernmodus, Fortschrittsdaten etc.
-    -   **Unterschiedlicher Progress-Schlüssel:**
-        - Basis-Trainer: `state.globalProgress[wortgruppeName][modus]`
-        - Themen-Trainer: `state.globalProgress["MainTopic|SubTopic"][modus]`
+### **Button-Typen:**
+- **Themen-Buttons**: Grau mit Deutschland-Farben Fortschrittsbalken
+- **Hauptthema-Test**: Orange-rot Gradient (`bg-orange-500`)
+- **Globaler Test**: Dunkelgrau (`bg-gray-600`)
+- **Lernmodus-Buttons**: Verschiedene Hintergründe mit Active-States
 
--   **DOM-Handling:**
-    -   Referenzen zu häufig genutzten DOM-Elementen werden einmalig nach dem `DOMContentLoaded`-Event in einer `initializeDOMReferences()`-Funktion gesammelt und in Variablen gespeichert.
-    -   Im Themen-Trainer: Zusätzliche Zentralisierung durch `dom.js`-Modul für bessere Wartbarkeit.
+### **UI-Komponenten:**
+- **Fortschrittsbalken**: Überall konsistente Deutschland-Farben
+- **Toast-Nachrichten**: Grün (Erfolg), Blau (Info), Rot (Fehler)
+- **Responsive Design**: Grid-Layout für verschiedene Bildschirmgrößen
 
--   **Umlaut-Eingabe:**
-    -   Erfolgt über dedizierte HTML-Buttons (`.umlaut-button` oder `.umlaut-btn`).
-    -   Die Logik ist in `initUmlautButtons()` (in den jeweiligen `trainer.js`-Dateien) gekapselt und nutzt die `insertTextAtCursor(inputElement, text)`-Funktion aus `shared/helfer.js`.
-    -   Unterstützt Großschreibung von Umlauten durch Drücken der Shift-Taste.
+## 💾 **Datenstruktur & Persistenz**
 
--   **Sprachausgabe (`speak`):**
-    -   Die Funktion `speak(text, lang)` in `shared/helfer.js` sendet eine Anfrage an die Netlify Serverless Function `/.netlify/functions/getGoogleVoice`.
-    -   Diese Funktion gibt Base64-kodierten MP3-Audio-Inhalt zurück, der dann im Browser abgespielt wird.
-    -   Lokales Testen der Sprachausgabe erfordert ein Deployment auf Netlify (z.B. Deploy Preview).
+### **State-Objekt (trainer.js):**
+```javascript
+const state = {
+    // Navigation
+    currentMainTopic: null,
+    currentSubTopic: null,
+    
+    // Vokabeln & Training
+    currentVocabularySet: [],
+    shuffledVocabForMode: [],
+    currentWordData: null,
+    currentMode: null,
+    
+    // Test-System
+    isTestModeActive: false,
+    testType: null,        // 'mainTopic' oder 'global'
+    testKey: null,         // Eindeutige Test-Identifikation
+    
+    // Fortschritt
+    correctInRound: 0,
+    attemptedInRound: 0,
+    globalProgress: {},    // Verschachtelt: {hauptthema|unterthema: {modus: Set}}
+    masteredWordsByMode: {},
+    wordsToRepeatByMode: {},
+    
+    // Persistenz
+    lastTestScores: {},    // Test-Ergebnisse mit erweiterten Schlüsseln
+    
+    // UI-Hilfsmittel
+    activeTextInput: null, // Für Umlaut-Buttons
+    
+    // NEU: Zurück-Navigation für Tests
+    previousMainTopic: null,
+    previousSubTopic: null
+};
+```
 
--   **Fortschrittsverfolgung:**
-    -   Der Lernfortschritt wird im `localStorage` gespeichert (`goetheA1Progress`).
-    -   `state.globalProgress` speichert gemasterte Wörter pro Wortgruppe/Thema und Modus.
-    -   `state.masteredWordsByMode` und `state.wordsToRepeatByMode` verwalten den Fortschritt und Fehler innerhalb einer aktuellen Lernsitzung.
-    -   Die eindeutige `id` jeder Vokabel (`state.currentWordData.id`) wird zur Identifizierung verwendet.
+### **LocalStorage-Persistenz:**
+- **`goetheA1Progress`**: Lernfortschritt pro Thema/Modus
+- **`goetheA1LastTestScores`**: Test-Ergebnisse mit Zeitstempel
 
--   **Lernmodi (`shared/ui-modes.js`):**
-    -   Jeder Lernmodus (z.B. Multiple Choice, Schreibweise) hat eine eigene `setup...Mode()`-Funktion.
-    -   Diese Funktionen sind dafür zuständig, die spezifische UI für den Modus zu initialisieren, Eingabefelder vorzubereiten und Event-Listener für die Antwortverarbeitung zu setzen.
-    -   Die Antwortverarbeitung erfolgt über eine zentrale `processAnswer(isCorrect, correctAnswer)`-Funktion im jeweiligen `trainer.js`.
+### **Vokabular-Struktur:**
+```javascript
+const vokabular = {
+    "Hauptthema": {
+        "Unterthema": [
+            {
+                id: "eindeutige-id",
+                german: "deutsches Wort",
+                english: "english translation",
+                // ... weitere Eigenschaften je nach Lernmodus
+            }
+        ]
+    }
+};
+```
 
-### 5.2. Spezifische Logik `trainer-basis`
--   **Vokabularstruktur (`packages/trainer-basis/vokabular.js`):**
-    -   Vokabeln sind in Wortgruppen organisiert.
-    -   Das Feld `example_de` ist ein Array von Objekten (`{text: "...", kasus: "..."}`), um die farbliche Kasus-Hervorhebung zu ermöglichen.
-    -   Jede Vokabel hat eine eindeutige `id` (Format: "basis-[nummer]").
+## 🧪 **Test-System (Erweitert)**
 
--   **Kasus-Hervorhebung:**
-    -   In `setupMcDeEnMode` (in `shared/ui-modes.js`) werden `<span>`-Elemente für jeden Teil des `example_de`-Arrays erstellt.
-    -   Entsprechende CSS-Klassen (`.kasus-nominativ`, `.kasus-verb` etc. aus `shared/style.css`) werden basierend auf der `kasus`-Eigenschaft zugewiesen.
+### **Test-Typen:**
+1. **Global Test** (`testType: 'global'`)
+   - 36 zufällige Aufgaben aus allen Themen
+   - Schlüssel: `global-{modus}`
+   - Zurück zur Hauptübersicht
 
--   **Testmodus:**
-    -   Ein Gesamttest kann für verschiedene Lernmodi gestartet werden.
-    -   Wählt zufällig Vokabeln aus allen Wortgruppen aus (2 pro Wortgruppe).
-    -   Speichert die letzten Testergebnisse im `localStorage` (`goetheA1LastTestScores`).
+2. **Hauptthema Test** (`testType: 'mainTopic'`)
+   - 1-3 Aufgaben pro Unterfeld, max. 30 total
+   - Schlüssel: `mainTopic-{hauptthema}-{modus}`
+   - Zurück zur Unterthemen-Ansicht
 
--   **Fortschrittsberechnung:**
-    -   Verwendet `getProgressColorClass(completed, total)` für einheitliche Farbgebung
-    -   Alle Statistikbalken (Rundentanzeige, Kategorie-Stats, Wortgruppen-Übersicht) verwenden das Schwarz-Rot-Gold System
+### **Test-Navigation (Zurück-Button Fix):**
+```javascript
+// In ui.js - backToSubtopicsButton Event-Listener
+if (state.isTestModeActive) {
+    state.isTestModeActive = false;
+    
+    if (state.testType === 'global') {
+        displayMainTopics(...);
+    } else if (state.testType === 'mainTopic' && state.previousMainTopic) {
+        displaySubTopics(..., state.previousMainTopic, ...);
+    }
+}
+```
 
-### 5.3. Spezifische Logik `trainer-themen`
--   **Modulare Architektur:**
-    -   `trainer.js`: Hauptlogik und State-Management
-    -   `ui.js`: UI-Manipulation und DOM-Updates
-    -   `dom.js`: Zentralisierte DOM-Referenzen
-    -   Bessere Trennung von Logik und Darstellung
+### **Test-Ergebnis-Struktur:**
+```javascript
+{
+    correct: number,
+    total: number,
+    accuracy: number,        // 0-1
+    timestamp: number,
+    testType: string,
+    topic: string,
+    subtopic: string
+}
+```
 
--   **Vokabularstruktur (`packages/trainer-themen/vokabular_*.js`):**
-    -   Vokabeln sind hierarchisch in Haupt- und Unterthemen organisiert.
-    -   Aufgeteilt in thematische Dateien (z.B. `vokabular_person.js`, `vokabular_reisen_verkehr.js`)
-    -   Enthält detailliertere grammatische Informationen pro Vokabel (z.B. `wortart`, `artikel`, `plural`, `konjugation_praesens`).
-    -   `example_de` ist hier aktuell noch ein einfacher String (keine Kasus-Hervorhebung implementiert).
-    -   Jede Vokabel hat eine eindeutige `id` (Format: "thema-kategorie-nummer").
+## 🔧 **Technische Implementierung**
 
--   **Navigation:**
-    -   Eine 3-Ebenen-Navigation (Hauptthemen -> Unterthemen -> Trainer).
-    -   Gesteuert durch Funktionen wie `displayMainTopics`, `displaySubTopics`, `startTraining` in `ui.js`.
-    -   Progress-Schlüssel: `"MainTopic|SubTopic"` Format für localStorage
+### **Kernfunktionen (trainer.js):**
+- **`loadNextTask()`**: Nächste Aufgabe laden, Shuffle-Logik
+- **`processAnswer()`**: Antwort verarbeiten, Fortschritt speichern
+- **`setMode()`**: Lernmodus wechseln, Wiederholungs-Sessions
+- **`starteGesamtTest()`**: Globaler Test mit 36 Aufgaben
+- **`starteHauptthemaTest()`**: Hauptthema-Test mit intelligenter Aufgaben-Verteilung
+- **`handleTestCompletion()`**: Test beenden, Ergebnisse speichern, Navigation
 
--   **PWA (`sw.js`, `manifest.json`):**
-    -   Der Service Worker (`sw.js`) ist primär für den Themen-Trainer konfiguriert, um Caching und Offline-Fähigkeiten zu ermöglichen.
-    -   Das `manifest.json` befindet sich im `trainer-themen`-Ordner und wird im Build-Prozess in das `dist`-Verzeichnis kopiert.
+### **UI-Funktionen (ui.js):**
+- **`displayMainTopics()`**: Hauptthemen mit Fortschritts-Aggregation
+- **`displaySubTopics()`**: Unterthemen mit Test-Button
+- **`showTestModal()`**: Modal für Test-Auswahl
+- **`updateTestModeProgressBars()`**: Test-Ergebnis-Visualisierung
+- **`hideAllUIs()`**: UI-Reset zwischen Aufgaben
 
-## 6. Farbschema-System (Schwarz-Rot-Gold)
+### **Fortschritts-System:**
+- **Progress-Key**: `${hauptthema}|${unterthema}`
+- **Mode-Sets**: Set-basierte Speicherung gemeisterter Wort-IDs
+- **Aggregation**: Hauptthemen-Fortschritt aus allen Unterthemen
+- **Farbkodierung**: Automatische Deutschland-Farben basierend auf Prozentsatz
 
-### 6.1. Implementierung
--   **CSS-Klassen (`shared/style.css`):**
-    ```css
-    .color-black-sr { background-color: #1f2937; } /* 0-33% */
-    .color-red-sr { background-color: #dc2626; }   /* 34-66% */
-    .color-gold-sr { background-color: #f59e0b; }  /* 67-100% */
-    .color-original { background-color: #3b82f6; } /* Fallback */
-    ```
+## 🎮 **Benutzerinteraktion**
 
--   **JavaScript-Logik (`shared/helfer.js`):**
-    ```javascript
-    getProgressColorClass(completed, total) // Hauptfunktion
-    setColorTheme(themeName)                // Theme-Wechsel
-    updateAllProgressBars()                 // Globale Aktualisierung
-    ```
+### **Navigation-Flow:**
+1. **Hauptthemen-Übersicht** → Thema auswählen
+2. **Unterthemen-Übersicht** → Unterthema auswählen ODER Hauptthema-Test
+3. **Lernmodus-Auswahl** → Modus wählen und üben
+4. **Test-Modi** → Modal öffnen → Modus wählen → Test starten
 
-### 6.2. Anwendungsbereiche
--   **Alle Fortschrittsbalken:** Wortgruppen, Themen, Unterthemen
--   **Statistik-Anzeigen:** Rundentanzeige, Genauigkeitsbalken
--   **Kategorie-Übersichten:** 4 kleine Balken pro Lernmodus
--   **Test-Resultate:** Testergebnis-Anzeigen
+### **Lern-Session:**
+1. Aufgabe wird geladen und angezeigt
+2. Benutzer gibt Antwort ein
+3. Sofortiges Feedback (richtig/falsch)
+4. Bei falscher Antwort: "Weiter"-Button
+5. Bei richtiger Antwort: Automatisch nächste Aufgabe (1.2s)
+6. Endlos-Loop mit Shuffle bei Durchlauf-Ende
 
-### 6.3. Motivationspsychologie
--   **Schwarz (0-33%):** Anfangsphase, neutral
--   **Rot (34-66%):** Fortschritt erkennbar, motivierend
--   **Gold (67-100%):** Meisterschaft erreicht, belohnend
--   **Thematische Verbindung:** Deutsche Nationalfarben für deutschen Sprachtrainer
+### **Test-Session:**
+1. Test-Aufgaben werden einmalig generiert
+2. Lineare Progression ohne Wiederholung
+3. Test-Statistiken werden live aktualisiert
+4. Bei Completion: Ergebnis-Speicherung und Navigation zurück
 
-## 7. Zukünftige Entwicklungsziele
+## 🌟 **Besondere Features**
 
-### 7.1. Priorität 1: Test-Button Verbesserungen
--   **Aktuelle Situation:** Basis-Trainer hat funktionierenden Test-Button, Themen-Trainer Test-Modal existiert aber funktioniert nicht optimal
--   **Ziele:**
-    -   Einheitliche Test-Button Implementierung für beide Trainer
-    -   Verbesserte Test-Modal Funktionalität im Themen-Trainer
-    -   Erweiterte Test-Optionen (pro Thema, gemischte Tests)
-    -   Bessere Test-Statistiken und -Auswertungen
-    -   Test-Verlauf und Performance-Tracking
+### **Umlaut-Unterstützung:**
+- Virtuelle Umlaut-Buttons (ä, ö, ü, ß)
+- Text-Insertion an Cursor-Position
+- Shift-Support für Großbuchstaben
 
-### 7.2. Geplante Features (mittelfristig)
--   **Erweiterte Statistiken:** Detaillierte Lernanalysen, Zeittracking
--   **Spaced Repetition:** Intelligente Wiederholungsalgorithmen
--   **Export/Import:** Fortschritt sichern und übertragen
--   **Accessibility:** ARIA-Labels, Keyboard-Navigation, Screenreader-Support
--   **Dark Mode:** Alternative Farbschemata
--   **Mobile Optimierung:** Verbesserte Touch-Interfaces
+### **Audio-Integration:**
+- Text-to-Speech für deutsche Wörter und Sätze
+- Speaker-Icons bei relevanten Aufgaben
+- Dynamische Audio-Button-Erstellung
 
-### 7.3. Technische Verbesserungen
--   **TypeScript Migration:** Bessere Type-Safety
--   **Unit Testing:** Automatisierte Tests für kritische Funktionen
--   **Bundle Optimization:** Performance-Verbesserungen
--   **Offline-First:** Erweiterte PWA-Funktionalitäten
+### **Intelligente Wiederholung:**
+- Falsch beantwortete Wörter werden gesammelt
+- Separate Wiederholungs-Sessions pro Lernmodus
+- Error-Counter auf Wiederholungs-Buttons
 
-## 8. Aktueller Stand & Hinweise für die Weiterentwicklung
+### **Responsive Statistiken:**
+- Live-Updates der Erfolgsraten
+- Farbige Fortschrittsbalken überall
+- Detaillierte Test-Statistiken (Fortschritt + Genauigkeit)
 
-### 8.1. Implementierter Stand (Januar 2025)
--   **Schwarz-Rot-Gold Farbschema:** Vollständig implementiert in beiden Trainern
--   **Modulare Architektur:** Themen-Trainer mit verbesserter Code-Struktur
--   **Kasus-Hervorhebung:** Funktional im Basis-Trainer
--   **Sprachausgabe:** Stabil über Netlify Functions
--   **Fortschrittsverfolgung:** Persistent über localStorage
--   **PWA-Funktionalität:** Grundlegend implementiert
+## 🚀 **Aktuelle Implementierung (Stand: Dezember 2024)**
 
-### 8.2. Bekannte Herausforderungen
--   **Continue vs. Claude Workflow:** Continue eignet sich für einfache Copy-Paste Operationen, nicht für komplexe Architektur-Änderungen
--   **Browser-Storage Limitierung:** Artifacts unterstützen keine localStorage APIs
--   **Cross-Trainer Konsistenz:** Unterschiedliche Datenstrukturen zwischen Basis- und Themen-Trainer
+### **Kürzlich implementierte Fixes:**
+1. **Zurück-Button im Test** ✅
+   - `previousMainTopic/previousSubTopic` State-Variablen
+   - Intelligente Test-Navigation in ui.js
+   - Korrekte Rückführung nach Test-Completion
 
-### 8.3. Bewährte Entwicklungspraktiken
--   **Schrittweise Implementation:** Kleine, testbare Änderungen
--   **Backup-Strategie:** Git-Commits oder Ordner-Kopien vor größeren Änderungen
--   **Tool-Kombination:** Claude für Architektur, Continue für mechanische Umsetzung
--   **Umfangreiches Testen:** Beide Trainer nach jeder Änderung prüfen
+2. **Erweiterte Test-Funktionalität** ✅
+   - Separate Test-Keys für verschiedene Test-Typen
+   - Hauptthema-Tests mit intelligenter Aufgaben-Verteilung
+   - Verbesserte Test-Completion-Logik
 
-### 8.4. Wichtige Hinweise für zukünftige Arbeiten
--   **Code-Änderungen:** Bei Änderungen, die von diesem Assistenten vorgeschlagen werden, ist es oft sicherer, ganze Dateien zu ersetzen (wenn der vollständige Inhalt bereitgestellt wird) oder sehr präzise Diff-Anweisungen zu befolgen.
--   **Testen:** Nach jeder signifikanten Änderung sollten die Kernfunktionen gründlich getestet werden:
-        -   Navigation zwischen Wortgruppen/Themen und den Trainer-Ansichten
-        -   Funktionalität aller Lernmodi
-        -   Korrekte Fortschrittsanzeige (Balken und Zahlen) mit Schwarz-Rot-Gold Farben
-        -   Funktionierende Fehlerwiederholung
-        -   Korrekte Audioausgabe (erfordert Test auf Netlify Deploy Preview)
-        -   Umlaut-Eingabe (inkl. Shift-Taste für Großbuchstaben)
--   **Git-Workflow:** Regelmäßige, kleine Commits mit aussagekräftigen Nachrichten. Netlify Deploy Previews intensiv nutzen.
--   **Konsistenz:** Verwendung von `state.currentWordData.id` als eindeutiger Bezeichner für Vokabeln beibehalten.
--   **Datenstrukturen:** Änderungen an zentralen Datenstrukturen erfordern sorgfältige Überprüfung aller abhängigen Code-Stellen.
--   **Browser-Konsole:** Bei unerwartetem Verhalten ist die Browser-Konsole (F12) das wichtigste Debugging-Werkzeug.
+3. **Design-Konsistenz** ✅
+   - Deutschland-Farben-Schema durchgängig implementiert
+   - Konsistente Button-Styles und Fortschrittsbalken
+   - Responsive Test-Button-Layouts
 
-## 9. Entwicklungs-Workflow Empfehlungen
+### **Aktuelle Funktionalität:**
+- ✅ Vollständige 3-Ebenen-Navigation
+- ✅ 4 verschiedene Lernmodi
+- ✅ 2 Test-Typen (Global + Hauptthema)
+- ✅ Persistente Fortschritts-Speicherung
+- ✅ Deutschland-Farben Design-System
+- ✅ Zurück-Navigation funktioniert in allen Kontexten
+- ✅ Responsive Design für verschiedene Bildschirmgrößen
 
-### 9.1. Für neue Features
-1. **Planung mit Claude:** Architektur und vollständige Code-Erstellung
-2. **Schrittweise Umsetzung:** Manual Copy-Paste oder präzise Continue-Anweisungen
-3. **Umfangreiches Testing:** Beide Trainer in allen Modi testen
-4. **Rollback-Plan:** Git oder Backup-Ordner ready
+### **Code-Qualität:**
+- Modulare Architektur mit klarer Trennung
+- Konsistente Namenskonvention
+- Umfangreiche Kommentierung
+- Error-Handling an kritischen Stellen
+- LocalStorage-Fallbacks implementiert
 
-### 9.2. Tool-Einsatz Strategie
--   **Claude:** Komplexe Features, Architektur-Entscheidungen, Code-Reviews
--   **Continue:** Mechanische Copy-Paste Aufgaben, einfache Einzeländerungen
--   **Entwickler:** Koordination, Testing, finale Entscheidungen
+## 🔮 **Mögliche Erweiterungen**
 
-### 9.3. Traffic-Optimierung
--   **Claude erstellt:** Komplette, getestete Lösungen in Artifacts
--   **Continue führt aus:** Exakte Copy-Paste Operationen ohne eigene Interpretation
--   **Minimaler Austausch:** Weniger Iterationen durch vollständige Lösungen
+### **Technische Verbesserungen:**
+- Service Worker für Offline-Funktionalität
+- IndexedDB für erweiterte Datenpersistenz
+- Progressive Web App (PWA) Features
+
+### **Feature-Erweiterungen:**
+- Spaced Repetition Algorithm
+- Detaillierte Lernstatistiken und Charts
+- Export/Import von Lernfortschritt
+- Zusätzliche Lernmodi (Hören, Sprechen)
+- Adaptive Schwierigkeits-Anpassung
+
+### **UI/UX-Verbesserungen:**
+- Animationen für Übergänge
+- Dark Mode Unterstützung
+- Erweiterte Barrierefreiheit
+- Touch-Gesten für mobile Nutzung
 
 ---
 
-**Letzte Aktualisierung:** Januar 2025
-**Aktueller Fokus:** Test-Button Implementierung und Verbesserung
-**Entwicklungsstatus:** Stabil, produktionsreif mit Schwarz-Rot-Gold System
+## 📚 **Für Entwickler:**
+
+**Diese Dokumentation dient als vollständige Referenz für:**
+- Neue Entwickler, die am Projekt arbeiten
+- Debugging und Fehlerbehebung  
+- Feature-Erweiterungen und Maintenance
+- Code-Reviews und Qualitätssicherung
+
+**Der Themen-Trainer ist ein ausgereiftes, produktionsreifes System mit robuster Architektur und benutzerfreundlichem Design.** 🎓

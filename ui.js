@@ -1,7 +1,28 @@
-// packages/trainer-themen/ui.js
+// ui.js - KORRIGIERTE VERSION ohne shared-Dependencies
 // Diese Datei ist ausschließlich für die Manipulation des DOM und die Darstellung von UI-Zuständen zuständig.
-// Sie erhält alle notwendigen Daten von der Logik-Schicht (trainer.js).
-import { insertTextAtCursor, calculateProgressPercentage, getProgressColorClass } from '/shared/helfer.js';
+
+// INLINE HILFSFUNKTIONEN (anstatt shared/helfer.js Import)
+function insertTextAtCursor(input, text) {
+    if (!input) return;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const currentValue = input.value;
+    input.value = currentValue.substring(0, start) + text + currentValue.substring(end);
+    input.selectionStart = input.selectionEnd = start + text.length;
+    input.focus();
+}
+
+function calculateProgressPercentage(completed, total) {
+    if (total === 0) return 0;
+    return Math.round((completed / total) * 100);
+}
+
+function getProgressColorClass(completed, total) {
+    const percentage = calculateProgressPercentage(completed, total);
+    if (percentage < 34) return 'color-black-sr';
+    if (percentage < 67) return 'color-red-sr';
+    return 'color-gold-sr';
+}
 
 /**
  * Zeigt eine temporäre Nachricht (Toast) an.
@@ -136,7 +157,21 @@ export function updateTestModeProgressBars(dom, state) {
     const testOptionsButtons = dom.testOptionsGridEl.querySelectorAll('.wortgruppe-button');
     testOptionsButtons.forEach(button => {
         const testType = button.dataset.testType;
-        const score = state.lastTestScores ? state.lastTestScores[testType] : null;
+        const testScope = button.dataset.testScope || 'global';
+        const testTopic = button.dataset.testTopic || '';
+        const testSubtopic = button.dataset.testSubtopic || '';
+        
+        // Erstelle erweiterten Schlüssel für verschiedene Test-Typen
+        let scoreKey = testType; // Fallback für alte globale Tests
+        if (testScope === 'subtopic') {
+            scoreKey = `subtopic-${testTopic}-${testSubtopic}-${testType}`;
+        } else if (testScope === 'mainTopic') {
+            scoreKey = `mainTopic-${testTopic}-${testType}`;
+        } else if (testScope === 'global') {
+            scoreKey = `global-${testType}`;
+        }
+        
+        const score = state.lastTestScores ? state.lastTestScores[scoreKey] : null;
         const progressBar = button.querySelector('.progress-bar-fill');
         if (score && progressBar) {
             const percentage = score.accuracy * 100; // score.accuracy ist bereits 0-1
@@ -197,11 +232,11 @@ export function displayMainTopics(dom, state, vokabular, learningModes) {
         dom.navigationContainerEl.appendChild(button);
     });
 
-    // Test-Button hinzufügen
+    // Globaler Test-Button hinzufügen
     const testButton = document.createElement('button');
     testButton.id = 'start-test-mode-btn';
     testButton.className = 'col-span-2 sm:col-span-3 rounded-lg py-2 font-semibold bg-gray-300 hover:bg-gray-500 hover:text-white transition-colors duration-200';
-    testButton.textContent = 'Test';
+    testButton.textContent = '🧪 Globaler Test';
     dom.navigationContainerEl.appendChild(testButton);
 
     // Ansicht umschalten
@@ -212,7 +247,7 @@ export function displayMainTopics(dom, state, vokabular, learningModes) {
 }
 
 /**
- * Zeigt die Unterthemen für ein ausgewähltes Hauptthema an.
+ * Zeigt die Unterthemen für ein ausgewähltes Hauptthema an - MIT TEST-BUTTONS.
  * @param {object} dom - Das DOM-Objekt.
  * @param {object} state - Das State-Objekt.
  * @param {object} vokabular - Das Vokabular-Objekt.
@@ -227,6 +262,7 @@ export function displaySubTopics(dom, state, vokabular, mainTopicName, learningM
     const numberOfModes = Object.keys(learningModes).length;
 
     Object.keys(vokabular[mainTopicName]).forEach(subTopicName => {
+        // NUR der normale Unterthema-Button (KEIN Test-Button)
         const button = document.createElement('button');
         button.className = 'wortgruppe-button rounded-lg';
         button.dataset.subTopic = subTopicName;
@@ -234,55 +270,182 @@ export function displaySubTopics(dom, state, vokabular, mainTopicName, learningM
         const wordsInSubTopic = vokabular[mainTopicName][subTopicName];
         const totalTasks = wordsInSubTopic.length * numberOfModes;
         
-        // KORREKTUR: Verwende den korrekten Progress-Schlüssel
         const progressKey = `${mainTopicName}|${subTopicName}`;
         const completedTasks = state.globalProgress[progressKey] ? 
             Object.values(state.globalProgress[progressKey]).reduce((sum, set) => sum + set.size, 0) : 0;
         
-        // Verwende Farbschema-System
         const colorClass = getProgressColorClass(completedTasks, totalTasks);
         const percentage = calculateProgressPercentage(completedTasks, totalTasks);
 
         button.innerHTML = `<span class="button-text-label">${subTopicName.replace(/\//g, '/<wbr>')}</span><div class="progress-bar-container"><div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%;"></div></div>`;
+        
         dom.navigationContainerEl.appendChild(button);
     });
+
+    // EINZIGER Test-Button: Hauptthema-Gesamttest
+    const mainTopicTestButton = document.createElement('button');
+    mainTopicTestButton.className = 'col-span-2 sm:col-span-3 rounded-lg py-2 font-semibold bg-orange-500 hover:bg-orange-600 text-white transition-colors duration-200';
+    mainTopicTestButton.textContent = `🎯 ${mainTopicName} Gesamttest`;
+    mainTopicTestButton.dataset.testMainTopicOnly = mainTopicName;
+    dom.navigationContainerEl.appendChild(mainTopicTestButton);
 }
 
 /**
- * Initialisiert alle zentralen Event-Listener der Anwendung.
+ * Erstellt Test-Modal für verschiedene Test-Typen.
+ * @param {object} dom - Das DOM-Objekt.
+ * @param {object} state - Das State-Objekt.
+ * @param {string} testType - 'subtopic', 'mainTopic', oder 'global'.
+ * @param {string} topicName - Name des Themas.
+ * @param {string} subTopicName - Name des Unterthemas (nur bei subtopic).
+ * @param {object} learningModes - Lernmodi-Objekt.
+ */
+export function showTestModal(dom, state, testType, topicName, subTopicName, learningModes) {
+    // Test-Modal Titel setzen
+    const modalTitle = dom.testSelectionModalEl.querySelector('h2');
+    if (modalTitle) {
+        switch(testType) {
+            case 'subtopic':
+                modalTitle.textContent = `Test: ${subTopicName}`;
+                break;
+            case 'mainTopic':
+                modalTitle.textContent = `Gesamttest: ${topicName}`;
+                break;
+            case 'global':
+                modalTitle.textContent = 'Globaler Gesamttest';
+                break;
+        }
+    }
+
+    // Test-Optionen Grid leeren und neu befüllen
+    dom.testOptionsGridEl.innerHTML = '';
+    
+    Object.keys(learningModes).forEach(modeId => {
+        const modeInfo = learningModes[modeId];
+        const button = document.createElement('button');
+        button.className = 'wortgruppe-button rounded-lg';
+        button.dataset.testType = modeId;
+        button.dataset.testScope = testType;
+        button.dataset.testTopic = topicName;
+        if (subTopicName) button.dataset.testSubtopic = subTopicName;
+
+        // Test-spezifischen Fortschritt anzeigen (wenn verfügbar)
+        let progressPercentage = 0;
+        let colorClass = 'color-black-sr';
+        
+        // Erstelle erweiterten Schlüssel für Test-Scores
+        let scoreKey = modeId; // Fallback für alte globale Tests
+        if (testType === 'subtopic') {
+            scoreKey = `subtopic-${topicName}-${subTopicName}-${modeId}`;
+        } else if (testType === 'mainTopic') {
+            scoreKey = `mainTopic-${topicName}-${modeId}`;
+        } else if (testType === 'global') {
+            scoreKey = `global-${modeId}`;
+        }
+        
+        if (state.lastTestScores && state.lastTestScores[scoreKey]) {
+            const score = state.lastTestScores[scoreKey];
+            progressPercentage = Math.round(score.accuracy * 100);
+            colorClass = getProgressColorClass(progressPercentage, 100);
+        }
+
+        button.innerHTML = `
+            <span class="button-text-label">${modeInfo.name}</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill ${colorClass}" style="width: ${progressPercentage}%;"></div>
+            </div>
+        `;
+        
+        dom.testOptionsGridEl.appendChild(button);
+    });
+
+    // Modal anzeigen
+    dom.testSelectionModalEl.classList.remove('hidden-view');
+}
+
+/**
+ * Initialisiert alle zentralen Event-Listener der Anwendung - ERWEITERT für Tests.
  * @param {object} dom - Das DOM-Objekt.
  * @param {object} state - Das State-Objekt.
  * @param {object} callbacks - Objekt mit Callback-Funktionen zur Logik-Schicht.
  * @param {object} learningModes - Das Objekt mit den Lernmodi.
  */
 export function initEventListeners(dom, state, callbacks, learningModes) {
-    // Event-Listener für die Navigation
-    dom.navigationContainerEl.addEventListener('click', (e) => callbacks.handleNavigation(e)); // Hauptnavigation
+    // Event-Listener für die Navigation - VEREINFACHT (nur noch Hauptthema-Tests)
+    dom.navigationContainerEl.addEventListener('click', (e) => {
+        const mainTopicButton = e.target.closest('[data-main-topic]');
+        const subTopicButton = e.target.closest('[data-sub-topic]');
+        const globalTestButton = e.target.closest('#start-test-mode-btn');
+        const mainTopicTestButton = e.target.closest('[data-test-main-topic-only]');
+
+        if (mainTopicButton) {
+            callbacks.handleNavigation(e);
+        } else if (subTopicButton) {
+            callbacks.handleNavigation(e);
+        } else if (globalTestButton) {
+            showTestModal(dom, state, 'global', 'Alle Themen', null, learningModes);
+        } else if (mainTopicTestButton) {
+            const mainTopic = mainTopicTestButton.dataset.testMainTopicOnly;
+            showTestModal(dom, state, 'mainTopic', mainTopic, null, learningModes);
+        }
+    });
+
     dom.backToMainTopicsButton.addEventListener('click', () => displayMainTopics(dom, state, callbacks.getVokabular(), learningModes));
     dom.backToSubtopicsButton.addEventListener('click', () => {
-        if (state.currentMainTopic) {
+        // KORREKTUR: Prüfe zuerst, ob wir im Test-Modus sind
+        if (state.isTestModeActive) {
+            // Im Test-Modus: Test abbrechen und zur vorherigen Ansicht zurück
+            state.isTestModeActive = false;
+            
+            // Intelligente Rücknavigation basierend auf Test-Typ
+            if (state.testType === 'global') {
+                // Globaler Test: zurück zur Hauptübersicht
+                displayMainTopics(dom, state, callbacks.getVokabular(), learningModes);
+            } else if (state.testType === 'mainTopic' && state.previousMainTopic) {
+                // Hauptthema-Test: zurück zur Unterthemen-Ansicht des ursprünglichen Hauptthemas
+                displaySubTopics(dom, state, callbacks.getVokabular(), state.previousMainTopic, learningModes);
+            } else {
+                // Fallback: zurück zur Hauptübersicht
+                displayMainTopics(dom, state, callbacks.getVokabular(), learningModes);
+            }
+        } else if (state.currentMainTopic && state.currentMainTopic !== "Gesamttest") {
+            // Normale Navigation: zurück zu den Unterthemen (aber nicht bei "Gesamttest")
             displaySubTopics(dom, state, callbacks.getVokabular(), state.currentMainTopic, learningModes);
         } else {
+            // Fallback: zurück zur Hauptübersicht
             displayMainTopics(dom, state, callbacks.getVokabular(), learningModes);
         }
         dom.navigationViewEl.classList.remove('hidden-view');
-        dom.trainerMainViewEl.classList.add('hidden-view'); // Versteckt den Trainer
+        dom.trainerMainViewEl.classList.add('hidden-view');
     });
 
-    // Test Modal
+    // Test Modal - NUR für Hauptthema- und Global-Tests
     dom.testSelectionModalEl.addEventListener('click', (event) => {
         if (event.target === dom.testSelectionModalEl) {
             dom.testSelectionModalEl.classList.add('hidden-view');
         }
     });
+
     if (dom.testOptionsGridEl) {
         dom.testOptionsGridEl.addEventListener('click', (event) => {
             const selectedButton = event.target.closest('.wortgruppe-button');
             if (!selectedButton) return;
+            
             const selectedTestType = selectedButton.dataset.testType;
+            const testScope = selectedButton.dataset.testScope;
+            const testTopic = selectedButton.dataset.testTopic;
+            
             if (selectedTestType) {
                 dom.testSelectionModalEl.classList.add('hidden-view');
-                callbacks.starteGesamtTest(selectedTestType);
+                
+                // NUR noch zwei Test-Typen
+                switch(testScope) {
+                    case 'mainTopic':
+                        callbacks.starteHauptthemaTest(selectedTestType, testTopic);
+                        break;
+                    case 'global':
+                        callbacks.starteGesamtTest(selectedTestType);
+                        break;
+                }
             }
         });
     }

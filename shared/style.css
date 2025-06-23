@@ -1,4 +1,4 @@
-/* style.css - Bereinigte Version */
+/* style.css - Bereinigte Version mit Test-Funktionalität */
 body {
     font-family: 'Inter', sans-serif ;
     display: flex;
@@ -364,4 +364,209 @@ body {
 
 .color-original {
     background-color: #3b82f6; /* Dein ursprüngliches Blau */
+}
+
+/* =================================================== */
+/* NEU: TEST-BUTTON STYLING                           */
+/* =================================================== */
+
+/* Test-Button Styling für Unterfelder */
+.test-button {
+    min-height: 32px;
+    font-size: 0.875rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    transition: all 0.2s ease-in-out;
+}
+
+.test-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.15);
+}
+
+.test-button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Unterfeld-Container für bessere Anordnung */
+.space-y-2 > * + * {
+    margin-top: 0.5rem;
+}
+
+/* Hauptthema-Test Button besondere Hervorhebung */
+button[data-test-main-topic-only] {
+    background: linear-gradient(135deg, #f59e0b 0%, #dc2626 50%, #1f2937 100%);
+    color: white;
+    font-weight: 700;
+    position: relative;
+    overflow: hidden;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+button[data-test-main-topic-only]:hover {
+    background: linear-gradient(135deg, #fbbf24 0%, #ef4444 50%, #374151 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.25);
+}
+
+button[data-test-main-topic-only]:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
+}
+
+/* Globaler Test Button */
+#start-test-mode-btn {
+    background: linear-gradient(135deg, #6b7280 0%, #374151 100%);
+    color: white;
+    font-weight: 600;
+    border: none;
+    transition: all 0.3s ease-in-out;
+}
+
+#start-test-mode-btn:hover {
+    background: linear-gradient(135deg, #9ca3af 0%, #4b5563 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Verbesserte Hover-Effekte für Test-Modi im Modal */
+.wortgruppe-button[data-test-type]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* Animation für Test-Fortschrittsbalken */
+.progress-bar-fill {
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+/* Deutschland-Farben Feedback für Test-Ergebnisse */
+.feedback-test-success {
+    background-color: #f59e0b; /* Gold */
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+.feedback-test-good {
+    background-color: #dc2626; /* Rot */
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+.feedback-test-needs-improvement {
+    background-color: #1f2937; /* Schwarz */
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+/* Test-Modal erweiterte Styling */
+.test-selection-modal h2 {
+    color: #1f2937;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Responsive Design für Test-Container */
+#navigation-container {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 1rem;
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    #navigation-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .col-span-2 {
+        grid-column: span 2;
+    }
+}
+
+@media (min-width: 768px) {
+    .test-button {
+        font-size: 0.875rem;
+        padding: 0.5rem 1rem;
+        min-height: 36px;
+    }
+}
+
+@media (min-width: 1024px) {
+    #navigation-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .sm\:col-span-3 {
+        grid-column: span 3;
+    }
+}
+
+/* Responsive Design für Test-Buttons auf kleineren Bildschirmen */
+@media (max-width: 640px) {
+    .test-button {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        min-height: 28px;
+    }
+    
+    button[data-test-main-topic-only] {
+        font-size: 0.875rem;
+        padding: 0.75rem;
+    }
+}
+
+/* Spezielle Hover-Effekte für Test-Hierarchie */
+.test-button:hover {
+    background-color: #eab308; /* Noch helleres Gelb beim Hover */
+}
+
+button[data-test-subtopic]:hover {
+    background-color: #eab308;
+    color: white;
+}
+
+/* Zusätzliche visuelle Verbesserungen */
+.test-button,
+button[data-test-main-topic-only],
+#start-test-mode-btn {
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.025em;
+}
+
+/* Fokus-Stile für Barrierefreiheit */
+.test-button:focus,
+button[data-test-main-topic-only]:focus,
+#start-test-mode-btn:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Smooth Scrolling für bessere UX beim Navigieren */
+html {
+    scroll-behavior: smooth;
 }
