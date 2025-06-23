@@ -531,8 +531,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!state.isTestModeActive) {
                 ui.updatePracticeStats(dom, state, learningModes);
             }
-            
-            showSyncNotification('📥 Fortschritt synchronisiert');
         } catch (error) {
             console.error('❌ Fehler beim Progress Sync:', error);
         }
@@ -542,7 +540,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             state.lastTestScores = { ...syncedTestScores };
             ui.updateTestModeProgressBars(dom, state);
-            showSyncNotification('📥 Test-Ergebnisse synchronisiert');
         } catch (error) {
             console.error('❌ Fehler beim TestScores Sync:', error);
         }
