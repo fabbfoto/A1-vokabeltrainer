@@ -1,4 +1,4 @@
-// trainer.js - ERWEITERTE VERSION mit vollständiger Test-Funktionalität
+// trainer.js - FIREBASE-ERWEITERTE VERSION
 // Steuerungslogik für den Themen-Trainer.
 // Diese Datei orchestriert den Anwendungszustand (State) und die UI-Interaktionen,
 // indem sie Funktionen aus den Modulen 'ui.js' und 'ui-modes.js' aufruft.
@@ -8,6 +8,10 @@ import { shuffleArray, speak } from '/shared/helfer.js';
 import * as uiModes from '/shared/ui-modes.js';
 import { dom } from './dom.js';
 import * as ui from './ui.js';
+
+// === FIREBASE IMPORTS ===
+import { firebaseSyncService } from './firebase-sync.js';
+import { initializeAuth } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -58,10 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     console.log('trainer.js: learningModes definiert:', learningModes, 'Anzahl der Modi:', Object.keys(learningModes).length);
 
-    // --- DATENPERSISTENZ (LocalStorage) ---
+    // --- DATENPERSISTENZ (LocalStorage + Firebase) ---
 
     function saveLastTestScores() {
         localStorage.setItem('goetheA1LastTestScores', JSON.stringify(state.lastTestScores));
+        
+        // Firebase Sync (asynchron)
+        firebaseSyncService.saveTestScores(state.lastTestScores).catch(error => {
+            console.error('❌ Firebase TestScores Sync fehlgeschlagen:', error);
+        });
     }
 
     function loadLastTestScores() {
@@ -77,6 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveGlobalProgress() {
+        // Konvertiere Sets zu Arrays für Firebase
         const progressToStore = {};
         for (const gruppe in state.globalProgress) {
             progressToStore[gruppe] = {};
@@ -84,7 +94,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 progressToStore[gruppe][mode] = Array.from(state.globalProgress[gruppe][mode]);
             }
         }
+        
+        // Speichere sowohl lokal als auch in Firebase
         localStorage.setItem('goetheA1Progress', JSON.stringify(progressToStore));
+        
+        // Firebase Sync (asynchron, blockiert nicht die UI)
+        firebaseSyncService.saveProgress(progressToStore).catch(error => {
+            console.error('❌ Firebase Progress Sync fehlgeschlagen:', error);
+        });
     }
 
     function loadGlobalProgress() {
@@ -164,6 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 state.masteredWordsByMode[state.currentMode]?.add(wordId);
                 state.wordsToRepeatByMode[state.currentMode]?.delete(wordId);
                 console.log('trainer.js: Wort als gemeistert hinzugefügt. Neuer globalProgress:', state.globalProgress);
+                
+                // Firebase Sync
                 saveGlobalProgress();
             }
             setTimeout(() => { loadNextTask(); }, 1200);
@@ -258,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
             accuracy: accuracy 
         };
         
+        // Firebase Sync
         saveLastTestScores();
         
         // Test-spezifische Erfolgsmeldung
@@ -427,23 +447,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- INITIALISIERUNG ---
-
-    function init() {
+    // === FIREBASE INTEGRATION ===
+    async function initWithFirebase() {
+        console.log('🚀 Starte Vokabeltrainer mit Firebase-Synchronisation...');
+        
+        // Zeige Loading-Indikator
+        showFirebaseStatus('Verbinde mit Cloud...', 'loading');
+        
+        try {
+            // 1. Firebase Auth initialisieren
+            await initializeAuth();
+            
+            // 2. Sync Service initialisieren
+            const syncInitialized = await firebaseSyncService.initialize();
+            
+            if (syncInitialized) {
+                showFirebaseStatus('✅ Cloud-Synchronisation aktiv', 'success');
+                setupFirebaseEventListeners();
+            } else {
+                showFirebaseStatus('⚠️ Offline-Modus (Daten nur lokal)', 'warning');
+            }
+            
+        } catch (error) {
+            console.error('❌ Firebase Initialisierung fehlgeschlagen:', error);
+            showFirebaseStatus('❌ Cloud nicht verfügbar (Offline-Modus)', 'error');
+        }
+        
+        // 3. Normale Trainer-Initialisierung
         loadGlobalProgress();
         loadLastTestScores();
-
-        // Erweiterte Callbacks für die UI-Schicht
+        
         const callbacks = {
             handleNavigation,
-            starteGesamtTest,           // Globaler Test
-            starteHauptthemaTest,       // Hauptthema Test (EINZIGER Test pro Hauptthema)
+            starteGesamtTest,
+            starteHauptthemaTest,
             getVokabular: () => vokabular
         };
         
         ui.initEventListeners(dom, state, callbacks, learningModes);
-
-        // Event-Listener, die direkt die Kernlogik triggern.
+        
         Object.keys(learningModes).forEach(modeId => {
             const button = document.getElementById(`mode-${modeId}`);
             const repeatButton = document.getElementById(`mode-repeat-${modeId}`);
@@ -452,9 +494,94 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         dom.continueButton.addEventListener('click', loadNextTask);
 
-        // Startansicht anzeigen.
         ui.displayMainTopics(dom, state, vokabular, learningModes);
+        
+        console.log('✅ Vokabeltrainer vollständig initialisiert');
     }
 
-    init();
+    function setupFirebaseEventListeners() {
+        window.addEventListener('firebaseSyncUpdate', (event) => {
+            const { type, data } = event.detail;
+            
+            switch(type) {
+                case 'progressUpdated':
+                    console.log('📥 Fortschritt von anderem Gerät erhalten');
+                    handleProgressSync(data);
+                    break;
+                case 'testScoresUpdated':
+                    console.log('📥 Test-Ergebnisse von anderem Gerät erhalten');
+                    handleTestScoresSync(data);
+                    break;
+            }
+        });
+    }
+
+    function handleProgressSync(syncedProgress) {
+        try {
+            const convertedProgress = {};
+            for (const gruppe in syncedProgress) {
+                convertedProgress[gruppe] = {};
+                for (const mode in syncedProgress[gruppe]) {
+                    convertedProgress[gruppe][mode] = new Set(syncedProgress[gruppe][mode]);
+                }
+            }
+            
+            state.globalProgress = convertedProgress;
+            
+            if (!state.isTestModeActive) {
+                ui.updatePracticeStats(dom, state, learningModes);
+            }
+            
+            showSyncNotification('📥 Fortschritt synchronisiert');
+        } catch (error) {
+            console.error('❌ Fehler beim Progress Sync:', error);
+        }
+    }
+
+    function handleTestScoresSync(syncedTestScores) {
+        try {
+            state.lastTestScores = { ...syncedTestScores };
+            ui.updateTestModeProgressBars(dom, state);
+            showSyncNotification('📥 Test-Ergebnisse synchronisiert');
+        } catch (error) {
+            console.error('❌ Fehler beim TestScores Sync:', error);
+        }
+    }
+
+    function showFirebaseStatus(message, type = 'info') {
+        let statusEl = document.getElementById('firebase-status');
+        if (!statusEl) {
+            statusEl = document.createElement('div');
+            statusEl.id = 'firebase-status';
+            statusEl.className = 'firebase-status-bar';
+            document.body.prepend(statusEl);
+            document.body.classList.add('firebase-active');
+        }
+        
+        statusEl.textContent = message;
+        statusEl.className = `firebase-status-bar firebase-status-${type}`;
+        
+        if (type === 'success' || type === 'error') {
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 3000);
+        }
+    }
+
+    function showSyncNotification(message) {
+        const notification = document.createElement('div');
+        notification.className = 'sync-notification';
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        
+        setTimeout(() => notification.classList.add('show'), 100);
+        
+        setTimeout(() => {
+            notification.classList.remove('show');
+            setTimeout(() => document.body.removeChild(notification), 300);
+        }, 2000);
+    }
+
+    // === FIREBASE-ERWEITERTE INITIALISIERUNG ===
+    initWithFirebase();
 });
