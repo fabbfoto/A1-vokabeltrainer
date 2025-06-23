@@ -1,12 +1,15 @@
+# Haupt-Build-Konfiguration
 [build]
-  # Dateien sind im Root, aber LICENSE.md muss sichtbar sein
-  command = "echo 'Files ready in root - LICENSE.md available'"
-  publish = "."
+  # Da es keine Build-Schritte gibt (nur statische Dateien), kann der Befehl leer bleiben.
+  command = ""
+  # Das Veröffentlichungsverzeichnis ist das Stammverzeichnis ("root") des Repositories.
+  publish = "/" 
 
+# Umgebungsvariablen für den Build-Prozess
 [build.environment]
   NODE_VERSION = "18"
 
-# Headers für bessere Sicherheit
+# Sicherheits-Header für alle Seiten und Ressourcen
 [[headers]]
   for = "/*"
   [headers.values]
@@ -15,11 +18,8 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-# LICENSE.md als statische Datei verfügbar machen
+# Spezifischer Header für die LICENSE.md-Datei, um sie korrekt als Textdatei auszuliefern
 [[headers]]
   for = "/LICENSE.md"
   [headers.values]
     Content-Type = "text/plain; charset=utf-8"
-    [build]
-  publish = "/"
-  command = "" # Oder entferne diese Zeile, wenn du keinen Build-Befehl benötigst.
