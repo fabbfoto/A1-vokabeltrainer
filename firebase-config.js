@@ -70,3 +70,57 @@ export async function initializeAuth() {
     });
   });
 }
+// ===== DEINE BESTEHENDE firebase-config.js =====
+// (alles bleibt wie es ist)
+
+const firebaseConfig = { ... };
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+// ... all dein bestehender Code ...
+
+// ===== HIER FÜGST DU NUR DAS HINZU =====
+// Device Sync Management
+let deviceSyncService = null;
+
+export function getDeviceSyncService() {
+  return deviceSyncService;
+}
+
+export function setDeviceSyncService(service) {
+  deviceSyncService = service;
+}
+
+// Device Information
+export function getCurrentDeviceInfo() {
+  const userAgent = navigator.userAgent;
+  let deviceType = 'desktop';
+  let deviceName = '🖥️ Desktop';
+  
+  if (/Mobi|Android/i.test(userAgent)) {
+    deviceType = 'mobile';
+    deviceName = '📱 Smartphone';
+  } else if (/iPad/i.test(userAgent)) {
+    deviceType = 'tablet';
+    deviceName = '📱 Tablet';
+  }
+  
+  const browserName = getBrowserName();
+  
+  return {
+    deviceType,
+    deviceName,
+    browserName,
+    userAgent: userAgent.substring(0, 100),
+    timestamp: Date.now()
+  };
+}
+
+function getBrowserName() {
+  const userAgent = navigator.userAgent;
+  if (userAgent.includes('Chrome')) return 'Chrome';
+  if (userAgent.includes('Firefox')) return 'Firefox';
+  if (userAgent.includes('Safari')) return 'Safari';
+  if (userAgent.includes('Edge')) return 'Edge';
+  return 'Browser';
+}

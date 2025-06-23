@@ -1,4 +1,4 @@
-// firebase-sync.js - Vollständiger Sync Service für A1-Vokabeltrainer
+// firebase-sync.js - Vollständiger Sync Service für A1-Vokabeltrainer mit Device-Sync
 import { 
   collection, 
   doc, 
@@ -6,15 +6,21 @@ import {
   setDoc, 
   onSnapshot, 
   serverTimestamp,
-  writeBatch 
+  writeBatch,
+  query,
+  where,
+  limit,
+  orderBy,
+  deleteDoc
 } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
-import { db, auth } from './firebase-config.js';
+import { db, auth, getCurrentDeviceInfo } from './firebase-config.js';
 
 class FirebaseSyncService {
   constructor() {
     this.userId = null;
     this.unsubscribeProgress = null;
     this.unsubscribeTestScores = null;
+    this.unsubscribeDeviceSync = null;
     this.localData = {
       progress: {},
       testScores: {}
@@ -22,6 +28,11 @@ class FirebaseSyncService {
     this.syncQueue = [];
     this.isInitialized = false;
     this.isOnline = navigator.onLine;
+    
+    // Device-Sync Eigenschaften
+    this.currentDevice = getCurrentDeviceInfo();
+    this.syncCodes = new Map(); // Aktive Sync-Codes
+    this.pendingSyncRequests = new Map(); // Wartende Sync-Anfragen
     
     // Event Listeners für Connection Changes
     window.addEventListener('online', () => {
@@ -357,13 +368,326 @@ class FirebaseSyncService {
     window.dispatchEvent(event);
   }
 
+  // ===========================================
+  // DEVICE-SYNC FUNKTIONEN
+  // ===========================================
+
+  /**
+   * Generiert einen 6-stelligen Sync-Code für Device-Pairing
+   */
+  generateSyncCode() {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) {
+      code += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return code;
+  }
+
+  /**
+   * Erstellt eine Sync-Session für Device-Pairing
+   */
+  async createSyncSession() {
+    if (!this.userId || !this.isOnline) {
+      throw new Error('Nicht verbunden oder nicht authentifiziert');
+    }
+
+    try {
+      const syncCode = this.generateSyncCode();
+      const syncSessionRef = doc(db, 'deviceSyncSessions', syncCode);
+      
+      const sessionData = {
+        hostUserId: this.userId,
+        hostDevice: this.currentDevice,
+        createdAt: serverTimestamp(),
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 Minuten
+        status: 'waiting',
+        guestUserId: null,
+        guestDevice: null
+      };
+
+      await setDoc(syncSessionRef, sessionData);
+      
+      // Lokale Verwaltung
+      this.syncCodes.set(syncCode, {
+        status: 'waiting',
+        createdAt: Date.now(),
+        type: 'host'
+      });
+
+      // Listener für diese Session
+      this.listenToSyncSession(syncCode);
+
+      console.log('✅ Sync-Session erstellt:', syncCode);
+      return syncCode;
+
+    } catch (error) {
+      console.error('❌ Fehler beim Erstellen der Sync-Session:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Verbindet sich mit einer bestehenden Sync-Session
+   */
+  async joinSyncSession(syncCode) {
+    if (!this.userId || !this.isOnline) {
+      throw new Error('Nicht verbunden oder nicht authentifiziert');
+    }
+
+    try {
+      const syncSessionRef = doc(db, 'deviceSyncSessions', syncCode);
+      const sessionDoc = await getDoc(syncSessionRef);
+
+      if (!sessionDoc.exists()) {
+        throw new Error('Sync-Code nicht gefunden');
+      }
+
+      const sessionData = sessionDoc.data();
+
+      // Prüfe ob Session noch gültig ist
+      if (sessionData.status !== 'waiting') {
+        throw new Error('Sync-Session ist nicht mehr verfügbar');
+      }
+
+      if (sessionData.expiresAt.toDate() < new Date()) {
+        throw new Error('Sync-Code ist abgelaufen');
+      }
+
+      // Aktualisiere Session als Guest
+      await setDoc(syncSessionRef, {
+        ...sessionData,
+        guestUserId: this.userId,
+        guestDevice: this.currentDevice,
+        status: 'connected',
+        connectedAt: serverTimestamp()
+      });
+
+      // Starte Synchronisation zwischen den beiden Accounts
+      await this.performDeviceSync(sessionData.hostUserId, this.userId);
+
+      console.log('✅ Erfolgreich mit Sync-Session verbunden:', syncCode);
+      return true;
+
+    } catch (error) {
+      console.error('❌ Fehler beim Beitreten zur Sync-Session:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Hört auf Änderungen in der Sync-Session
+   */
+  listenToSyncSession(syncCode) {
+    const syncSessionRef = doc(db, 'deviceSyncSessions', syncCode);
+    
+    const unsubscribe = onSnapshot(syncSessionRef, async (doc) => {
+      if (!doc.exists()) return;
+
+      const sessionData = doc.data();
+      
+      if (sessionData.status === 'connected' && sessionData.guestUserId) {
+        console.log('🔄 Neues Gerät verbunden, starte Synchronisation...');
+        
+        // Führe die Synchronisation durch
+        await this.performDeviceSync(this.userId, sessionData.guestUserId);
+        
+        // Räume die Session auf
+        setTimeout(() => {
+          this.cleanupSyncSession(syncCode);
+        }, 5000);
+
+        // Benachrichtige UI über erfolgreiche Verbindung
+        this.dispatchSyncEvent('deviceConnected', {
+          guestDevice: sessionData.guestDevice,
+          syncCode: syncCode
+        });
+      }
+    });
+
+    // Speichere Unsubscribe-Funktion für Cleanup
+    this.syncCodes.get(syncCode).unsubscribe = unsubscribe;
+  }
+
+  /**
+   * Führt die tatsächliche Synchronisation zwischen zwei Geräten durch
+   */
+  async performDeviceSync(hostUserId, guestUserId) {
+    try {
+      console.log('🔄 Starte Device-Synchronisation zwischen', hostUserId, 'und', guestUserId);
+
+      // Lade Daten von beiden Geräten
+      const [hostProgress, hostTestScores, guestProgress, guestTestScores] = await Promise.all([
+        this.loadUserData('userProgress', hostUserId),
+        this.loadUserData('userTestScores', hostUserId),
+        this.loadUserData('userProgress', guestUserId),
+        this.loadUserData('userTestScores', guestUserId)
+      ]);
+
+      // Merge die Daten intelligent
+      const mergedProgress = this.mergeProgress(
+        hostProgress?.progress || {},
+        guestProgress?.progress || {}
+      );
+
+      const mergedTestScores = this.mergeTestScores(
+        hostTestScores?.testScores || {},
+        guestTestScores?.testScores || {}
+      );
+
+      // Speichere die gemergten Daten auf beiden Geräten
+      const batch = writeBatch(db);
+
+      const hostProgressRef = doc(db, 'userProgress', hostUserId);
+      const hostTestScoresRef = doc(db, 'userTestScores', hostUserId);
+      const guestProgressRef = doc(db, 'userProgress', guestUserId);
+      const guestTestScoresRef = doc(db, 'userTestScores', guestUserId);
+
+      batch.set(hostProgressRef, {
+        progress: mergedProgress,
+        lastUpdated: serverTimestamp(),
+        version: 1,
+        syncedAt: serverTimestamp()
+      });
+
+      batch.set(hostTestScoresRef, {
+        testScores: mergedTestScores,
+        lastUpdated: serverTimestamp(),
+        version: 1,
+        syncedAt: serverTimestamp()
+      });
+
+      batch.set(guestProgressRef, {
+        progress: mergedProgress,
+        lastUpdated: serverTimestamp(),
+        version: 1,
+        syncedAt: serverTimestamp()
+      });
+
+      batch.set(guestTestScoresRef, {
+        testScores: mergedTestScores,
+        lastUpdated: serverTimestamp(),
+        version: 1,
+        syncedAt: serverTimestamp()
+      });
+
+      await batch.commit();
+
+      console.log('✅ Device-Synchronisation erfolgreich abgeschlossen');
+
+      // Benachrichtige UI
+      this.dispatchSyncEvent('deviceSyncCompleted', {
+        mergedProgressItems: Object.keys(mergedProgress).length,
+        mergedTestScores: Object.keys(mergedTestScores).length
+      });
+
+    } catch (error) {
+      console.error('❌ Fehler bei Device-Synchronisation:', error);
+      this.dispatchSyncEvent('deviceSyncError', { error: error.message });
+      throw error;
+    }
+  }
+
+  /**
+   * Lädt Benutzerdaten für Synchronisation
+   */
+  async loadUserData(collection, userId) {
+    try {
+      const docRef = doc(db, collection, userId);
+      const docSnap = await getDoc(docRef);
+      return docSnap.exists() ? docSnap.data() : null;
+    } catch (error) {
+      console.warn(`⚠️ Fehler beim Laden von ${collection} für ${userId}:`, error);
+      return null;
+    }
+  }
+
+  /**
+   * Räumt abgelaufene Sync-Sessions auf
+   */
+  async cleanupSyncSession(syncCode) {
+    try {
+      // Entferne Firestore-Dokument
+      const syncSessionRef = doc(db, 'deviceSyncSessions', syncCode);
+      await deleteDoc(syncSessionRef);
+
+      // Räume lokale Daten auf
+      const syncData = this.syncCodes.get(syncCode);
+      if (syncData && syncData.unsubscribe) {
+        syncData.unsubscribe();
+      }
+      this.syncCodes.delete(syncCode);
+
+      console.log('🧹 Sync-Session aufgeräumt:', syncCode);
+    } catch (error) {
+      console.warn('⚠️ Fehler beim Aufräumen der Sync-Session:', error);
+    }
+  }
+
+  /**
+   * Generiert QR-Code-Daten für Sync
+   */
+  generateQRCodeData(syncCode) {
+    const currentUrl = window.location.origin + window.location.pathname;
+    return `${currentUrl}?sync=${syncCode}`;
+  }
+
+  /**
+   * Generiert Sync-Link
+   */
+  generateSyncLink(syncCode) {
+    return this.generateQRCodeData(syncCode);
+  }
+
+  /**
+   * Prüft URL auf Sync-Parameter beim Laden
+   */
+  checkForSyncCode() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const syncCode = urlParams.get('sync');
+    
+    if (syncCode) {
+      console.log('🔗 Sync-Code in URL gefunden:', syncCode);
+      // Benachrichtige UI über automatische Sync-Anfrage
+      this.dispatchSyncEvent('autoSyncRequested', { syncCode });
+      
+      // Entferne Sync-Parameter aus URL (für Privacy)
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+      
+      return syncCode;
+    }
+    return null;
+  }
+
+  /**
+   * Räumt alle abgelaufenen Sync-Sessions auf (Wartung)
+   */
+  async cleanupExpiredSessions() {
+    if (!this.isOnline) return;
+
+    try {
+      console.log('🧹 Prüfe auf abgelaufene Sync-Sessions...');
+      
+      for (const [syncCode, syncData] of this.syncCodes.entries()) {
+        if (Date.now() - syncData.createdAt > 15 * 60 * 1000) { // 15 Minuten
+          await this.cleanupSyncSession(syncCode);
+        }
+      }
+    } catch (error) {
+      console.warn('⚠️ Fehler beim Aufräumen abgelaufener Sessions:', error);
+    }
+  }
+
   // Status Information
   getStatus() {
     return {
       isInitialized: this.isInitialized,
       userId: this.userId,
       isOnline: this.isOnline,
-      syncQueueLength: this.syncQueue.length
+      syncQueueLength: this.syncQueue.length,
+      activeSyncCodes: this.syncCodes?.size || 0,
+      currentDevice: this.currentDevice
     };
   }
 
@@ -374,6 +698,16 @@ class FirebaseSyncService {
     }
     if (this.unsubscribeTestScores) {
       this.unsubscribeTestScores();
+    }
+    
+    // Räume alle Sync-Sessions auf
+    if (this.syncCodes) {
+      for (const [syncCode, syncData] of this.syncCodes.entries()) {
+        if (syncData.unsubscribe) {
+          syncData.unsubscribe();
+        }
+      }
+      this.syncCodes.clear();
     }
   }
 }
