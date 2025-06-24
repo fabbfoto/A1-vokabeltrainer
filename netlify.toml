@@ -1,17 +1,19 @@
 [build]
-  # Dieser Befehl ist jetzt explizit und listet jede Datei einzeln auf,
-  # um Fehler durch nicht gefundene Platzhalter zu vermeiden.
-  # Die `\` am Ende jeder Zeile verbinden alles zu einem einzigen Befehl.
-  # Dieser Befehl hat jetzt den KORREKTEN Pfad zur manifest.json.
-  command = """
-  mkdir -p dist && \
-  cp packages/trainer-basis/index.html \
-     packages/trainer-basis/trainer.js \
-     packages/trainer-basis/vokabular.js \
-     packages/trainer-themen/manifest.json \
-     dist/ && \
-  cp -r shared dist/
-  """
+  command = ""
+  publish = "/"
 
-  # Das Veröffentlichungs-Verzeichnis bleibt dasselbe.
-  publish = "packages/trainer-basis"
+[build.environment]
+  NODE_VERSION = "18"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/LICENSE.md"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
