@@ -1,6 +1,6 @@
 [build]
   command = ""
-  publish = "/"
+  publish = "packages/trainer-basis"
 
 [build.environment]
   NODE_VERSION = "18"
