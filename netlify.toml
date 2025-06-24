@@ -1,11 +1,15 @@
+# Basis-Trainer Netlify Konfiguration
 [build]
+  # Kein Build-Command nötig, da nur statische Dateien
   command = ""
+  # Publish-Verzeichnis für den Basis-Trainer
   publish = "packages/trainer-basis"
-  publish = "/"
 
+# Umgebungsvariablen
 [build.environment]
   NODE_VERSION = "18"
 
+# Sicherheits-Header für alle Seiten
 [[headers]]
   for = "/*"
   [headers.values]
@@ -13,27 +17,10 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    # NEU: CORS für Firebase
+    Access-Control-Allow-Origin = "*"
 
-[[headers]]
-  for = "/LICENSE.md"
-  [headers.values]
-    Content-Type = "text/plain; charset=utf-8"
-[build]
-  command = ""
-  publish = "packages/trainer-basis"
-  publish = "/"
-
-[build.environment]
-  NODE_VERSION = "18"
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    X-Content-Type-Options = "nosniff"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-
+# Spezifischer Header für LICENSE.md
 [[headers]]
   for = "/LICENSE.md"
   [headers.values]
