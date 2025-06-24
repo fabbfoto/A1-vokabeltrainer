@@ -1,5 +1,4 @@
-// packages/trainer-basis/trainer.js - FIREBASE-ERWEITERTE VERSION
-// Angepasst für den Speicherort packages/trainer-basis/
+// trainer.js - Angepasst für den Speicherort packages/trainer-basis/
 
 // Import der Vokabeln aus dem gleichen Ordner
 import { goetheA1Wortschatz } from './vokabular.js';
@@ -8,17 +7,12 @@ import { goetheA1Wortschatz } from './vokabular.js';
 import { vergleicheAntwort, shuffleArray, setUIMode, calculateProgressPercentage, getProgressColorClass, insertTextAtCursor } from '../../shared/helfer.js';
 import * as uiModes from '../../shared/ui-modes.js';
 
-// === FIREBASE IMPORTS ===
-import { firebaseSyncService } from './firebase-sync.js';
-import { initializeAuth } from './firebase-config.js';
-import { deviceSyncUI } from './device-sync-ui.js';
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("[trainer.js] DOMContentLoaded Event ausgelöst. Starte Initialisierung..."); // NEUER LOG
 
-document.addEventListener('DOMContentLoaded', async () => {
-    console.log("[trainer.js] DOMContentLoaded Event ausgelöst. Starte Initialisierung...");
-
-    // Ein zentrales State-Objekt, um den Zustand der App zu verwalten
+    // NEU: Ein zentrales State-Objekt, um den Zustand der App zu verwalten (kopiert von trainer-themen).
     const state = {
-        currentWortgruppeName: null,
+        currentWortgruppeName: null, // Angepasst für Basis-Trainer
         currentVocabularySet: [],
         shuffledVocabForMode: [],
         currentWordIndexInShuffled: -1,
@@ -32,7 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         masteredWordsByMode: {},
         wordsToRepeatByMode: {},
         lastTestScores: {},
-        activeTextInput: null,
+        activeTextInput: null, // NEU: Für Umlaut-Buttons
     };
 
     let wortgruppenSelectorContainerEl, trainerMainViewEl, wortgruppenButtonsEl, backToWortgruppenButton,
@@ -100,10 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function saveLastTestScores() {
-        // Firebase Sync
-        firebaseSyncService.saveTestScores(state.lastTestScores).catch(error => {
-            console.error('❌ Firebase Test Scores Sync fehlgeschlagen:', error);
-        });
+        localStorage.setItem('goetheA1LastTestScores', JSON.stringify(state.lastTestScores));
     }
 
     function loadLastTestScores() {
@@ -136,8 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         state.lastTestScores[state.currentMode] = {
             correct: state.correctInRound,
             total: state.attemptedInRound,
-            accuracy: accuracy,
-            timestamp: Date.now()
+            accuracy: accuracy
         };
         saveLastTestScores();
 
@@ -200,6 +190,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 state.globalProgress[state.currentWortgruppeName][state.currentMode].add(wordId);
                 if(state.masteredWordsByMode[state.currentMode]) state.masteredWordsByMode[state.currentMode].add(wordId);
                 if(state.wordsToRepeatByMode[state.currentMode]) state.wordsToRepeatByMode[state.currentMode].delete(wordId);
+
                 saveGlobalProgress();
             }
             setTimeout(() => { loadNextTask(); }, 1200);
@@ -254,11 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 progressToStore[gruppe][mode] = Array.from(state.globalProgress[gruppe][mode]);
             }
         }
-        
-        // Firebase Sync (asynchron, blockiert nicht die UI)
-        firebaseSyncService.saveProgress(progressToStore).catch(error => {
-            console.error('❌ Firebase Progress Sync fehlgeschlagen:', error);
-        });
+        localStorage.setItem('goetheA1Progress', JSON.stringify(progressToStore));
     }
 
     function loadGlobalProgress() {
@@ -332,7 +319,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (state.globalProgress[name]) {
                 completedTasks = Object.values(state.globalProgress[name]).reduce((sum, set) => sum + set.size, 0);
             }
-            const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+            const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0; // Behalte diese Zeile, da sie für percentage benötigt wird
             const colorClass = getProgressColorClass(completedTasks, totalTasks);
             button.innerHTML = `<span class="button-text-label">${name}</span><div class="progress-bar-container"><div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%;"></div></div>`;
             wortgruppenButtonsEl.appendChild(button);
@@ -398,18 +385,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         testAccuracyTextEl.textContent = `${state.correctInRound} / ${state.attemptedInRound}`;
         const accuracyPercentage = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) * 100 : 0;
         testAccuracyBarEl.style.width = `${accuracyPercentage}%`;
-    }
-
-    function insertTextAtCursor(inputElement, text) {
-        if (!inputElement) return;
-        const start = inputElement.selectionStart;
-        const end = inputElement.selectionEnd;
-        const oldValue = inputElement.value;
-        inputElement.value = oldValue.substring(0, start) + text + oldValue.substring(end);
-        inputElement.selectionStart = inputElement.selectionEnd = start + text.length;
-        inputElement.focus();
-        const event = new Event('input', { bubbles: true, cancelable: true });
-        inputElement.dispatchEvent(event);
     }
 
     function initUmlautButtons() {
@@ -522,37 +497,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // === FIREBASE INTEGRATION ===
-    async function initWithFirebase() {
-        console.log('🚀 Starte Basistrainer mit Firebase-Synchronisation...');
-        
-        // Zeige Loading-Indikator
-        showFirebaseStatus('Verbinde mit Cloud...', 'loading');
-        
-        try {
-            // 1. Firebase Auth initialisieren
-            await initializeAuth();
-            
-            // 2. Sync Service initialisieren
-            const syncInitialized = await firebaseSyncService.initialize();
-            
-            if (syncInitialized) {
-                showFirebaseStatus('✅ Cloud-Synchronisation aktiv', 'success');
-                setupFirebaseEventListeners();
-            } else {
-                showFirebaseStatus('⚠️ Offline-Modus (Daten nur lokal)', 'warning');
-            }
-            
-        } catch (error) {
-            console.error('❌ Firebase Initialisierung fehlgeschlagen:', error);
-            showFirebaseStatus('❌ Cloud nicht verfügbar (Offline-Modus)', 'error');
-        }
-        
-        // 3. Normale Trainer-Initialisierung
+    function init() {
+        state.lastTestScores = {};
         loadGlobalProgress();
         loadLastTestScores();
-
-        dom.processAnswer = processAnswer;
 
         backToWortgruppenButton.addEventListener('click', showWortgruppenSelector);
         Object.keys(learningModes).forEach(modeId => {
@@ -567,105 +515,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         initUmlautButtons();
         showWortgruppenSelector();
         initTestModeListeners();
-        
-        console.log('✅ Basistrainer vollständig initialisiert');
-    }
-
-    function setupFirebaseEventListeners() {
-        window.addEventListener('firebaseSyncUpdate', (event) => {
-            const { type, data } = event.detail;
-            
-            switch(type) {
-                case 'progressUpdated':
-                    console.log('📥 Fortschritt von anderem Gerät erhalten');
-                    handleProgressSync(data);
-                    break;
-                case 'testScoresUpdated':
-                    console.log('📥 Test-Ergebnisse von anderem Gerät erhalten');
-                    handleTestScoresSync(data);
-                    break;
-            }
-        });
-    }
-
-    function handleProgressSync(syncedProgress) {
-        try {
-            const convertedProgress = {};
-            for (const gruppe in syncedProgress) {
-                convertedProgress[gruppe] = {};
-                for (const mode in syncedProgress[gruppe]) {
-                    convertedProgress[gruppe][mode] = new Set(syncedProgress[gruppe][mode]);
-                }
-            }
-            
-            state.globalProgress = convertedProgress;
-            
-            if (!state.isTestModeActive) {
-                updatePracticeStats();
-                updateCategoryStats();
-                updateErrorCounts();
-            }
-        } catch (error) {
-            console.error('❌ Fehler beim Progress Sync:', error);
-        }
-    }
-
-    function handleTestScoresSync(syncedTestScores) {
-        try {
-            state.lastTestScores = { ...syncedTestScores };
-            updateTestModeProgressBars();
-        } catch (error) {
-            console.error('❌ Fehler beim TestScores Sync:', error);
-        }
-    }
-
-    function showFirebaseStatus(message, type = 'info') {
-        let statusEl = document.getElementById('firebase-status');
-        if (!statusEl) {
-            statusEl = document.createElement('div');
-            statusEl.id = 'firebase-status';
-            statusEl.className = 'firebase-status-bar';
-            document.body.prepend(statusEl);
-            document.body.classList.add('firebase-active');
-        }
-        
-        statusEl.textContent = message;
-        statusEl.className = `firebase-status-bar firebase-status-${type}`;
-        
-        if (type === 'success' || type === 'error') {
-            setTimeout(() => {
-                statusEl.style.display = 'none';
-            }, 3000);
-        }
-    }
-
-    function showSyncNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'sync-notification';
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        setTimeout(() => notification.classList.add('show'), 100);
-        
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => document.body.removeChild(notification), 300);
-        }, 2000);
     }
 
     // ===== START DER INITIALISIERUNGSSEQUENZ =====
 
-    // 1. Die Funktion "initializeDOMReferences()" wird aufgerufen.
     initializeDOMReferences();
 
-    // Früher Fehlercheck für kritische Abhängigkeiten
     if (typeof goetheA1Wortschatz === 'undefined' || typeof vergleicheAntwort === 'undefined') {
         console.error("KRITISCHER FEHLER: Wichtige Skript-Dateien (vokabular.js, helfer.js) fehlen oder sind fehlerhaft.");
         document.body.innerHTML = '<div style="padding: 2rem; text-align: center; font-family: sans-serif; background-color: #ffcccc; border: 2px solid red;"><h1>Fehler beim Laden</h1><p>Wichtige App-Daten konnten nicht geladen werden. Bitte überprüfe die Browser-Konsole (F12) für Details.</p></div>';
         return;
     }
 
-    // 2. Das "dom"-Objekt, das die DOM-Referenzen bündelt, wird erstellt.
     const dom = {
         mcUiEl, mcAnswersContainerEl, questionDisplayEl, exampleSentenceDisplayEl, audioWordButtonEl,
         audioSentenceButtonEl, wordLineContainerEl, sentenceLineContainerEl, SVG_SPEAKER_ICON,
@@ -678,7 +539,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const alleVokabeln = Object.values(goetheA1Wortschatz).flat();
 
-    // 3. Das "learningModes"-Objekt wird erstellt, da es vom "dom"-Objekt abhängt.
     const learningModes = {
         'mc-de-en': { name: "Bedeutung", setupFunc: () => uiModes.setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) },
         'type-de-adj': { name: "Schreibweise", setupFunc: () => uiModes.setupSpellingMode(dom, state, processAnswer) },
@@ -686,43 +546,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         'sentence-translation-en-de': { name: "Satzübersetzung", setupFunc: () => uiModes.setupSentenceTranslationEnDeMode(dom, state, processAnswer) },
     };
 
-    // 4. FIREBASE-ERWEITERTE INITIALISIERUNG
-    await initWithFirebase();
-    
-    // NEU: Device-Sync UI aktivieren
-    try {
-        window.deviceSyncUI = deviceSyncUI;  // NEU: Global verfügbar machen
-        await deviceSyncUI.initialize();
-        deviceSyncUI.createAndAppendSyncButton();
-        console.log('✅ Device-Sync UI erfolgreich gestartet');
-    } catch (error) {
-        console.error('❌ Fehler beim Starten der Device-Sync UI:', error);
-    }
+    init();
 
-    // Funktion für Beispielsatz-Anzeige (existierte bereits am Ende der Datei)
     function displaySentence(vokabel, sentenceContainer) {
-        // Vorherigen Satz löschen
         sentenceContainer.innerHTML = '';
 
         if (!vokabel.beispielsatz) {
-            return; // Nichts zu tun, wenn kein Satz vorhanden ist
+            return;
         }
 
-        // Prüfen, ob der Beispielsatz das neue Array-Format hat
         if (Array.isArray(vokabel.beispielsatz)) {
             vokabel.beispielsatz.forEach(part => {
                 const span = document.createElement('span');
                 span.textContent = part.text;
 
-                // CSS-Klasse nur hinzufügen, wenn ein Kasus definiert ist (und nicht 'none')
                 if (part.kasus && part.kasus !== 'none') {
                     span.className = `kasus-${part.kasus}`;
                 }
                 sentenceContainer.appendChild(span);
             });
         } else {
-            // Fallback für alte Sätze, die nur Text sind
             sentenceContainer.textContent = vokabel.beispielsatz;
         }
     }
+
 });
