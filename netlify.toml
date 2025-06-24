@@ -14,4 +14,4 @@
   """
 
   # Das Veröffentlichungs-Verzeichnis bleibt dasselbe.
-  publish = "dist"
+  publish = "packages/trainer-basis"
