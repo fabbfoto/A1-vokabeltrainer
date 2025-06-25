@@ -530,8 +530,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         showFirebaseStatus('Verbinde mit Cloud...', 'loading');
         
         try {
-            // 1. Firebase Auth initialisieren
-            await initializeAuth();
             
             // 2. Sync Service initialisieren
             const syncInitialized = await firebaseSyncService.initialize();

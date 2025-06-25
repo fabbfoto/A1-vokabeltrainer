@@ -13,7 +13,7 @@ import {
   limit,
   orderBy,
   deleteDoc
-} from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+} from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 import { db, auth, getCurrentDeviceInfo } from './firebase-config.js';
 
 class FirebaseSyncService {
@@ -52,6 +52,12 @@ class FirebaseSyncService {
     try {
       console.log('🔄 Initialisiere Firebase Sync Service...');
       
+      // Prüfe zuerst auf Import-Link
+      const imported = await this.importFromShareLink();
+      if (imported) {
+        console.log('✅ Daten via Link importiert!');
+      }
+      
       // Warte auf Authentifizierung
       const user = await this.waitForAuth();
       this.userId = user.uid;
@@ -70,6 +76,68 @@ class FirebaseSyncService {
     } catch (error) {
       console.error('❌ Fehler bei Sync Service Initialisierung:', error);
       this.isInitialized = false;
+      return false;
+    }
+  }
+
+  // Importiere Daten von einem Share-Link
+  async importFromShareLink() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    if (!token) {
+      return false;
+    }
+
+    console.log(`🔗 Import-Token in URL gefunden: ${token}`);
+
+    try {
+      const tokenRef = doc(db, 'syncTokens', token);
+      const tokenDoc = await getDoc(tokenRef);
+
+      if (!tokenDoc.exists() || tokenDoc.data().used) {
+        console.warn('⚠️ Ungültiger oder bereits benutzter Token.');
+        this.removeTokenFromUrl();
+        return false;
+      }
+
+      const tokenData = tokenDoc.data();
+      const dataRef = doc(db, tokenData.dataLocation);
+      const dataDoc = await getDoc(dataRef);
+
+      if (!dataDoc.exists()) {
+        console.error('❌ Geteilte Daten nicht gefunden.');
+        this.removeTokenFromUrl();
+        return false;
+      }
+
+      const sharedData = dataDoc.data();
+      
+      // Warte auf User-ID
+      const user = await this.waitForAuth();
+      this.userId = user.uid;
+
+      // Merge-Logik: Cloud-Daten (vom Link) mit lokalen Daten zusammenführen
+      this.handleCloudUpdate('progress', sharedData.progress);
+      this.handleCloudUpdate('testScores', sharedData.testScores);
+      
+      // Die jetzt gemergten lokalen Daten in die Cloud dieses Nutzers speichern
+      await this.syncLocalToCloud();
+
+      // Token als benutzt markieren und User-Zugriff auf die geteilten Daten gewähren
+      const batch = writeBatch(db);
+      batch.update(tokenRef, { used: true, usedBy: this.userId, usedAt: serverTimestamp() });
+      batch.update(dataRef, { [`allowedUsers.${this.userId}`]: true });
+      await batch.commit();
+      
+      console.log('✅ Daten erfolgreich importiert und mit deinem Account verknüpft.');
+      this.removeTokenFromUrl();
+      
+      return true;
+
+    } catch (error) {
+      console.error('❌ Fehler beim Importieren via Link:', error);
+      this.removeTokenFromUrl();
       return false;
     }
   }
@@ -377,7 +445,13 @@ class FirebaseSyncService {
       // Setze Listener für eingehende Verbindungen
       this.listenForSyncConnection(syncCode);
       
-      return syncCode;
+      // Erstelle auch einen Share-Link
+      const shareData = await this.createShareableSync();
+      return { 
+        syncCode: syncCode, 
+        shareLink: shareData.shareLink,
+        token: shareData.token 
+      };
     } catch (error) {
       console.error('❌ Fehler beim Erstellen der Sync-Session:', error);
       return null;
@@ -452,6 +526,47 @@ class FirebaseSyncService {
     }
   }
 
+  async createShareableSync() {
+    try {
+      // 1. Erstelle einmaligen Token
+      const token = this.generateSyncCode(); // 6-stelliger Code
+      const tokenRef = doc(db, 'syncTokens', token);
+      
+      // 2. Speichere Token mit Verweis auf echte Daten
+      await setDoc(tokenRef, {
+        createdBy: this.userId,
+        createdAt: serverTimestamp(),
+        expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 Min
+        dataLocation: `sharedVocabularies/${this.userId}_${Date.now()}`,
+        used: false
+      });
+      
+      // 3. Speichere die eigentlichen Daten geschützt
+      const dataRef = doc(db, 'sharedVocabularies', `${this.userId}_${Date.now()}`);
+      await setDoc(dataRef, {
+        progress: this.localData.progress,
+        testScores: this.localData.testScores,
+        createdBy: this.userId,
+        allowedUsers: {
+          [this.userId]: true  // Erstmal nur der Ersteller
+        },
+        createdAt: serverTimestamp()
+      });
+      
+      // 4. Generiere Link mit Token statt direkter ID
+      const shareLink = `${window.location.origin}${window.location.pathname}?token=${token}`;
+      
+      return {
+        token,
+        shareLink
+      };
+      
+    } catch (error) {
+      console.error('❌ Fehler beim Erstellen des Share-Links:', error);
+      throw error;
+    }
+  }
+
   async syncToConnectedDevice(targetUserId) {
     // Kopiere aktuelle Daten zum Ziel-User
     const batch = writeBatch(db);
@@ -504,6 +619,12 @@ class FirebaseSyncService {
     } catch (error) {
       console.error('Fehler beim Cleanup:', error);
     }
+  }
+
+  removeTokenFromUrl() {
+    const newUrl = new URL(window.location);
+    newUrl.searchParams.delete('token');
+    window.history.replaceState({}, document.title, newUrl.toString());
   }
 
   // Cleanup beim Beenden

@@ -1,14 +1,8 @@
 // packages/trainer-basis/firebase-config.js
-// === KORRIGIERTE VERSION, DIE MIT firebase-sync.js FUNKTIONIERT ===
-
-// Wichtig: Die URLs müssen in Anführungszeichen stehen, aber nicht in eckigen Klammern
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
-// ====================================================================
-// HIER MUSS DEINE FIREBASE-KONFIGURATION AUS DER CONSOLE STEHEN
-// ====================================================================
 const firebaseConfig = {
   apiKey: "AIzaSyDvbEE9u2-y1sB8COT3zw4dQ6nJAry2Z2g",
   authDomain: "a1-vokabeltrainer.firebaseapp.com",
@@ -18,41 +12,35 @@ const firebaseConfig = {
   appId: "1:149333337863:web:71e5894cca5086024c47a2",
   measurementId: "G-WZELR67WKZ"
 };
-// ====================================================================
-
-// Firebase initialisieren
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Device Information
-export function getCurrentDeviceInfo() {
+function getCurrentDeviceInfo() {
+    let browserName = 'Unknown';
   const userAgent = navigator.userAgent;
-  let deviceType = 'desktop';
-  let deviceName = '🖥️ Desktop';
-  
-  if (/Mobi|Android/i.test(userAgent)) {
-    deviceType = 'mobile';
-    deviceName = '📱 Smartphone';
-  } else if (/iPad/i.test(userAgent)) {
-    deviceType = 'tablet';
-    deviceName = '📱 Tablet';
-  }
-  
+    if (userAgent.indexOf("Firefox") > -1) {
+        browserName = "Mozilla Firefox";
+    } else if (userAgent.indexOf("SamsungBrowser") > -1) {
+        browserName = "Samsung Internet";
+    } else if (userAgent.indexOf("Opera") > -1 || userAgent.indexOf("OPR") > -1) {
+        browserName = "Opera";
+    } else if (userAgent.indexOf("Trident") > -1) {
+        browserName = "Microsoft Internet Explorer";
+    } else if (userAgent.indexOf("Edge") > -1) {
+        browserName = "Microsoft Edge";
+    } else if (userAgent.indexOf("Chrome") > -1) {
+        browserName = "Google Chrome";
+    } else if (userAgent.indexOf("Safari") > -1) {
+        browserName = "Apple Safari";
+    }
   return {
-    deviceType,
-    deviceName,
-    browserName,
-    userAgent: userAgent.substring(0, 100),
-    timestamp: Date.now()
+        browser: browserName,
+        userAgent: userAgent,
+        platform: navigator.platform,
+        language: navigator.language,
+        timestamp: new Date().toISOString()
   };
 }
 
-function getBrowserName() {
-  const userAgent = navigator.userAgent;
-  if (userAgent.includes('Chrome')) return 'Chrome';
-  if (userAgent.includes('Firefox')) return 'Firefox';
-  if (userAgent.includes('Safari')) return 'Safari';
-  if (userAgent.includes('Edge')) return 'Edge';
-  return 'Browser';
-}
+export { auth, db, getCurrentDeviceInfo };

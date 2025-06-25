@@ -6,6 +6,9 @@ class DeviceSyncUI {
   constructor() {
     this.modal = null;
     this.isInitialized = false;
+    this.currentSyncCode = null;
+    this.currentShareLink = null;
+    this.currentToken = null;
   }
 
   async initialize() {
@@ -189,16 +192,18 @@ class DeviceSyncUI {
     this.showState('create');
     
     try {
-      const syncCode = await firebaseSyncService.createDeviceSyncSession();
+      const syncData = await firebaseSyncService.createDeviceSyncSession();
       
-      if (syncCode) {
-        const syncUrl = `${window.location.origin}${window.location.pathname}?sync=${syncCode}`;
-        this.modal.querySelector('#sync-link-input').value = syncUrl;
+      if (syncData && syncData.shareLink) {
+        this.currentSyncCode = syncData.syncCode;
+        this.currentShareLink = syncData.shareLink;
+        this.currentToken = syncData.token;
+        this.modal.querySelector('#sync-link-input').value = syncData.shareLink;
         
         // Automatisch kopieren
         this.copyLink();
       } else {
-        throw new Error('Sync-Code konnte nicht erstellt werden');
+        throw new Error('Sync-Daten konnten nicht erstellt werden');
       }
     } catch (error) {
       this.showError('Link konnte nicht erstellt werden');
