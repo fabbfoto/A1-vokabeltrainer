@@ -343,6 +343,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         testButton.className = 'col-span-3 rounded-lg py-2 font-semibold bg-gray-300 hover:bg-gray-500 hover:text-white transition-colors duration-200';
         testButton.innerHTML = `Test`;
         wortgruppenButtonsEl.appendChild(testButton);
+        deviceSyncUI.createAndAppendSyncButton(); // Füge den Sync-Button hinzu, nachdem alle anderen Buttons erstellt wurden
     }
 
     function showWortgruppenSelector() {
@@ -691,7 +692,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
         window.deviceSyncUI = deviceSyncUI;  // NEU: Global verfügbar machen
         await deviceSyncUI.initialize();
-        deviceSyncUI.createAndAppendSyncButton();
         console.log('✅ Device-Sync UI erfolgreich gestartet');
     } catch (error) {
         console.error('❌ Fehler beim Starten der Device-Sync UI:', error);

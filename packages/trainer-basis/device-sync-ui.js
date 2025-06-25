@@ -1,5 +1,6 @@
 // packages/trainer-basis/device-sync-ui.js
 // Multi-Device Sync UI für Basistrainer
+import { getAuth, GoogleAuthProvider, linkWithPopup } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { firebaseSyncService } from './firebase-sync.js';
 
 class DeviceSyncUI {
@@ -15,8 +16,12 @@ class DeviceSyncUI {
     if (this.isInitialized) return;
     
     try {
-      // Erstelle Modal (initial versteckt)
+      // Erstelle Modal (initial versteckt) - Dies ist das Modal für die Geräte-Synchronisation
       this.createModal();
+      // Erstelle und füge den Sync-Button hinzu, da er für die Event-Listener benötigt wird.
+      this.createAndAppendSyncButton();
+      // Event-Listener für das Auth-Modal einrichten
+      this.initializeModalEventListeners();
       
       // Prüfe URL-Parameter für Sync-Code
       await this.checkUrlForSyncCode();
@@ -30,13 +35,13 @@ class DeviceSyncUI {
   // Füge diese neue Methode nach initialize() ein:
   createAndAppendSyncButton() {
     // Prüfe ob Button bereits existiert
-    if (document.getElementById('device-sync-btn')) {
+    if (document.getElementById('show-auth-modal-btn')) {
       return;
     }
     
     // Erstelle Sync-Button
     const syncButton = document.createElement('button');
-    syncButton.id = 'device-sync-btn';
+    syncButton.id = 'show-auth-modal-btn';
     syncButton.className = 'col-span-3 rounded-lg py-3 font-semibold bg-gradient-to-r from-black via-red-600 to-yellow-500 text-white hover:shadow-lg transition-all duration-300 transform hover:scale-105';
     syncButton.innerHTML = `
       <span class="flex items-center justify-center gap-2">
@@ -45,7 +50,11 @@ class DeviceSyncUI {
       </span>
     `;
     
-    syncButton.addEventListener('click', () => this.showModal());
+    syncButton.addEventListener('click', () => {
+      console.log('Sync-Button wurde geklickt!');
+      console.log('showAuthModal wird aufgerufen...');
+      this.showAuthModal();
+    });
     
     // Füge Button direkt zu wortgruppen-buttons hinzu
     const wortgruppenButtons = document.getElementById('wortgruppen-buttons');
@@ -57,12 +66,113 @@ class DeviceSyncUI {
     }
   }
 
+  /**
+   * NEU: Richtet alle Event-Listener für das Authentifizierungs-Modal ein.
+   * Diese Methode ist kompatibel mit der .visible-Klassenlogik.
+   */
+  initializeModalEventListeners() {
+    // Alle benötigten Elemente aus dem DOM holen.
+    const showModalBtn = document.getElementById('show-auth-modal-btn');
+    const authModalOverlay = document.getElementById('auth-modal-overlay');
+    const closeModalBtn = document.querySelector('.close-modal-btn');
+    const googleBtn = document.getElementById('google-signin-btn');
+    const emailForm = document.getElementById('email-form');
+    const emailInput = document.getElementById('email-input');
+
+    // Sicherheitsprüfung, ob alle HTML-Elemente vorhanden sind.
+    if (!showModalBtn || !authModalOverlay || !closeModalBtn || !googleBtn || !emailForm) {
+        console.error('Ein oder mehrere Modal-Elemente konnten nicht im DOM gefunden werden. Stelle sicher, dass der HTML-Code aus Schritt 1 in index.html eingefügt wurde.');
+        return;
+    }
+
+    // --- Hilfsfunktionen ---
+        const showModal = () => this.showAuthModal(); // Use instance method
+        const hideModal = () => this.hideAuthModal(); // Use instance method
+
+    // --- Event-Listener Zuweisung ---
+    showModalBtn.addEventListener('click', showModal);
+    closeModalBtn.addEventListener('click', hideModal);
+
+    authModalOverlay.addEventListener('click', (event) => {
+        if (event.target === authModalOverlay) {
+            hideModal();
+        }
+    });
+
+    googleBtn.addEventListener('click', async () => {
+        console.log('Firebase: Google-Login-Prozess wird gestartet...');
+        this.hideAuthModal(); // Modal nach Aktion schließen.
+
+        try {
+            const auth = getAuth();
+            const provider = new GoogleAuthProvider();
+
+            // Der entscheidende Aufruf: Verknüpft den aktuellen anonymen Nutzer (auth.currentUser)
+            // mit dem vom Nutzer im Popup ausgewählten Google-Konto.
+            const result = await linkWithPopup(auth.currentUser, provider);
+
+            const user = result.user;
+            console.log('Erfolgreich verknüpft! Permanenter User:', user);
+            alert(`Dein Account wurde erfolgreich mit ${user.email} verknüpft! Dein Lernfortschritt ist jetzt sicher.`);
+
+        } catch (error) {
+            // Professionelle Fehlerbehandlung
+            console.error("Fehler bei der Verknüpfung mit Google: ", error.code, error.message);
+
+            // Spezifische Fehler für eine bessere Nutzerführung
+            if (error.code === 'auth/popup-closed-by-user') {
+                alert('Anmeldung abgebrochen. Das Fenster wurde vor Abschluss geschlossen.');
+            } else if (error.code === 'auth/credential-already-in-use') {
+                alert('Fehler: Dieses Google-Konto ist bereits mit einem anderen Account in dieser App verknüpft.');
+            } else {
+                alert('Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut.');
+            }
+        }
+    });
+
+    emailForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Standard-Formular-Verhalten unterbinden.
+        const email = emailInput.value;
+        console.log(`Firebase: Login-Link wird an ${email} gesendet...`);
+        alert(`Platzhalter: Ein Login-Link würde jetzt an ${email} gesendet.`);
+        this.hideAuthModal(); // Modal nach Aktion schließen.
+    });
+  }
+
   appendSyncButton() {
     const wortgruppenButtons = document.getElementById('wortgruppen-buttons');
     if (wortgruppenButtons && this.syncButton && !document.getElementById('device-sync-btn')) {
       wortgruppenButtons.appendChild(this.syncButton);
     }
   }
+
+  // NEU: Methoden zur Steuerung des Authentifizierungs-Modals (statisch in index.html)
+  showAuthModal() {
+    console.log('showAuthModal wurde erreicht');
+    const authModalOverlay = document.getElementById('auth-modal-overlay');
+    console.log('Modal-Element gefunden:', authModalOverlay);
+    if (!authModalOverlay) {
+        console.error('FEHLER: auth-modal-overlay Element nicht gefunden!');
+        console.log('Vorhandene Elemente mit IDs:', Array.from(document.querySelectorAll('[id]')).map(el => el.id));
+        return;
+    }
+    console.log('Modal display style vor Änderung:', authModalOverlay.style.display);
+    if (authModalOverlay) {
+      authModalOverlay.classList.add('visible'); // Korrigiert: Fügt die 'visible'-Klasse hinzu
+      console.log('Modal display style nach Änderung:', authModalOverlay.style.display);
+      console.log('Modal classList:', authModalOverlay.classList.toString());
+      console.log('Modal sichtbar?', window.getComputedStyle(authModalOverlay).display);
+    }
+  }
+
+  hideAuthModal() {
+    const authModalOverlay = document.getElementById('auth-modal-overlay');
+    if (authModalOverlay) {
+      authModalOverlay.classList.remove('visible'); // Korrigiert: Entfernt die 'visible'-Klasse
+    }
+  }
+
+  // Bestehende createModal für das GERÄTE-SYNCHRONISATIONS-MODAL
   createModal() {
     // Erstelle Modal-Container
     this.modal = document.createElement('div');
@@ -161,12 +271,12 @@ class DeviceSyncUI {
     });
   }
 
-  showModal() {
+  showDeviceSyncModal() { // Umbenannt für Klarheit
     this.resetModal();
     this.modal.classList.remove('hidden');
   }
 
-  hideModal() {
+  hideDeviceSyncModal() { // Umbenannt für Klarheit
     this.modal.classList.add('hidden');
   }
 
@@ -260,7 +370,7 @@ class DeviceSyncUI {
       console.log('🔗 Sync-Code in URL gefunden:', syncCode);
       
       // Zeige Modal
-      this.showModal();
+      this.showDeviceSyncModal(); // Verwendet umbenannte Methode
       this.showState('connect');
       
       try {
@@ -277,7 +387,7 @@ class DeviceSyncUI {
         
         // Schließe Modal nach 3 Sekunden
         setTimeout(() => {
-          this.hideModal();
+          this.hideDeviceSyncModal(); // Verwendet umbenannte Methode
           // Zeige Sync-Notification
           this.showSyncNotification('Geräte erfolgreich synchronisiert!');
         }, 3000);
@@ -322,4 +432,4 @@ class DeviceSyncUI {
 }
 
 // Exportiere Singleton-Instanz
-export const deviceSyncUI = new DeviceSyncUI();
+export const deviceSyncUI = new DeviceSyncUI('#wortgruppen-buttons');

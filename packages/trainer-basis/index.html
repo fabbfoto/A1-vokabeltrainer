@@ -137,67 +137,28 @@
             <p class="version-info">Basis-Trainer v2.0</p>
         </div>
     </footer>
-    <style>
-    .copyright-footer {
-        margin-top: 40px;
-        padding: 24px 20px;
-        border-top: 2px solid #e5e5e5;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        text-align: center;
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    .footer-content {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-    .copyright-text {
-        font-size: 1.1em;
-        font-weight: 600;
-        color: #2d3748;
-        margin: 0 0 12px 0;
-    }
-    .footer-links {
-        font-size: 0.95em;
-        color: #4a5568;
-        margin: 0 0 8px 0;
-    }
-    .footer-link {
-        color: #3b82f6;
-        text-decoration: none;
-        font-weight: 500;
-        transition: color 0.2s ease;
-    }
-    .footer-link:hover {
-        color: #1d4ed8;
-        text-decoration: underline;
-    }
-    .separator {
-        margin: 0 12px;
-        color: #a0aec0;
-    }
-    .educational-note {
-        color: #059669;
-        font-weight: 500;
-    }
-    .version-info {
-        font-size: 0.85em;
-        color: #6b7280;
-        margin: 8px 0 0 0;
-        font-style: italic;
-    }
-    @media (max-width: 640px) {
-        .copyright-footer {
-            padding: 20px 16px;
-        }
-        .footer-links {
-            font-size: 0.9em;
-        }
-        .separator {
-            display: block;
-            margin: 8px 0;
-        }
-    }
-    </style>
+
+    <!-- Auth Modal Overlay -->
+    <div id="auth-modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <span class="close-modal-btn">&times;</span>
+            <h2>Auf allen Geräten lernen</h2>
+            <p>Sichere deinen Fortschritt mit einem kostenlosen Konto. Dein bisheriger Lernstand wird automatisch übernommen.</p>
+            <div class="modal-options">
+                <button id="google-signin-btn" class="auth-option-btn google-btn">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google Logo">
+                    Mit Google verbinden
+                </button>
+                <div class="divider">ODER</div>
+                <form id="email-form" class="email-form-container">
+                    <p class="email-form-label">Per E-Mail-Link verbinden:</p>
+                    <input type="email" id="email-input" placeholder="deine.email@adresse.de" required>
+                    <button type="submit" id="email-signin-btn" class="auth-option-btn">Login-Link senden</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script type="module" src="firebase-config.js"></script>
     <script type="module" src="vokabular.js"></script>
     <script type="module" src="trainer.js"></script>
