@@ -51,8 +51,6 @@ class DeviceSyncUI {
     `;
     
     syncButton.addEventListener('click', () => {
-      console.log('Sync-Button wurde geklickt!');
-      console.log('showAuthModal wird aufgerufen...');
       this.showAuthModal();
     });
     
@@ -148,26 +146,17 @@ class DeviceSyncUI {
 
   // NEU: Methoden zur Steuerung des Authentifizierungs-Modals (statisch in index.html)
   showAuthModal() {
-    console.log('showAuthModal wurde erreicht');
     const authModalOverlay = document.getElementById('auth-modal-overlay');
-    console.log('Modal-Element gefunden:', authModalOverlay);
-    if (!authModalOverlay) {
-        console.error('FEHLER: auth-modal-overlay Element nicht gefunden!');
-        console.log('Vorhandene Elemente mit IDs:', Array.from(document.querySelectorAll('[id]')).map(el => el.id));
-        return;
-    }
-    console.log('Modal display style vor Änderung:', authModalOverlay.style.display);
     if (authModalOverlay) {
-      authModalOverlay.classList.add('visible');
-      console.log('Modal display style nach Änderung:', authModalOverlay.style.display);
-      console.log('Modal classList:', authModalOverlay.classList.toString());
-      console.log('Modal sichtbar?', window.getComputedStyle(authModalOverlay).display);
+        authModalOverlay.style.display = 'flex';
+        authModalOverlay.classList.add('visible');
     }
   }
 
   hideAuthModal() {
     const authModalOverlay = document.getElementById('auth-modal-overlay');
     if (authModalOverlay) {
+        authModalOverlay.style.display = 'none';
       authModalOverlay.classList.remove('visible');
     }
   }
