@@ -1,10 +1,15 @@
-// packages/trainer-basis/firebase-config.js
-// Firebase v9+ Modular SDK Konfiguration für Basistrainer
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
-import { getFirestore, enableNetwork, disableNetwork } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+// A1-VOKABELTRAINER/packages/trainer-basis/firebase-config.js
+// --- NEUE, SAUBERE VERSION ---
 
-// Firebase-Konfiguration (identisch mit Thementrainer)
+// Importieren der notwendigen Firebase-Module
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+
+// ====================================================================
+// HIER IHRE FIREBASE-KONFIGURATION AUS DER CONSOLE EINFÜGEN
+// ====================================================================
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: "AIzaSyDvbEE9u2-y1sB8COT3zw4dQ6nJAry2Z2g",
   authDomain: "a1-vokabeltrainer.firebaseapp.com",
@@ -13,76 +18,37 @@ const firebaseConfig = {
   messagingSenderId: "149333337863",
   appId: "1:149333337863:web:71e5894cca5086024c47a2",
   measurementId: "G-WZELR67WKZ"
-};
+};// ====================================================================
 
-// Firebase initialisieren
+// Firebase-App initialisieren
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
 
-// Connection State Management
-let isOnline = navigator.onLine;
-let connectionListeners = [];
+// Die Dienste holen, die wir in anderen Dateien verwenden wollen
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-export function onConnectionChange(callback) {
-  connectionListeners.push(callback);
-}
-
-export function getConnectionStatus() {
-  return isOnline;
-}
-
-// Network Status Detection
-window.addEventListener('online', () => {
-  isOnline = true;
-  enableNetwork(db);
-  connectionListeners.forEach(callback => callback(true));
-});
-
-window.addEventListener('offline', () => {
-  isOnline = false;
-  disableNetwork(db);
-  connectionListeners.forEach(callback => callback(false));
-});
-
-// Anonyme Authentifizierung
-export async function initializeAuth() {
-  return new Promise((resolve, reject) => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        console.log('✅ Benutzer authentifiziert:', user.uid);
-        resolve(user);
-      } else {
-        try {
-          console.log('🔄 Melde Benutzer anonym an...');
-          const userCredential = await signInAnonymously(auth);
-          console.log('✅ Anonyme Anmeldung erfolgreich:', userCredential.user.uid);
-          resolve(userCredential.user);
-        } catch (error) {
-          console.error('❌ Fehler bei anonymer Anmeldung:', error);
-          reject(error);
-        }
-      }
+/**
+ * ÜBERWACHT DEN LOGIN-STATUS DES BENUTZERS.
+ * Dies ist das Herzstück der Authentifizierung.
+ * Wenn kein Benutzer angemeldet ist, wird automatisch ein anonymer Account erstellt.
+ */
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    // Der Benutzer ist angemeldet (entweder anonym oder permanent).
+    // Die 'user' Variable enthält die wichtige UID (user.uid).
+    console.log("Firebase Auth: Benutzer ist angemeldet mit UID:", user.uid);
+    // Hier könnte man z.B. den Lade-Prozess für den Fortschritt anstoßen.
+    
+  } else {
+    // Es ist kein Benutzer angemeldet.
+    // Wir erstellen sofort und unsichtbar einen neuen, anonymen Account.
+    console.log("Firebase Auth: Kein Benutzer gefunden. Erstelle anonymen Account...");
+    signInAnonymously(auth).catch((error) => {
+      console.error("Firebase Auth: Fehler beim Erstellen des anonymen Accounts:", error);
     });
-  });
-}
-
-// Device Info für Multi-Device Sync
-export function getCurrentDeviceInfo() {
-  const userAgent = navigator.userAgent;
-  let deviceType = 'Desktop';
-  
-  if (/android/i.test(userAgent)) {
-    deviceType = 'Android';
-  } else if (/iPad|iPhone|iPod/.test(userAgent)) {
-    deviceType = 'iOS';
-  } else if (/Windows Phone/i.test(userAgent)) {
-    deviceType = 'Windows Phone';
   }
-  
-  return {
-    type: deviceType,
-    userAgent: userAgent.substring(0, 100),
-    timestamp: Date.now()
-  };
-}
+});
+
+// Wir exportieren die initialisierten Dienste, damit andere Dateien
+// wie trainer.js oder firebase-sync.js darauf zugreifen können.
+export { auth, db };

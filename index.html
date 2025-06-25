@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goethe A1 Vokabeltrainer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="manifest" href="manifest.json"> 
+    <meta name="theme-color" content="#3b82f6">
+    <link rel="stylesheet" href="/shared/style.css">
+</head>
+<body class="bg-gray-50">
+
+    <!-- NAVIGATION VIEW -->
+    <div id="navigation-view" class="p-4 max-w-2xl mx-auto">
+        <header class="flex items-center mb-6">
+            <button id="back-to-main-topics" class="hidden mr-4 px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&larr; Zurück</button>
+            <h1 id="navigation-title" class="text-2xl font-bold text-gray-700">Themen</h1>
+        </header>
+        <div id="navigation-container" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <!-- Navigation Buttons werden hier dynamisch eingefügt -->
+        </div>
+    </div>
+
+    <!-- TRAINER MAIN VIEW -->
+    <div id="trainer-main-view" class="hidden-view p-4 max-w-2xl mx-auto flex flex-col items-center">
+        <!-- Header mit Zurück-Button und Titel -->
+        <div class="p-2 bg-white rounded-lg shadow-md mb-4 w-full">
+            <div class="flex justify-between items-center mb-2">
+                <button id="back-to-subtopics" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&larr; Zurück</button>
+                <h2 id="current-training-title" class="text-lg font-semibold text-gray-700">Training</h2>
+            </div>
+            
+            <!-- Lernmodus-Buttons Grid -->
+            <div id="mode-button-grid" class="button-grid">
+                <div class="flex flex-col gap-2">
+                    <button id="mode-mc-de-en" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Bedeutung</button>
+                    <button id="mode-repeat-mc-de-en" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm">
+                        <span class="count-display">0</span>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button id="mode-type-de-adj" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Schreibweise</button>
+                    <button id="mode-repeat-type-de-adj" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm">
+                        <span class="count-display">0</span>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button id="mode-cloze-adj-de" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Lückentext</button>
+                    <button id="mode-repeat-cloze-adj-de" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm">
+                        <span class="count-display">0</span>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button id="mode-sentence-translation-en-de" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Satzübersetzung</button>
+                    <button id="mode-repeat-sentence-translation-en-de" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm">
+                        <span class="count-display">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Haupt-Trainer-Card -->
+        <div class="card w-full">
+            <!-- Audio-Container für Wort und Satz -->
+            <div id="word-line-container" class="audio-line-container">
+                <div id="question-display-area"></div>
+                <button id="audio-word-button" class="audio-button" title="Wort vorspielen"></button>
+            </div>
+            <div id="sentence-line-container" class="audio-line-container">
+                <div id="example-sentence-display"></div>
+                <button id="audio-sentence-button" class="audio-button" title="Satz vorspielen"></button>
+            </div>
+            <div id="task-prompt-area"></div>
+
+            <!-- MULTIPLE CHOICE MODE -->
+            <div id="mc-de-en-ui" class="ui-mode my-4">
+                <div id="mc-answers-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <!-- Multiple Choice Antworten werden hier eingefügt -->
+                </div>
+            </div>
+            
+            <!-- SPELLING MODE -->
+            <div id="spelling-mode-ui" class="ui-mode my-4 space-y-3">
+                <div id="single-input-container" class="w-full flex">
+                    <input type="text" id="spelling-input-single" class="single-word-input w-full" 
+                           autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
+                </div>
+                <div id="noun-input-container" class="hidden flex items-center gap-2">
+                    <input type="text" id="spelling-input-noun-1" class="single-word-input flex-grow" 
+                           autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
+                    <input type="text" id="spelling-input-noun-2" class="single-word-input flex-grow" 
+                           autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
+                </div>
+                <button id="check-spelling-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
+            </div>
+
+            <!-- Umlaut-Buttons -->
+            <div id="umlaut-buttons-container" class="mt-4 flex justify-center space-x-2" style="display: none;">
+                <button class="umlaut-button" title="Shift für Caps">ä</button>
+                <button class="umlaut-button" title="Shift für Caps">ö</button>
+                <button class="umlaut-button" title="Shift für Caps">ü</button>
+                <button class="umlaut-button" title="Shift für Caps">ß</button>
+            </div>
+
+            <!-- CLOZE MODE -->
+            <div id="cloze-adj-de-ui" class="ui-mode my-4 space-y-3">
+                <div id="cloze-hint-container" class="text-center text-lg text-gray-500 mb-2" style="display: none;"></div>
+                <div id="cloze-sentence-container" class="text-center text-xl"></div>
+                <button id="check-cloze-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
+            </div>
+
+            <!-- SENTENCE TRANSLATION MODE -->
+            <div id="sentence-translation-en-de-ui" class="ui-mode my-4 space-y-3">
+                <div id="sentence-word-input-container" class="word-input-row text-xl"></div>
+                <button id="check-sentence-translation-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
+            </div>
+
+            <!-- Feedback Container -->
+            <div id="feedback-container" class="my-6 text-center min-h-[3rem] flex flex-col justify-center items-center"></div>
+            <button id="continue-button" class="action-button hidden w-full bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg mt-4">Weiter</button>
+
+            <!-- Statistiken -->
+            <div id="stats-container" class="mt-6 space-y-3">
+                <!-- Practice Stats -->
+                <div id="practice-stats-view">
+                    <p class="text-sm text-gray-600 text-center">Richtig in dieser Runde: <span id="correct-in-round-practice">0</span> / <span id="attempted-in-round-practice">0</span></p>
+                    <div class="stats-bar-container">
+                        <div id="accuracy-bar" class="stats-bar" style="width: 0%;"></div>
+                    </div>
+                    <hr class="my-2">
+                    <p class="text-xs text-gray-500 text-center mb-1">Fortschritt pro Übungsmodus:</p>
+                    <div id="category-stats-container" class="text-xs text-gray-600 space-y-1"></div>
+                </div>
+
+                <!-- Test Stats -->
+                <div id="test-stats-view" class="hidden">
+                    <p class="text-sm text-gray-600 text-center">Gesamtfortschritt: <span id="test-progress-text">0 / 36</span></p>
+                    <div class="stats-bar-container">
+                        <div id="test-progress-bar" class="stats-bar bg-green-500" style="width: 0%;"></div>
+                    </div>
+                    <hr class="my-2">
+                    <p class="text-sm text-gray-600 text-center">Genauigkeit: <span id="test-accuracy-text">0 / 0</span></p>
+                    <div class="stats-bar-container">
+                        <div id="test-accuracy-bar" class="stats-bar bg-blue-500" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Box -->
+            <div id="message-box" class="fixed bottom-5 right-5 bg-red-500 text-white p-3 rounded-lg shadow-xl hidden animate-pulse"></div>
+        </div>
+    </div>
+
+    <!-- REWARD POPUP -->
+    <div id="reward-popup" class="fixed inset-0 flex justify-center items-center hidden z-50 pointer-events-none">
+        <div id="reward-content" class="text-center p-6 bg-white rounded-xl shadow-2xl">
+            <span id="reward-emoji" class="text-7xl block mb-2"></span>
+            <p id="reward-text" class="text-xl font-semibold text-gray-700"></p>
+        </div>
+    </div>
+    
+    <!-- TEST SELECTION MODAL -->
+    <div id="test-selection-modal" class="hidden-view fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-40">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div class="p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Test auswählen</h2>
+                <div id="test-options-grid" class="grid grid-cols-1 gap-3">
+                    <!-- Test-Optionen werden hier dynamisch eingefügt -->
+                </div>
+                <button class="mt-4 w-full px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg transition-colors" 
+                        onclick="document.getElementById('test-selection-modal').classList.add('hidden-view')">
+                    Abbrechen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="vokabular.js"></script>
+    <script type="module" src="trainer.js"></script>
+
+
+    <!-- COPYRIGHT FOOTER -->
+    <footer class="copyright-footer">
+        <div class="footer-content">
+            <p class="copyright-text">© 2025 Frank Burkert - A1 Vokabeltrainer</p>
+            <p class="footer-links">
+                <a href="LICENSE.md" target="_blank" class="footer-link">
+                    📄 Nutzungsbedingungen & Copyright
+                </a>
+                <span class="separator">|</span>
+                <span class="educational-note">🎓 Nur für Bildungszwecke</span>
+            </p>
+            <p class="version-info">Themen-Trainer v2.0 (Standalone)</p>
+        </div>
+    </footer>
+
+    <style>
+    @keyframes shine { 0% { left: -100%; } 100% { left: 100%; } }
+
+    .copyright-footer {
+        margin-top: 40px;
+        padding: 24px 20px;
+        border-top: 2px solid #e5e5e5;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        text-align: center;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    .footer-content {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    .copyright-text {
+        font-size: 1.1em;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0 0 12px 0;
+    }
+    .footer-links {
+        font-size: 0.95em;
+        color: #4a5568;
+        margin: 0 0 8px 0;
+    }
+    .footer-link {
+        color: #3b82f6;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+    .footer-link:hover {
+        color: #1d4ed8;
+        text-decoration: underline;
+    }
+    .separator {
+        margin: 0 12px;
+        color: #a0aec0;
+    }
+    .educational-note {
+        color: #059669;
+        font-weight: 500;
+    }
+    .version-info {
+        font-size: 0.85em;
+        color: #6b7280;
+        margin: 8px 0 0 0;
+        font-style: italic;
+    }
+    @media (max-width: 640px) {
+        .copyright-footer {
+            padding: 20px 16px;
+        }
+        .footer-links {
+            font-size: 0.9em;
+        }
+        .separator {
+            display: block;
+            margin: 8px 0;
+        }
+    }
+
+    /* Deutschland-Farben für Sync-Buttons */
+    .sync-btn-germany {
+      background: linear-gradient(135deg, #1f2937 0%, #dc2626 50%, #f59e0b 100%);
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sync-btn-germany:hover {
+      background: linear-gradient(135deg, #374151 0%, #ef4444 50%, #fbbf24 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+
+    .sync-btn-germany::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      animation: shine 3s infinite;
+    }
+
+    /* Verbessertes Link-Container Design */
+    .sync-link-container {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin: 16px 0;
+    }
+
+    .sync-link-input {
+      flex: 1;
+      padding: 12px 16px;
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: monospace;
+      background: #f9fafb;
+      transition: border-color 0.2s ease;
+    }
+
+    .sync-link-input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: white;
+    }
+
+    .sync-link-copy-btn {
+      padding: 12px;
+      background: linear-gradient(135deg, #1f2937 0%, #dc2626 50%, #f59e0b 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      min-width: 48px;
+      transition: all 0.2s ease;
+    }
+
+    .sync-link-copy-btn:hover {
+      background: linear-gradient(135deg, #374151 0%, #ef4444 50%, #fbbf24 100%);
+      transform: scale(1.05);
+    }
+
+    .sync-link-description {
+      font-size: 14px;
+      color: #6b7280;
+      text-align: center;
+      font-style: italic;
+    }
+
+    /* Verbesserte Modal-Anzeige */
+    .sync-option.active {
+      border-color: #f59e0b;
+      background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2);
+    }
+
+    .sync-option-icon.link {
+      background: linear-gradient(135deg, #1f2937 0%, #dc2626 50%, #f59e0b 100%);
+    }
+    </style>
+
+</body>
+</html>
