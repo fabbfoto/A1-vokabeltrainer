@@ -3,28 +3,43 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebas
 import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 import { getFirestore, enableNetwork, disableNetwork } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
 
-// HIER DEINE FIREBASE-KONFIGURATION EINFÜGEN
+// =========================================================================
+// HIER IST DIE STELLE, DIE DU ÄNDERN MUSST
+// Die folgenden Werte müssen zu deinem Projekt "vokabeltrainer-app-462515" passen.
+// =========================================================================
 const firebaseConfig = {
- apiKey: "AIzaSyDvbEE9u2-y1sB8COT3zw4dQ6nJAry2Z2g",
-  authDomain: "a1-vokabeltrainer.firebaseapp.com",
-  projectId: "a1-vokabeltrainer",
-  storageBucket: "a1-vokabeltrainer.firebasestorage.app",
-  messagingSenderId: "149333337863",
-  appId: "1:149333337863:web:71e5894cca5086024c47a2",
-  measurementId: "G-WZELR67WKZ"
-};
+  // 1. HIER KOMMT DEIN NEUER "API-Schlüssel 1" HINEIN
+  apiKey: "AIzaSyB2kPYj9oY3-3bLO3Gzvws9qZOfKIowycY",
 
-// Firebase initialisieren
+  // 2. DIESE WERTE MÜSSEN AUCH KORRIGIERT WERDEN!
+  authDomain: "vokabeltrainer-app-462515.firebaseapp.com",
+  projectId: "vokabeltrainer-app-462515",
+  storageBucket: "vokabeltrainer-app-462515.appspot.com",
+
+  // Diese Werte findest du in den Projekteinstellungen deines Firebase-Projekts
+  messagingSenderId: "DEINE_MESSAGING_SENDER_ID",
+  appId: "DEINE_APP_ID",
+  measurementId: "DEINE_MEASUREMENT_ID" // optional
+};
+// =========================================================================
+// ENDE DES ZU ÄNDERNDEN BEREICHS
+// =========================================================================
+
+
+// Der Rest deines Codes bleibt gleich.
+// Netlify Domain Fix (Dieser Teil ist wahrscheinlich nicht mehr nötig, wenn die Konfiguration stimmt)
+if (window.location.hostname.includes('netlify.app')) {
+    // Verwende direkte Auth ohne Domain-Redirect
+    firebaseConfig.authDomain = 'vokabeltrainer-app-462515.firebaseapp.com';
+    // Deaktiviere Popup/Redirect Auth für Netlify
+    window.localStorage.setItem('firebase:authUser:' + firebaseConfig.apiKey + ':[DEFAULT]', null);
+}
+
+
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// ... Rest des Codes folgt im nächsten Schritt
-// Firebase initialisieren
-
-
-
-// Connection State Management
 let isOnline = navigator.onLine;
 let connectionListeners = [];
 
@@ -36,7 +51,6 @@ export function getConnectionStatus() {
   return isOnline;
 }
 
-// Network Status Detection
 window.addEventListener('online', () => {
   isOnline = true;
   enableNetwork(db);
@@ -49,7 +63,6 @@ window.addEventListener('offline', () => {
   connectionListeners.forEach(callback => callback(false));
 });
 
-// Anonyme Authentifizierung
 export async function initializeAuth() {
   return new Promise((resolve, reject) => {
     onAuthStateChanged(auth, async (user) => {
@@ -70,7 +83,7 @@ export async function initializeAuth() {
     });
   });
 }
-// Device Sync Management
+
 let deviceSyncService = null;
 
 export function getDeviceSyncService() {
@@ -81,7 +94,6 @@ export function setDeviceSyncService(service) {
   deviceSyncService = service;
 }
 
-// Device Information
 export function getCurrentDeviceInfo() {
   const userAgent = navigator.userAgent;
   let deviceType = 'desktop';
@@ -114,3 +126,14 @@ function getBrowserName() {
   if (userAgent.includes('Edge')) return 'Edge';
   return 'Browser';
 }
+```
+
+Ich habe die entscheidende Stelle für dich markiert und die Werte auf das richtige Projekt (`vokabeltrainer-app-462515`) aktualisiert.
+
+**Was du jetzt tun musst:**
+1.  Kopiere den Wert von "API-Schlüssel 1" aus der Google Cloud Console.
+2.  Setze ihn an der markierten Stelle bei `apiKey` ein.
+3.  Gehe in deine **Firebase-Projekteinstellungen** (nicht Google Cloud) für das Projekt `vokabeltrainer-app-462515`. Dort findest du die korrekten Werte für `messagingSenderId` und `appId`. Kopiere diese ebenfalls in den Code.
+4.  Speichere die Datei und lade sie auf Netlify hoch.
+
+Danach sollte deine App funktionieren. Der Fehler lag die ganze Zeit darin, dass die Cloud-Einstellungen und der Code nicht zum selben Projekt gehört

@@ -10,7 +10,7 @@ import * as uiModes from '../../shared/ui-modes.js';
 
 // === FIREBASE IMPORTS ===
 import { firebaseSyncService } from './firebase-sync.js';
-import { initializeAuth } from './firebase-config.js';
+
 import { deviceSyncUI } from './device-sync-ui.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
