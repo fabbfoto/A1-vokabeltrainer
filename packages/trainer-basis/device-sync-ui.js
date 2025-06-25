@@ -122,6 +122,10 @@ class DeviceSyncUI {
                 alert('Anmeldung abgebrochen. Das Fenster wurde vor Abschluss geschlossen.');
             } else if (error.code === 'auth/credential-already-in-use') {
                 alert('Fehler: Dieses Google-Konto ist bereits mit einem anderen Account in dieser App verknüpft.');
+            } else if (error.code === 'auth/unauthorized-domain') {
+                alert('Diese Domain ist nicht für Google-Login autorisiert. Bitte in Firebase Console hinzufügen.');
+            } else if (error.code === 'auth/operation-not-allowed') {
+                alert('Google-Login ist nicht aktiviert. Bitte in Firebase Console unter Authentication > Sign-in method aktivieren.');
             } else {
                 alert('Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut.');
             }
