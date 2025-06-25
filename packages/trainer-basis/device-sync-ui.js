@@ -158,7 +158,7 @@ class DeviceSyncUI {
     }
     console.log('Modal display style vor Änderung:', authModalOverlay.style.display);
     if (authModalOverlay) {
-      authModalOverlay.classList.add('visible'); // Korrigiert: Fügt die 'visible'-Klasse hinzu
+      authModalOverlay.classList.add('visible');
       console.log('Modal display style nach Änderung:', authModalOverlay.style.display);
       console.log('Modal classList:', authModalOverlay.classList.toString());
       console.log('Modal sichtbar?', window.getComputedStyle(authModalOverlay).display);
@@ -168,7 +168,7 @@ class DeviceSyncUI {
   hideAuthModal() {
     const authModalOverlay = document.getElementById('auth-modal-overlay');
     if (authModalOverlay) {
-      authModalOverlay.classList.remove('visible'); // Korrigiert: Entfernt die 'visible'-Klasse
+      authModalOverlay.classList.remove('visible');
     }
   }
 
