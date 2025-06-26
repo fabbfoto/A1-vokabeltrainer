@@ -7,6 +7,17 @@ import { vokabular } from './vokabular.js';
 import { shuffleArray, speak } from '/shared/helfer.js';
 import * as uiModes from '/shared/ui-modes.js';
 import { dom } from './dom.js';
+import { vokabularPerson } from './vokabular_person.js';
+// Importiere hier zukünftig weitere themenspezifische Vokabulardateien
+import { vokabularPersoenlicheBeziehungen } from './vokabular_persoenliche_beziehungen.js';
+import { vokabularMenschlicherKoerperGesundheit } from './vokabular_menschlicher_koerper_gesundheit.js';
+import { vokabularWohnen } from './vokabular_wohnen.js'; // NEU: Import für Wohnen
+import { vokabularUmwelt } from './vokabular_umwelt.js'; // NEU: Import für Umwelt
+import { vokabularEssenTrinken } from './vokabular_essen_trinken.js';
+import { vokabularKommunikationsmittel } from './vokabular_kommunikationsmittel.js'; // NEU: Import für Kommunikationsmittel
+import { vokabularReisenVerkehr } from './vokabular_reisen_verkehr.js'; // NEU: Import für Reisen und Verkehr
+import { vokabularEinkaufen } from './vokabular_einkaufen.js'; // NEU: Import für Einkaufen
+import { vokabularLernen } from './vokabular_lernen.js'; // NEU: Import für Lernen
 import * as ui from './ui.js';
 
 // === FIREBASE IMPORTS ===

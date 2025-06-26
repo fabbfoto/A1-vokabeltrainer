@@ -197,7 +197,7 @@ export function displayMainTopics(dom, state, vokabular, learningModes) {
     dom.navigationContainerEl.innerHTML = '';
     const mainTopicNames = Object.keys(vokabular);
     const numberOfModes = Object.keys(learningModes).length;
-
+    
     mainTopicNames.forEach(topicName => {
         const button = document.createElement('button');
         button.className = 'wortgruppe-button rounded-lg';
@@ -205,13 +205,13 @@ export function displayMainTopics(dom, state, vokabular, learningModes) {
 
         // KORRIGIERTE FORTSCHRITTS-AGGREGATION für Themen-Trainer
         let totalWordsInMainTopic = 0;
-        let completedTasksInMainTopic = 0;
+        let completedTasksInMainTopic = 0; 
 
         // Iteriere über alle Unterthemen des Hauptthemas
         for (const subTopicName in vokabular[topicName]) {
             if (Object.hasOwnProperty.call(vokabular[topicName], subTopicName)) {
                 const wordsInSubTopic = vokabular[topicName][subTopicName]?.length || 0;
-                totalWordsInMainTopic += wordsInSubTopic;
+                totalWordsInMainTopic += wordsInSubTopic; 
 
                 // KORREKTUR: Verwende den korrekten Progress-Schlüssel
                 const progressKey = `${topicName}|${subTopicName}`;
@@ -222,13 +222,13 @@ export function displayMainTopics(dom, state, vokabular, learningModes) {
             }
         }
 
-        const totalTasksInMainTopic = totalWordsInMainTopic * numberOfModes;
+        const totalTasksInMainTopic = totalWordsInMainTopic * numberOfModes; 
 
         // Verwende Farbschema-System
         const colorClass = getProgressColorClass(completedTasksInMainTopic, totalTasksInMainTopic);
         const percentage = calculateProgressPercentage(completedTasksInMainTopic, totalTasksInMainTopic);
 
-        button.innerHTML = `<span class="button-text-label">${topicName}</span><div class="progress-bar-container"><div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%;"></div></div>`;
+        button.innerHTML = `<span class="button-text-label">${topicName}</span><div class="progress-bar-container"><div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%;"></div></div>`; 
         dom.navigationContainerEl.appendChild(button);
     });
 
@@ -236,7 +236,7 @@ export function displayMainTopics(dom, state, vokabular, learningModes) {
     const testButton = document.createElement('button');
     testButton.id = 'start-test-mode-btn';
     testButton.className = 'col-span-2 sm:col-span-3 rounded-lg py-2 font-semibold bg-gray-300 hover:bg-gray-500 hover:text-white transition-colors duration-200';
-    testButton.textContent = '🧪 Globaler Test';
+    testButton.textContent = '🧪 Globaler Test'; 
     dom.navigationContainerEl.appendChild(testButton);
 
     // Ansicht umschalten
