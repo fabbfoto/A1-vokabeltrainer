@@ -1,6 +1,7 @@
 // packages/trainer-basis/device-sync-ui.js
 // Multi-Device Sync UI für Basistrainer
-import { getAuth, GoogleAuthProvider, linkWithPopup } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { auth, db } from './firebase-config.js';
+import { getAuth, GoogleAuthProvider, linkWithPopup, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { firebaseSyncService } from './firebase-sync.js';
 
 class DeviceSyncUI {
