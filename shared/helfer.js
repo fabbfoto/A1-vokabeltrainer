@@ -1,7 +1,7 @@
 // helfer.js - Modul mit neuer, zentraler splitSentence Funktion
 
 export async function speak(text, lang = 'de-DE') {
-  const NETLIFY_FUNCTION_PATH = '/.netlify/functions/getGoogleVoice';
+  const NETLIFY_FUNCTION_PATH = '/api/getGoogleVoice';
   if (window.currentAudio) {
       window.currentAudio.pause();
   }
