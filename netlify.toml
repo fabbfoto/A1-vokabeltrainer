@@ -1,6 +1,7 @@
 [build]
-  # Dieser Befehl kopiert alle benötigten Dateien in ein dist Verzeichnis
+  # Dieser Befehl installiert Dependencies UND kopiert Dateien
   command = """
+  npm install && \
   mkdir -p dist && \
   cp packages/trainer-basis/index.html \
      packages/trainer-basis/trainer.js \
@@ -15,6 +16,9 @@
   
   # Veröffentliche das dist Verzeichnis
   publish = "dist"
+  
+  # Functions Directory (im Root, nicht in dist)
+  functions = "netlify/functions"
 
 [build.environment]
   NODE_VERSION = "18"
