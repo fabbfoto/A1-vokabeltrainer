@@ -1,6 +1,7 @@
 // packages/trainer-basis/device-sync-ui.js
 // Multi-Device Sync UI für Basistrainer
-import { getAuth, GoogleAuthProvider, linkWithPopup } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, linkWithPopup, signInWithPopup, sendSignInLinkToEmail } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { auth } from './firebase-config.js'; // Importiere auth direkt
 import { firebaseSyncService } from './firebase-sync.js';
 
 class DeviceSyncUI {
@@ -70,26 +71,21 @@ class DeviceSyncUI {
    */
   initializeModalEventListeners() {
     // Alle benötigten Elemente aus dem DOM holen.
-    const showModalBtn = document.getElementById('show-auth-modal-btn');
     const authModalOverlay = document.getElementById('auth-modal-overlay');
-    const closeModalBtn = document.querySelector('.close-modal-btn');
-    const googleBtn = document.getElementById('google-signin-btn');
-    const emailForm = document.getElementById('email-form');
-    const emailInput = document.getElementById('email-input');
+    const modalCloseBtn = document.querySelector('.modal-close'); // Korrigiert auf .modal-close
+    const googleAuthBtn = document.getElementById('googleAuthBtn');
 
     // Sicherheitsprüfung, ob alle HTML-Elemente vorhanden sind.
-    if (!showModalBtn || !authModalOverlay || !closeModalBtn || !googleBtn || !emailForm) {
+    if (!authModalOverlay || !modalCloseBtn || !googleAuthBtn) { // Vereinfachte Prüfung
         console.error('Ein oder mehrere Modal-Elemente konnten nicht im DOM gefunden werden. Stelle sicher, dass der HTML-Code aus Schritt 1 in index.html eingefügt wurde.');
         return;
     }
 
     // --- Hilfsfunktionen ---
-        const showModal = () => this.showAuthModal(); // Use instance method
         const hideModal = () => this.hideAuthModal(); // Use instance method
 
     // --- Event-Listener Zuweisung ---
-    showModalBtn.addEventListener('click', showModal);
-    closeModalBtn.addEventListener('click', hideModal);
+    modalCloseBtn.addEventListener('click', hideModal);
 
     authModalOverlay.addEventListener('click', (event) => {
         if (event.target === authModalOverlay) {
@@ -97,64 +93,35 @@ class DeviceSyncUI {
         }
     });
 
-    googleBtn.addEventListener('click', async () => {
-        console.log('Firebase: Google-Login-Prozess wird gestartet...');
-        this.hideAuthModal(); // Modal nach Aktion schließen.
+    if (googleAuthBtn) {
+        googleAuthBtn.addEventListener('click', () => this.handleGoogleAuth());
+    }
 
-        try {
-            const auth = getAuth();
-            const provider = new GoogleAuthProvider();
-
-            // Der entscheidende Aufruf: Verknüpft den aktuellen anonymen Nutzer (auth.currentUser)
-            // mit dem vom Nutzer im Popup ausgewählten Google-Konto.
-            const result = await linkWithPopup(auth.currentUser, provider);
-
-            const user = result.user;
-            console.log('Erfolgreich verknüpft! Permanenter User:', user);
-            // alert(`Dein Account wurde erfolgreich mit ${user.email} verknüpft! Dein Lernfortschritt ist jetzt sicher.`); // Original alert, now replaced
-
-            // Nach erfolgreichem Login
-            console.log('Google Login erfolgreich!');
-
-            // Zeige Erfolgsmeldung
-            alert('✅ Erfolgreich mit Google verbunden! Dein Fortschritt wird nun synchronisiert.');
-
-            // Schließe das Modal
-            this.hideAuthModal();
-
-            // Optional: Button ausblenden oder Text ändern
-            const syncButton = document.getElementById('show-auth-modal-btn'); // Corrected ID
-            if (syncButton) {
-                syncButton.textContent = '✅ Verbunden';
-                syncButton.disabled = true;
+    // Email Form Handler
+    const emailForm = document.getElementById('emailAuthForm');
+    if (emailForm) {
+        emailForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const emailInput = document.getElementById('emailInput');
+            const email = emailInput.value;
+            
+            try {
+                const actionCodeSettings = {
+                    url: window.location.href,
+                    handleCodeInApp: true,
+                };
+                
+                await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+                window.localStorage.setItem('emailForSignIn', email);
+                
+                alert('✅ Login-Link wurde an ' + email + ' gesendet! Prüfe dein Postfach.');
+                this.hideAuthModal();
+            } catch (error) {
+                console.error('Email Auth Fehler:', error);
+                alert('Fehler: ' + error.message);
             }
-
-        } catch (error) {
-            // Professionelle Fehlerbehandlung
-            console.error("Fehler bei der Verknüpfung mit Google: ", error.code, error.message);
-
-            // Spezifische Fehler für eine bessere Nutzerführung
-            if (error.code === 'auth/popup-closed-by-user') {
-                alert('Anmeldung abgebrochen. Das Fenster wurde vor Abschluss geschlossen.');
-            } else if (error.code === 'auth/credential-already-in-use') {
-                alert('Fehler: Dieses Google-Konto ist bereits mit einem anderen Account in dieser App verknüpft.');
-            } else if (error.code === 'auth/unauthorized-domain') {
-                alert('Diese Domain ist nicht für Google-Login autorisiert. Bitte in Firebase Console hinzufügen.');
-            } else if (error.code === 'auth/operation-not-allowed') {
-                alert('Google-Login ist nicht aktiviert. Bitte in Firebase Console unter Authentication > Sign-in method aktivieren.');
-            } else {
-                alert('Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut.');
-            }
-        }
-    });
-
-    emailForm.addEventListener('submit', (event) => {
-        event.preventDefault(); // Standard-Formular-Verhalten unterbinden.
-        const email = emailInput.value;
-        console.log(`Firebase: Login-Link wird an ${email} gesendet...`);
-        alert(`Platzhalter: Ein Login-Link würde jetzt an ${email} gesendet.`);
-        this.hideAuthModal(); // Modal nach Aktion schließen.
-    });
+        });
+    }
   }
 
   appendSyncButton() {
@@ -165,11 +132,14 @@ class DeviceSyncUI {
   }
 
   // NEU: Methoden zur Steuerung des Authentifizierungs-Modals (statisch in index.html)
-  showAuthModal() {
+  async showAuthModal() {
     const authModalOverlay = document.getElementById('auth-modal-overlay');
     if (authModalOverlay) {
         authModalOverlay.style.display = 'flex';
         authModalOverlay.classList.add('visible');
+        
+        // Update Status Info
+        await this.updateAuthStatus();
     }
   }
 
@@ -178,6 +148,101 @@ class DeviceSyncUI {
     if (authModalOverlay) {
         authModalOverlay.style.display = 'none';
       authModalOverlay.classList.remove('visible');
+    }
+  }
+
+  /**
+   * Updates the authentication status and debug information in the modal.
+   */
+  async updateAuthStatus() {
+    const statusText = document.getElementById('auth-status-text');
+    const userIdText = document.getElementById('user-id-text');
+    const isSignedInText = document.getElementById('is-signed-in');
+    const googleBtn = document.getElementById('googleAuthBtn');
+    
+    if (auth.currentUser) {
+        statusText.textContent = auth.currentUser.isAnonymous ? 'Anonym angemeldet' : 'Mit Account verbunden';
+        userIdText.textContent = auth.currentUser.uid.substring(0, 8) + '...';
+        isSignedInText.textContent = auth.currentUser.isAnonymous ? 'Anonym' : 'Ja';
+        
+        // Wenn bereits mit Google verbunden, Button anpassen
+        if (!auth.currentUser.isAnonymous && googleBtn) {
+            googleBtn.innerHTML = '<span>✅ Bereits mit Google verbunden</span>';
+            googleBtn.disabled = true;
+        }
+    } else {
+        statusText.textContent = 'Nicht angemeldet';
+        userIdText.textContent = '-';
+        isSignedInText.textContent = 'Nein';
+    }
+  }
+
+  /**
+   * Handles the Google authentication process.
+   * Links the current anonymous user with a Google account.
+   */
+  async handleGoogleAuth() {
+    console.log('Google Auth Button geklickt');
+    this.hideAuthModal(); // Modal nach Aktion schließen.
+
+    try {
+        const provider = new GoogleAuthProvider();
+        
+        // Prüfe ob User bereits authentifiziert ist
+        if (auth.currentUser && !auth.currentUser.isAnonymous) {
+            console.log('User ist bereits mit Google verbunden');
+            alert('✅ Du bist bereits mit Google verbunden!');
+            this.hideAuthModal();
+            return;
+        }
+        
+        // Wenn User anonym ist, versuche zu verknüpfen
+        if (auth.currentUser && auth.currentUser.isAnonymous) {
+            try {
+                const result = await linkWithPopup(auth.currentUser, provider);
+                console.log('✅ Erfolgreich mit Google verknüpft!');
+                alert('✅ Dein Fortschritt ist jetzt mit Google gesichert!');
+            } catch (linkError) {
+                if (linkError.code === 'auth/credential-already-in-use') {
+                    // Credential wird bereits verwendet, melde dich direkt an
+                    const result = await signInWithPopup(provider);
+                    console.log('✅ Mit bestehendem Google-Account angemeldet');
+                    alert('✅ Mit deinem Google-Account verbunden!');
+                } else {
+                    throw linkError; // Wirf andere Fehler weiter
+                }
+            }
+        } else {
+            // Kein User vorhanden, normale Anmeldung
+            const result = await signInWithPopup(provider);
+            console.log('✅ Neu mit Google angemeldet');
+            alert('✅ Erfolgreich mit Google angemeldet!');
+        }
+        
+        this.hideAuthModal();
+        this.updateSyncButton();
+        await this.updateAuthStatus(); // Call updateAuthStatus here
+        
+    } catch (error) {
+        console.error('❌ Google Auth Fehler:', error);
+        if (error.code !== 'auth/popup-closed-by-user') {
+            alert('Fehler: ' + error.message);
+        }
+    }
+  }
+
+  /**
+   * Updates the text and appearance of the sync button based on authentication status.
+   */
+  updateSyncButton() {
+    const syncButton = document.getElementById('show-auth-modal-btn');
+    if (syncButton && auth.currentUser && !auth.currentUser.isAnonymous) {
+        syncButton.innerHTML = `
+            <span class="flex items-center justify-center gap-2">
+                <span>✅</span>
+                <span>Mit Google verbunden</span>
+            </span>
+        `;
     }
   }
 
