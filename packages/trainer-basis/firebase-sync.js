@@ -151,7 +151,7 @@ class FirebaseSyncService {
           resolve(user);
         } else {
           // Versuche anonyme Anmeldung
-          import('https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js')
+          import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js')
             .then(({ signInAnonymously }) => {
               return signInAnonymously(auth);
             })
