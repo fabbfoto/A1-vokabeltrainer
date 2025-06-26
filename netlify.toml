@@ -9,14 +9,10 @@
      packages/trainer-basis/firebase-sync.js \
      packages/trainer-basis/device-sync-ui.js \
      dist/ && \
-  mkdir -p dist/shared && \
-  cp shared/helfer.js \
-     shared/ui-modes.js \
-     shared/style.css \
-     dist/shared/ && \
+  cp -r shared dist/ && \
   cp LICENSE.md dist/
   """
-
+  
   # Veröffentliche das dist Verzeichnis
   publish = "dist"
 
