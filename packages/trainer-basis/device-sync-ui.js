@@ -62,6 +62,22 @@ class DeviceSyncUI {
     } else {
       console.warn('⚠️ wortgruppen-buttons Container nicht gefunden');
     }
+
+    // Auth State Listener für Button-Updates
+    auth.onAuthStateChanged((user) => {
+        const syncButton = document.getElementById('show-auth-modal-btn'); // Corrected ID to match the button created
+        if (!syncButton) return;
+        
+        if (user) {
+            // User eingeloggt - zeige Email im Button
+            syncButton.innerHTML = `✓ ${user.email}`;
+            syncButton.style.backgroundColor = '#10b981'; // Grün
+        } else {
+            // User nicht eingeloggt
+            syncButton.innerHTML = '🔄 Geräte synchronisieren';
+            syncButton.style.backgroundColor = '#3b82f6'; // Blau
+        }
+    });
   }
 
   /**
@@ -166,13 +182,20 @@ class DeviceSyncUI {
 
   // NEU: Methoden zur Steuerung des Authentifizierungs-Modals (statisch in index.html)
   showAuthModal() {
-    const authModalOverlay = document.getElementById('auth-modal-overlay');
-    if (authModalOverlay) {
-        authModalOverlay.style.display = 'flex';
-        authModalOverlay.classList.add('visible');
+    // Prüfe ob User bereits eingeloggt ist
+    if (auth.currentUser) {
+        // User ist eingeloggt - zeige Info statt Modal
+        alert(`Du bist bereits als ${auth.currentUser.email} angemeldet!`);
+        return;
+    }
+    
+    // Nur wenn NICHT eingeloggt, zeige Modal
+    const modal = document.getElementById('auth-modal-overlay');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('visible');
     }
   }
-
   hideAuthModal() {
     const authModalOverlay = document.getElementById('auth-modal-overlay');
     if (authModalOverlay) {
