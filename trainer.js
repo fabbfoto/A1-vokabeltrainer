@@ -59,6 +59,12 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
     // --- KERNLOGIK (TRAINING & TEST) ---
     // processAnswer muss VOR learningModes definiert werden, da es dort verwendet wird.
     function processAnswer(isCorrect, correctAnswer) {
+        // === DEBUGGING LOGS START ===
+        console.log(`[processAnswer] Aufgerufen für Modus: ${state.currentMode}`);
+        console.log(`[processAnswer] isCorrect empfangen: ${isCorrect}`);
+        console.log(`[processAnswer] correctAnswer empfangen: ${correctAnswer}`);
+        // === DEBUGGING LOGS END ===
+
         if (dom.checkSpellingButton) dom.checkSpellingButton.disabled = true;
         if (dom.checkClozeButton) dom.checkClozeButton.disabled = true;
         if (dom.checkSentenceButton) dom.checkSentenceButton.disabled = true;
@@ -67,6 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         const wordId = state.currentWordData.id;
 
         if (isCorrect) {
+            console.log('[processAnswer] Antwort ist KORREKT. Springe zur nächsten Aufgabe.'); // Debugging
             state.correctInRound++;
             dom.feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
             if (wordId && !state.isTestModeActive) {
@@ -81,6 +88,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
             }
             setTimeout(() => { loadNextTask(); }, 1200);
         } else {
+            console.log('[processAnswer] Antwort ist FALSCH. Zeige "Weiter"-Button.'); // Debugging
             dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">${correctAnswer}</span>`;
             if (wordId) {
                 if (!state.wordsToRepeatByMode[state.currentMode]) state.wordsToRepeatByMode[state.currentMode] = new Set();
