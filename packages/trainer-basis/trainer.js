@@ -2,7 +2,7 @@
 // Angepasst für den Speicherort packages/trainer-basis/
 
 // Import der Vokabeln aus dem gleichen Ordner
-import { goetheA1Wortschatz } from './vokabular.js';
+import { a1Wortschatz } from './vokabular.js';
 
 // Import der Helfer- und UI-Funktionen aus dem geteilten Ordner (zwei Ebenen nach oben, dann in /shared)
 import { vergleicheAntwort, shuffleArray, setUIMode, calculateProgressPercentage, getProgressColorClass, insertTextAtCursor } from '../../shared/helfer.js';
@@ -100,14 +100,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function saveLastTestScores() {
-        // Firebase Sync
+        // Firebase Sync (asynchron, blockiert nicht die UI)
         firebaseSyncService.saveTestScores(state.lastTestScores).catch(error => {
             console.error('❌ Firebase Test Scores Sync fehlgeschlagen:', error);
         });
     }
 
     function loadLastTestScores() {
-        const storedScores = localStorage.getItem('goetheA1LastTestScores');
+        const storedScores = localStorage.getItem('a1LastTestScores');
         if (storedScores) {
             try {
                 state.lastTestScores = JSON.parse(storedScores);
@@ -247,19 +247,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function saveGlobalProgress() {
-        const progressToStore = {};
+        const progressToStore = {}; // Erstelle ein einfaches Objekt für die Speicherung
         for (const gruppe in state.globalProgress) {
             progressToStore[gruppe] = {};
             for (const mode in state.globalProgress[gruppe]) {
                 progressToStore[gruppe][mode] = Array.from(state.globalProgress[gruppe][mode]);
             }
         }
-        
         // Firebase Sync (asynchron, blockiert nicht die UI)
         firebaseSyncService.saveProgress(progressToStore).catch(error => {
             console.error('❌ Firebase Progress Sync fehlgeschlagen:', error);
         });
     }
+    
 
     function loadGlobalProgress() {
         const storedProgress = localStorage.getItem('goetheA1Progress');
@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {
             console.error("Fehler beim Laden des Fortschritts. Setze zurück.", e);
             state.globalProgress = {};
-            localStorage.removeItem('goetheA1Progress');
+            localStorage.removeItem('a1Progress');
         }
     }
 
@@ -319,14 +319,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function populateWortgruppenButtons() {
-        wortgruppenButtonsEl.innerHTML = '';
-        const alleWortgruppenNamen = Object.keys(goetheA1Wortschatz);
+        wortgruppenButtonsEl.innerHTML = ''; // Leere den Container zuerst
+        const alleWortgruppenNamen = Object.keys(a1Wortschatz);
         alleWortgruppenNamen.forEach((name, index) => {
             const button = document.createElement('button');
             button.className = 'wortgruppe-button rounded-lg';
             button.onclick = () => showTrainerForWortgruppe(name);
-            const totalWordsInGroup = goetheA1Wortschatz[name]?.length || 0;
-            const numberOfModes = 4;
+            const totalWordsInGroup = a1Wortschatz[name]?.length || 0; // Anzahl der Vokabeln in dieser Gruppe
+            const numberOfModes = 4; // Anzahl der Lernmodi
             const totalTasks = totalWordsInGroup * numberOfModes;
             let completedTasks = 0;
             if (state.globalProgress[name]) {
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
             const colorClass = getProgressColorClass(completedTasks, totalTasks);
-            button.innerHTML = `<span class="button-text-label">${name}</span><div class="progress-bar-container"><div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%;"></div></div>`;
+            button.innerHTML = `<span class="button-text-label">${name}</span><div class="progress-bar-container"><div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%;"></div></div>`; // HTML für den Button
             wortgruppenButtonsEl.appendChild(button);
         });
 
@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showWortgruppenSelector() {
         populateWortgruppenButtons();
         setUIMode('wortgruppen-selector');
-    }
+    } // Ende showWortgruppenSelector
 
     function showTrainerForWortgruppe(wortgruppeName) {
         hideAllUIs();
@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function erstelleTestAufgaben() {
-        const alleWortgruppenNamen = Object.keys(goetheA1Wortschatz);
+        const alleWortgruppenNamen = Object.keys(a1Wortschatz);
         let testAufgaben = [];
         alleWortgruppenNamen.forEach(gruppenName => {
             const gruppenVokabeln = goetheA1Wortschatz[gruppenName];
@@ -655,10 +655,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ===== START DER INITIALISIERUNGSSEQUENZ =====
 
     // 1. Die Funktion "initializeDOMReferences()" wird aufgerufen.
-    initializeDOMReferences();
+    initializeDOMReferences(); // Initialisiert alle DOM-Referenzen
 
     // Früher Fehlercheck für kritische Abhängigkeiten
-    if (typeof goetheA1Wortschatz === 'undefined' || typeof vergleicheAntwort === 'undefined') {
+    if (typeof a1Wortschatz === 'undefined' || typeof vergleicheAntwort === 'undefined') {
         console.error("KRITISCHER FEHLER: Wichtige Skript-Dateien (vokabular.js, helfer.js) fehlen oder sind fehlerhaft.");
         document.body.innerHTML = '<div style="padding: 2rem; text-align: center; font-family: sans-serif; background-color: #ffcccc; border: 2px solid red;"><h1>Fehler beim Laden</h1><p>Wichtige App-Daten konnten nicht geladen werden. Bitte überprüfe die Browser-Konsole (F12) für Details.</p></div>';
         return;
@@ -675,7 +675,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         umlautButtonsContainerEl
     };
 
-    const alleVokabeln = Object.values(goetheA1Wortschatz).flat();
+    const alleVokabeln = Object.values(a1Wortschatz).flat();
 
     // 3. Das "learningModes"-Objekt wird erstellt, da es vom "dom"-Objekt abhängt.
     const learningModes = {

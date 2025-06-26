@@ -111,7 +111,23 @@ class DeviceSyncUI {
 
             const user = result.user;
             console.log('Erfolgreich verknüpft! Permanenter User:', user);
-            alert(`Dein Account wurde erfolgreich mit ${user.email} verknüpft! Dein Lernfortschritt ist jetzt sicher.`);
+            // alert(`Dein Account wurde erfolgreich mit ${user.email} verknüpft! Dein Lernfortschritt ist jetzt sicher.`); // Original alert, now replaced
+
+            // Nach erfolgreichem Login
+            console.log('Google Login erfolgreich!');
+
+            // Zeige Erfolgsmeldung
+            alert('✅ Erfolgreich mit Google verbunden! Dein Fortschritt wird nun synchronisiert.');
+
+            // Schließe das Modal
+            this.hideAuthModal();
+
+            // Optional: Button ausblenden oder Text ändern
+            const syncButton = document.getElementById('show-auth-modal-btn'); // Corrected ID
+            if (syncButton) {
+                syncButton.textContent = '✅ Verbunden';
+                syncButton.disabled = true;
+            }
 
         } catch (error) {
             // Professionelle Fehlerbehandlung

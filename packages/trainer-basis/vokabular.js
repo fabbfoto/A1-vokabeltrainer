@@ -1,4 +1,4 @@
-export const goetheA1Wortschatz = {
+export const a1Wortschatz = {
     "Farben": [
         {
             "id": "basis-1",
