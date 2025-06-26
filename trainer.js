@@ -9,7 +9,11 @@ import * as uiModes from '/shared/ui-modes.js';
 import { dom } from './dom.js';
 import * as ui from './ui.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+// === FIREBASE IMPORTS ===
+import { firebaseSyncService } from './firebase-sync.js';
+import { deviceSyncUI } from './device-sync-ui.js';
+
+document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'async' hier
 
     // Zentrales State-Objekt zur Verwaltung des Anwendungszustands - ERWEITERT.
     const state = {
@@ -84,11 +88,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 progressToStore[gruppe][mode] = Array.from(state.globalProgress[gruppe][mode]);
             }
         }
-        localStorage.setItem('goetheA1Progress', JSON.stringify(progressToStore));
+        localStorage.setItem('a1ThemenProgress', JSON.stringify(progressToStore));
+        // Sync mit Firebase
+        if (firebaseSyncService && firebaseSyncService.isInitialized) {
+            firebaseSyncService.saveProgress(state.globalProgress);
+        }
     }
 
     function loadGlobalProgress() {
-        const storedProgress = localStorage.getItem('goetheA1Progress');
+        const storedProgress = localStorage.getItem('a1ThemenProgress');
         if (!storedProgress) return;
         try {
             const parsedProgress = JSON.parse(storedProgress);
@@ -103,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {
             console.error("Fehler beim Laden des Fortschritts. Setze zurück.", e);
             state.globalProgress = {};
-            localStorage.removeItem('goetheA1Progress');
+            localStorage.removeItem('a1ThemenProgress');
         }
     }
 
@@ -456,5 +464,39 @@ document.addEventListener('DOMContentLoaded', () => {
         ui.displayMainTopics(dom, state, vokabular, learningModes);
     }
 
-    init();
+    init(); // Aufruf der init-Funktion
+
+    // === FIREBASE INTEGRATION ===
+    console.log('🚀 Starte Thementrainer mit Firebase-Synchronisation...');
+
+    try {
+        const syncInitialized = await firebaseSyncService.initialize();
+        
+        if (syncInitialized) {
+            console.log('✅ Cloud-Synchronisation aktiv');
+            
+            // Event Listener für Sync-Updates
+            window.addEventListener('firebaseSyncUpdate', (event) => {
+                const { type, data } = event.detail;
+                if (type === 'progressUpdated') {
+                    console.log('📥 Fortschritt von anderem Gerät erhalten');
+                    state.globalProgress = data;
+                    // Annahme: updateUI() ist eine Funktion, die die UI basierend auf state.globalProgress aktualisiert
+                    // Diese Funktion müsste noch definiert werden, falls sie nicht existiert.
+                    // ui.updateUI(); 
+                }
+            });
+        }
+    } catch (error) {
+        console.error('❌ Firebase Initialisierung fehlgeschlagen:', error);
+    }
+
+    // Device-Sync UI aktivieren
+    try {
+        window.deviceSyncUI = deviceSyncUI;
+        await deviceSyncUI.initialize();
+        console.log('✅ Device-Sync UI gestartet');
+    } catch (error) {
+        console.error('❌ Fehler beim Starten der Device-Sync UI:', error);
+    }
 });
