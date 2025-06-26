@@ -1,53 +1,24 @@
-.DS_Store
-.DS_Store
-.DS_Store
-node_modules/
-# 1. Zuerst die aktuelle .gitignore sichern (falls wichtige Einträge drin sind)
-cp .gitignore .gitignore.backup
-
-# 2. Neue, korrekte .gitignore erstellen
-cat > .gitignore << 'EOF'
 # Dependencies
 node_modules/
 */node_modules/
 **/node_modules/
 
 # Logs
-*.log
 npm-debug.log*
+*.log
 
 # OS files
 .DS_Store
 Thumbs.db
 
-# IDE
+# IDEs
 .vscode/
 .idea/
 
-# Environment
+# Environment variables
 .env
 .env.local
 
 # Build/Distribution
 dist/
 build/
-
-# Misc
-*.tmp
-*.temp
-EOF
-
-# 3. Git Cache komplett leeren
-git rm -r --cached .
-
-# 4. Alles neu hinzufügen (respektiert jetzt die neue .gitignore)
-git add .
-
-# 5. Status prüfen - sollten jetzt viel weniger Änderungen sein
-git status
-
-# 6. Committen
-git commit -m "Gitignore korrigiert und node_modules entfernt"
-
-# 7. Push
-git push origin themen-trainer-test-integration

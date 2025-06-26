@@ -1,11 +1,7 @@
-# Haupt-Build-Konfiguration
 [build]
-  # Da es keine Build-Schritte gibt (nur statische Dateien), kann der Befehl leer bleiben.
-  command = ""
-  # Das Veröffentlichungsverzeichnis ist das Stammverzeichnis ("root") des Repositories.
-  publish = "/" 
+  # Da der Thementrainer alle Dateien im Root hat, brauchen wir keinen speziellen Build-Befehl
+  publish = "."
 
-# Umgebungsvariablen für den Build-Prozess
 [build.environment]
   NODE_VERSION = "18"
 
@@ -18,8 +14,8 @@
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
 
-# Spezifischer Header für die LICENSE.md-Datei, um sie korrekt als Textdatei auszuliefern
-[[headers]]
-  for = "/LICENSE.md"
-  [headers.values]
-    Content-Type = "text/plain; charset=utf-8"
+# Wichtig für Single Page Apps
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
