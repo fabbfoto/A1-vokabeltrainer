@@ -42,7 +42,7 @@ export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
     });
 }
 
-export function setupSpellingMode(dom, state, processAnswer) {
+export function setupSpellingMode(dom, state, alleVokabeln, processAnswer) {
     // ===== KORREKTUR =====
     dom.checkSpellingButton.disabled = false ;
 
@@ -106,7 +106,7 @@ export function setupSpellingMode(dom, state, processAnswer) {
     }
 }
 
-export function setupClozeAdjDeMode(dom, state, processAnswer) {
+export function setupClozeAdjDeMode(dom, state, alleVokabeln, processAnswer) {
     // ===== KORREKTUR =====
     dom.checkClozeButton.disabled = false ;
 
@@ -144,7 +144,7 @@ export function setupClozeAdjDeMode(dom, state, processAnswer) {
     }
 }
 
-export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
+export function setupSentenceTranslationEnDeMode(dom, state, alleVokabeln, processAnswer) {
     // ===== KORREKTUR =====
     dom.checkSentenceButton.disabled = false ;
     
