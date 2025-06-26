@@ -336,6 +336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const colorClass = getProgressColorClass(completedTasks, totalTasks);
             button.innerHTML = `<span class="button-text-label">${name}</span><div class="progress-bar-container"><div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%;"></div></div>`; // HTML für den Button
             wortgruppenButtonsEl.appendChild(button);
+            button.addEventListener('click', () => showTrainerForWortgruppe(name));
         });
 
         const testButton = document.createElement('button');
@@ -355,7 +356,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         hideAllUIs();
         state.currentWortgruppeName = wortgruppeName;
         state.isTestModeActive = false;
-        state.currentVocabularySet = goetheA1Wortschatz[wortgruppeName] || [];
+        state.currentVocabularySet = a1Wortschatz[wortgruppeName] || [];
 
         practiceStatsViewEl.classList.remove('hidden');
         testStatsViewEl.classList.add('hidden');
@@ -429,7 +430,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const alleWortgruppenNamen = Object.keys(a1Wortschatz);
         let testAufgaben = [];
         alleWortgruppenNamen.forEach(gruppenName => {
-            const gruppenVokabeln = goetheA1Wortschatz[gruppenName];
+            const gruppenVokabeln = a1Wortschatz[gruppenName];
             if (gruppenVokabeln && gruppenVokabeln.length > 0) {
                 const shuffledGruppe = shuffleArray([...gruppenVokabeln]);
                 const ausgewaehlteAufgaben = shuffledGruppe.slice(0, 2);
