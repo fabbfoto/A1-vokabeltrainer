@@ -3,21 +3,13 @@
 // Diese Datei orchestriert den Anwendungszustand (State) und die UI-Interaktionen,
 // indem sie Funktionen aus den Modulen 'ui.js' und 'ui-modes.js' aufruft.
 
+// Import des kombinierten Vokabulars
 import { vokabular } from './vokabular.js';
+
+// Import der Helfer- und UI-Funktionen aus dem geteilten Ordner
 import { shuffleArray, speak } from '/shared/helfer.js';
 import * as uiModes from '/shared/ui-modes.js';
 import { dom } from './dom.js';
-import { vokabularPerson } from './vokabular_person.js';
-// Importiere hier zukünftig weitere themenspezifische Vokabulardateien
-import { vokabularPersoenlicheBeziehungen } from './vokabular_persoenliche_beziehungen.js';
-import { vokabularMenschlicherKoerperGesundheit } from './vokabular_menschlicher_koerper_gesundheit.js';
-import { vokabularWohnen } from './vokabular_wohnen.js'; // NEU: Import für Wohnen
-import { vokabularUmwelt } from './vokabular_umwelt.js'; // NEU: Import für Umwelt
-import { vokabularEssenTrinken } from './vokabular_essen_trinken.js';
-import { vokabularKommunikationsmittel } from './vokabular_kommunikationsmittel.js'; // NEU: Import für Kommunikationsmittel
-import { vokabularReisenVerkehr } from './vokabular_reisen_verkehr.js'; // NEU: Import für Reisen und Verkehr
-import { vokabularEinkaufen } from './vokabular_einkaufen.js'; // NEU: Import für Einkaufen
-import { vokabularLernen } from './vokabular_lernen.js'; // NEU: Import für Lernen
 import * as ui from './ui.js';
 
 // === FIREBASE IMPORTS ===
@@ -39,10 +31,10 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         isRepeatSessionActive: false,
         correctInRound: 0,
         attemptedInRound: 0,
-        globalProgress: {},
+        globalProgress: {}, // Initialisiert als leeres Objekt
         masteredWordsByMode: {},
         wordsToRepeatByMode: {},
-        lastTestScores: {},
+        lastTestScores: {}, // Initialisiert als leeres Objekt
         activeTextInput: null,
         // NEU für erweiterte Test-Funktionalität:
         testType: null, // 'subtopic', 'mainTopic', oder 'global'
@@ -62,14 +54,14 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         }
         return allWords;
     }
-    const alleVokabeln = getAllWords(vokabular);
+    const alleVokabeln = getAllWords(vokabular); // Verwendet das kombinierte vokabular
 
     // Definition der Lernmodi und ihrer Setup-Funktionen.
     const learningModes = {
         'mc-de-en': { name: "Bedeutung", setupFunc: () => uiModes.setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) },
-        'type-de-adj': { name: "Schreibweise", setupFunc: () => uiModes.setupSpellingMode(dom, state, processAnswer) },
-        'cloze-adj-de': { name: "Lückentext", setupFunc: () => uiModes.setupClozeAdjDeMode(dom, state, processAnswer) },
-        'sentence-translation-en-de': { name: "Satzübersetzung", setupFunc: () => uiModes.setupSentenceTranslationEnDeMode(dom, state, processAnswer) },
+        'type-de-adj': { name: "Schreibweise", setupFunc: () => uiModes.setupSpellingMode(dom, state, alleVokabeln, processAnswer) },
+        'cloze-adj-de': { name: "Lückentext", setupFunc: () => uiModes.setupClozeAdjDeMode(dom, state, alleVokabeln, processAnswer) },
+        'sentence-translation-en-de': { name: "Satzübersetzung", setupFunc: () => uiModes.setupSentenceTranslationEnDeMode(dom, state, alleVokabeln, processAnswer) },
     };
     console.log('trainer.js: learningModes definiert:', learningModes, 'Anzahl der Modi:', Object.keys(learningModes).length);
 
@@ -309,10 +301,10 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         // Zurück zur entsprechenden Ansicht
         if (state.testType === 'subtopic' && state.currentMainTopic) {
             // Zurück zur Unterthemen-Ansicht
-            ui.displaySubTopics(dom, state, vokabular, state.currentMainTopic, learningModes);
+            ui.displaySubTopics(dom, state, vokabular, state.currentMainTopic, learningModes); // Verwendet vokabular
         } else {
             // Zurück zur Hauptthemen-Ansicht
-            ui.displayMainTopics(dom, state, vokabular, learningModes);
+            ui.displayMainTopics(dom, state, vokabular, learningModes); // Verwendet vokabular
         }
     }
 
@@ -322,7 +314,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
 
     // NEU: Hauptthema-Test starten (alle Unterfelder eines Hauptthemas)
     function starteHauptthemaTest(modus, mainTopicName) {
-        const hauptthema = vokabular[mainTopicName];
+        const hauptthema = vokabular[mainTopicName]; // Verwendet vokabular
         if (!hauptthema) {
             ui.showMessage(dom, `Hauptthema "${mainTopicName}" nicht gefunden.`, 'error');
             return;
@@ -403,7 +395,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
 
     function startTraining(subTopicName) {
         state.currentSubTopic = subTopicName;
-        const vocabularySet = vokabular[state.currentMainTopic][subTopicName];
+        const vocabularySet = vokabular[state.currentMainTopic][subTopicName]; // Verwendet vokabular
         if (!vocabularySet || vocabularySet.length === 0) {
             ui.showMessage(dom, `Keine Vokabeln für "${subTopicName}" gefunden.`, 'info');
             return;
@@ -437,7 +429,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         const testButton = event.target.closest('#start-test-mode-btn');
 
         if (mainTopicButton) {
-            ui.displaySubTopics(dom, state, vokabular, mainTopicButton.dataset.mainTopic, learningModes);
+            ui.displaySubTopics(dom, state, vokabular, mainTopicButton.dataset.mainTopic, learningModes); // Verwendet vokabular
         } else if (subTopicButton) {
             startTraining(subTopicButton.dataset.subTopic);
         } else if (testButton) {
@@ -457,7 +449,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
             handleNavigation,
             starteGesamtTest,           // Globaler Test
             starteHauptthemaTest,       // Hauptthema Test (EINZIGER Test pro Hauptthema)
-            getVokabular: () => vokabular
+            getVokabular: () => vokabular // Verwendet vokabular
         };
         
         ui.initEventListeners(dom, state, callbacks, learningModes);
@@ -472,7 +464,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         dom.continueButton.addEventListener('click', loadNextTask);
 
         // Startansicht anzeigen.
-        ui.displayMainTopics(dom, state, vokabular, learningModes);
+        ui.displayMainTopics(dom, state, vokabular, learningModes); // Verwendet vokabular
     }
 
     init(); // Aufruf der init-Funktion
