@@ -56,6 +56,48 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
     }
     const alleVokabeln = getAllWords(vokabular); // Verwendet das kombinierte vokabular
 
+    // --- KERNLOGIK (TRAINING & TEST) ---
+    // processAnswer muss VOR learningModes definiert werden, da es dort verwendet wird.
+    function processAnswer(isCorrect, correctAnswer) {
+        if (dom.checkSpellingButton) dom.checkSpellingButton.disabled = true;
+        if (dom.checkClozeButton) dom.checkClozeButton.disabled = true;
+        if (dom.checkSentenceButton) dom.checkSentenceButton.disabled = true;
+
+        state.attemptedInRound++;
+        const wordId = state.currentWordData.id;
+
+        if (isCorrect) {
+            state.correctInRound++;
+            dom.feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
+            if (wordId && !state.isTestModeActive) {
+                const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+                if (!state.globalProgress[progressKey]) state.globalProgress[progressKey] = {};
+                if (!state.globalProgress[progressKey][state.currentMode]) state.globalProgress[progressKey][state.currentMode] = new Set();
+                state.globalProgress[progressKey][state.currentMode].add(wordId);
+                state.masteredWordsByMode[state.currentMode]?.add(wordId);
+                state.wordsToRepeatByMode[state.currentMode]?.delete(wordId);
+                console.log('trainer.js: Wort als gemeistert hinzugefügt. Neuer globalProgress:', state.globalProgress);
+                saveGlobalProgress();
+            }
+            setTimeout(() => { loadNextTask(); }, 1200);
+        } else {
+            dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">${correctAnswer}</span>`;
+            if (wordId) {
+                if (!state.wordsToRepeatByMode[state.currentMode]) state.wordsToRepeatByMode[state.currentMode] = new Set();
+                state.wordsToRepeatByMode[state.currentMode].add(wordId);
+                console.log('trainer.js: Wort zur Wiederholung hinzugefügt. Neuer wordsToRepeatByMode:', state.wordsToRepeatByMode);
+            }
+            dom.continueButton.classList.remove('hidden');
+        }
+
+        if (state.isTestModeActive) {
+            ui.updateTestStats(dom, state);
+        } else {
+            ui.updatePracticeStats(dom, state, learningModes);
+        }
+        ui.updateErrorCounts(dom, state, learningModes);
+    }
+
     // Definition der Lernmodi und ihrer Setup-Funktionen.
     const learningModes = {
         'mc-de-en': { name: "Bedeutung", setupFunc: () => uiModes.setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) },
@@ -154,46 +196,6 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         } else {
             console.error(`Keine Setup-Funktion für Modus "${state.currentMode}" gefunden.`);
         }
-    }
-
-    function processAnswer(isCorrect, correctAnswer) {
-        if (dom.checkSpellingButton) dom.checkSpellingButton.disabled = true;
-        if (dom.checkClozeButton) dom.checkClozeButton.disabled = true;
-        if (dom.checkSentenceButton) dom.checkSentenceButton.disabled = true;
-
-        state.attemptedInRound++;
-        const wordId = state.currentWordData.id;
-
-        if (isCorrect) {
-            state.correctInRound++;
-            dom.feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
-            if (wordId && !state.isTestModeActive) {
-                const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
-                if (!state.globalProgress[progressKey]) state.globalProgress[progressKey] = {};
-                if (!state.globalProgress[progressKey][state.currentMode]) state.globalProgress[progressKey][state.currentMode] = new Set();
-                state.globalProgress[progressKey][state.currentMode].add(wordId);
-                state.masteredWordsByMode[state.currentMode]?.add(wordId);
-                state.wordsToRepeatByMode[state.currentMode]?.delete(wordId);
-                console.log('trainer.js: Wort als gemeistert hinzugefügt. Neuer globalProgress:', state.globalProgress);
-                saveGlobalProgress();
-            }
-            setTimeout(() => { loadNextTask(); }, 1200);
-        } else {
-            dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">${correctAnswer}</span>`;
-            if (wordId) {
-                if (!state.wordsToRepeatByMode[state.currentMode]) state.wordsToRepeatByMode[state.currentMode] = new Set();
-                state.wordsToRepeatByMode[state.currentMode].add(wordId);
-                console.log('trainer.js: Wort zur Wiederholung hinzugefügt. Neuer wordsToRepeatByMode:', state.wordsToRepeatByMode);
-            }
-            dom.continueButton.classList.remove('hidden');
-        }
-
-        if (state.isTestModeActive) {
-            ui.updateTestStats(dom, state);
-        } else {
-            ui.updatePracticeStats(dom, state, learningModes);
-        }
-        ui.updateErrorCounts(dom, state, learningModes);
     }
 
     function setMode(modeId, isRepeat = false) {
@@ -467,7 +469,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         ui.displayMainTopics(dom, state, vokabular, learningModes); // Verwendet vokabular
     }
 
-    init(); // Aufruf der init-Funktion
+    init(); // Aufruf der init-funktion
 
     // === FIREBASE INTEGRATION ===
     console.log('🚀 Starte Thementrainer mit Firebase-Synchronisation...');
@@ -478,7 +480,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         if (syncInitialized) {
             console.log('✅ Cloud-Synchronisation aktiv');
             
-            // Event Listener für Sync-Updates
+            // Event Listener für Sync-updates
             window.addEventListener('firebaseSyncUpdate', (event) => {
                 const { type, data } = event.detail;
                 if (type === 'progressUpdated') {
