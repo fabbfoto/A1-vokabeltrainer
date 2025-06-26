@@ -151,7 +151,7 @@ class FirebaseSyncService {
           resolve(user);
         } else {
           // Versuche anonyme Anmeldung
-          import('https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js')
+          import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js')
             .then(({ signInAnonymously }) => {
               return signInAnonymously(auth);
             })
@@ -171,10 +171,26 @@ class FirebaseSyncService {
   // Lade lokale Daten aus localStorage
   loadLocalData() {
     try {
-      const progressData = localStorage.getItem('goetheA1Progress');
+      const progressData = localStorage.getItem('a1ThemenProgress');
       const testScoreData = localStorage.getItem('goetheA1LastTestScores');
       
-      this.localData.progress = progressData ? JSON.parse(progressData) : {};
+      // Ersetze den gesamten try-Block für progress
+      try {
+        const parsed = JSON.parse(progressData);
+        // Konvertiere Arrays zurück zu Sets mit 3-Ebenen-Struktur
+        for (const hauptthema in parsed) {
+          this.localData.progress[hauptthema] = {};
+          for (const unterthema in parsed[hauptthema]) {
+            this.localData.progress[hauptthema][unterthema] = {};
+            for (const mode in parsed[hauptthema][unterthema]) {
+              this.localData.progress[hauptthema][unterthema][mode] = new Set(parsed[hauptthema][unterthema][mode]);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Fehler beim Parsen des Progress:', e);
+        this.localData.progress = {}; // Sicherstellen, dass es auch bei Fehlern initialisiert ist
+      }
       this.localData.testScores = testScoreData ? JSON.parse(testScoreData) : {};
       
       console.log('📥 Lokale Daten geladen:', {
@@ -333,16 +349,35 @@ class FirebaseSyncService {
     return merged;
   }
 
+  /**
+   * Konvertiert die 3-Ebenen-Fortschrittsdaten von Sets in Arrays für die Speicherung.
+   * @param {object} progress - Das Fortschrittsobjekt mit Sets.
+   * @returns {object} Das konvertierte Fortschrittsobjekt mit Arrays.
+   */
+  convertProgressForStorage(progress) {
+    const converted = {};
+    for (const hauptthema in progress) {
+      converted[hauptthema] = {};
+      for (const unterthema in progress[hauptthema]) {
+        converted[hauptthema][unterthema] = {};
+        for (const mode in progress[hauptthema][unterthema]) {
+          converted[hauptthema][unterthema][mode] = Array.from(progress[hauptthema][unterthema][mode]);
+        }
+      }
+    }
+    return converted;
+  }
+
   // Speichere Progress
   async saveProgress(progressData) {
     this.localData.progress = progressData;
-    localStorage.setItem('goetheA1Progress', JSON.stringify(progressData));
+    localStorage.setItem('a1ThemenProgress', JSON.stringify(this.convertProgressForStorage(progressData)));
     
     if (this.isOnline && this.userId) {
       try {
         const progressRef = doc(db, 'userProgress', this.userId);
         await setDoc(progressRef, {
-          data: progressData,
+          data: this.convertProgressForStorage(progressData),
           lastUpdated: serverTimestamp(),
           deviceInfo: this.currentDevice
         }, { merge: true });
