@@ -1,6 +1,24 @@
 [build]
-  # Der Thementrainer liegt direkt im Root, also kein Build-Command nötig
-  publish = "."
+  # Dieser Befehl kopiert alle benötigten Dateien in ein dist Verzeichnis
+  command = """
+  mkdir -p dist && \
+  cp packages/trainer-basis/index.html \
+     packages/trainer-basis/trainer.js \
+     packages/trainer-basis/vokabular.js \
+     packages/trainer-basis/firebase-config.js \
+     packages/trainer-basis/firebase-sync.js \
+     packages/trainer-basis/device-sync-ui.js \
+     dist/ && \
+  mkdir -p dist/shared && \
+  cp shared/helfer.js \
+     shared/ui-modes.js \
+     shared/style.css \
+     dist/shared/ && \
+  cp LICENSE.md dist/
+  """
+
+  # Veröffentliche das dist Verzeichnis
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
@@ -12,9 +30,8 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseapp.com https://*.firebaseio.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com https://apis.google.com https://*.gstatic.com https://*.firebaseapp.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://*.googleapis.com https://fonts.googleapis.com https://cdn.tailwindcss.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://*.firebaseapp.com wss://*.firebaseio.com https://identitytoolkit.googleapis.com; media-src 'self' data: blob: https:"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[[headers]]
+  for = "/LICENSE.md"
+  [headers.values]
+    Content-Type = "text/plain; charset=utf-8"
