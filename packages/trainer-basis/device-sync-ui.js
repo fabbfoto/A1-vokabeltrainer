@@ -51,10 +51,7 @@ class DeviceSyncUI {
       </span>
     `;
     
-    // Entferne alten Listener falls vorhanden
-    syncButton.removeEventListener('click', this.showAuthModal);
-
-    // Füge neuen Listener hinzu
+    syncButton.addEventListener('click', () => {
       this.showAuthModal();
     });
     
@@ -113,7 +110,10 @@ class DeviceSyncUI {
 
     // --- Event-Listener Zuweisung ---
     showModalBtn.addEventListener('click', showModal);
-    closeModalBtn.addEventListener('click', hideModal);
+    closeModalBtn.addEventListener('click', (e) => {
+        e.stopPropagation(); // Verhindert Event-Bubbling
+        hideModal();
+    });
 
     authModalOverlay.addEventListener('click', (event) => {
         if (event.target === authModalOverlay) {
@@ -190,22 +190,6 @@ class DeviceSyncUI {
 
   // NEU: Methoden zur Steuerung des Authentifizierungs-Modals (statisch in index.html)
   showAuthModal() {
-    // Prüfe ob User bereits eingeloggt ist
-    if (auth.currentUser) {
-        // Sichere Email-Anzeige mit Fallback
-        const userEmail = auth.currentUser.email || 'Unbekannt';
-        alert(`Du bist bereits als ${userEmail} angemeldet!`);
-        
-        // WICHTIG: Modal explizit schließen falls es offen ist
-        const modal = document.getElementById('auth-modal-overlay');
-        if (modal) {
-            modal.classList.add('hidden');
-            modal.classList.remove('visible');
-        }
-        return;
-    }
-    
-    // Nur wenn NICHT eingeloggt, zeige Modal
     const modal = document.getElementById('auth-modal-overlay');
     if (modal) {
         modal.classList.remove('hidden');
@@ -215,8 +199,8 @@ class DeviceSyncUI {
   hideAuthModal() {
     const authModalOverlay = document.getElementById('auth-modal-overlay');
     if (authModalOverlay) {
-        authModalOverlay.style.display = 'none';
-      authModalOverlay.classList.remove('visible');
+        authModalOverlay.classList.add('hidden');
+        authModalOverlay.classList.remove('visible');
     }
   }
 
