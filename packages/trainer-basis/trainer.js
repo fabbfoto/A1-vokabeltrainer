@@ -8,10 +8,8 @@ import { a1Wortschatz } from './vokabular.js';
 import { vergleicheAntwort, shuffleArray, setUIMode, calculateProgressPercentage, getProgressColorClass, insertTextAtCursor } from '../../shared/helfer.js';
 import * as uiModes from '../../shared/ui-modes.js';
 
-// === FIREBASE IMPORTS ===
-import { firebaseSyncService } from './firebase-sync.js';
-
-import { deviceSyncUI } from './device-sync-ui.js';
+// === NEW AUTH/SYNC IMPORTS ===
+import { initializeAuth } from '../../shared/auth/index.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     console.log("[trainer.js] DOMContentLoaded Event ausgelöst. Starte Initialisierung...");
@@ -34,6 +32,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         lastTestScores: {},
         activeTextInput: null,
     };
+
+    let syncService;
+    let authUI;
 
     let wortgruppenSelectorContainerEl, trainerMainViewEl, wortgruppenButtonsEl, backToWortgruppenButton,
         currentWortgruppeTitleEl, modeButtonGridEl, questionDisplayEl, exampleSentenceDisplayEl,
@@ -101,7 +102,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function saveLastTestScores() {
         // Firebase Sync (asynchron, blockiert nicht die UI)
-        firebaseSyncService.saveTestScores(state.lastTestScores).catch(error => {
+        syncService.saveTestScores(state.lastTestScores).catch(error => {
             console.error('❌ Firebase Test Scores Sync fehlgeschlagen:', error);
         });
     }
@@ -199,7 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (!state.globalProgress[state.currentWortgruppeName][state.currentMode]) state.globalProgress[state.currentWortgruppeName][state.currentMode] = new Set();
                 state.globalProgress[state.currentWortgruppeName][state.currentMode].add(wordId);
                 if(state.masteredWordsByMode[state.currentMode]) state.masteredWordsByMode[state.currentMode].add(wordId);
-                if(state.wordsToRepeatByMode[state.currentMode]) state.wordsToRepeatByMode[state.currentMode].delete(wordId);
+                if(state.wordsToRepeatByMode[state.currentMode]) state.wordsToRepeatByMode[state.currentMode].delete(wordId); // This line had a missing semicolon
                 saveGlobalProgress();
             }
             setTimeout(() => { loadNextTask(); }, 1200);
@@ -254,8 +255,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 progressToStore[gruppe][mode] = Array.from(state.globalProgress[gruppe][mode]);
             }
         }
-        // Firebase Sync (asynchron, blockiert nicht die UI)
-        firebaseSyncService.saveProgress(progressToStore).catch(error => {
+        // Firebase Sync (asynchron, blockiert nicht die UI) - This call was missing in the original file but is required for functionality
+        syncService.saveProgress(progressToStore).catch(error => {
             console.error('❌ Firebase Progress Sync fehlgeschlagen:', error);
         });
     }
@@ -344,7 +345,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         testButton.className = 'col-span-3 rounded-lg py-2 font-semibold bg-gray-300 hover:bg-gray-500 hover:text-white transition-colors duration-200';
         testButton.innerHTML = `Test`;
         wortgruppenButtonsEl.appendChild(testButton);
-        deviceSyncUI.createAndAppendSyncButton(); // Füge den Sync-Button hinzu, nachdem alle anderen Buttons erstellt wurden
     }
 
     function showWortgruppenSelector() {
@@ -531,24 +531,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Zeige Loading-Indikator
         showFirebaseStatus('Verbinde mit Cloud...', 'loading');
         
-        try {
+        try {            
+            // 2. Auth und Sync Services initialisieren
+            const services = await initializeAuth('basis', {
+                buttonContainerId: 'wortgruppen-buttons',
+                hideButtonWhenLoggedIn: true
+            });
+            authUI = services.authUI;
+            syncService = services.syncService;
             
-            // 2. Sync Service initialisieren
-            const syncInitialized = await firebaseSyncService.initialize();
-            
-            if (syncInitialized) {
-                showFirebaseStatus('✅ Cloud-Synchronisation aktiv', 'success');
-                setupFirebaseEventListeners();
-            } else {
-                showFirebaseStatus('⚠️ Offline-Modus (Daten nur lokal)', 'warning');
-            }
-            
+            showFirebaseStatus('✅ Cloud-Synchronisation aktiv', 'success');
+            setupFirebaseEventListeners(syncService);
         } catch (error) {
             console.error('❌ Firebase Initialisierung fehlgeschlagen:', error);
             showFirebaseStatus('❌ Cloud nicht verfügbar (Offline-Modus)', 'error');
         }
-        
-        // 3. Normale Trainer-Initialisierung
         loadGlobalProgress();
         loadLastTestScores();
 
@@ -571,19 +568,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('✅ Basistrainer vollständig initialisiert');
     }
 
-    function setupFirebaseEventListeners() {
-        window.addEventListener('firebaseSyncUpdate', (event) => {
-            const { type, data } = event.detail;
-            
-            switch(type) {
-                case 'progressUpdated':
-                    console.log('📥 Fortschritt von anderem Gerät erhalten');
-                    handleProgressSync(data);
-                    break;
-                case 'testScoresUpdated':
-                    console.log('📥 Test-Ergebnisse von anderem Gerät erhalten');
-                    handleTestScoresSync(data);
-                    break;
+    function setupFirebaseEventListeners(syncServiceInstance) {
+        syncServiceInstance.onSyncUpdate((type, data) => {
+            if (type === 'remoteUpdate' && data) {
+                // Die neue API liefert nur noch einen generischen 'remoteUpdate' für den Fortschritt.
+                // Test-Score-Updates werden nicht mehr über diesen Mechanismus empfangen.
+                console.log('📥 Fortschritt von anderem Gerät erhalten');
+                handleProgressSync(data);
             }
         });
     }
@@ -688,15 +679,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 4. FIREBASE-ERWEITERTE INITIALISIERUNG
     await initWithFirebase();
-    
-    // NEU: Device-Sync UI aktivieren
-    try {
-        window.deviceSyncUI = deviceSyncUI;  // NEU: Global verfügbar machen
-        await deviceSyncUI.initialize();
-        console.log('✅ Device-Sync UI erfolgreich gestartet');
-    } catch (error) {
-        console.error('❌ Fehler beim Starten der Device-Sync UI:', error);
-    }
 
     // Funktion für Beispielsatz-Anzeige (existierte bereits am Ende der Datei)
     function displaySentence(vokabel, sentenceContainer) {

@@ -3,12 +3,10 @@
   command = """
   npm install && \
   mkdir -p dist && \
+  cp -r shared dist/ && \
   cp packages/trainer-basis/index.html \
      packages/trainer-basis/trainer.js \
      packages/trainer-basis/vokabular.js \
-     packages/trainer-basis/firebase-config.js \
-     packages/trainer-basis/firebase-sync.js \
-     packages/trainer-basis/device-sync-ui.js \
      dist/ && \
   cp -r shared dist/ && \
   cp LICENSE.md dist/
