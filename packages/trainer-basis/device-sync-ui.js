@@ -66,12 +66,16 @@ class DeviceSyncUI {
 
     // Auth State Listener für Button-Updates
     auth.onAuthStateChanged((user) => {
-        const syncButton = document.getElementById('show-auth-modal-btn'); // Corrected ID to match the button created
+        const syncButton = document.getElementById('show-auth-modal-btn');
         if (!syncButton) return;
         
-        if (user) {
+        if (user && user.email) {
             // User eingeloggt - zeige Email im Button
             syncButton.innerHTML = `✓ ${user.email}`;
+            syncButton.style.backgroundColor = '#10b981'; // Grün
+        } else if (user) {
+            // User eingeloggt aber keine Email
+            syncButton.innerHTML = `✓ Angemeldet`;
             syncButton.style.backgroundColor = '#10b981'; // Grün
         } else {
             // User nicht eingeloggt
@@ -185,8 +189,9 @@ class DeviceSyncUI {
   showAuthModal() {
     // Prüfe ob User bereits eingeloggt ist
     if (auth.currentUser) {
-        // User ist eingeloggt - zeige Info statt Modal
-        alert(`Du bist bereits als ${auth.currentUser.email} angemeldet!`);
+        // Sichere Email-Anzeige mit Fallback
+        const userEmail = auth.currentUser.email || 'Unbekannt';
+        alert(`Du bist bereits als ${userEmail} angemeldet!`);
         return;
     }
     
