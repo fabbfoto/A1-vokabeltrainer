@@ -124,33 +124,30 @@ class DeviceSyncUI {
     googleBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         
+        // Prüfe ZUERST ob User schon eingeloggt ist
+        if (auth.currentUser) {
+            alert('Sie sind bereits angemeldet!');
+            // Modal schließen
+            this.hideAuthModal();
+            return;
+        }
+        
         try {
             const provider = new GoogleAuthProvider();
-            
-            // WICHTIG: Prüfe zuerst ob dieses Google-Konto schon verknüpft ist
-            // Dies verhindert den weißen Bildschirm
-            if (auth.currentUser && auth.currentUser.email) {
-                const methods = await fetchSignInMethodsForEmail(auth, auth.currentUser.email);
-                if (methods.length > 0) {
-                    // Zeige direkt die Fehlermeldung OHNE Google-Popup
-                    alert('Dieses Google-Konto ist bereits mit einem anderen Account verknüpft.');
-                    
-                    // Schließe das Modal
-                    this.hideAuthModal();
-                    return;
-                }
-            }
-            
-            // Nur wenn alles OK ist, öffne Google-Login
             await signInWithPopup(auth, provider);
             
-            // Schließe das Modal
+            // Bei Erfolg Modal schließen
             this.hideAuthModal();
             
         } catch (error) {
-            // Andere Fehler
-            if (error.code !== 'auth/popup-closed-by-user') {
-                alert('Anmeldung fehlgeschlagen: ' + error.message);
+            // Benutzerfreundliche Fehlermeldungen
+            if (error.code === 'auth/popup-blocked') {
+                alert('Der Login wurde vom Browser blockiert. Bitte erlauben Sie Popups für diese Seite.');
+            } else if (error.code === 'auth/popup-closed-by-user') {
+                // User hat abgebrochen - nichts tun
+                return;
+            } else {
+                alert('Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.');
             }
         }
     });
