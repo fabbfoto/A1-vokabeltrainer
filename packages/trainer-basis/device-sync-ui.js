@@ -1,7 +1,7 @@
 // packages/trainer-basis/device-sync-ui.js
 // Multi-Device Sync UI für Basistrainer
 import { auth, db } from './firebase-config.js';
-import { getAuth, GoogleAuthProvider, linkWithPopup, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+import { getAuth, GoogleAuthProvider, linkWithPopup, signInWithPopup, onAuthStateChanged, fetchSignInMethodsForEmail } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { firebaseSyncService } from './firebase-sync.js';
 
 class DeviceSyncUI {
@@ -121,53 +121,36 @@ class DeviceSyncUI {
         }
     });
 
-    googleBtn.addEventListener('click', async () => {
-        console.log('Firebase: Google-Login-Prozess wird gestartet...');
-        this.hideAuthModal(); // Modal nach Aktion schließen.
-
+    googleBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        
         try {
-            const auth = getAuth();
             const provider = new GoogleAuthProvider();
-
-            // Der entscheidende Aufruf: Verknüpft den aktuellen anonymen Nutzer (auth.currentUser)
-            // mit dem vom Nutzer im Popup ausgewählten Google-Konto.
-            const result = await linkWithPopup(auth.currentUser, provider);
-
-            const user = result.user;
-            console.log('Erfolgreich verknüpft! Permanenter User:', user);
-            // alert(`Dein Account wurde erfolgreich mit ${user.email} verknüpft! Dein Lernfortschritt ist jetzt sicher.`); // Original alert, now replaced
-
-            // Nach erfolgreichem Login
-            console.log('Google Login erfolgreich!');
-
-            // Zeige Erfolgsmeldung
-            alert('✅ Erfolgreich mit Google verbunden! Dein Fortschritt wird nun synchronisiert.');
-
+            
+            // WICHTIG: Prüfe zuerst ob dieses Google-Konto schon verknüpft ist
+            // Dies verhindert den weißen Bildschirm
+            if (auth.currentUser && auth.currentUser.email) {
+                const methods = await fetchSignInMethodsForEmail(auth, auth.currentUser.email);
+                if (methods.length > 0) {
+                    // Zeige direkt die Fehlermeldung OHNE Google-Popup
+                    alert('Dieses Google-Konto ist bereits mit einem anderen Account verknüpft.');
+                    
+                    // Schließe das Modal
+                    this.hideAuthModal();
+                    return;
+                }
+            }
+            
+            // Nur wenn alles OK ist, öffne Google-Login
+            await signInWithPopup(auth, provider);
+            
             // Schließe das Modal
             this.hideAuthModal();
-
-            // Optional: Button ausblenden oder Text ändern
-            const syncButton = document.getElementById('show-auth-modal-btn'); // Corrected ID
-            if (syncButton) {
-                syncButton.textContent = '✅ Verbunden';
-                syncButton.disabled = true;
-            }
-
+            
         } catch (error) {
-            // Professionelle Fehlerbehandlung
-            console.error("Fehler bei der Verknüpfung mit Google: ", error.code, error.message);
-
-            // Spezifische Fehler für eine bessere Nutzerführung
-            if (error.code === 'auth/popup-closed-by-user') {
-                alert('Anmeldung abgebrochen. Das Fenster wurde vor Abschluss geschlossen.');
-            } else if (error.code === 'auth/credential-already-in-use') {
-                alert('Fehler: Dieses Google-Konto ist bereits mit einem anderen Account in dieser App verknüpft.');
-            } else if (error.code === 'auth/unauthorized-domain') {
-                alert('Diese Domain ist nicht für Google-Login autorisiert. Bitte in Firebase Console hinzufügen.');
-            } else if (error.code === 'auth/operation-not-allowed') {
-                alert('Google-Login ist nicht aktiviert. Bitte in Firebase Console unter Authentication > Sign-in method aktivieren.');
-            } else {
-                alert('Ein unbekannter Fehler ist aufgetreten. Bitte versuche es erneut.');
+            // Andere Fehler
+            if (error.code !== 'auth/popup-closed-by-user') {
+                alert('Anmeldung fehlgeschlagen: ' + error.message);
             }
         }
     });
