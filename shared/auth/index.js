@@ -1,24 +1,41 @@
 // shared/auth/index.js
-// Zentrale Export-Datei für alle Auth-Module
 
-export { authService } from './auth-service.js';
-export { AuthUI } from './auth-ui.js';
-export { createSyncService } from './sync-service.js';
+import { getAuth, onIdTokenChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+import { app } from './firebase-config.js'; // Stellt sicher, dass 'app' hier importiert wird
 
-// Convenience Funktion für einfache Initialisierung
-export async function initializeAuth(trainerType = 'basis', options = {}) {
-    const { authService } = await import('./auth-service.js');
-    const { AuthUI } = await import('./auth-ui.js');
-    const { createSyncService } = await import('./sync-service.js');
-    
-    // Auth UI initialisieren
-    const authUI = new AuthUI(options);
-    await authUI.initialize();
-    
-    // Sync Service initialisieren
-    const syncService = createSyncService(trainerType);
-    syncService.initialize();
-    
+import { AuthService } from './auth-service.js';
+import { SyncService } from './sync-service.js';
+import { AuthUI } from './auth-ui.js';
+
+
+export function initializeAuth(trainerId, uiConfig) {
+    console.log('[initializeAuth] Starte die Initialisierung der Shared-Module...');
+
+    // 1. Erstelle Instanzen aller Services
+    const authService = new AuthService();
+    const syncService = new SyncService(trainerId, authService); // Pass authService to SyncService
+    const authUI = new AuthUI(uiConfig, authService); // authUI benötigt den authService
+
+    // 2. Erstelle den zentralen Auth-Listener als "Dirigent"
+    const auth = getAuth(app);
+    onIdTokenChanged(auth, (user) => {
+        authService.currentUser = user; // Keep authService's state in sync
+
+        if (user) {
+            // Wenn ein User eingeloggt ist (oder sein Token erneuert wurde)...
+            console.log(`[Auth Listener] User ist eingeloggt: ${user.uid}. Starte Echtzeit-Synchronisation.`);
+            syncService.startRealtimeSync(user.uid);
+            authUI.updateUIAfterLogin(user);
+
+        } else {
+            // Wenn kein User (mehr) eingeloggt ist...
+            console.log('[Auth Listener] User ist ausgeloggt. Stoppe Synchronisation.');
+            syncService.stopRealtimeSync();
+            authUI.updateUIAfterLogout();
+        }
+    });
+
+    // 3. Gib die Service-Instanzen zurück. Der Listener kümmert sich um den Start.
     return {
         authService,
         authUI,

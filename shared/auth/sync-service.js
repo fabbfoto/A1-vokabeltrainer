@@ -8,25 +8,14 @@ import {
     serverTimestamp 
 } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 import { app } from './firebase-config.js';
-import { authService } from './auth-service.js';
 
 export class SyncService {
-    constructor(trainerType = 'basis') {
+    constructor(trainerType = 'basis', authService) {
         this.db = getFirestore(app);
         this.trainerType = trainerType; // 'basis' oder 'themen'
+        this.authService = authService; // AuthService Instanz speichern
         this.syncListeners = [];
         this.unsubscribe = null;
-    }
-
-    // Listener für Auth-Changes
-    initialize() {
-        authService.onAuthStateChange((user) => {
-            if (user) {
-                this.startRealtimeSync(user.uid);
-            } else {
-                this.stopRealtimeSync();
-            }
-        });
     }
 
     // Realtime Sync starten
@@ -52,12 +41,13 @@ export class SyncService {
         if (this.unsubscribe) {
             this.unsubscribe();
             this.unsubscribe = null;
+            console.log('☁️ Realtime-Sync gestoppt.');
         }
     }
 
     // Progress speichern
     async saveProgress(progressData) {
-        const user = authService.currentUser;
+        const user = this.authService.currentUser;
         if (!user) {
             console.warn('Kein User eingeloggt - Progress nur lokal gespeichert');
             return { success: false, reason: 'not_logged_in' };
@@ -81,7 +71,7 @@ export class SyncService {
 
     // Progress laden
     async loadProgress() {
-        const user = authService.currentUser;
+        const user = this.authService.currentUser;
         if (!user) return null;
 
         try {
@@ -102,7 +92,7 @@ export class SyncService {
     async saveTestScores(scores) {
         if (this.trainerType !== 'basis') return;
         
-        const user = authService.currentUser;
+        const user = this.authService.currentUser;
         if (!user) return { success: false };
 
         try {
@@ -138,9 +128,4 @@ export class SyncService {
             timestamp: new Date().toISOString()
         };
     }
-}
-
-// Factory für verschiedene Trainer
-export function createSyncService(trainerType) {
-    return new SyncService(trainerType);
 }

@@ -532,12 +532,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         showFirebaseStatus('Verbinde mit Cloud...', 'loading');
         
         try {            
-            // 2. Auth und Sync Services initialisieren
-            const services = await initializeAuth('basis', {
+            // 2. Auth und Sync Services initialisieren. Die Funktion ist nicht mehr async.
+            // Sie erstellt die Services und richtet den zentralen Auth-Listener ein.
+            const services = initializeAuth('basis', {
                 buttonContainerId: 'wortgruppen-buttons',
                 hideButtonWhenLoggedIn: true
             });
-            authUI = services.authUI;
+            // authUI wird intern von initializeAuth erstellt und verwaltet.
             syncService = services.syncService;
             
             showFirebaseStatus('✅ Cloud-Synchronisation aktiv', 'success');

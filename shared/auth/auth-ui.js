@@ -1,8 +1,8 @@
 // shared/auth/auth-ui.js
-import { authService } from './auth-service.js';
 
 export class AuthUI {
-    constructor(options = {}) {
+    constructor(options = {}, authService) {
+        this.authService = authService;
         // Konfigurierbare Optionen
         this.options = {
             buttonContainerId: options.buttonContainerId || 'wortgruppen-buttons',
@@ -13,21 +13,14 @@ export class AuthUI {
         };
         this.modal = null;
         this.syncButton = null;
-        this.initialized = false;
+
+        this.initialize();
     }
 
-    // Initialisierung
-    async initialize() {
-        if (this.initialized) return;
-        
-        // Auth State Listener
-        authService.onAuthStateChange((user) => {
-            this.updateUI(user);
-        });
-        
+    initialize() {
         // Sync Button erstellen
         this.createSyncButton();
-        
+
         // Modal Event Listeners
         this.setupModalListeners();
         
@@ -45,7 +38,7 @@ export class AuthUI {
         }
 
         // Nur Button erstellen wenn nicht eingeloggt
-        if (!authService.isLoggedIn()) {
+        if (!this.authService.isLoggedIn()) {
             this.syncButton = document.createElement('button');
             this.syncButton.id = 'device-sync-btn';
             this.syncButton.className = `${this.options.buttonColumns} rounded-lg py-2 font-semibold transition-colors duration-200`;
@@ -61,33 +54,29 @@ export class AuthUI {
         }
     }
 
-    // UI basierend auf Auth State aktualisieren
-    updateUI(user) {
-        if (user) {
-            // User ist eingeloggt
-            if (this.syncButton) {
-                if (this.options.hideButtonWhenLoggedIn) {
-                    // Button komplett entfernen
-                    this.syncButton.remove();
-                    this.syncButton = null;
-                } else if (this.options.showEmailInButton) {
-                    // Button als Status anzeigen
-                    this.syncButton.innerHTML = `✓ ${user.email || 'Angemeldet'}`;
-                    this.syncButton.style.backgroundColor = '#10b981';
-                    this.syncButton.disabled = true;
-                }
-            }
-        } else {
-            // User ist nicht eingeloggt
-            this.createSyncButton();
+    // Wird vom zentralen Listener in index.js aufgerufen
+    updateUIAfterLogin(user) {
+        if (!this.syncButton) return;
+
+        if (this.options.hideButtonWhenLoggedIn) {
+            this.syncButton.remove();
+            this.syncButton = null;
+        } else if (this.options.showEmailInButton) {
+            this.syncButton.innerHTML = `✓ ${user.email || 'Angemeldet'}`;
+            this.syncButton.style.backgroundColor = '#10b981';
+            this.syncButton.disabled = true;
         }
+    }
+
+    // Wird vom zentralen Listener in index.js aufgerufen
+    updateUIAfterLogout() {
+        this.createSyncButton();
     }
 
     // Auth Modal anzeigen
     showAuthModal() {
-        // Prüfe ob bereits eingeloggt
-        if (authService.isLoggedIn()) {
-            alert(`Sie sind bereits als ${authService.getUserEmail()} angemeldet!`);
+        if (this.authService.isLoggedIn()) {
+            alert(`Sie sind bereits als ${this.authService.getUserEmail()} angemeldet!`);
             return;
         }
 
@@ -123,7 +112,7 @@ export class AuthUI {
             googleBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 
-                const result = await authService.loginWithGoogle();
+                const result = await this.authService.loginWithGoogle();
                 
                 if (result.success) {
                     this.hideAuthModal();
@@ -144,6 +133,3 @@ export class AuthUI {
         }
     }
 }
-
-// Singleton Export
-export const authUI = new AuthUI();
