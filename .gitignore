@@ -15,4 +15,5 @@ npm-debug.log*
 Thumbs.db
 
 # Environment-Variablen (falls Sie sie später verwenden)
-.env
+.envnode_modules/
+**/node_modules/
