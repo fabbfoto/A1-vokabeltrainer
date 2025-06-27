@@ -51,7 +51,10 @@ class DeviceSyncUI {
       </span>
     `;
     
-    syncButton.addEventListener('click', () => {
+    // Entferne alten Listener falls vorhanden
+    syncButton.removeEventListener('click', this.showAuthModal);
+
+    // Füge neuen Listener hinzu
       this.showAuthModal();
     });
     
@@ -192,6 +195,13 @@ class DeviceSyncUI {
         // Sichere Email-Anzeige mit Fallback
         const userEmail = auth.currentUser.email || 'Unbekannt';
         alert(`Du bist bereits als ${userEmail} angemeldet!`);
+        
+        // WICHTIG: Modal explizit schließen falls es offen ist
+        const modal = document.getElementById('auth-modal-overlay');
+        if (modal) {
+            modal.classList.add('hidden');
+            modal.classList.remove('visible');
+        }
         return;
     }
     
