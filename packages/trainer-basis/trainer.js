@@ -5,8 +5,8 @@
 import { a1Wortschatz } from './vokabular.js';
 
 // Import der Helfer- und UI-Funktionen aus dem geteilten Ordner (zwei Ebenen nach oben, dann in /shared)
-import { vergleicheAntwort, shuffleArray, setUIMode, calculateProgressPercentage, getProgressColorClass, insertTextAtCursor } from '../../shared/helfer.js';
-import * as uiModes from '../../shared/ui-modes.js';
+import { vergleicheAntwort, shuffleArray, setUIMode, calculateProgressPercentage, getProgressColorClass, insertTextAtCursor } from '../../shared/utils/helfer.js';
+import * as uiModes from '../../shared/utils/ui-modes.js';
 
 // === NEW AUTH/SYNC IMPORTS ===
 import { initializeAuth } from '../../shared/auth/index.js';

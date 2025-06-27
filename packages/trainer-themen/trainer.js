@@ -1,9 +1,9 @@
 // trainer.js - Vollständig angepasst für die 3-Ebenen-Navigation des Themen-Trainers
 
 // GEÄNDERT: 'vokabular' wird aus der neuen, thematischen Datei importiert.
-import { vokabular } from './vokabular.js'; 
-import { vergleicheAntwort, shuffleArray, speak } from '/shared/helfer.js';
-import * as uiModes from '/shared/ui-modes.js';
+import { vokabular } from './vokabular.js';
+import { vergleicheAntwort, shuffleArray, speak } from '../../shared/utils/helfer.js';
+import * as uiModes from '../../shared/utils/ui-modes.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
