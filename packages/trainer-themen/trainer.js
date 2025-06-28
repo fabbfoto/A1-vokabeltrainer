@@ -2,8 +2,8 @@
 
 // GEÄNDERT: 'vokabular' wird aus der neuen, thematischen Datei importiert.
 import { vokabular } from './vokabular.js';
-import { vergleicheAntwort, shuffleArray, speak } from '../../shared/utils/helfer.js';
-import * as uiModes from '../../shared/utils/ui-modes.js';
+import { vergleicheAntwort, shuffleArray, speak, setUIMode, calculateProgressPercentage, getProgressColorClass, insertTextAtCursor } from '../../shared/helfer.js';
+import * as uiModes from '../../shared/ui-modes.js';
 // Firebase Auth/Sync Import
 import { initializeAuth } from '../../shared/auth/index.js';
 
