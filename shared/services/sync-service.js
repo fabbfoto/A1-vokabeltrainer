@@ -4,11 +4,11 @@ import { getFirestore, doc, onSnapshot, setDoc } from 'https://www.gstatic.com/f
 import { app } from '../auth/firebase-config.js';
 
 export class SyncService {
-    constructor() {
+    constructor(trainerId = 'basis') {
         this.db = getFirestore(app);
         this.unsubscribe = null;
-        this.trainerType = 'basis'; // Standardwert, kann später angepasst werden
-        this.listeners = []; // Für Benachrichtigungen über Updates
+        this.trainerType = trainerId;  // Jetzt flexibel!
+        this.listeners = [];
     }
 
     /**

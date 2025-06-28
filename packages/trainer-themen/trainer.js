@@ -4,8 +4,15 @@
 import { vokabular } from './vokabular.js';
 import { vergleicheAntwort, shuffleArray, speak } from '../../shared/utils/helfer.js';
 import * as uiModes from '../../shared/utils/ui-modes.js';
+// Firebase Auth/Sync Import
+import { initializeAuth } from '../../shared/auth/index.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    const { authService, authUI, syncService } = initializeAuth('themen', {
+        buttonContainerId: 'navigation-header',
+        buttonColumns: 'ml-auto'
+    });
 
     // NEU: Ein zentrales State-Objekt, um den Zustand der App zu verwalten.
     const state = {
@@ -480,6 +487,28 @@ document.addEventListener('DOMContentLoaded', () => {
         loadGlobalProgress();
         loadLastTestScores();
         
+        // NEU: Firebase Sync-Listener für Updates von anderen Geräten.
+        // Wird hier initialisiert, um sicherzustellen, dass alle UI-Funktionen (z.B. displayMainTopics) bereits definiert sind.
+        syncService.onSyncUpdate((type, data) => {
+            if (type === 'remoteUpdate' && data) {
+                console.log('📥 Fortschritt von anderem Gerät erhalten.');
+                
+                // Daten von Firebase (Arrays) wieder in Sets umwandeln
+                const convertedProgress = {};
+                for (const gruppe in data) {
+                    convertedProgress[gruppe] = {};
+                    for (const mode in data[gruppe]) {
+                        if (Array.isArray(data[gruppe][mode])) {
+                            convertedProgress[gruppe][mode] = new Set(data[gruppe][mode]);
+                        }
+                    }
+                }
+                state.globalProgress = convertedProgress;
+                displayMainTopics(); // UI mit dem neuen Fortschritt aktualisieren
+                showMessage('Fortschritt synchronisiert!', 'success');
+            }
+        });
+
         navigationContainerEl.addEventListener('click', handleNavigation);
         backToMainTopicsButton.addEventListener('click', displayMainTopics);
         backToSubtopicsButton.addEventListener('click', () => { if (state.currentMainTopic) { displaySubTopics(state.currentMainTopic); } else { displayMainTopics(); } navigationViewEl.classList.remove('hidden-view'); trainerMainViewEl.classList.add('hidden-view'); });
