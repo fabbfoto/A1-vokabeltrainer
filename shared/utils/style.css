@@ -1,0 +1,578 @@
+/* style.css - Bereinigte Version */
+body {
+    font-family: 'Inter', sans-serif ;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f3f4f6;
+    padding: 1rem;
+}
+
+.wortgruppe-button {
+    background-color: #e9e9ed;
+    color: #374151 ;
+    border: 1px solid #d1d5db ;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    text-align: center ;
+    position: relative;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem; /* Angepasst für besseres Padding */
+    cursor: pointer ;
+    font-weight: 500;
+}
+
+.wortgruppe-button:not(:disabled):hover {
+    background-color: #d1d5db;
+}
+
+.wortgruppe-button:disabled {
+    opacity: 0.5 ;
+    cursor: not-allowed;
+}
+
+.wortgruppe-button.selected {
+    background-color: #3b82f6 ;
+    color: white ;
+    border-color: #3b82f6 ;
+}
+
+.card {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) , 0 4px 6px -2px rgba(0, 0, 0, 0.05) ;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 1rem;
+}
+
+.mode-button,
+
+.action-button,
+.answer-button {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+    text-align: center ;
+}
+
+.mode-button:not(.active):not(:disabled):hover,
+.answer-button:not(:disabled):hover {
+    background-color: #e5e7eb;
+}
+
+.mode-button.active {
+    background-color: #3b82f6 ;
+    color: white ;
+    border-color: #3b82f6 ;
+}
+
+.mode-button.repeat-button {
+    background-color: #fee2e2 ;
+    color: #ef4444;
+    border-color: #ef4444;
+    font-weight: bold;
+}
+
+.mode-button.repeat-button:not(:disabled):hover {
+    background-color: #fecaca;
+}
+
+.mode-button.repeat-button.repeat-active {
+    background-color: #ef4444 ;
+    color: white ;
+    border-color: #ef4444 ;
+}
+
+.mode-button:disabled,
+.action-button:disabled,
+.answer-button:disabled {
+    opacity: 0.5 ;
+    cursor: not-allowed;
+}
+
+.action-button {
+    background-color: #3b82f6 ;
+    color: white ;
+}
+
+.action-button:not(:disabled):hover {
+    background-color: #2563eb;
+}
+.feedback-correct {
+    color: #10b981;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.feedback-incorrect {
+    color: #ef4444;
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+.input-field,
+.word-input-box,
+.cloze-input,
+.single-word-input {
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.correct-user-input {
+    background-color: #d1fae5 !important;
+    border-color: #10b981 !important;
+}
+
+.incorrect-user-input {
+    background-color: #fee2e2 !important;
+    border-color: #ef4444 !important;
+}
+
+.stats-bar-container {
+    background-color: #e5e7eb;
+    border-radius: 0.375rem;
+    overflow: hidden;
+    height: 20px;
+}
+
+.stats-bar {
+    background-color: #3b82f6;
+    height: 100%;
+    transition: width 0.5s ease-in-out;
+    text-align: center;
+    color: white;
+    font-size: 0.75rem;
+    line-height: 20px;
+}
+
+.ui-mode {
+    display: none;
+}
+
+.word-input-row {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#question-display-area {
+    min-height: 2em;
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+#example-sentence-display {
+    font-style: italic;
+    color: #4b5563;
+    text-align: center;
+    min-height: 1.5em;
+    font-size: 1.125rem;
+}
+
+#task-prompt-area {
+    font-size: 1.25rem;
+    color: #1f2937;
+    margin-bottom: 1rem;
+    text-align: center;
+    min-height: 1.5em;
+}
+
+.category-stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.category-stat-text {
+    flex-grow: 1;
+}
+
+.category-progress-bar-bg {
+    background-color: #e5e7eb;
+    border-radius: 0.25rem;
+    height: 8px;
+    width: 100px;
+    overflow: hidden;
+    margin-left: 8px;
+}
+
+.category-progress-bar-fg {
+    background-color: #3b82f6;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.hidden-view {
+    display: none !important;
+}
+
+.audio-line-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.audio-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    transition: color 0.2s ease-in-out;
+    width: 28px;
+    height: 28px;
+}
+
+.audio-button:hover {
+    color: #1f2937;
+}
+
+.audio-button svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* =================================================== */
+/* RESPONSIVE LÖSUNG FÜR DAS LAYOUT DER MODUS-BUTTONS  */
+/* =================================================== */
+.button-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .button-grid {
+    display: flex;
+    flex-wrap: nowrap;
+  }
+  .button-grid > div {
+    flex: 1;
+  }
+}
+
+/* =================================================== */
+/* KORREKTUREN FÜR DEN SCHREIBWEISE-MODUS              */
+/* =================================================== */
+#spelling-mode-ui {
+    min-height: 150px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+#single-input-container,
+#noun-input-container {
+    width: 100%;
+    justify-content: center; 
+}
+
+/* Stil für die Fortschrittsbalken der Wortgruppen */
+.progress-bar-container {
+    width: 100%;
+    background-color: #e0e0e0; /* Hintergrund des leeren Balkens */
+    border-radius: 4px;
+    height: 8px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    transition: width 0.4s ease-in-out; /* Animation für den Fortschritt */
+    width: 0%;
+}
+
+/* Farben für die Kasus-Hervorhebung in Beispielsätzen */
+.kasus-nominativ {
+    color: green; /* Grün für Nominativ */
+}
+
+.kasus-akkusativ {
+    color: blue; /* Blau für Akkusativ */
+}
+
+.kasus-dativ {
+    color: red; /* Rot für Dativ */
+}
+
+.kasus-genitiv {
+    color: #FFD700; /* Gold/Gelb für Genitiv (Beispiel: Gold) */
+}
+.kasus-verb {
+    color: magenta; /* Magenta für Verben (kräftiger als Pink) */
+}
+
+/* SCHWARZ-ROT-GOLD FARBSCHEMA */
+.color-black-sr { background-color: #1f2937 !important; }
+.color-red-sr { background-color: #dc2626 !important; }
+.color-gold-sr { background-color: #f59e0b !important; }
+.color-original { background-color: #3b82f6 !important; }
+
+.stats-bar.color-black-sr,
+.category-progress-bar-fg.color-black-sr,
+.progress-bar-fill.color-black-sr {
+    background-color: #1f2937 !important;
+}
+
+.stats-bar.color-red-sr,
+.category-progress-bar-fg.color-red-sr,
+.progress-bar-fill.color-red-sr {
+    background-color: #dc2626 !important;
+}
+
+.stats-bar.color-gold-sr,
+.category-progress-bar-fg.color-gold-sr,
+.progress-bar-fill.color-gold-sr {
+    background-color: #f59e0b !important;
+}
+/* Firebase UI Styles - Firebase-Status & Sync-Anzeigen */
+
+/* Firebase Status Bar */
+.firebase-status-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-align: center;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.firebase-status-loading {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.firebase-status-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.firebase-status-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.firebase-status-error {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+/* Sync Notification */
+.sync-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.sync-notification.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Body adjustment when Firebase is active */
+body.firebase-active {
+    padding-top: 40px;
+}
+
+/* Device Sync Modal Additional Styles */
+#device-sync-modal {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+#device-sync-modal .modal-content {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+ 
+/* ======================= AUTH MODAL STYLING (mit .visible-Klasse) ======================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Etwas dunkler für mehr Kontrast */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden; /* Verhindert Interaktion, wenn unsichtbar */
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background-color: #f8f9fa;
+    padding: 25px 35px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 450px;
+    position: relative;
+    text-align: center;
+    color: #333;
+    transform: scale(0.95); /* Startzustand für Animation */
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.modal-overlay.visible .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.close-modal-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-modal-btn:hover {
+    color: #333;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #212529;
+    font-size: 1.75rem; /* Etwas größer */
+}
+
+.modal-content p {
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.divider {
+    margin: 20px 0;
+    font-weight: bold;
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+}
+.divider:not(:empty)::before {
+    margin-right: .5em;
+}
+.divider:not(:empty)::after {
+    margin-left: .5em;
+}
+
+.auth-option-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-option-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.google-btn {
+    background-color: #fff;
+    color: #444;
+    border: 1px solid #ddd;
+}
+
+.google-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.email-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.email-form-label {
+    margin: 0;
+    font-weight: normal;
+    font-size: 14px;
+    color: #555;
+    text-align: left;
+}
+
+.email-form-container input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+#email-signin-btn {
+    color: white;
+    background: linear-gradient(90deg, #d9534f, #f0ad4e);
+}
