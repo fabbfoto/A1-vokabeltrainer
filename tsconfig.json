@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    // Ziel: Modernes JavaScript
+    "target": "ES2020",
+    "module": "ES2020",
+    "moduleResolution": "node",
+    
+    // Erlaubt JavaScript und TypeScript gemischt
+    "allowJs": true,
+    "checkJs": false,
+    
+    // Ausgabe-Einstellungen
+    "outDir": "./dist",
+    "sourceMap": true,
+    
+    // Strenge Typ-Überprüfung (später aktivieren)
+    "strict": false,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    
+    // Hilfreiche Optionen
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    
+    // Pfade für saubere Imports
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*"],
+      "@utils/*": ["shared/utils/*"],
+      "@services/*": ["shared/services/*"]
+    }
+  },
+  "include": [
+    "shared/**/*",
+    "packages/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}
