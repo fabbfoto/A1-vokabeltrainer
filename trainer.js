@@ -7,16 +7,19 @@
 import { vokabular } from './vokabular.js';
 
 // Import der Helfer- und UI-Funktionen aus dem geteilten Ordner
-import { shuffleArray, speak } from '/shared/helfer.js';
-import * as uiModes from '/shared/ui-modes.js';
+import { shuffleArray, speak, vergleicheAntwort } from './shared/utils/helfer.js';
+import * as uiModes from './shared/utils/ui-modes.js';
 import { dom } from './dom.js';
 import * as ui from './ui.js';
-
-// === FIREBASE IMPORTS ===
-import { firebaseSyncService } from './firebase-sync.js';
-import { deviceSyncUI } from './device-sync-ui.js';
+// Import der neuen, geteilten Auth- und Sync-Funktion
+import { initializeAuth } from './shared/auth/index.js';
 
 document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'async' hier
+
+    // Firebase Auth und Sync initialisieren
+    const { authService, authUI, syncService } = initializeAuth('themen', {
+        buttonContainerId: 'navigation-header' // ID des Headers in index.html
+    });
 
     // Zentrales State-Objekt zur Verwaltung des Anwendungszustands - ERWEITERT.
     const state = {
@@ -142,9 +145,10 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
             }
         }
         localStorage.setItem('a1ThemenProgress', JSON.stringify(progressToStore));
-        // Sync mit Firebase
-        if (firebaseSyncService && firebaseSyncService.isInitialized) {
-            firebaseSyncService.saveProgress(state.globalProgress);
+
+        // Fortschritt auch in die Cloud speichern, wenn der Nutzer angemeldet ist
+        if (authService.isLoggedIn()) {
+            syncService.saveProgress(progressToStore);
         }
     }
 
@@ -476,40 +480,27 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         // Startansicht anzeigen.
         ui.displayMainTopics(dom, state, vokabular, learningModes); // Verwendet vokabular
     }
-
-    init(); // Aufruf der init-funktion
-
-    // === FIREBASE INTEGRATION ===
-    console.log('🚀 Starte Thementrainer mit Firebase-Synchronisation...');
-
-    try {
-        const syncInitialized = await firebaseSyncService.initialize();
-        
-        if (syncInitialized) {
-            console.log('✅ Cloud-Synchronisation aktiv');
+    
+    // NEU: Firebase Sync-Listener für Updates von anderen Geräten.
+    syncService.onSyncUpdate((type, data) => {
+        if (type === 'remoteUpdate' && data) {
+            console.log('📥 Fortschritt von anderem Gerät erhalten.');
             
-            // Event Listener für Sync-updates
-            window.addEventListener('firebaseSyncUpdate', (event) => {
-                const { type, data } = event.detail;
-                if (type === 'progressUpdated') {
-                    console.log('📥 Fortschritt von anderem Gerät erhalten');
-                    state.globalProgress = data;
-                    // Annahme: updateUI() ist eine Funktion, die die UI basierend auf state.globalProgress aktualisiert
-                    // Diese Funktion müsste noch definiert werden, falls sie nicht existiert.
-                    // ui.updateUI(); 
+            // Daten von Firebase (Arrays) wieder in Sets umwandeln
+            const convertedProgress = {};
+            for (const progressKey in data) {
+                convertedProgress[progressKey] = {};
+                for (const mode in data[progressKey]) {
+                    if (Array.isArray(data[progressKey][mode])) {
+                        convertedProgress[progressKey][mode] = new Set(data[progressKey][mode]);
+                    }
                 }
-            });
+            }
+            state.globalProgress = convertedProgress;
+            ui.displayMainTopics(dom, state, vokabular, learningModes); // UI mit dem neuen Fortschritt aktualisieren
+            ui.showMessage(dom, 'Fortschritt synchronisiert!', 'success');
         }
-    } catch (error) {
-        console.error('❌ Firebase Initialisierung fehlgeschlagen:', error);
-    }
-
-    // Device-Sync UI aktivieren
-    try {
-        window.deviceSyncUI = deviceSyncUI;
-        await deviceSyncUI.initialize();
-        console.log('✅ Device-Sync UI gestartet');
-    } catch (error) {
-        console.error('❌ Fehler beim Starten der Device-Sync UI:', error);
-    }
+    });
+    
+    init(); // Aufruf der init-funktion
 });
