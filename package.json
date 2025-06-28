@@ -1,15 +1,15 @@
 {
-  "name": "a1-themen-trainer",
+  "name": "a1-vokabeltrainer",
   "version": "1.0.0",
-  "description": "A1 Themen-Vokabeltrainer für Deutsch als Fremdsprache",
-  "dependencies": {
-    "@google-cloud/text-to-speech": "^5.0.0"
-  },
-  "engines": {
-    "node": "18"
+  "description": "A1 Deutsch Vokabeltrainer",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "devDependencies": {
-    "@types/node": "^24.0.7",
-    "typescript": "^5.8.3"
+    "typescript": "^5.0.0",
+    "vite": "^4.5.14"
   }
 }

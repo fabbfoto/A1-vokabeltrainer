@@ -101,11 +101,6 @@ export function setUIMode(modeId: string): void {
   }
 }
 
-export function splitSentence(sentence: string): string[] {
-  if (typeof sentence !== 'string') return [];
-  return sentence.match(/\S+/g) || [];
-}
-
 let currentColorTheme = localStorage.getItem('vokabeltrainer-theme') || 'german';
 
 export function calculateProgressPercentage(completed: number, total: number): number {
@@ -174,4 +169,10 @@ export function parseNounString(nounString: string): ParsedNoun | null {
   const singular = firstPart.substring(1).trim();
   const pluralInfo = parts[1].trim();
   return { genus, singular, pluralInfo, isPluralOnly: false };
+}
+
+// Zerlegt einen Satz in ein Array von Wörtern
+export function splitSentence(sentence: string): string[] {
+    if (typeof sentence !== 'string') return [];
+    return sentence.match(/\S+/g) || [];
 }
