@@ -1,7 +1,7 @@
 // shared/services/auth-service.js - VOLLSTÄNDIGE VERSION
 
-import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
-import { app } from '../auth/firebase-config.js';
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth';
+import { app } from '../auth/firebase-config';
 
 export class AuthService {
     constructor() {

@@ -8,7 +8,7 @@ type LearningModes = any;
 type UICallbacks = any;
 
 // Import für Fortschritts-Funktionen
-import { calculateProgressPercentage, getProgressColorClass } from './statistics.js';
+import { calculateProgressPercentage, getProgressColorClass } from './statistics';
 
 /**
  * Zeigt das Test-Auswahl-Modal an.

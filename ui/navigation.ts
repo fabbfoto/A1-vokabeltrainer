@@ -1,8 +1,8 @@
 // ui/navigation.ts
 // Navigation und Themen-Anzeige Funktionen
 
-import { NavigationEvents } from '../shared/events/navigation-events.js';
-import { ButtonFactory } from '../shared/styles/button-factory.js';
+import { NavigationEvents } from '../shared/events/navigation-events';
+import { ButtonFactory } from '../shared/styles/button-factory';
 
 // Type imports (temporär any, später aus shared/types)
 type DOMElements = any;

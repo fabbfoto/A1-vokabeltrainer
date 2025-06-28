@@ -1,12 +1,12 @@
 // shared/auth/index.js - FINALE VERSION MIT ALLEN KORREKTEN PFADEN
 
-import { getAuth, onIdTokenChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
-import { app } from './firebase-config.js';
+import { getAuth, onIdTokenChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth';
+import { app } from './firebase-config';
 
 // KORRIGIERTE PFADE: Die Imports zeigen jetzt auf die Ordner 'services' und 'ui'.
-import { AuthService } from '../services/auth-service.js';
-import { SyncService } from '../services/sync-service.js';
-import { AuthUI } from '../ui/auth-ui.js';
+import { AuthService } from '../services/auth-service';
+import { SyncService } from '../services/sync-service';
+import { AuthUI } from '../ui/auth-ui';
 
 export function initializeAuth(trainerId, uiConfig) {
     console.log('[initializeAuth] Starte die Initialisierung der Shared-Module...');

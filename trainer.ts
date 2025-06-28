@@ -2,82 +2,30 @@
 // Steuerungslogik für den Themen-Trainer mit vollständiger Type-Safety
 // Diese Datei orchestriert den Anwendungszustand (State) und die UI-Interaktionen
 
-// Type imports
-
-// Lokale Type-Definitionen (temporär bis Import-Problem gelöst ist)
-interface Word {
-  id: string;
-  german: string;
-  english: string;
-  artikel?: string;
-  plural?: string;
-  [key: string]: any;
-}
-
-interface AuthUI {
-  show: () => void;
-  hide: () => void;
-  [key: string]: any;
-}
-
-interface InitializeAuthResult {
-  authService: any;
-  authUI: AuthUI;
-  syncService: any;
-}
-
-interface UICallbacks {
-  handleNavigation: (event: Event) => void;
-  starteGesamtTest: (modus: string) => void;
-  starteHauptthemaTest: (modus: string) => void;
-  getVokabular: () => VocabularyStructure;
-}
-
-interface TrainerState {
-  currentMainTopic: string | null;
-  currentSubTopic: string | null;
-  previousMainTopic: string | null;
-  previousSubTopic: string | null;
-  currentVocabularySet: Word[];
-  shuffledVocabForMode: Word[];
-  currentWordIndexInShuffled: number;
-  currentWordData: Word | null;
-  currentMode: string | null;
-  isTestModeActive: boolean;
-  isRepeatSessionActive: boolean;
-  testType: 'subtopic' | 'mainTopic' | 'global' | null;
-  testKey: string | null;
-  correctInRound: number;
-  attemptedInRound: number;
-  globalProgress: any;
-  masteredWordsByMode: Record<string, Set<string>>;
-  wordsToRepeatByMode: Record<string, Set<string>>;
-  lastTestScores: any;
-  activeTextInput: HTMLInputElement | null;
-}
-
-interface LearningModes {
-  [key: string]: { name: string; setupFunc: () => void; }
-}
-
-interface VocabularyStructure {
-  [key: string]: { [key: string]: Word[] }
-}
-
-type ProcessAnswerFunction = (isCorrect: boolean, correctAnswer: string) => void;
+// Type imports - jetzt zentral und konsistent
+import type {
+    Word,
+    TrainerState,
+    LearningModes,
+    VocabularyStructure,
+    ProcessAnswerFunction,
+    UICallbacks,
+    AuthUI,
+    InitializeAuthResult
+} from './shared/types/index';
 
 // Import des kombinierten Vokabulars
-import { vokabular } from './vokabular.js';
+import { vokabular } from './vokabular';
 
 // Import der Helfer- und UI-Funktionen
-import { shuffleArray, speak, vergleicheAntwort } from './shared/utils/helfer.js';
-import * as uiModes from './shared/utils/ui-modes.js';
-import { dom } from './dom.js';
-import * as ui from './ui/index.js';
+import { shuffleArray } from './shared/utils/helfer';
+import * as uiModes from './shared/utils/ui-modes';
+import { dom } from './dom';
+import * as ui from './ui/index';
 
 // Import der Auth- und Sync-Funktionen
-import { initializeAuth } from './shared/auth/index.js';
-import { NavigationEvents } from './shared/events/navigation-events.js';
+import { initializeAuth } from './shared/auth/index';
+import { NavigationEvents } from './shared/events/navigation-events';
 
 // Globale AuthUI Referenz
 let globalAuthUI: AuthUI | null = null;

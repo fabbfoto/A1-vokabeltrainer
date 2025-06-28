@@ -1,19 +1,19 @@
 // trainer.js - ERWEITERTE VERSION mit vollständiger Test-Funktionalität
 // Steuerungslogik für den Themen-Trainer.
 // Diese Datei orchestriert den Anwendungszustand (State) und die UI-Interaktionen,
-// indem sie Funktionen aus den Modulen 'ui.js' und 'ui-modes.js' aufruft.
+// indem sie Funktionen aus den Modulen 'ui' und 'ui-modes' aufruft.
 
 // Import des kombinierten Vokabulars
-import { vokabular } from './vokabular.js';
+import { vokabular } from './vokabular';
 
 // Import der Helfer- und UI-Funktionen aus dem geteilten Ordner
-import { shuffleArray, speak, vergleicheAntwort } from './shared/utils/helfer.js';
-import * as uiModes from './shared/utils/ui-modes.js';
-import { dom } from './dom.js';
-import * as ui from './ui.js';
+import { shuffleArray, speak, vergleicheAntwort } from './shared/utils/helfer';
+import * as uiModes from './shared/utils/ui-modes';
+import { dom } from './dom';
+import * as ui from './ui';
 // Import der neuen, geteilten Auth- und Sync-Funktion
-import { initializeAuth } from './shared/auth/index.js';
-import { NavigationEvents } from './shared/events/navigation-events.js';
+import { initializeAuth } from './shared/auth/index';
+import { NavigationEvents } from './shared/events/navigation-events';
 
 let globalAuthUI = null; // NEU: Globale Referenz für die AuthUI
 
