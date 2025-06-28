@@ -1,6 +1,9 @@
 // ui.js - KORRIGIERTE VERSION ohne shared-Dependencies
 // Diese Datei ist ausschließlich für die Manipulation des DOM und die Darstellung von UI-Zuständen zuständig.
 
+import { NavigationEvents } from './shared/events/navigation-events.js';
+import { ButtonFactory } from './shared/styles/button-factory.js';
+
 // INLINE HILFSFUNKTIONEN (anstatt shared/helfer.js Import)
 function insertTextAtCursor(input, text) {
     if (!input) return;
@@ -197,21 +200,17 @@ export function displayMainTopics(dom, state, vokabular, learningModes) {
     dom.navigationContainerEl.innerHTML = '';
     const mainTopicNames = Object.keys(vokabular);
     const numberOfModes = Object.keys(learningModes).length;
-    
-    mainTopicNames.forEach(topicName => {
-        const button = document.createElement('button');
-        button.className = 'wortgruppe-button rounded-lg';
-        button.dataset.mainTopic = topicName;
 
+    mainTopicNames.forEach(topicName => {
         // KORRIGIERTE FORTSCHRITTS-AGGREGATION für Themen-Trainer
         let totalWordsInMainTopic = 0;
-        let completedTasksInMainTopic = 0; 
+        let completedTasksInMainTopic = 0;
 
         // Iteriere über alle Unterthemen des Hauptthemas
         for (const subTopicName in vokabular[topicName]) {
             if (Object.hasOwnProperty.call(vokabular[topicName], subTopicName)) {
                 const wordsInSubTopic = vokabular[topicName][subTopicName]?.length || 0;
-                totalWordsInMainTopic += wordsInSubTopic; 
+                totalWordsInMainTopic += wordsInSubTopic;
 
                 // KORREKTUR: Verwende den korrekten Progress-Schlüssel
                 const progressKey = `${topicName}|${subTopicName}`;
@@ -222,21 +221,30 @@ export function displayMainTopics(dom, state, vokabular, learningModes) {
             }
         }
 
-        const totalTasksInMainTopic = totalWordsInMainTopic * numberOfModes; 
+        const totalTasksInMainTopic = totalWordsInMainTopic * numberOfModes;
 
         // Verwende Farbschema-System
         const colorClass = getProgressColorClass(completedTasksInMainTopic, totalTasksInMainTopic);
         const percentage = calculateProgressPercentage(completedTasksInMainTopic, totalTasksInMainTopic);
 
-        button.innerHTML = `<span class="button-text-label">${topicName}</span><div class="progress-bar-container"><div class="progress-bar-fill ${colorClass}" style="width: ${percentage}%;"></div></div>`; 
+        const button = ButtonFactory.createThemeButton(topicName, {
+            data: { mainTopic: topicName },
+            progress: percentage,
+            progressClass: colorClass
+        });
+
         dom.navigationContainerEl.appendChild(button);
     });
 
     // Globaler Test-Button hinzufügen
-    const testButton = document.createElement('button');
+    const testButton = ButtonFactory.createTestButton(
+        '🧪 Globaler Test',
+        {
+            size: 'large',
+            fullWidth: true
+        }
+    );
     testButton.id = 'start-test-mode-btn';
-    testButton.className = 'col-span-2 sm:col-span-3 rounded-lg py-2 font-semibold bg-gray-300 hover:bg-gray-500 hover:text-white transition-colors duration-200';
-    testButton.textContent = '🧪 Globaler Test'; 
     dom.navigationContainerEl.appendChild(testButton);
 
     // Ansicht umschalten
@@ -244,6 +252,9 @@ export function displayMainTopics(dom, state, vokabular, learningModes) {
     dom.navigationViewEl.classList.remove('hidden-view');
     dom.backToMainTopicsButton.classList.add('hidden');
     dom.navigationTitleEl.textContent = "Themen";
+
+    // Sende Event: Wir sind auf der Hauptseite
+    NavigationEvents.dispatchRoot();
 }
 
 /**
@@ -283,11 +294,21 @@ export function displaySubTopics(dom, state, vokabular, mainTopicName, learningM
     });
 
     // EINZIGER Test-Button: Hauptthema-Gesamttest
-    const mainTopicTestButton = document.createElement('button');
-    mainTopicTestButton.className = 'col-span-2 sm:col-span-3 rounded-lg py-2 font-semibold bg-orange-500 hover:bg-orange-600 text-white transition-colors duration-200';
-    mainTopicTestButton.textContent = `🎯 ${mainTopicName} Gesamttest`;
-    mainTopicTestButton.dataset.testMainTopicOnly = mainTopicName;
+    const mainTopicTestButton = ButtonFactory.createTestButton(
+        `🎯 ${mainTopicName} Gesamttest`,
+        {
+            size: 'large',
+            fullWidth: true,
+            data: { testMainTopicOnly: mainTopicName }
+        }
+    );
     dom.navigationContainerEl.appendChild(mainTopicTestButton);
+
+    // Sende Event: Wir sind in einem Unterthema
+    NavigationEvents.dispatchSub({
+        mainTopic: mainTopicName,
+        level: 'subtopic'
+    });
 }
 
 /**

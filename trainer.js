@@ -13,13 +13,28 @@ import { dom } from './dom.js';
 import * as ui from './ui.js';
 // Import der neuen, geteilten Auth- und Sync-Funktion
 import { initializeAuth } from './shared/auth/index.js';
+import { NavigationEvents } from './shared/events/navigation-events.js';
+
+let globalAuthUI = null; // NEU: Globale Referenz für die AuthUI
 
 document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'async' hier
 
     // Firebase Auth und Sync initialisieren
     const { authService, authUI, syncService } = initializeAuth('themen', {
-        buttonContainerId: 'navigation-header' // ID des Headers in index.html
+        buttonContainerId: 'auth-button-container',
+        hideOnNavigation: true,  // ← NEU HINZUFÜGEN!
+        // Themen-Trainer spezifische Button-Styles
+        buttonClasses: {
+            loggedIn: 'w-full rounded-lg py-3 font-semibold text-white cursor-default',
+            loggedOut: 'w-full rounded-lg py-3 font-semibold transition-colors duration-200'
+        }
     });
+
+    // Initial auf Root-Seite
+    NavigationEvents.dispatchRoot();
+
+    // Speichere authUI Referenz für späteren Zugriff durch andere Module (z.B. ui.js)
+    globalAuthUI = authUI;
 
     // Zentrales State-Objekt zur Verwaltung des Anwendungszustands - ERWEITERT.
     const state = {
@@ -242,6 +257,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
 
     // NEU: Gemeinsame Test-UI Startfunktion
     function startTestUI(testTitle, modus) {
+        authUI.hide(); // Auth-Button im Trainings-Modus verstecken
         ui.hideAllUIs(dom);
         dom.trainerMainViewEl.classList.remove('hidden-view');
         dom.navigationViewEl.classList.add('hidden-view');
@@ -260,6 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
     // VERBESSERT: Test-Completion mit erweiterten Scores
     function handleTestCompletion() {
         const accuracy = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) : 0;
+        authUI.show(); // Auth-Button in der Navigation wieder anzeigen
         
         if (!state.lastTestScores) state.lastTestScores = {};
         
@@ -415,6 +432,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
             return;
         }
 
+        authUI.hide(); // Auth-Button im Trainings-Modus verstecken
         ui.hideAllUIs(dom);
         state.isTestModeActive = false;
         state.currentVocabularySet = vocabularySet;
@@ -443,6 +461,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         const testButton = event.target.closest('#start-test-mode-btn');
 
         if (mainTopicButton) {
+            // authUI.show(); // Veraltet: Wird jetzt durch Events in ui.js gesteuert.
             ui.displaySubTopics(dom, state, vokabular, mainTopicButton.dataset.mainTopic, learningModes); // Verwendet vokabular
         } else if (subTopicButton) {
             startTraining(subTopicButton.dataset.subTopic);
@@ -478,6 +497,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         dom.continueButton.addEventListener('click', loadNextTask);
 
         // Startansicht anzeigen.
+        authUI.show(); // Auth-Button in der Navigation anzeigen
         ui.displayMainTopics(dom, state, vokabular, learningModes); // Verwendet vokabular
     }
     

@@ -1,6 +1,8 @@
-/* style.css - Bereinigte Version mit Test-Funktionalität */
+/* style.css - Optimierte Version für Themen-Trainer */
+
+/* ===== BASIS STYLES ===== */
 body {
-    font-family: 'Inter', sans-serif ;
+    font-family: 'Inter', sans-serif;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -10,23 +12,38 @@ body {
     padding: 1rem;
 }
 
+/* ===== LAYOUT KOMPONENTEN ===== */
+.card {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    max-width: 600px;
+    margin-top: 1rem;
+}
+
+.hidden-view {
+    display: none !important;
+}
+
+/* ===== BUTTONS (Basis für nicht-konvertierte) ===== */
 .wortgruppe-button {
     background-color: #e9e9ed;
-    color: #374151 ;
-    border: 1px solid #d1d5db ;
-    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
-    text-align: center ;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    transition: all 0.3s ease;
+    text-align: center;
     position: relative;
     min-height: 70px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 1rem; /* Angepasst für besseres Padding */
-    cursor: pointer ;
-    white-space: normal; /* Stellt sicher, dass Text umbrechen kann */
-    overflow-wrap: break-word; /* Versucht, an sinnvollen Stellen umzubrechen */
-    /* word-break: break-all; */ /* Entfernt, um unschöne Trennungen zu vermeiden */
+    padding: 1rem;
+    cursor: pointer;
+    white-space: normal;
+    overflow-wrap: break-word;
     font-weight: 500;
 }
 
@@ -35,32 +52,22 @@ body {
 }
 
 .wortgruppe-button:disabled {
-    opacity: 0.5 ;
+    opacity: 0.5;
     cursor: not-allowed;
 }
 
 .wortgruppe-button.selected {
-    background-color: #3b82f6 ;
-    color: white ;
-    border-color: #3b82f6 ;
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
 }
 
-.card {
-    background-color: white;
-    padding: 2rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) , 0 4px 6px -2px rgba(0, 0, 0, 0.05) ;
-    width: 100%;
-    max-width: 600px;
-    margin-top: 1rem;
-}
-
+/* Mode Buttons */
 .mode-button,
-
 .action-button,
 .answer-button {
-    transition: background-color 0.3s ease, border-color 0.3s ease;
-    text-align: center ;
+    transition: all 0.3s ease;
+    text-align: center;
 }
 
 .mode-button:not(.active):not(:disabled):hover,
@@ -69,43 +76,42 @@ body {
 }
 
 .mode-button.active {
-    background-color: #3b82f6 ;
-    color: white ;
-    border-color: #3b82f6 ;
+    background-color: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
 }
 
 .mode-button.repeat-button {
-    background-color: #fee2e2 ;
+    background-color: #fee2e2;
     color: #ef4444;
     border-color: #ef4444;
     font-weight: bold;
 }
 
-.mode-button.repeat-button:not(:disabled):hover {
+.mode-button.repeat-button:hover:not(:disabled) {
     background-color: #fecaca;
 }
 
 .mode-button.repeat-button.repeat-active {
-    background-color: #ef4444 ;
-    color: white ;
-    border-color: #ef4444 ;
-}
-
-.mode-button:disabled,
-.action-button:disabled,
-.answer-button:disabled {
-    opacity: 0.5 ;
-    cursor: not-allowed;
+    background-color: #ef4444;
+    color: white;
 }
 
 .action-button {
-    background-color: #3b82f6 ;
-    color: white ;
+    background-color: #3b82f6;
+    color: white;
 }
 
 .action-button:not(:disabled):hover {
     background-color: #2563eb;
 }
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ===== FEEDBACK ===== */
 .feedback-correct {
     color: #10b981;
     font-weight: bold;
@@ -118,6 +124,7 @@ body {
     font-size: 1.5rem;
 }
 
+/* ===== INPUTS ===== */
 .input-field,
 .word-input-box,
 .cloze-input,
@@ -138,51 +145,64 @@ body {
     border-color: #ef4444 !important;
 }
 
-.stats-bar-container {
+/* ===== FORTSCHRITTSBALKEN ===== */
+.stats-bar-container,
+.progress-bar-container {
     background-color: #e5e7eb;
     border-radius: 0.375rem;
     overflow: hidden;
     height: 20px;
 }
 
-.stats-bar {
-    background-color: #3b82f6;
+.progress-bar-container {
+    height: 8px;
+    margin-top: 8px;
+}
+
+.stats-bar,
+.progress-bar-fill {
     height: 100%;
     transition: width 0.5s ease-in-out;
+}
+
+.stats-bar {
+    background-color: #3b82f6;
     text-align: center;
     color: white;
     font-size: 0.75rem;
     line-height: 20px;
 }
 
-.ui-mode {
-    display: none;
-}
+/* Deutschland-Farben für Fortschrittsbalken */
+.color-black-sr { background-color: #1f2937 !important; }
+.color-red-sr { background-color: #dc2626 !important; }
+.color-gold-sr { background-color: #f59e0b !important; }
 
-.word-input-row {
-    display: flex;
-    gap: 0.25rem;
-    justify-content: center;
-    flex-wrap: wrap;
-}
+/* ===== KASUS HERVORHEBUNG ===== */
+.kasus-nominativ { color: green; }
+.kasus-akkusativ { color: blue; }
+.kasus-dativ { color: #FF0000; }
+.kasus-genitiv { color: #FFD700; }
+.kasus-verb { color: magenta; }
 
+/* ===== TRAINER SPEZIFISCH ===== */
 #question-display-area {
     min-height: 2em;
     text-align: center;
-    font-size: 1.5rem; /* Etwas kleiner als zuvor */
-    font-weight: 500;  /* Weniger fett als zuvor */
+    font-size: 1.5rem;
+    font-weight: 500;
     color: #1f2937;
 }
 
 #example-sentence-display {
-    font-family: 'Times New Roman', Times, serif; /* Serifenschrift */
+    font-family: 'Times New Roman', Times, serif;
     font-style: italic;
     color: #4b5563;
     text-align: center;
     min-height: 1.5em;
-    font-size: 2rem; /* Deutlich größer, um die Hierarchie umzukehren */
-    font-weight: 600; /* Fett, um die Betonung zu verstärken */
-    line-height: 1.4; /* Optional: Etwas mehr Zeilenabstand für bessere Lesbarkeit bei größerer Schrift */
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1.4;
 }
 
 #task-prompt-area {
@@ -193,36 +213,7 @@ body {
     min-height: 1.5em;
 }
 
-.category-stat-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.25rem;
-}
-
-.category-stat-text {
-    flex-grow: 1;
-}
-
-.category-progress-bar-bg {
-    background-color: #e5e7eb;
-    border-radius: 0.25rem;
-    height: 8px;
-    width: 100px;
-    overflow: hidden;
-    margin-left: 8px;
-}
-
-.category-progress-bar-fg {
-    background-color: #3b82f6;
-    height: 100%;
-    transition: width 0.3s ease;
-}
-
-.hidden-view {
-    display: none !important;
-}
-
+/* Audio Buttons */
 .audio-line-container {
     display: flex;
     justify-content: center;
@@ -255,482 +246,78 @@ body {
     height: 100%;
 }
 
-/* =================================================== */
-/* RESPONSIVE LÖSUNG FÜR DAS LAYOUT DER MODUS-BUTTONS  */
-/* =================================================== */
-.button-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 0.5rem;
-}
-
-@media (min-width: 768px) {
-  .button-grid {
+/* Word Input Row */
+.word-input-row {
     display: flex;
-    flex-wrap: nowrap;
-  }
-  .button-grid > div {
-    flex: 1;
-  }
+    gap: 0.25rem;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-/* =================================================== */
-/* KORREKTUREN FÜR DEN SCHREIBWEISE-MODUS              */
-/* =================================================== */
+/* Category Stats */
+.category-stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.category-stat-text {
+    flex-grow: 1;
+}
+
+.category-progress-bar-bg {
+    background-color: #e5e7eb;
+    border-radius: 0.25rem;
+    height: 8px;
+    width: 100px;
+    overflow: hidden;
+    margin-left: 8px;
+}
+
+.category-progress-bar-fg {
+    background-color: #3b82f6;
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+/* ===== LAYOUT HELPERS ===== */
+.ui-mode {
+    display: none;
+}
+
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 0.5rem;
+}
+
+/* Spelling Mode Spezifisch */
 #spelling-mode-ui {
     min-height: 150px !important;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
+
 #single-input-container,
 #noun-input-container {
     width: 100%;
-    justify-content: center; 
-}
-
-/* Stil für die Fortschrittsbalken der Wortgruppen */
-.progress-bar-container {
-    width: 100%;
-    background-color: #e0e0e0; /* Hintergrund des leeren Balkens */
-    border-radius: 4px;
-    height: 8px;
-    margin-top: 8px;
-    overflow: hidden;
-}
-
-.progress-bar-fill {
-    height: 100%;
-    transition: width 0.4s ease-in-out; /* Animation für den Fortschritt */
-    width: 0%;
-}
-
-/* Farben für die Kasus-Hervorhebung in Beispielsätzen */
-.kasus-nominativ {
-    color: green; /* Grün für Nominativ */
-}
-
-.kasus-akkusativ {
-    color: blue; /* Blau für Akkusativ */
-}
-
-.kasus-dativ {
-    color: #FF0000; /* Kräftigeres Rot (Flaggenrot-ähnlich) für Dativ */
-}
-
-.kasus-genitiv {
-    color: #FFD700; /* Gold/Gelb für Genitiv (Beispiel: Gold) */
-}
-.kasus-verb {
-    color: magenta; /* Magenta für Verben (kräftiger als Pink) */
-}
-
-/* Schwarz-Rot-Gold Farben für Fortschrittsbalken */
-.color-black-sr {
-    background-color: #1f2937; /* Dunkleres Schwarz für besseren Kontrast */
-}
-
-.color-red-sr {
-    background-color: #dc2626; /* Deutsches Flaggen-Rot */
-}
-
-.color-gold-sr {
-    background-color: #f59e0b; /* Kräftiges Gold */
-    position: relative;
-}
-
-/* Optional: Glanz-Effekt für Gold-Balken */
-.color-gold-sr::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 255, 255, 0.3),
-        transparent
-    );
-    animation: shine 3s infinite;
-}
-
-@keyframes shine {
-    0% { left: -100%; }
-    50% { left: 100%; }
-    100% { left: 100%; }
-}
-
-.color-original {
-    background-color: #3b82f6; /* Dein ursprüngliches Blau */
-}
-
-/* =================================================== */
-/* NEU: TEST-BUTTON STYLING                           */
-/* =================================================== */
-
-/* Test-Button Styling für Unterfelder */
-.test-button {
-    min-height: 32px;
-    font-size: 0.875rem;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 4px;
-    border-radius: 0.375rem;
-    font-weight: 600;
-    transition: all 0.2s ease-in-out;
 }
 
-.test-button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.15);
-}
-
-.test-button:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-}
-
-/* Unterfeld-Container für bessere Anordnung */
-.space-y-2 > * + * {
-    margin-top: 0.5rem;
-}
-
-/* Hauptthema-Test Button besondere Hervorhebung */
-button[data-test-main-topic-only] {
-    background: linear-gradient(135deg, #f59e0b 0%, #dc2626 50%, #1f2937 100%);
-    color: white;
-    font-weight: 700;
-    position: relative;
-    overflow: hidden;
-    border: none;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-}
-
-button[data-test-main-topic-only]:hover {
-    background: linear-gradient(135deg, #fbbf24 0%, #ef4444 50%, #374151 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px 0 rgba(0, 0, 0, 0.25);
-}
-
-button[data-test-main-topic-only]:active {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.2);
-}
-
-/* Globaler Test Button */
-#start-test-mode-btn {
-    background: linear-gradient(135deg, #6b7280 0%, #374151 100%);
-    color: white;
-    font-weight: 600;
-    border: none;
-    transition: all 0.3s ease-in-out;
-}
-
-#start-test-mode-btn:hover {
-    background: linear-gradient(135deg, #9ca3af 0%, #4b5563 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15);
-}
-
-/* Verbesserte Hover-Effekte für Test-Modi im Modal */
-.wortgruppe-button[data-test-type]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15);
-}
-
-/* Animation für Test-Fortschrittsbalken */
-.progress-bar-fill {
-    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
-}
-
-/* Deutschland-Farben Feedback für Test-Ergebnisse */
-.feedback-test-success {
-    background-color: #f59e0b; /* Gold */
-    color: white;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    text-align: center;
-    font-weight: 600;
-    margin: 1rem 0;
-}
-
-.feedback-test-good {
-    background-color: #dc2626; /* Rot */
-    color: white;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    text-align: center;
-    font-weight: 600;
-    margin: 1rem 0;
-}
-
-.feedback-test-needs-improvement {
-    background-color: #1f2937; /* Schwarz */
-    color: white;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    text-align: center;
-    font-weight: 600;
-    margin: 1rem 0;
-}
-
-/* Test-Modal erweiterte Styling */
-.test-selection-modal h2 {
-    color: #1f2937;
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-    text-align: center;
-}
-
-/* Responsive Design für Test-Container */
-#navigation-container {
-    display: grid;
-    grid-template-columns: repeat(1, 1fr);
-    gap: 1rem;
-    width: 100%;
-}
-
-@media (min-width: 640px) {
-    #navigation-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .col-span-2 {
-        grid-column: span 2;
-    }
-}
-
+/* ===== RESPONSIVE ===== */
 @media (min-width: 768px) {
-    .test-button {
-        font-size: 0.875rem;
-        padding: 0.5rem 1rem;
-        min-height: 36px;
+    .button-grid {
+        display: flex;
+        flex-wrap: nowrap;
+    }
+    .button-grid > div {
+        flex: 1;
     }
 }
 
-@media (min-width: 1024px) {
-    #navigation-container {
-        grid-template-columns: repeat(3, 1fr);
-    }
-    
-    .sm\:col-span-3 {
-        grid-column: span 3;
-    }
-}
-
-/* Responsive Design für Test-Buttons auf kleineren Bildschirmen */
-@media (max-width: 640px) {
-    .test-button {
-        font-size: 0.75rem;
-        padding: 0.25rem 0.75rem;
-        min-height: 28px;
-    }
-    
-    button[data-test-main-topic-only] {
-        font-size: 0.875rem;
-        padding: 0.75rem;
-    }
-}
-
-/* Spezielle Hover-Effekte für Test-Hierarchie */
-.test-button:hover {
-    background-color: #eab308; /* Noch helleres Gelb beim Hover */
-}
-
-button[data-test-subtopic]:hover {
-    background-color: #eab308;
-    color: white;
-}
-
-/* Zusätzliche visuelle Verbesserungen */
-.test-button,
-button[data-test-main-topic-only],
-#start-test-mode-btn {
-    font-family: 'Inter', sans-serif;
-    letter-spacing: 0.025em;
-}
-
-/* Fokus-Stile für Barrierefreiheit */
-.test-button:focus,
-button[data-test-main-topic-only]:focus,
-#start-test-mode-btn:focus {
-    outline: 2px solid #3b82f6;
-    outline-offset: 2px;
-}
-
-/* Smooth Scrolling für bessere UX beim Navigieren */
+/* ===== UTILITIES ===== */
 html {
     scroll-behavior: smooth;
-}
-
-/* Email Form Styles */
-.email-form {
-    margin-top: 1rem;
-}
-
-.email-input {
-    width: 100%;
-    padding: 12px 16px;
-    margin-bottom: 10px;
-    border: 1px solid #dadce0;
-    border-radius: 8px;
-    font-size: 16px;
-    outline: none;
-    transition: border-color 0.3s ease;
-}
-
-.email-input:focus {
-    border-color: #4285f4;
-}
-
-.email-auth-button {
-    background: #4285f4;
-    color: white;
-    font-weight: 500;
-}
-
-.email-auth-button:hover {
-    background: #3367d6;
-}
-
-/* Divider */
-.divider {
-    text-align: center;
-    margin: 1rem 0;
-    position: relative;
-}
-
-.divider span {
-    background: white;
-    padding: 0 10px;
-    color: #666;
-    font-size: 0.875rem;
-}
-
-.divider::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: #dadce0;
-    z-index: -1;
-}
-
-/* Status Styles */
-.auth-status {
-    padding: 1rem;
-    margin: 1rem 0;
-    border-radius: 8px;
-    background: #e8f5e9;
-    border: 1px solid #4caf50;
-}
-
-.status-message {
-    color: #2e7d32;
-    font-weight: 500;
-}
-
-.debug-info p {
-    margin: 0.25rem 0;
-}
-
-.debug-info strong {
-    font-weight: 600;
-}
-
-/* Disabled Button Style */
-button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* Firebase Auth Modal */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-
-.modal-overlay.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    max-width: 400px;
-    width: 90%;
-    position: relative;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-}
-
-.modal-close {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #666;
-}
-
-.auth-button {
-    width: 100%;
-    padding: 12px 20px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-}
-
-.google-auth-button {
-    background: white;
-    border: 1px solid #dadce0;
-    color: #3c4043;
-}
-
-.google-auth-button:hover {
-    background: #f8f9fa;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.auth-icon {
-    width: 18px;
-    height: 18px;
-}
-
-.auth-info {
-    text-align: center;
-    color: #666;
-    font-size: 0.875rem;
-    margin-top: 1rem;
 }
