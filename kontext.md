@@ -464,5 +464,251 @@ Eine Komponente gilt als "Enterprise-Ready" wenn:
 
 ---
 
-*Letzte Aktualisierung: 28.06.2025*
-*Nächstes Review: 01.07.2025*
+# Kontext: A1-Vokabeltrainer TypeScript Migration
+
+## 🎯 **WICHTIGER HINWEIS**
+**BEVOR Sie Fragen stellen oder Änderungen vorschlagen:**
+1. **Schauen Sie IMMER zuerst ins Projekt** (`fabbfoto/A1-vokabeltrainer`)
+2. **Der komplette Vokabeltrainer ist im Projekt abgebildet**
+3. **Alle Dateien können und sollen eingesehen werden**
+4. **Prüfen Sie die aktuelle Dateistruktur bevor Sie Vorschläge machen**
+
+---
+
+## 📋 **Projektstatus: TypeScript Migration (Stand: 28.06.2025)**
+
+### **Was ist das Projekt?**
+Der **A1-Vokabeltrainer** ist eine webbasierte Lernapplikation für Deutsch als Fremdsprache (Goethe A1 Niveau). Es gibt zwei Trainer-Varianten:
+- **Basis-Trainer**: Einfache Vokabelübungen
+- **Themen-Trainer**: 3-Ebenen-Navigation mit verschiedenen Lernmodi
+
+Wir arbeiten aktuell am **Themen-Trainer** im Root-Verzeichnis.
+
+### **Projektziel**
+Transformation von einem Hobby-Projekt zu einer **Production-Ready Enterprise Application** mit:
+- 100% TypeScript
+- Professionellem Error Handling
+- Test Coverage >80%
+- Build-System (Vite/Webpack)
+- Monitoring & Analytics
+
+---
+
+## ✅ **Was wir heute gemacht haben**
+
+### **1. TypeScript Setup** ✅
+- TypeScript installiert (`npm install --save-dev typescript`)
+- `tsconfig.json` konfiguriert mit:
+  - `outDir: "./dist"` - Kompilierte Dateien landen im dist/ Ordner
+  - `sourceMap: true` - Für Debugging
+  - Module: ES2020
+- TypeScript Compiler läuft mit `npx tsc --watch`
+
+### **2. Type-Definitionen erstellt** ✅
+- `shared/types/index.ts` mit allen wichtigen Interfaces:
+  - `Word`, `User`, `TrainerState`, `LearningModes`
+  - `VocabularyStructure`, `DOMElements`
+  - Service-Interfaces für Auth und Sync
+- Vollständige Type-Safety für das gesamte Projekt
+
+### **3. Dateien zu TypeScript konvertiert** ✅
+- ✅ `trainer.js` → `trainer.ts` (vollständig typisiert)
+- ✅ `dom.js` → `dom.ts` (mit Type-Safe Element-Abfragen)
+- ✅ `shared/utils/helfer.js` → `shared/utils/helfer.ts`
+
+### **4. UI-Module aufgeteilt** ✅
+Die große `ui.js` wurde in 5 spezialisierte Module aufgeteilt:
+```
+/ui/
+  ├── navigation.ts    # Themen-Navigation
+  ├── statistics.ts    # Fortschritts-Anzeigen
+  ├── test-modal.ts    # Test-Auswahl Modal
+  ├── feedback.ts      # Nachrichten & UI-Reset
+  ├── umlaut-buttons.ts # Umlaut-Eingabe
+  └── index.ts         # Re-exportiert alles
+```
+
+### **5. Probleme gelöst** ✅
+- Import-Fehler behoben (4 Parameter statt 3 bei uiModes)
+- Type-Casting für DOM-Elemente
+- Doppelte `ui-modes.js` Datei identifiziert
+- ButtonFactory Fehler durch inline HTML ersetzt
+
+### **6. Build-Prozess läuft** ✅
+- TypeScript kompiliert automatisch nach `dist/`
+- Source Maps werden generiert
+- `index.html` lädt Dateien aus `dist/`
+
+---
+
+## ❌ **Aktuelle Probleme**
+
+### **1. 404 Fehler im Browser**
+```
+Failed to load: http://127.0.0.1:5500/dist/ui/navigation
+Failed to load: http://127.0.0.1:5500/dist/ui/statistics
+etc.
+```
+**Ursache**: Die Import-Pfade in den kompilierten Dateien stimmen nicht mit der Dateistruktur überein.
+
+### **2. TypeScript Watch Mode**
+- Läuft möglicherweise nicht oder reagiert nicht
+- Terminal zeigt keine Aktivität
+
+### **3. Relative Import-Pfade**
+Die kompilierten Dateien haben falsche relative Pfade, weil:
+- HTML lädt aus Root
+- JavaScript liegt in `dist/`
+- Imports zeigen auf falsche Ebenen
+
+---
+
+## 🔧 **Was noch zu tun ist**
+
+### **Sofort (Critical)**
+1. **Import-Pfade fixen**
+   - Option A: `baseUrl` in tsconfig.json anpassen
+   - Option B: Build-System (Vite) einrichten
+   - Option C: Alle Dateien ins Root kompilieren
+
+2. **TypeScript Watcher prüfen**
+   ```bash
+   pkill tsc
+   npx tsc --watch
+   ```
+
+### **Diese Woche**
+1. **Restliche JavaScript-Dateien konvertieren**
+   - [ ] `shared/utils/ui-modes.js` → `.ts`
+   - [ ] Alle Service-Dateien
+   - [ ] Vokabular-Dateien (niedrige Priorität)
+
+2. **Build-System einrichten (Vite)**
+   - Hot Module Replacement
+   - Automatische Pfad-Auflösung
+   - Production Build Optimierung
+   - Netlify-Integration
+
+3. **Testing Setup**
+   - Jest oder Vitest installieren
+   - Erste Unit Tests schreiben
+   - GitHub Actions für CI/CD
+
+### **Nächste Wochen**
+1. **Error Handling verbessern**
+   - Sentry Integration
+   - Custom Error Classes
+   - User-friendly Error Messages
+
+2. **State Management**
+   - Zustand oder Redux einführen
+   - LocalStorage Abstraction Layer
+
+3. **Performance Optimierung**
+   - Code Splitting
+   - Lazy Loading
+   - Bundle Size Analyse
+
+---
+
+## 📁 **Aktuelle Dateistruktur**
+
+```
+fabbfoto/A1-vokabeltrainer/
+├── index.html
+├── trainer.ts (✅ TypeScript)
+├── dom.ts (✅ TypeScript)
+├── vokabular.js
+├── tsconfig.json
+├── package.json
+├── dist/
+│   ├── trainer.js (kompiliert)
+│   ├── dom.js (kompiliert)
+│   ├── vokabular.js (kopiert)
+│   └── ui/
+│       ├── navigation.js
+│       ├── statistics.js
+│       ├── test-modal.js
+│       ├── feedback.js
+│       ├── umlaut-buttons.js
+│       └── index.js
+├── ui/ (✅ TypeScript Module)
+│   ├── navigation.ts
+│   ├── statistics.ts
+│   ├── test-modal.ts
+│   ├── feedback.ts
+│   ├── umlaut-buttons.ts
+│   └── index.ts
+├── shared/
+│   ├── types/
+│   │   └── index.ts (✅ Alle Type-Definitionen)
+│   ├── utils/
+│   │   ├── helfer.ts (✅ TypeScript)
+│   │   └── ui-modes.js (❌ noch JavaScript)
+│   ├── auth/
+│   ├── services/
+│   └── ui/
+└── packages/
+    └── trainer-basis/
+```
+
+---
+
+## 💡 **Wichtige Befehle**
+
+```bash
+# TypeScript kompilieren
+npx tsc
+
+# TypeScript Watch Mode
+npx tsc --watch
+
+# Projekt starten
+# Live Server in VSCode oder
+python -m http.server 5500
+
+# Cache löschen
+rm -rf node_modules/.cache
+rm -rf dist/*
+
+# Dependencies prüfen
+npm list typescript
+```
+
+---
+
+## 🚀 **Best Practices für die Weiterarbeit**
+
+1. **IMMER ins Projekt schauen** bevor Änderungen vorgeschlagen werden
+2. **TypeScript Watcher laufen lassen** während der Entwicklung
+3. **Kleine, inkrementelle Änderungen** - nicht alles auf einmal
+4. **Testen nach jeder Änderung** im Browser
+5. **Git Commits** nach jedem erfolgreichen Schritt
+
+---
+
+## 📊 **Fortschritt TypeScript Migration**
+
+```
+Gesamt:          ████████░░░░░░░░░░░░ 40%
+trainer.ts:      ████████████████████ 100% ✅
+dom.ts:          ████████████████████ 100% ✅
+ui/* Module:     ████████████████████ 100% ✅
+shared/types:    ████████████████████ 100% ✅
+shared/utils:    ████████░░░░░░░░░░░░ 40%  🚧
+services:        ░░░░░░░░░░░░░░░░░░░░ 0%   ❌
+vokabular:       ░░░░░░░░░░░░░░░░░░░░ 0%   ❌
+```
+
+---
+
+## 🎯 **Nächste Schritte (Priorität)**
+
+1. **SOFORT**: Import-Pfade fixen damit der Trainer wieder läuft
+2. **HEUTE**: TypeScript Watcher stabilisieren
+3. **MORGEN**: Vite Build-System einrichten
+4. **DIESE WOCHE**: Alle kritischen Dateien zu TypeScript
+
+---
+
+**ERINNERUNG**: Bevor Sie IRGENDETWAS fragen oder vorschlagen - **SCHAUEN SIE ERST INS PROJEKT!** Alle Dateien sind dort vollständig abgebildet und einsehbar. 🔍
