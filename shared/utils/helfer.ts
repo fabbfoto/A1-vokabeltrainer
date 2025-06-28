@@ -136,3 +136,42 @@ export function insertTextAtCursor(inputElement: HTMLInputElement, text: string)
   const event = new Event('input', { bubbles: true, cancelable: true });
   inputElement.dispatchEvent(event);
 }
+
+// Parse Noun String Interface
+interface ParsedNoun {
+  genus: string;
+  singular: string;
+  pluralInfo: string;
+  isPluralOnly: boolean;
+}
+
+export function parseNounString(nounString: string): ParsedNoun | null {
+  if (!nounString) return null;
+  
+  if (nounString.includes('(Pl.)')) {
+    return {
+      genus: 'e',
+      singular: nounString.replace(' (Pl.)', '').trim(),
+      pluralInfo: '(Pl.)',
+      isPluralOnly: true
+    };
+  }
+  
+  const parts = nounString.split(',');
+  if (parts.length < 2) {
+    const firstSpaceIndex = nounString.indexOf(' ');
+    if (firstSpaceIndex > -1) {
+      const genus = nounString.charAt(0);
+      const singular = nounString.substring(1, firstSpaceIndex).trim();
+      const pluralInfo = nounString.substring(firstSpaceIndex).trim();
+      return { genus, singular, pluralInfo, isPluralOnly: false };
+    }
+    return null;
+  }
+  
+  const firstPart = parts[0].trim();
+  const genus = firstPart.charAt(0);
+  const singular = firstPart.substring(1).trim();
+  const pluralInfo = parts[1].trim();
+  return { genus, singular, pluralInfo, isPluralOnly: false };
+}

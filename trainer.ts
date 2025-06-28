@@ -1,32 +1,41 @@
-// trainer.js - ERWEITERTE VERSION mit vollständiger Test-Funktionalität
-// Steuerungslogik für den Themen-Trainer.
-// Diese Datei orchestriert den Anwendungszustand (State) und die UI-Interaktionen,
-// indem sie Funktionen aus den Modulen 'ui.js' und 'ui-modes.js' aufruft.
-// Type imports
-// Type imports
-import type { User, Word, Progress, LearningMode } from './shared/types/index';
-// Import des kombinierten Vokabulars
+// trainer.ts - VOLLSTÄNDIGE TypeScript VERSION
+// Steuerungslogik für den Themen-Trainer mit vollständiger Type-Safety
+// Diese Datei orchestriert den Anwendungszustand (State) und die UI-Interaktionen
 
+// Type imports
+import type {
+  Word,
+  TrainerState,
+  LearningModes,
+  VokabularStructure,
+  UICallbacks,
+  AuthUI,
+  ProcessAnswerFunction,
+  InitializeAuthResult,
+  DOMElements
+} from './shared/types/index';
+
+// Import des kombinierten Vokabulars
 import { vokabular } from './vokabular.js';
 
-// Import der Helfer- und UI-Funktionen aus dem geteilten Ordner
+// Import der Helfer- und UI-Funktionen
 import { shuffleArray, speak, vergleicheAntwort } from './shared/utils/helfer.js';
 import * as uiModes from './shared/utils/ui-modes.js';
 import { dom } from './dom.js';
 import * as ui from './ui.js';
-// Import der neuen, geteilten Auth- und Sync-Funktion
+
+// Import der Auth- und Sync-Funktionen
 import { initializeAuth } from './shared/auth/index.js';
 import { NavigationEvents } from './shared/events/navigation-events.js';
 
-let globalAuthUI = null; // NEU: Globale Referenz für die AuthUI
+// Globale AuthUI Referenz
+let globalAuthUI: AuthUI | null = null;
 
-document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'async' hier
-
+document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Firebase Auth und Sync initialisieren
-    const { authService, authUI, syncService } = initializeAuth('themen', {
+    const { authService, authUI, syncService }: InitializeAuthResult = initializeAuth('themen', {
         buttonContainerId: 'auth-button-container',
-        hideOnNavigation: true,  // ← NEU HINZUFÜGEN!
-        // Themen-Trainer spezifische Button-Styles
+        hideOnNavigation: true,
         buttonClasses: {
             loggedIn: 'w-full rounded-lg py-3 font-semibold text-white cursor-default',
             loggedOut: 'w-full rounded-lg py-3 font-semibold transition-colors duration-200'
@@ -36,11 +45,11 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
     // Initial auf Root-Seite
     NavigationEvents.dispatchRoot();
 
-    // Speichere authUI Referenz für späteren Zugriff durch andere Module (z.B. ui.js)
+    // Speichere authUI Referenz
     globalAuthUI = authUI;
 
-    // Zentrales State-Objekt zur Verwaltung des Anwendungszustands - ERWEITERT.
-    const state = {
+    // Zentrales State-Objekt mit vollständiger Type-Definition
+    const state: TrainerState = {
         currentMainTopic: null,
         currentSubTopic: null,
         currentVocabularySet: [],
@@ -52,22 +61,20 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         isRepeatSessionActive: false,
         correctInRound: 0,
         attemptedInRound: 0,
-        globalProgress: {}, // Initialisiert als leeres Objekt
+        globalProgress: {},
         masteredWordsByMode: {},
         wordsToRepeatByMode: {},
-        lastTestScores: {}, // Initialisiert als leeres Objekt
+        lastTestScores: {},
         activeTextInput: null,
-        // NEU für erweiterte Test-Funktionalität:
-        testType: null, // 'subtopic', 'mainTopic', oder 'global'
-        testKey: null, // Eindeutiger Schlüssel für Test-Ergebnis-Speicherung
-        // NEU: Für Zurück-Navigation im Test
+        testType: null,
+        testKey: null,
         previousMainTopic: null,
         previousSubTopic: null,
     };
 
-    // Hilfsfunktion, um alle Vokabeln aus der verschachtelten Struktur zu extrahieren.
-    function getAllWords(vocabularyObject) {
-        let allWords = [];
+    // Hilfsfunktion: Alle Vokabeln aus der verschachtelten Struktur extrahieren
+    function getAllWords(vocabularyObject: VokabularStructure): Word[] {
+        const allWords: Word[] = [];
         for (const mainTopic of Object.values(vocabularyObject)) {
             for (const subTopic of Object.values(mainTopic)) {
                 allWords.push(...subTopic);
@@ -75,167 +82,218 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         }
         return allWords;
     }
-    const alleVokabeln = getAllWords(vokabular); // Verwendet das kombinierte vokabular
+    
+    const alleVokabeln: Word[] = getAllWords(vokabular);
 
     // --- KERNLOGIK (TRAINING & TEST) ---
-    // processAnswer muss VOR learningModes definiert werden, da es dort verwendet wird.
-    function processAnswer(isCorrect, correctAnswer) {
-        // === DEBUGGING LOGS START ===
+    
+    // processAnswer Funktion mit Type-Safety
+    const processAnswer: ProcessAnswerFunction = (isCorrect: boolean, correctAnswer: string): void => {
         console.log(`[processAnswer] Aufgerufen für Modus: ${state.currentMode}`);
-        console.log(`[processAnswer] isCorrect empfangen: ${isCorrect}`);
-        console.log(`[processAnswer] correctAnswer empfangen: ${correctAnswer}`);
-        // === DEBUGGING LOGS END ===
+        console.log(`[processAnswer] isCorrect: ${isCorrect}, correctAnswer: ${correctAnswer}`);
 
+        // Buttons deaktivieren
         if (dom.checkSpellingButton) dom.checkSpellingButton.disabled = true;
         if (dom.checkClozeButton) dom.checkClozeButton.disabled = true;
         if (dom.checkSentenceButton) dom.checkSentenceButton.disabled = true;
 
         state.attemptedInRound++;
-        const wordId = state.currentWordData.id;
+        const wordId = state.currentWordData?.id;
 
         if (isCorrect) {
-            console.log('[processAnswer] Antwort ist KORREKT. Springe zur nächsten Aufgabe.'); // Debugging
+            console.log('[processAnswer] Antwort ist KORREKT');
             state.correctInRound++;
             dom.feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
-            if (wordId && !state.isTestModeActive) {
+            
+            if (wordId && !state.isTestModeActive && state.currentMainTopic && state.currentSubTopic && state.currentMode) {
                 const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
-                if (!state.globalProgress[progressKey]) state.globalProgress[progressKey] = {};
-                if (!state.globalProgress[progressKey][state.currentMode]) state.globalProgress[progressKey][state.currentMode] = new Set();
-                state.globalProgress[progressKey][state.currentMode].add(wordId);
+                
+                if (!state.globalProgress[progressKey]) {
+                    state.globalProgress[progressKey] = {};
+                }
+                if (!state.globalProgress[progressKey][state.currentMode]) {
+                    state.globalProgress[progressKey][state.currentMode] = new Set<string>();
+                }
+                
+                const modeProgress = state.globalProgress[progressKey][state.currentMode];
+                if (modeProgress instanceof Set) {
+                    modeProgress.add(wordId);
+                }
+                
                 state.masteredWordsByMode[state.currentMode]?.add(wordId);
                 state.wordsToRepeatByMode[state.currentMode]?.delete(wordId);
-                console.log('trainer.js: Wort als gemeistert hinzugefügt. Neuer globalProgress:', state.globalProgress);
+                
+                console.log('trainer.ts: Wort als gemeistert hinzugefügt');
                 saveGlobalProgress();
             }
             setTimeout(() => { loadNextTask(); }, 1200);
         } else {
-            console.log('[processAnswer] Antwort ist FALSCH. Zeige "Weiter"-Button.'); // Debugging
+            console.log('[processAnswer] Antwort ist FALSCH');
             dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">${correctAnswer}</span>`;
-            if (wordId) {
-                if (!state.wordsToRepeatByMode[state.currentMode]) state.wordsToRepeatByMode[state.currentMode] = new Set();
+            
+            if (wordId && state.currentMode) {
+                if (!state.wordsToRepeatByMode[state.currentMode]) {
+                    state.wordsToRepeatByMode[state.currentMode] = new Set<string>();
+                }
                 state.wordsToRepeatByMode[state.currentMode].add(wordId);
-                console.log('trainer.js: Wort zur Wiederholung hinzugefügt. Neuer wordsToRepeatByMode:', state.wordsToRepeatByMode);
+                console.log('trainer.ts: Wort zur Wiederholung hinzugefügt');
             }
             dom.continueButton.classList.remove('hidden');
         }
 
+        // Statistiken aktualisieren
         if (state.isTestModeActive) {
             ui.updateTestStats(dom, state);
         } else {
             ui.updatePracticeStats(dom, state, learningModes);
         }
         ui.updateErrorCounts(dom, state, learningModes);
-    }
-
-    // Definition der Lernmodi und ihrer Setup-Funktionen.
-    const learningModes = {
-        'mc-de-en': { name: "Bedeutung", setupFunc: () => uiModes.setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) },
-        'type-de-adj': { name: "Schreibweise", setupFunc: () => uiModes.setupSpellingMode(dom, state, alleVokabeln, processAnswer) },
-        'cloze-adj-de': { name: "Lückentext", setupFunc: () => uiModes.setupClozeAdjDeMode(dom, state, alleVokabeln, processAnswer) },
-        'sentence-translation-en-de': { name: "Satzübersetzung", setupFunc: () => uiModes.setupSentenceTranslationEnDeMode(dom, state, alleVokabeln, processAnswer) },
     };
-    console.log('trainer.js: learningModes definiert:', learningModes, 'Anzahl der Modi:', Object.keys(learningModes).length);
+
+    // Definition der Lernmodi mit Type-Safety
+    const learningModes: LearningModes = {
+        'mc-de-en': { 
+            name: "Bedeutung", 
+            setupFunc: () => uiModes.setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) 
+        },
+        'type-de-adj': { 
+            name: "Schreibweise", 
+            setupFunc: () => uiModes.setupSpellingMode(dom, state, alleVokabeln, processAnswer) 
+        },
+        'cloze-adj-de': { 
+            name: "Lückentext", 
+            setupFunc: () => uiModes.setupClozeAdjDeMode(dom, state, alleVokabeln, processAnswer) 
+        },
+        'sentence-translation-en-de': { 
+            name: "Satzübersetzung", 
+            setupFunc: () => uiModes.setupSentenceTranslationEnDeMode(dom, state, alleVokabeln, processAnswer) 
+        },
+    };
+
+    console.log('trainer.ts: learningModes definiert:', Object.keys(learningModes).length, 'Modi');
 
     // --- DATENPERSISTENZ (LocalStorage) ---
 
-    function saveLastTestScores() {
-        localStorage.setItem('goetheA1LastTestScores', JSON.stringify(state.lastTestScores));
+    function saveLastTestScores(): void {
+        try {
+            localStorage.setItem('goetheA1LastTestScores', JSON.stringify(state.lastTestScores));
+        } catch (error) {
+            console.error("Fehler beim Speichern der Testergebnisse:", error);
+        }
     }
 
-    function loadLastTestScores() {
+    function loadLastTestScores(): void {
         const storedScores = localStorage.getItem('goetheA1LastTestScores');
         if (storedScores) {
             try {
                 state.lastTestScores = JSON.parse(storedScores);
-            } catch (e) {
-                console.error("Fehler beim Laden der letzten Testergebnisse.", e);
-                state.lastTestScores = {};
+            } catch (error) {
+                console.error("Fehler beim Laden der letzten Testergebnisse:", error);
             }
         }
     }
 
-    function saveGlobalProgress() {
-        const progressToStore = {};
-        for (const gruppe in state.globalProgress) {
-            progressToStore[gruppe] = {};
-            for (const mode in state.globalProgress[gruppe]) {
-                progressToStore[gruppe][mode] = Array.from(state.globalProgress[gruppe][mode]);
-            }
-        }
-        localStorage.setItem('a1ThemenProgress', JSON.stringify(progressToStore));
-
-        // Fortschritt auch in die Cloud speichern, wenn der Nutzer angemeldet ist
-        if (authService.isLoggedIn()) {
-            syncService.saveProgress(progressToStore);
-        }
-    }
-
-    function loadGlobalProgress() {
-        const storedProgress = localStorage.getItem('a1ThemenProgress');
-        if (!storedProgress) return;
+    function saveGlobalProgress(): void {
         try {
-            const parsedProgress = JSON.parse(storedProgress);
-            state.globalProgress = {};
-            for (const gruppe in parsedProgress) {
-                state.globalProgress[gruppe] = {};
-                for (const mode in parsedProgress[gruppe]) {
-                    state.globalProgress[gruppe][mode] = new Set(parsedProgress[gruppe][mode]);
+            // Konvertiere Sets zu Arrays für die Speicherung
+            const progressToSave: Record<string, Record<string, string[]>> = {};
+            
+            for (const key in state.globalProgress) {
+                progressToSave[key] = {};
+                for (const mode in state.globalProgress[key]) {
+                    const modeProgress = state.globalProgress[key][mode];
+                    if (modeProgress instanceof Set) {
+                        progressToSave[key][mode] = Array.from(modeProgress);
+                    }
                 }
             }
-            console.log('trainer.js: globalProgress aus LocalStorage geladen:', state.globalProgress);
-        } catch (e) {
-            console.error("Fehler beim Laden des Fortschritts. Setze zurück.", e);
-            state.globalProgress = {};
-            localStorage.removeItem('a1ThemenProgress');
+            
+            localStorage.setItem('goetheA1Progress', JSON.stringify(progressToSave));
+            console.log('trainer.ts: Fortschritt gespeichert');
+            
+            // Firebase Sync
+            if (authService.isLoggedIn()) {
+                syncService.saveProgress(progressToSave);
+            }
+        } catch (error) {
+            console.error("Fehler beim Speichern des Fortschritts:", error);
         }
     }
 
-    // --- KERNLOGIK (TRAINING & TEST) ---
+    function loadGlobalProgress(): void {
+        const storedProgress = localStorage.getItem('goetheA1Progress');
+        if (storedProgress) {
+            try {
+                const parsed = JSON.parse(storedProgress);
+                
+                // Konvertiere Arrays zurück zu Sets
+                for (const key in parsed) {
+                    state.globalProgress[key] = {};
+                    for (const mode in parsed[key]) {
+                        state.globalProgress[key][mode] = new Set(parsed[key][mode]);
+                    }
+                }
+                
+                console.log('trainer.ts: Fortschritt geladen');
+            } catch (error) {
+                console.error("Fehler beim Laden des Fortschritts:", error);
+            }
+        }
+    }
 
-    function loadNextTask() {
+    // --- TASK LOADING ---
+
+    function loadNextTask(): void {
+        console.log('[loadNextTask] Aufgerufen');
         ui.hideAllUIs(dom);
-        if ((!state.currentVocabularySet || state.currentVocabularySet.length === 0) && state.shuffledVocabForMode.length === 0) return;
+        dom.feedbackContainerEl.innerHTML = '';
+        dom.continueButton.classList.add('hidden');
 
         state.currentWordIndexInShuffled++;
-        if (state.currentWordIndexInShuffled >= state.shuffledVocabForMode.length) {
-            if (state.isTestModeActive) {
-                handleTestCompletion();
-                return;
-            }
-            if (state.isRepeatSessionActive) {
-                ui.showMessage(dom, 'Alle Fehler wurden wiederholt!', 'success');
-                state.isRepeatSessionActive = false;
-                document.querySelector('.mode-button.repeat-active')?.classList.remove('repeat-active');
-                state.shuffledVocabForMode = shuffleArray([...state.currentVocabularySet]);
-            } else {
-                state.shuffledVocabForMode = shuffleArray([...state.shuffledVocabForMode]);
-            }
-            state.currentWordIndexInShuffled = 0;
-        }
 
-        state.currentWordData = state.shuffledVocabForMode[state.currentWordIndexInShuffled];
-        if (!state.currentWordData) {
-            console.error("Kein Wort gefunden, versuche nächstes.");
-            if (state.shuffledVocabForMode.length > 0 && state.currentWordIndexInShuffled < state.shuffledVocabForMode.length) loadNextTask();
+        // Test-Modus Completion Check
+        if (state.isTestModeActive && state.currentWordIndexInShuffled >= state.shuffledVocabForMode.length) {
+            console.log('[loadNextTask] Test abgeschlossen');
+            handleTestCompletion();
             return;
         }
 
-        const modeInfo = learningModes[state.currentMode];
+        // Normaler Modus: Endlos-Schleife
+        if (!state.isTestModeActive && state.currentWordIndexInShuffled >= state.shuffledVocabForMode.length) {
+            console.log('[loadNextTask] Alle Wörter durchlaufen, starte neu');
+            state.shuffledVocabForMode = shuffleArray(state.shuffledVocabForMode);
+            state.currentWordIndexInShuffled = 0;
+        }
+
+        // Repeat-Session Check
+        if (state.isRepeatSessionActive && state.currentWordIndexInShuffled >= state.shuffledVocabForMode.length) {
+            ui.showMessage(dom, 'Wiederholungsrunde abgeschlossen!', 'success');
+            state.isRepeatSessionActive = false;
+            document.querySelectorAll('.repeat-active').forEach(btn => btn.classList.remove('repeat-active'));
+            return;
+        }
+
+        // Aktuelle Vokabel laden
+        state.currentWordData = state.shuffledVocabForMode[state.currentWordIndexInShuffled];
+        console.log('[loadNextTask] Aktuelle Vokabel:', state.currentWordData?.german);
+
+        // Modus-spezifisches Setup
+        const modeInfo = state.currentMode ? learningModes[state.currentMode] : null;
         if (modeInfo && typeof modeInfo.setupFunc === 'function') {
             modeInfo.setupFunc();
         } else {
-            console.error(`Keine Setup-Funktion für Modus "${state.currentMode}" gefunden.`);
+            console.error(`Keine Setup-Funktion für Modus "${state.currentMode}" gefunden`);
         }
     }
 
-    function setMode(modeId, isRepeat = false) {
+    function setMode(modeId: string, isRepeat: boolean = false): void {
         state.currentMode = modeId;
         state.isTestModeActive = false;
         state.isRepeatSessionActive = isRepeat;
-        let wordsForSession = [];
+        let wordsForSession: Word[] = [];
 
         if (isRepeat) {
-            const wordIdsToRepeat = new Set(state.wordsToRepeatByMode[modeId] || []);
+            const wordIdsToRepeat = state.wordsToRepeatByMode[modeId] || new Set<string>();
             if (wordIdsToRepeat.size === 0) {
                 ui.showMessage(dom, 'Keine Fehler zum Wiederholen in diesem Modus.', 'info');
                 state.isRepeatSessionActive = false;
@@ -251,16 +309,22 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         state.correctInRound = 0;
         state.attemptedInRound = 0;
 
-        document.querySelectorAll('#mode-button-grid .mode-button').forEach(btn => btn.classList.remove('active', 'repeat-active'));
+        // Button-Styles aktualisieren
+        document.querySelectorAll('#mode-button-grid .mode-button').forEach(btn => {
+            btn.classList.remove('active', 'repeat-active');
+        });
         document.getElementById(`mode-${modeId}`)?.classList.add('active');
-        if (isRepeat) document.getElementById(`mode-repeat-${modeId}`)?.classList.add('repeat-active');
+        if (isRepeat) {
+            document.getElementById(`mode-repeat-${modeId}`)?.classList.add('repeat-active');
+        }
 
         loadNextTask();
     }
 
-    // NEU: Gemeinsame Test-UI Startfunktion
-    function startTestUI(testTitle, modus) {
-        authUI.hide(); // Auth-Button im Trainings-Modus verstecken
+    // --- TEST FUNKTIONEN ---
+
+    function startTestUI(testTitle: string, modus: string): void {
+        authUI.hide();
         ui.hideAllUIs(dom);
         dom.trainerMainViewEl.classList.remove('hidden-view');
         dom.navigationViewEl.classList.add('hidden-view');
@@ -276,117 +340,94 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         loadNextTask();
     }
 
-    // VERBESSERT: Test-Completion mit erweiterten Scores
-    function handleTestCompletion() {
-        const accuracy = state.attemptedInRound > 0 ? (state.correctInRound / state.attemptedInRound) : 0;
-        authUI.show(); // Auth-Button in der Navigation wieder anzeigen
-        
-        if (!state.lastTestScores) state.lastTestScores = {};
-        
+    function handleTestCompletion(): void {
+        const accuracy = state.attemptedInRound > 0 
+            ? state.correctInRound / state.attemptedInRound 
+            : 0;
+
+        console.log('[handleTestCompletion] Test beendet:', {
+            correct: state.correctInRound,
+            total: state.attemptedInRound,
+            accuracy: accuracy,
+            testKey: state.testKey
+        });
+
         // Speichere Test-Ergebnis mit erweitertem Schlüssel
         if (state.testKey) {
-            state.lastTestScores[state.testKey] = { 
-                correct: state.correctInRound, 
-                total: state.attemptedInRound, 
+            state.lastTestScores[state.testKey] = {
+                correct: state.correctInRound,
+                total: state.attemptedInRound,
                 accuracy: accuracy,
                 timestamp: Date.now(),
-                testType: state.testType,
-                topic: state.currentMainTopic,
-                subtopic: state.currentSubTopic
+                testType: state.testType || 'subtopic',
+                topic: state.currentMainTopic || undefined,
+                subtopic: state.currentSubTopic || undefined
             };
+            saveLastTestScores();
         }
-        
-        // Speichere auch den alten Schlüssel für Rückwärtskompatibilität
-        state.lastTestScores[state.currentMode] = { 
-            correct: state.correctInRound, 
-            total: state.attemptedInRound, 
-            accuracy: accuracy 
-        };
-        
-        saveLastTestScores();
-        
-        // Test-spezifische Erfolgsmeldung
-        let testTypeName = "Test";
-        switch(state.testType) {
-            case 'subtopic':
-                testTypeName = `${state.currentSubTopic} Test`;
-                break;
-            case 'mainTopic':
-                testTypeName = `${state.currentMainTopic} Gesamttest`;
-                break;
-            case 'global':
-                testTypeName = 'Globaler Gesamttest';
-                break;
-        }
-        
-        // Deutschland-Farben Feedback basierend auf Accuracy
-        const accuracyPercent = Math.round(accuracy * 100);
-        let feedbackColor = 'info';
-        if (accuracyPercent >= 67) feedbackColor = 'success';
-        else if (accuracyPercent >= 34) feedbackColor = 'info';
-        else feedbackColor = 'error';
-        
-        ui.showMessage(dom, 
-            `${testTypeName} beendet! Ergebnis: ${state.correctInRound} / ${state.attemptedInRound} (${accuracyPercent}%)`, 
-            feedbackColor, 5000);
-        
-        state.isTestModeActive = false;
-        
-        // Zurück zur entsprechenden Ansicht
-        if (state.testType === 'subtopic' && state.currentMainTopic) {
-            // Zurück zur Unterthemen-Ansicht
-            ui.displaySubTopics(dom, state, vokabular, state.currentMainTopic, learningModes); // Verwendet vokabular
-        } else {
-            // Zurück zur Hauptthemen-Ansicht
-            ui.displayMainTopics(dom, state, vokabular, learningModes); // Verwendet vokabular
-        }
+
+        // Nachricht anzeigen
+        const percentage = Math.round(accuracy * 100);
+        ui.showMessage(
+            dom, 
+            `Test abgeschlossen! ${state.correctInRound} von ${state.attemptedInRound} richtig (${percentage}%)`, 
+            accuracy >= 0.8 ? 'success' : 'info'
+        );
+
+        // Zurück-Navigation basierend auf Test-Typ
+        setTimeout(() => {
+            state.isTestModeActive = false;
+            
+            if (state.testType === 'global') {
+                ui.displayMainTopics(dom, state, vokabular, learningModes);
+            } else if (state.testType === 'mainTopic' && state.previousMainTopic) {
+                state.currentMainTopic = state.previousMainTopic;
+                ui.displaySubTopics(dom, state, vokabular, state.previousMainTopic, learningModes);
+            } else {
+                ui.displayMainTopics(dom, state, vokabular, learningModes);
+            }
+            
+            dom.trainerMainViewEl.classList.add('hidden-view');
+            dom.navigationViewEl.classList.remove('hidden-view');
+        }, 3000);
     }
 
-    function erstelleTestAufgaben() {
-        return shuffleArray([...alleVokabeln]).slice(0, 36);
-    }
-
-    // NEU: Hauptthema-Test starten (alle Unterfelder eines Hauptthemas)
-    function starteHauptthemaTest(modus, mainTopicName) {
-        const hauptthema = vokabular[mainTopicName]; // Verwendet vokabular
-        if (!hauptthema) {
-            ui.showMessage(dom, `Hauptthema "${mainTopicName}" nicht gefunden.`, 'error');
+    // Hauptthema-Test Funktion
+    function starteHauptthemaTest(modus: string): void {
+        console.log('[starteHauptthemaTest] Starte Test für Hauptthema:', state.currentMainTopic);
+        
+        if (!state.currentMainTopic) {
+            ui.showMessage(dom, 'Kein Hauptthema ausgewählt!', 'error');
             return;
         }
 
-        // Alle Vokabeln aus allen Unterfeldern sammeln
-        let alleVokabelnImHauptthema = [];
-        Object.values(hauptthema).forEach(subtopic => {
-            if (Array.isArray(subtopic)) {
-                alleVokabelnImHauptthema.push(...subtopic);
-            }
-        });
-
-        if (alleVokabelnImHauptthema.length === 0) {
-            ui.showMessage(dom, `Keine Vokabeln in "${mainTopicName}" gefunden.`, 'error');
+        const hauptthemaVokabeln = vokabular[state.currentMainTopic];
+        if (!hauptthemaVokabeln) {
+            ui.showMessage(dom, 'Keine Vokabeln für dieses Hauptthema gefunden!', 'error');
             return;
         }
 
-        // Zufällige Auswahl: 1-3 Aufgaben pro Unterfeld, maximal 30 insgesamt
-        const maxAufgaben = Math.min(30, alleVokabelnImHauptthema.length);
-        const minAufgabenProUnterfeld = 1;
-        const anzahlUnterfelder = Object.keys(hauptthema).length;
-        const aufgabenProUnterfeld = Math.max(minAufgabenProUnterfeld, Math.floor(maxAufgaben / anzahlUnterfelder));
+        const aufgaben: Word[] = [];
+        const unterthemen = Object.keys(hauptthemaVokabeln);
+        const aufgabenProUnterthema = Math.max(1, Math.min(3, Math.floor(30 / unterthemen.length)));
 
-        let aufgaben = [];
-        Object.values(hauptthema).forEach(subtopic => {
-            if (Array.isArray(subtopic)) {
-                const shuffledSubtopic = shuffleArray([...subtopic]);
-                aufgaben.push(...shuffledSubtopic.slice(0, aufgabenProUnterfeld));
-            }
-        });
+        // Sammle Aufgaben aus jedem Unterthema
+        for (const unterthema of unterthemen) {
+            const unterthemaVokabeln = hauptthemaVokabeln[unterthema];
+            const verfuegbar = unterthemaVokabeln.length;
+            const anzahl = Math.min(aufgabenProUnterthema, verfuegbar);
+            
+            const ausgewaehlt = shuffleArray([...unterthemaVokabeln]).slice(0, anzahl);
+            aufgaben.push(...ausgewaehlt);
+        }
 
-        const finalAufgaben = shuffleArray(aufgaben).slice(0, maxAufgaben);
+        // Finales Shuffle
+        const finalAufgaben = shuffleArray(aufgaben).slice(0, 30);
 
+        // State für Test vorbereiten
         state.isTestModeActive = true;
         state.currentMode = modus;
-        state.currentMainTopic = mainTopicName;
-        state.currentSubTopic = "Gesamttest";
+        state.currentSubTopic = `${state.currentMainTopic} - Gesamttest`;
         state.currentVocabularySet = finalAufgaben;
         state.shuffledVocabForMode = finalAufgaben;
         state.masteredWordsByMode = {};
@@ -395,16 +436,20 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         state.correctInRound = 0;
         state.attemptedInRound = 0;
         state.testType = 'mainTopic';
-        state.testKey = `mainTopic-${mainTopicName}-${modus}`;
+        state.testKey = `mainTopic-${state.currentMainTopic}-${modus}`;
+        state.previousMainTopic = state.currentMainTopic;
 
-        startTestUI(`${mainTopicName} Gesamttest`, modus);
+        startTestUI(`Test: ${state.currentMainTopic}`, modus);
     }
 
-    // VERBESSERT: Globaler Gesamttest (bestehende Funktion erweitert)
-    function starteGesamtTest(modus) {
-        const aufgaben = erstelleTestAufgaben();
-        if (aufgaben.length < 1) {
-            ui.showMessage(dom, 'Fehler: Es konnten nicht genügend Testaufgaben erstellt werden.', 'error');
+    // Globaler Test Funktion
+    function starteGesamtTest(modus: string): void {
+        console.log('[starteGesamtTest] Starte globalen Test für Modus:', modus);
+        
+        const aufgaben = shuffleArray([...alleVokabeln]).slice(0, 36);
+        
+        if (aufgaben.length === 0) {
+            ui.showMessage(dom, 'Keine Vokabeln für den Test gefunden!', 'error');
             return;
         }
 
@@ -427,22 +472,37 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
 
     // --- NAVIGATIONSLOGIK ---
 
-    function startTraining(subTopicName) {
+    function startTraining(subTopicName: string): void {
         state.currentSubTopic = subTopicName;
-        const vocabularySet = vokabular[state.currentMainTopic][subTopicName]; // Verwendet vokabular
+        
+        if (!state.currentMainTopic) {
+            console.error('Kein Hauptthema ausgewählt');
+            return;
+        }
+        
+        const vocabularySet = vokabular[state.currentMainTopic][subTopicName];
         if (!vocabularySet || vocabularySet.length === 0) {
             ui.showMessage(dom, `Keine Vokabeln für "${subTopicName}" gefunden.`, 'info');
             return;
         }
 
-        authUI.hide(); // Auth-Button im Trainings-Modus verstecken
+        authUI.hide();
         ui.hideAllUIs(dom);
         state.isTestModeActive = false;
         state.currentVocabularySet = vocabularySet;
+        
         const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
         const progressForGroup = state.globalProgress[progressKey] || {};
+        
         Object.keys(learningModes).forEach(mode => {
-            state.masteredWordsByMode[mode] = new Set(progressForGroup[mode] || []);
+            const modeProgress = progressForGroup[mode];
+            if (modeProgress instanceof Set) {
+                state.masteredWordsByMode[mode] = new Set(modeProgress);
+            } else if (Array.isArray(modeProgress)) {
+                state.masteredWordsByMode[mode] = new Set(modeProgress);
+            } else {
+                state.masteredWordsByMode[mode] = new Set();
+            }
             state.wordsToRepeatByMode[mode] = new Set();
         });
 
@@ -458,16 +518,23 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         setTimeout(() => setMode('mc-de-en'), 10);
     }
 
-    function handleNavigation(event) {
-        const mainTopicButton = event.target.closest('[data-main-topic]');
-        const subTopicButton = event.target.closest('[data-sub-topic]');
-        const testButton = event.target.closest('#start-test-mode-btn');
+    function handleNavigation(event: Event): void {
+        const target = event.target as HTMLElement;
+        const mainTopicButton = target.closest('[data-main-topic]') as HTMLElement | null;
+        const subTopicButton = target.closest('[data-sub-topic]') as HTMLElement | null;
+        const testButton = target.closest('#start-test-mode-btn') as HTMLElement | null;
 
         if (mainTopicButton) {
-            // authUI.show(); // Veraltet: Wird jetzt durch Events in ui.js gesteuert.
-            ui.displaySubTopics(dom, state, vokabular, mainTopicButton.dataset.mainTopic, learningModes); // Verwendet vokabular
+            const mainTopic = mainTopicButton.dataset.mainTopic;
+            if (mainTopic) {
+                state.currentMainTopic = mainTopic;
+                ui.displaySubTopics(dom, state, vokabular, mainTopic, learningModes);
+            }
         } else if (subTopicButton) {
-            startTraining(subTopicButton.dataset.subTopic);
+            const subTopic = subTopicButton.dataset.subTopic;
+            if (subTopic) {
+                startTraining(subTopic);
+            }
         } else if (testButton) {
             ui.updateTestModeProgressBars(dom, state);
             dom.testSelectionModalEl.classList.remove('hidden-view');
@@ -476,41 +543,48 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
 
     // --- INITIALISIERUNG ---
 
-    function init() {
+    function init(): void {
         loadGlobalProgress();
         loadLastTestScores();
 
-        // Erweiterte Callbacks für die UI-Schicht
-        const callbacks = {
+        // Callbacks für die UI-Schicht
+        const callbacks: UICallbacks = {
             handleNavigation,
-            starteGesamtTest,           // Globaler Test
-            starteHauptthemaTest,       // Hauptthema Test (EINZIGER Test pro Hauptthema)
-            getVokabular: () => vokabular // Verwendet vokabular
+            starteGesamtTest,
+            starteHauptthemaTest,
+            getVokabular: () => vokabular
         };
         
         ui.initEventListeners(dom, state, callbacks, learningModes);
 
-        // Event-Listener, die direkt die Kernlogik triggern.
+        // Event-Listener für Lernmodi
         Object.keys(learningModes).forEach(modeId => {
             const button = document.getElementById(`mode-${modeId}`);
             const repeatButton = document.getElementById(`mode-repeat-${modeId}`);
-            if (button) button.addEventListener('click', () => setMode(modeId, false));
-            if (repeatButton) repeatButton.addEventListener('click', () => setMode(modeId, true));
+            
+            if (button) {
+                button.addEventListener('click', () => setMode(modeId, false));
+            }
+            if (repeatButton) {
+                repeatButton.addEventListener('click', () => setMode(modeId, true));
+            }
         });
+        
         dom.continueButton.addEventListener('click', loadNextTask);
 
-        // Startansicht anzeigen.
-        authUI.show(); // Auth-Button in der Navigation anzeigen
-        ui.displayMainTopics(dom, state, vokabular, learningModes); // Verwendet vokabular
+        // Startansicht anzeigen
+        authUI.show();
+        ui.displayMainTopics(dom, state, vokabular, learningModes);
     }
     
-    // NEU: Firebase Sync-Listener für Updates von anderen Geräten.
-    syncService.onSyncUpdate((type, data) => {
+    // Firebase Sync-Listener für Updates von anderen Geräten
+    syncService.onSyncUpdate((type: string, data: any) => {
         if (type === 'remoteUpdate' && data) {
-            console.log('📥 Fortschritt von anderem Gerät erhalten.');
+            console.log('📥 Fortschritt von anderem Gerät erhalten');
             
             // Daten von Firebase (Arrays) wieder in Sets umwandeln
-            const convertedProgress = {};
+            const convertedProgress: typeof state.globalProgress = {};
+            
             for (const progressKey in data) {
                 convertedProgress[progressKey] = {};
                 for (const mode in data[progressKey]) {
@@ -519,11 +593,13 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
                     }
                 }
             }
+            
             state.globalProgress = convertedProgress;
-            ui.displayMainTopics(dom, state, vokabular, learningModes); // UI mit dem neuen Fortschritt aktualisieren
+            ui.displayMainTopics(dom, state, vokabular, learningModes);
             ui.showMessage(dom, 'Fortschritt synchronisiert!', 'success');
         }
     });
     
-    init(); // Aufruf der init-funktion
+    // Starte die Anwendung
+    init();
 });
