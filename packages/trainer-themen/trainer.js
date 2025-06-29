@@ -3,7 +3,7 @@
 // GEÄNDERT: 'vokabular' wird aus der neuen, thematischen Datei importiert.
 import { vokabular } from './vokabular';
 import { vergleicheAntwort, shuffleArray, speak, setUIMode, calculateProgressPercentage, getProgressColorClass, insertTextAtCursor } from '../../shared/helfer';
-import * as uiModes from '../../shared/ui-modes';
+import * as uiModes from '../../shared/ui-modes.old';
 // Firebase Auth/Sync Import
 import { initializeAuth } from '../../shared/auth/index';
 
