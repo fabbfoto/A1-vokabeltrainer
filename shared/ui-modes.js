@@ -1,6 +1,6 @@
 // ui-modes.js - Bugfix für den deaktivierten "Auswerten"-Button
 
-import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence, formatGermanNoun, displayFormattedSentence } from './helfer';
+import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence, formatGermanNoun, displayFormattedSentence } from './utils/helfer';
 
 export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
     dom.mcUiEl.style.display = 'block';
