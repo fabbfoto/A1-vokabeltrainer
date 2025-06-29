@@ -104,7 +104,7 @@ interface TrainerState {
 - **`goetheA1Progress`**: Lernfortschritt pro Thema/Modus
 - **`goetheA1LastTestScores`**: Test-Ergebnisse mit Zeitstempel
 
-## 🚀 TypeScript Migration Status
+## 🚀 TypeScript Migration Status (Stand: 29.06.2025)
 
 ### ✅ Bereits konvertiert
 - TypeScript Setup komplett (tsconfig.json)
@@ -113,11 +113,14 @@ interface TrainerState {
 - dom.js → dom.ts
 - shared/utils/helfer.js → helfer.ts
 - ui.js aufgeteilt in 5 TypeScript Module
+- **NEU: Vite 4.5.14 erfolgreich eingerichtet** ✅
+- **NEU: Alle .js Import-Extensions entfernt** ✅
+- **NEU: splitSentence Funktion zu helfer.ts hinzugefügt** ✅
 
 ### 🚧 In Arbeit
-- Build-System (Vite/Webpack)
-- Import-Pfade klären
-- Vokabular-Dateien (niedrige Priorität)
+- **AKTUELLES PROBLEM: Trainer startet nicht - keine Themen werden angezeigt**
+- UI-Initialisierung debuggen
+- Module-Loading überprüfen
 
 ### ❌ Noch zu erledigen
 - Testing Setup (Jest/Vitest)
@@ -143,6 +146,43 @@ interface TrainerState {
 - Separate Wiederholungs-Sessions pro Lernmodus
 - Error-Counter auf Wiederholungs-Buttons
 
+## 🔧 Aktueller Status (29.06.2025)
+
+### Was wir heute erreicht haben
+1. **Vite erfolgreich eingerichtet** ✅
+   - Vite 4.5.14 läuft auf Port 5173
+   - Hot Module Replacement funktioniert
+   - TypeScript wird on-the-fly kompiliert
+
+2. **Import-Probleme gelöst** ✅
+   - Alle .js Extensions aus Imports entfernt
+   - splitSentence Funktion zu helfer.ts hinzugefügt
+   - Module Resolution funktioniert
+
+3. **Development Setup** ✅
+   - npm run dev startet Vite
+   - Keine Build-Fehler mehr
+   - Firebase-Warnungen sind harmlos
+
+### Aktuelles Problem 🚨
+**Der Trainer startet, aber zeigt keine Themen an:**
+- Seite lädt mit "Themen" Überschrift
+- Footer wird angezeigt
+- Aber: Keine Themen-Buttons sichtbar
+- Vermutung: UI-Initialisierung oder Module-Loading Problem
+
+### Nächste Schritte zur Lösung
+1. Browser-Konsole auf Fehler prüfen
+2. Debuggen ob trainer.ts überhaupt ausgeführt wird
+3. DOMContentLoaded Event überprüfen
+4. Module-Loading im Network-Tab checken
+
+### Unser Ziel 🎯
+- Vokabeltrainer soll vollständig funktionieren
+- Alle Themen und Navigation sichtbar
+- TypeScript-Migration abschließen
+- Moderne Development-Experience mit Vite
+
 ## 🔧 Technische Details
 
 ### Test-Navigation (Zurück-Button Fix)
@@ -167,27 +207,53 @@ if (state.isTestModeActive) {
 
 ## 📅 Nächste Schritte
 
-### Priorität 1 (Diese Woche)
-1. TypeScript Migration fortsetzen
-2. Build-System einrichten
-3. Erste Tests schreiben
+### Priorität 1 - JETZT (Debug-Phase)
+1. **Trainer zum Laufen bringen**
+   - Console-Fehler analysieren
+   - Module-Loading debuggen
+   - UI-Initialisierung fixen
 
-### Priorität 2 (Nächste 2 Wochen)
-1. Error Handling System
-2. State Management
-3. Test Coverage >50%
+### Priorität 2 (Nach dem Fix)
+1. **Funktionalität testen**
+   - Alle Lernmodi durchgehen
+   - Navigation überprüfen
+   - LocalStorage Persistenz testen
 
-### Priorität 3 (Nächster Monat)
-1. API Layer
-2. Monitoring Setup
-3. Performance Optimierung
+### Priorität 3 (Diese Woche)
+1. **TypeScript Migration abschließen**
+   - Restliche .js Dateien konvertieren
+   - Type-Safety überall gewährleisten
+2. **Build-Optimierung**
+   - Production Build testen
+   - Bundle-Size optimieren
+
+### Langfristig (Nächster Monat)
+1. **Testing einführen**
+2. **Error Handling verbessern**
+3. **State Management modernisieren**
+4. **CI/CD Pipeline aufsetzen**
 
 ## 📚 Für Entwickler
 
-**Wichtige Hinweise:**
-- **IMMER zuerst ins Projekt schauen** bevor Änderungen vorgeschlagen werden
-- Der komplette Code ist im Repository verfügbar
-- Diese Dokumentation ist die zentrale Referenz
-- Bei Unklarheiten: Code > Dokumentation
+**Wichtige Befehle:**
+```bash
+# Development Server starten
+npm run dev
 
-**Der Themen-Trainer ist auf dem Weg von einem funktionierenden Prototyp zu einer professionellen Enterprise-Anwendung.** 🎓
+# TypeScript kompilieren
+npx tsc
+
+# Production Build
+npm run build
+
+# Projekt-Struktur anzeigen
+ls -la
+```
+
+**Debug-Tipps:**
+- Browser-Konsole (F12) für Fehler checken
+- Network Tab für 404 Fehler
+- Vite zeigt Fehler direkt im Browser an
+- Source Maps ermöglichen TypeScript-Debugging
+
+**WICHTIG:** Der Trainer ist fast fertig migriert! Nur noch das Startup-Problem lösen, dann läuft alles mit moderner TypeScript/Vite Entwicklungsumgebung. 🚀
