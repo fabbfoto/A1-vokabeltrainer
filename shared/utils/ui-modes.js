@@ -1,7 +1,6 @@
 // ui-modes.js - Bugfix für den deaktivierten "Auswerten"-Button
 
-import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence } from './helfer.js';
-
+import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence } from './helfer';
 export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
     dom.mcUiEl.style.display = 'block';
     if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'none'; // Umlaut-Buttons ausblenden
