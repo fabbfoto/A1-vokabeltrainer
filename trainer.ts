@@ -71,7 +71,7 @@ import { vokabular } from './vokabular.js';
 
 // Import der Helfer- und UI-Funktionen
 import { shuffleArray, speak, vergleicheAntwort } from './shared/utils/helfer.js';
-import * as uiModes from './shared/utils/ui-modes.js';
+import * as uiModes from './shared/ui-modes.js';
 import { dom } from './dom.js';
 import * as ui from './ui/index.js';
 

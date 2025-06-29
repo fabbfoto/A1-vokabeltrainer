@@ -8,7 +8,7 @@ import { vokabular } from './vokabular';
 
 // Import der Helfer- und UI-Funktionen aus dem geteilten Ordner
 import { shuffleArray, speak, vergleicheAntwort } from './shared/utils/helfer';
-import * as uiModes from './shared/utils/ui-modes';
+import * as uiModes from './shared/ui-modes.js';
 import { dom } from './dom';
 import * as ui from './ui';
 // Import der neuen, geteilten Auth- und Sync-Funktion
