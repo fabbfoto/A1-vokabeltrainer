@@ -46,13 +46,11 @@ export {
 } from './umlaut-buttons';
 
 // Combined init function for all UI event listeners
-export function initEventListeners(dom: any, state: any, callbacks: any, learningModes: any): void {
-    // Import die einzelnen Init-Funktionen
-    import('./navigation').then(({ initNavigationListeners }) => {
-        initNavigationListeners(dom, state, callbacks, learningModes);
-    });
+export async function initEventListeners(dom: any, state: any, callbacks: any, learningModes: any): Promise<void> {
+    // Import die einzelnen Init-Funktionen und warte auf deren Abschluss
+    const navigationModule = await import('./navigation');
+    navigationModule.initNavigationListeners(dom, state, callbacks, learningModes);
     
-    import('./test-modal').then(({ initTestModalListeners }) => {
-        initTestModalListeners(dom, state, callbacks, learningModes);
-    });
+    const testModalModule = await import('./test-modal');
+    testModalModule.initTestModalListeners(dom, state, callbacks, learningModes);
 }

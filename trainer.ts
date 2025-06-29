@@ -2,36 +2,97 @@
 // Steuerungslogik für den Themen-Trainer mit vollständiger Type-Safety
 // Diese Datei orchestriert den Anwendungszustand (State) und die UI-Interaktionen
 
-// Type imports - jetzt zentral und konsistent
-import type {
-    Word,
-    TrainerState,
-    LearningModes,
-    VocabularyStructure,
-    ProcessAnswerFunction,
-    UICallbacks,
-    AuthUI,
-    InitializeAuthResult
-} from './shared/types/index';
+// Type imports
+
+// Lokale Type-Definitionen (temporär bis Import-Problem gelöst ist)
+interface Word {
+  id: string;
+  german: string;
+  english: string;
+  artikel?: string;
+  plural?: string;
+  [key: string]: any;
+}
+
+interface AuthUI {
+  show: () => void;
+  hide: () => void;
+  [key: string]: any;
+}
+
+interface InitializeAuthResult {
+  authService: any;
+  authUI: AuthUI;
+  syncService: any;
+}
+
+interface UICallbacks {
+  handleNavigation: (event: Event) => void;
+  starteGesamtTest: (modus: string) => void;
+  starteHauptthemaTest: (modus: string) => void;
+  getVokabular: () => VocabularyStructure;
+}
+
+interface TrainerState {
+  currentMainTopic: string | null;
+  currentSubTopic: string | null;
+  previousMainTopic: string | null;
+  previousSubTopic: string | null;
+  currentVocabularySet: Word[];
+  shuffledVocabForMode: Word[];
+  currentWordIndexInShuffled: number;
+  currentWordData: Word | null;
+  currentMode: string | null;
+  isTestModeActive: boolean;
+  isRepeatSessionActive: boolean;
+  testType: 'subtopic' | 'mainTopic' | 'global' | null;
+  testKey: string | null;
+  correctInRound: number;
+  attemptedInRound: number;
+  globalProgress: any;
+  masteredWordsByMode: Record<string, Set<string>>;
+  wordsToRepeatByMode: Record<string, Set<string>>;
+  lastTestScores: any;
+  activeTextInput: HTMLInputElement | null;
+}
+
+interface LearningModes {
+  [key: string]: { name: string; setupFunc: () => void; }
+}
+
+interface VocabularyStructure {
+  [key: string]: { [key: string]: Word[] }
+}
+
+type ProcessAnswerFunction = (isCorrect: boolean, correctAnswer: string) => void;
 
 // Import des kombinierten Vokabulars
-import { vokabular } from './vokabular';
+import { vokabular } from './vokabular.js';
 
 // Import der Helfer- und UI-Funktionen
-import { shuffleArray } from './shared/utils/helfer';
-import * as uiModes from './shared/utils/ui-modes';
-import { dom } from './dom';
-import * as ui from './ui/index';
+import { shuffleArray, speak, vergleicheAntwort } from './shared/utils/helfer.js';
+import * as uiModes from './shared/utils/ui-modes.js';
+import { dom } from './dom.js';
+import * as ui from './ui/index.js';
 
 // Import der Auth- und Sync-Funktionen
-import { initializeAuth } from './shared/auth/index';
-import { NavigationEvents } from './shared/events/navigation-events';
+import { initializeAuth } from './shared/auth/index.js';
+import { NavigationEvents } from './shared/events/navigation-events.js';
+
+// Direkt nach dem Import
+console.log('📚 Vokabular importiert:', vokabular);
+console.log('📚 Anzahl Hauptthemen:', Object.keys(vokabular).length);
 
 // Globale AuthUI Referenz
 let globalAuthUI: AuthUI | null = null;
 
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
+    console.log('🚀 DOMContentLoaded Event gefeuert');
+
     // Firebase Auth und Sync initialisieren
+    console.log('📱 Initialisiere Firebase...');
+    // Temporär auskommentieren
+    /*
     const { authService, authUI, syncService }: InitializeAuthResult = initializeAuth('themen', {
         buttonContainerId: 'auth-button-container',
         hideOnNavigation: true,
@@ -40,6 +101,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             loggedOut: 'w-full rounded-lg py-3 font-semibold transition-colors duration-200'
         }
     });
+    */
+    const authService = { isLoggedIn: () => false };
+    const authUI = { show: () => {}, hide: () => {} };
+    const syncService = { onSyncUpdate: () => {} };
 
     // Initial auf Root-Seite
     NavigationEvents.dispatchRoot();
@@ -542,9 +607,13 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // --- INITIALISIERUNG ---
 
-    function init(): void {
+    async function init(): Promise<void> {
+        console.log('🔧 init() startet...');
+
         loadGlobalProgress();
         loadLastTestScores();
+
+        console.log('📊 Progress geladen');
 
         // Callbacks für die UI-Schicht
         const callbacks: UICallbacks = {
@@ -554,7 +623,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             getVokabular: () => vokabular
         };
         
-        ui.initEventListeners(dom, state, callbacks, learningModes);
+        await ui.initEventListeners(dom, state, callbacks, learningModes);
 
         // Event-Listener für Lernmodi
         Object.keys(learningModes).forEach(modeId => {
@@ -573,7 +642,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
         // Startansicht anzeigen
         authUI.show();
+
+        // Vor displayMainTopics
+        console.log('🎨 Rufe displayMainTopics auf...');
+        console.log('📦 vokabular Objekt:', vokabular);
+        console.log('🎮 learningModes:', learningModes);
+
         ui.displayMainTopics(dom, state, vokabular, learningModes);
+        console.log('✨ displayMainTopics wurde aufgerufen');
     }
     
     // Firebase Sync-Listener für Updates von anderen Geräten
@@ -599,6 +675,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     });
     
+    console.log('🎯 init() Funktion definiert, rufe sie jetzt auf...');
+
     // Starte die Anwendung
-    init();
+    await init();
+
+    console.log('✅ init() wurde ausgeführt');
 });

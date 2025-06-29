@@ -176,8 +176,3 @@ export function splitSentence(sentence: string): string[] {
     if (typeof sentence !== 'string') return [];
     return sentence.match(/\S+/g) || [];
 }
-// Zerlegt einen Satz in ein Array von Wörtern
-export function splitSentence(sentence: string): string[] {
-    if (typeof sentence !== 'string') return [];
-    return sentence.match(/\S+/g) || [];
-}
