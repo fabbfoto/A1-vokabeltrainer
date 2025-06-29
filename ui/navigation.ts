@@ -104,7 +104,7 @@ export function displaySubTopics(
     mainTopicName: string,
     learningModes: LearningModes
 ): void {
-    NavigationEvents.dispatchSubtopic();
+    NavigationEvents.dispatchSub();
     
     state.currentMainTopic = mainTopicName;
     dom.navigationViewEl.classList.remove('hidden-view');

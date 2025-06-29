@@ -640,6 +640,18 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         
         dom.continueButton.addEventListener('click', loadNextTask);
 
+        // Zurück zur Unterthemen-Übersicht
+        dom.backToSubtopicsButton.addEventListener('click', () => {
+            if (state.currentMainTopic && state.currentMainTopic !== "Gesamttest") {
+                ui.displaySubTopics(dom, state, vokabular, state.currentMainTopic, learningModes);
+            } else {
+                ui.displayMainTopics(dom, state, vokabular, learningModes);
+            }
+            dom.navigationViewEl.classList.remove('hidden-view');
+            dom.trainerMainViewEl.classList.add('hidden-view');
+        });
+
+
         // Startansicht anzeigen
         authUI.show();
 
