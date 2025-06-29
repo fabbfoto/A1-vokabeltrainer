@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         },
         'type-de-adj': { 
             name: "Schreibweise", 
-            setupFunc: () => uiModes.setupSpellingMode(dom, state, processAnswer) 
+            setupFunc: () => uiModes.setupTypeDeAdjMode(dom, state, alleVokabeln, processAnswer) 
         },
         'cloze-adj-de': { 
             name: "Lückentext", 
