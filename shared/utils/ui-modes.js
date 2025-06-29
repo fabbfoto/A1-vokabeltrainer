@@ -60,76 +60,101 @@ export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
     });
 }
 
-export function setupSpellingMode(dom, state, processAnswer) {
-    // ===== KORREKTUR =====
-    dom.checkSpellingButton.disabled = false ;
-
-    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
+export function setupTypeDeAdjMode(dom, state, processAnswer) {
     dom.spellingModeUiEl.style.display = 'block';
-    dom.questionDisplayEl.textContent = (state.currentWordData.english || "").split(',')[0].trim();
-    dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_en || "";
+    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
+    dom.checkSpellingButton.disabled = false; // ===== KORREKTUR =====
+    dom.questionDisplayEl.textContent = state.currentWordData.english;
+    dom.exampleSentenceDisplayEl.textContent = '';
     dom.wordLineContainerEl.style.display = 'flex';
-    dom.sentenceLineContainerEl.style.display = 'flex';
-    const resetInputStyles = (...inputs) => { inputs.forEach(input => { if(input) input.classList.remove('correct-user-input', 'incorrect-user-input'); }); };
-    resetInputStyles(dom.spellingInputSingleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El);
-    const isNounWithPlural = state.currentWordData && typeof state.currentWordData.plural !== 'undefined';
-    if (isNounWithPlural) {
-        dom.nounInputContainerEl.classList.remove('hidden');
-        dom.singleInputContainerEl.classList.add('hidden');
-        const inputs = [dom.spellingInputNoun1El, dom.spellingInputNoun2El];
-        inputs.forEach(input => { 
-            input.value = ''; 
-            input.disabled = false; 
-            input.addEventListener('focus', () => state.activeTextInput = input);
-        });
-        const handleEnter = (event) => { if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) { event.preventDefault(); dom.checkSpellingButton.click(); } };
-        inputs.forEach(input => { input.addEventListener('keydown', handleEnter); });
-        dom.checkSpellingButton.onclick = () => {
-            const correctAnswerSingular = `${state.currentWordData.artikel} ${state.currentWordData.german}`;
-            const correctAnswerPluralWord = state.currentWordData.plural;
-            const userInputSingular = dom.spellingInputNoun1El.value;
-            const userInputPlural = dom.spellingInputNoun2El.value;
-            const isSingularCorrect = vergleicheAntwort(userInputSingular, correctAnswerSingular);
-            const isPluralCorrect = vergleicheAntwort(userInputPlural, correctAnswerPluralWord);
-            dom.spellingInputNoun1El.classList.add(isSingularCorrect ? 'correct-user-input' : 'incorrect-user-input' );
-            dom.spellingInputNoun2El.classList.add(isPluralCorrect ? 'correct-user-input' : 'incorrect-user-input');
-            const isOverallCorrect = isSingularCorrect && isPluralCorrect ;
-            const combinedCorrectAnswer = `${correctAnswerSingular} / ${correctAnswerPluralWord}`;
-            processAnswer(isOverallCorrect, combinedCorrectAnswer);
-            inputs.forEach(input => input.disabled = true);
-        };
+    dom.sentenceLineContainerEl.style.display = 'none';
+    
+    // Reset input visibility
+    dom.singleInputContainerEl.style.display = 'none';
+    dom.nounInputContainerEl.style.display = 'none';
+    dom.spellingInputSingleEl.value = '';
+    dom.spellingInputNoun1El.value = '';
+    dom.spellingInputNoun2El.value = '';
+    
+    let correctAnswer = "";
+    
+    // Prüfe auf nomen_notation
+    if (state.currentWordData.nomen_notation && typeof parseNounString === 'function') {
+        dom.nounInputContainerEl.style.display = 'flex';
+        const parsed = parseNounString(state.currentWordData.nomen_notation);
+        if (parsed) {
+            if (parsed.isPluralOnly) {
+                correctAnswer = `die ${parsed.singular}`;
+            } else {
+                const genus = { 'r': 'der', 'e': 'die', 's': 'das' }[parsed.genus] || parsed.genus;
+                correctAnswer = `${genus} ${parsed.singular}`;
+            }
+        } else {
+            correctAnswer = state.currentWordData.german;
+        }
+    } else {
+        // Für andere Wortarten oder wenn parseNounString nicht verfügbar ist
+        dom.singleInputContainerEl.style.display = 'block';
+        correctAnswer = state.currentWordData.german;
+    }
+    
+    const handleCheckAnswer = () => {
+        let userAnswer = "";
+        if (dom.nounInputContainerEl.style.display === 'flex') {
+            const artikel = dom.spellingInputNoun1El.value.trim();
+            const nomen = dom.spellingInputNoun2El.value.trim();
+            userAnswer = artikel && nomen ? `${artikel} ${nomen}` : "";
+        } else {
+            userAnswer = dom.spellingInputSingleEl.value.trim();
+        }
+        
+        const isCorrect = vergleicheAntwort(userAnswer, correctAnswer);
+        processAnswer(isCorrect, correctAnswer);
+        
+        // Deaktiviere Eingabefelder nach Überprüfung
+        dom.spellingInputSingleEl.disabled = true;
+        dom.spellingInputNoun1El.disabled = true;
+        dom.spellingInputNoun2El.disabled = true;
+        dom.checkSpellingButton.disabled = true;
+    };
+    
+    dom.checkSpellingButton.onclick = handleCheckAnswer;
+    
+    const handleEnter = (event) => {
+        if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) {
+            event.preventDefault();
+            dom.checkSpellingButton.click();
+        }
+    };
+    
+    // Event-Listener und Fokus setzen
+    if (dom.nounInputContainerEl.style.display === 'flex') {
+        dom.spellingInputNoun1El.addEventListener('keydown', handleEnter);
+        dom.spellingInputNoun2El.addEventListener('keydown', handleEnter);
+        dom.spellingInputNoun1El.addEventListener('focus', () => state.activeTextInput = dom.spellingInputNoun1El);
+        dom.spellingInputNoun2El.addEventListener('focus', () => state.activeTextInput = dom.spellingInputNoun2El);
+        
         setTimeout(() => {
             dom.spellingInputNoun1El.focus();
             state.activeTextInput = dom.spellingInputNoun1El;
         }, 100);
     } else {
-        dom.singleInputContainerEl.classList.remove('hidden');
-        dom.nounInputContainerEl.classList.add('hidden');
-        const input = dom.spellingInputSingleEl;
-        input.value = ''; input.disabled = false ;
-        input.addEventListener('focus', () => state.activeTextInput = input);
-
-        dom.checkSpellingButton.onclick = () => {
-            const correctAnswer = state.currentWordData.german;
-            const isCorrect = vergleicheAntwort(input.value, correctAnswer);
-            input.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
-            processAnswer(isCorrect, correctAnswer);
-            input.disabled = true;
-        };
-        input.onkeydown = (event) => { if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) { event.preventDefault(); dom.checkSpellingButton.click(); } };
+        dom.spellingInputSingleEl.addEventListener('keydown', handleEnter);
+        dom.spellingInputSingleEl.addEventListener('focus', () => state.activeTextInput = dom.spellingInputSingleEl);
+        
         setTimeout(() => {
-            input.focus();
-            state.activeTextInput = input;
+            dom.spellingInputSingleEl.focus();
+            state.activeTextInput = dom.spellingInputSingleEl;
         }, 100);
     }
 }
 
 export function setupClozeAdjDeMode(dom, state, processAnswer) {
-    // ===== KORREKTUR =====
-    dom.checkClozeButton.disabled = false ;
-
+    dom.checkClozeButton.disabled = false; // ===== KORREKTUR =====
     if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
     dom.clozeUiEl.style.display = 'block';
+    dom.questionDisplayEl.textContent = '';
+    dom.exampleSentenceDisplayEl.textContent = '';
     dom.wordLineContainerEl.style.display = 'none';
     dom.sentenceLineContainerEl.style.display = 'none';
     const { cloze_parts, cloze_answers, english } = state.currentWordData;
