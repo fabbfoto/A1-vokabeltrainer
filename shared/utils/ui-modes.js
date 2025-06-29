@@ -257,3 +257,9 @@ export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
         }, 100);
     }
 }
+// Am Ende der Datei shared/utils/ui-modes.js, füge diese Zeile hinzu:
+
+// Alias für Rückwärtskompatibilität
+export const setupSpellingMode = setupTypeDeAdjMode;
+export const setupClozeMode = setupClozeAdjDeMode;
+export const setupSentenceTranslationMode = setupSentenceTranslationEnDeMode;
