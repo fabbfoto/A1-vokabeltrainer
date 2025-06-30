@@ -1,5 +1,6 @@
 // ui/navigation.ts
 // Navigation und Themen-Anzeige Funktionen
+// 🔧 KORRIGIERT: Einheitliche Button-Höhen für perfektes Grid-Layout
 
 import { NavigationEvents } from '../shared/events/navigation-events.js';
 import { createTopicButton, createActionButton } from '../shared/styles/button-factory.js';
@@ -11,7 +12,7 @@ type VocabularyStructure = any;
 type LearningModes = any;
 type UICallbacks = any;
 
-// Hilfsfunktionen (später in statistics.ts verschieben)
+// Hilfsfunktionen (bereits in shared/utils/helfer.ts, aber hier für Konsistenz)
 function calculateProgressPercentage(completed: number, total: number): number {
     if (total === 0) return 0;
     return Math.round((completed / total) * 100);
@@ -21,7 +22,7 @@ function calculateProgressPercentage(completed: number, total: number): number {
 function getProgressColorClass(completed: number, total: number): string {
     const percentage = calculateProgressPercentage(completed, total);
 
-    // Original CSS Farben
+    // Deutschland-Farben aus Tailwind Config
     if (percentage < 34) {
         return 'bg-de-black';
     } else if (percentage < 67) {
@@ -31,8 +32,20 @@ function getProgressColorClass(completed: number, total: number): string {
     }
 }
 
+// 🎯 GRID-OPTIMIERUNG: Stelle sicher, dass alle Buttons perfekt aligned sind
+function optimizeSubTopicGrid(container: HTMLElement): void {
+    const buttons = container.querySelectorAll('button');
+    buttons.forEach(button => {
+        // Falls ein Button nicht die richtigen Klassen hat, korrigiere ihn
+        if (!button.className.includes('min-h-[90px]')) {
+            button.classList.add('min-h-[90px]', 'max-h-[110px]');
+        }
+    });
+}
+
 /**
- * Zeigt die Hauptthemen-Übersicht an.
+ * 🔧 KORRIGIERTE displayMainTopics Funktion 
+ * Zeigt die Hauptthemen-Übersicht an mit einheitlichen Button-Höhen
  */
 export function displayMainTopics(
     dom: DOMElements,
@@ -50,15 +63,13 @@ export function displayMainTopics(
     dom.backToMainTopicsButton.classList.add('hidden');
     dom.navigationContainerEl.innerHTML = '';
     
-    // Grid-Layout für 3 Spalten
-    dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
+    // ✅ Grid-Layout für 3 Spalten mit auto-rows-max
+    dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max';
     
     const numberOfModes = Object.keys(learningModes).length;
     
-    // Hauptthemen erstellen - ORIGINAL WORTGRUPPE-BUTTON STYLE
+    // ✅ HAUPTTHEMEN BUTTONS - alle einheitliche Höhe
     Object.keys(vokabular).forEach(mainTopicName => {
-        
-        // Berechne Fortschritt
         let totalWords = 0;
         let totalMastered = 0;
         
@@ -77,22 +88,22 @@ export function displayMainTopics(
         const percentage = calculateProgressPercentage(totalMastered, totalWords);
         const progressColorClass = getProgressColorClass(totalMastered, totalWords);
         
-        // Button wird jetzt durch die zentrale Funktion erstellt
+        // ✅ Button wird durch die zentrale Funktion erstellt
         const button = createTopicButton(mainTopicName, percentage, progressColorClass);
-
         button.dataset.mainTopic = mainTopicName;
         dom.navigationContainerEl.appendChild(button);
     });
     
-    // Globaler Test Button - Original Style
+    // ✅ ACTION BUTTONS - alle mit col-span-full und einheitlicher Höhe
     const globalTestButton = createActionButton('global-test', 'Globaler Test');
+    globalTestButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2');
     dom.navigationContainerEl.appendChild(globalTestButton);
     
-    // Geräte verbinden Button
     const syncButton = createActionButton('sync', 'Geräte verbinden');
+    syncButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2');
     dom.navigationContainerEl.appendChild(syncButton);
 
-    // Copyright nur auf Hauptseite anzeigen
+    // ✅ COPYRIGHT FOOTER
     const existingFooter = dom.navigationViewEl.querySelector('.copyright-footer');
     if (existingFooter) {
         existingFooter.remove();
@@ -105,11 +116,17 @@ export function displayMainTopics(
         <p class="mt-1">Nur für Bildungszwecke · v2.0</p>
     `;
     dom.navigationContainerEl.parentElement.appendChild(footerDiv);
+    
+    console.log(`✅ Hauptthemen-Grid optimiert:`, {
+        topics: Object.keys(vokabular).length,
+        totalButtons: Object.keys(vokabular).length + 2, // +2 für Test/Sync Buttons
+        gridLayout: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+    });
 }
 
 /**
- * Zeigt die Unterthemen eines Hauptthemas an.
- * KORRIGIERT: Verwendet jetzt das gleiche 3-Spalten-Layout wie die Hauptthemen
+ * 🔧 KORRIGIERTE displaySubTopics Funktion 
+ * Zeigt die Unterthemen eines Hauptthemas an mit einheitlichen Button-Höhen
  */
 export function displaySubTopics(
     dom: DOMElements,
@@ -127,11 +144,13 @@ export function displaySubTopics(
     dom.backToMainTopicsButton.classList.remove('hidden');
     dom.navigationContainerEl.innerHTML = '';
 
-    dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
+    // 🔧 WICHTIG: Grid-Layout mit expliziter Höhenangabe
+    dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max';
 
     const subTopics = Object.keys(vokabular[mainTopicName]);
     const numberOfModes = Object.keys(learningModes).length;
 
+    // 📋 SUBTOPIC BUTTONS - alle bekommen einheitliche Höhe von createTopicButton
     subTopics.forEach(subTopicName => {
         const words = vokabular[mainTopicName][subTopicName];
         const totalPossibleTasks = words.length * numberOfModes;
@@ -146,7 +165,7 @@ export function displaySubTopics(
         const percentage = calculateProgressPercentage(completedTasks, totalPossibleTasks);
         const progressColorClass = getProgressColorClass(completedTasks, totalPossibleTasks);
 
-        // Button wird jetzt durch die zentrale Funktion erstellt
+        // ✅ Button wird durch die zentrale Funktion erstellt (einheitliche Höhe!)
         const buttonText = subTopicName.replace(/\//g, '/<br>');
         const button = createTopicButton(buttonText, percentage, progressColorClass);
         
@@ -162,10 +181,23 @@ export function displaySubTopics(
         dom.navigationContainerEl.appendChild(button);
     });
 
-    // Hauptthema-Test Button - überspannt alle 3 Spalten
+    // 🎯 HAUPTTHEMA-TEST BUTTON - überspannt alle 3 Spalten mit GLEICHER HÖHE
     const mainTopicTestButton = createActionButton('main-topic-test', `${mainTopicName} Gesamttest`, '(Alle Unterthemen)');
     mainTopicTestButton.dataset.testMainTopicOnly = mainTopicName;
+    
+    // 🔧 WICHTIG: col-span-full für vollbreite über alle Spalten
+    mainTopicTestButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2');
+    
     dom.navigationContainerEl.appendChild(mainTopicTestButton);
+
+    // 🎯 GRID-OPTIMIERUNG: Stelle sicher, dass alle Buttons perfekt aligned sind
+    optimizeSubTopicGrid(dom.navigationContainerEl);
+    
+    console.log(`✅ Unterthemen-Grid für "${mainTopicName}" optimiert:`, {
+        subtopics: subTopics.length,
+        totalButtons: subTopics.length + 1, // +1 für Test-Button
+        gridLayout: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+    });
 }
 
 /**
