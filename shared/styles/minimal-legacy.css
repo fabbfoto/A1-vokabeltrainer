@@ -1,4 +1,6 @@
-/* Nur noch benötigte Legacy-Regeln */
-.hidden-view { 
-    display: none !important; 
-}
+/* NUR Kasus-Highlighting (fachspezifisch - NICHT ersetzbar) */
+.kasus-nominativ { background-color: #fef3c7; }
+.kasus-akkusativ { background-color: #fecaca; }
+.kasus-dativ { background-color: #bbf7d0; }
+.kasus-genitiv { background-color: #e0e7ff; }
+.kasus-verb { background-color: #f3e8ff; }

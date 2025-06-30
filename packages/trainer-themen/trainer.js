@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let barColor = '#374151'; 
                 if (percentage > 66) { barColor = '#d69e2e'; } else if (percentage > 33) { barColor = '#ef4444'; }
                 progressBar.style.width = `${percentage}%`;
-                progressBar.style.backgroundColor = barColor;
+                progressBar.className = `h-full transition-all duration-500 ${colorClass}`;
             } else if (progressBar) {
                 progressBar.style.width = '0%';
                 progressBar.style.backgroundColor = '#374151';
@@ -381,8 +381,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // =========================================================================
     
     function displayMainTopics() {
-        navigationViewEl.classList.remove('hidden-view');
-        trainerMainViewEl.classList.add('hidden-view');
+        navigationViewEl.classList.remove('hidden');
+        trainerMainViewEl.classList.add('hidden');
         navigationTitleEl.textContent = 'Themenübersicht';
         backToMainTopicsButton.classList.add('hidden');
         navigationContainerEl.innerHTML = '';
@@ -432,8 +432,8 @@ document.addEventListener('DOMContentLoaded', () => {
         testStatsViewEl.classList.add('hidden');
         modeButtonGridEl.classList.remove('hidden');
         currentTrainingTitleEl.textContent = subTopicName;
-        navigationViewEl.classList.add('hidden-view');
-        trainerMainViewEl.classList.remove('hidden-view');
+        navigationViewEl.classList.add('hidden');
+        trainerMainViewEl.classList.remove('hidden');
         updatePracticeStats();
         updateErrorCounts();
         setTimeout(() => setMode('mc-de-en'), 10);
@@ -446,7 +446,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (mainTopicButton) { displaySubTopics(mainTopicButton.dataset.mainTopic); } 
         else if (subTopicButton) { startTraining(subTopicButton.dataset.subTopic); }
-        else if (testButton) { updateTestModeProgressBars(); testSelectionModalEl.classList.remove('hidden-view'); }
+        else if (testButton) { updateTestModeProgressBars(); testSelectionModalEl.classList.remove('hidden'); }
     }
     
     // NEU: Funktion zum Einfügen von Text an der Cursorposition
@@ -476,9 +476,9 @@ document.addEventListener('DOMContentLoaded', () => {
          }
     }
     function initTestModeListeners() {
-        testSelectionModalEl.addEventListener('click', (event) => { if (event.target === testSelectionModalEl) { testSelectionModalEl.classList.add('hidden-view'); } });
+        testSelectionModalEl.addEventListener('click', (event) => { if (event.target === testSelectionModalEl) { testSelectionModalEl.classList.add('hidden'); } });
         if (testOptionsGridEl) {
-            testOptionsGridEl.addEventListener('click', (event) => { const selectedButton = event.target.closest('.wortgruppe-button'); if (!selectedButton) return; const selectedTestType = selectedButton.dataset.testType; if (selectedTestType) { testSelectionModalEl.classList.add('hidden-view'); starteGesamtTest(selectedTestType); } });
+            testOptionsGridEl.addEventListener('click', (event) => { const selectedButton = event.target.closest('.wortgruppe-button'); if (!selectedButton) return; const selectedTestType = selectedButton.dataset.testType; if (selectedTestType) { testSelectionModalEl.classList.add('hidden'); starteGesamtTest(selectedTestType); } });
         }
     }
 
@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         navigationContainerEl.addEventListener('click', handleNavigation);
         backToMainTopicsButton.addEventListener('click', displayMainTopics);
-        backToSubtopicsButton.addEventListener('click', () => { if (state.currentMainTopic) { displaySubTopics(state.currentMainTopic); } else { displayMainTopics(); } navigationViewEl.classList.remove('hidden-view'); trainerMainViewEl.classList.add('hidden-view'); });
+        backToSubtopicsButton.addEventListener('click', () => { if (state.currentMainTopic) { displaySubTopics(state.currentMainTopic); } else { displayMainTopics(); } navigationViewEl.classList.remove('hidden'); trainerMainViewEl.classList.add('hidden'); });
         
         Object.keys(learningModes).forEach(modeId => { const button = document.getElementById(`mode-${modeId}`); const repeatButton = document.getElementById(`mode-repeat-${modeId}`); if (button) button.addEventListener('click', () => setMode(modeId, false)); if (repeatButton) repeatButton.addEventListener('click', () => setMode(modeId, true)); });
         continueButton.addEventListener('click', loadNextTask);

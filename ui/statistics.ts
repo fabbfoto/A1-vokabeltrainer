@@ -70,11 +70,11 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
         const colorClass = getProgressColorClass(masteredCount, totalItemsInSet);
 
         const item = document.createElement('div');
-        item.className = 'category-stat-item';
+        item.className = 'flex justify-between items-center';
         item.innerHTML = `
-            <span class="category-stat-text">${modeInfo.name}: ${masteredCount} / ${totalItemsInSet}</span>
-            <div class="category-progress-bar-bg">
-                <div class="category-progress-bar-fg ${colorClass}" style="width: ${percentage}%;"></div>
+            <span class="text-xs text-gray-600">${modeInfo.name}: ${masteredCount} / ${totalItemsInSet}</span>
+            <div class="bg-gray-200 rounded-lg overflow-hidden h-3 w-24">
+                <div class="h-full transition-all duration-300 ${colorClass}" style="width: ${percentage}%;"></div>
             </div>
         `;
         itemsContainer.appendChild(item);

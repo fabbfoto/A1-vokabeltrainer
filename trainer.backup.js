@@ -259,8 +259,8 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
     function startTestUI(testTitle, modus) {
         authUI.hide(); // Auth-Button im Trainings-Modus verstecken
         ui.hideAllUIs(dom);
-        dom.trainerMainViewEl.classList.remove('hidden-view');
-        dom.navigationViewEl.classList.add('hidden-view');
+        dom.trainerMainViewEl.classList.remove('hidden');
+        dom.navigationViewEl.classList.add('hidden');
         
         const modusName = learningModes[modus]?.name || "Test";
         dom.currentTrainingTitleEl.textContent = `${testTitle} - ${modusName}`;
@@ -447,8 +447,8 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
         dom.testStatsViewEl.classList.add('hidden');
         dom.modeButtonGridEl.classList.remove('hidden');
         dom.currentTrainingTitleEl.textContent = subTopicName;
-        dom.navigationViewEl.classList.add('hidden-view');
-        dom.trainerMainViewEl.classList.remove('hidden-view');
+        dom.navigationViewEl.classList.add('hidden');
+        dom.trainerMainViewEl.classList.remove('hidden');
 
         ui.updatePracticeStats(dom, state, learningModes);
         ui.updateErrorCounts(dom, state, learningModes);
@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Hinzugefügt 'asy
             startTraining(subTopicButton.dataset.subTopic);
         } else if (testButton) {
             ui.updateTestModeProgressBars(dom, state);
-            dom.testSelectionModalEl.classList.remove('hidden-view');
+            dom.testSelectionModalEl.classList.remove('hidden');
         }
     }
 

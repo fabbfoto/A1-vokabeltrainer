@@ -44,8 +44,8 @@ export function displayMainTopics(
     
     state.currentMainTopic = null;
     state.currentSubTopic = null;
-    dom.navigationViewEl.classList.remove('hidden-view');
-    dom.trainerMainViewEl.classList.add('hidden-view');
+    dom.navigationViewEl.classList.remove('hidden');
+    dom.trainerMainViewEl.classList.add('hidden');
     dom.navigationTitleEl.textContent = 'Themen';
     dom.backToMainTopicsButton.classList.add('hidden');
     dom.navigationContainerEl.innerHTML = '';
@@ -122,8 +122,8 @@ export function displaySubTopics(
     NavigationEvents.dispatchSub();
 
     state.currentMainTopic = mainTopicName;
-    dom.navigationViewEl.classList.remove('hidden-view');
-    dom.trainerMainViewEl.classList.add('hidden-view');
+    dom.navigationViewEl.classList.remove('hidden');
+    dom.trainerMainViewEl.classList.add('hidden');
     dom.navigationTitleEl.textContent = mainTopicName;
     dom.backToMainTopicsButton.classList.remove('hidden');
     dom.navigationContainerEl.innerHTML = '';

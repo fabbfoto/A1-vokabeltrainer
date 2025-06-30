@@ -77,7 +77,7 @@ export function setUIMode(modeId: string): void {
     console.log(`[setUIMode] Verarbeite Element: #${modeEl.id}`);
     if (modeEl.id === modeId) {
       console.log(`[setUIMode] Zeige Element #${modeEl.id}`);
-      modeEl.classList.remove('hidden-view');
+      modeEl.classList.remove('hidden');
       if (modeEl.id === 'trainer-main-view' || modeEl.id === 'navigation-view') {
         modeEl.style.display = 'flex';
       } else {
