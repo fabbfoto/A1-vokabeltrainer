@@ -19,9 +19,9 @@ export function calculateProgressPercentage(completed: number, total: number): n
  */
 export function getProgressColorClass(completed: number, total: number): string {
     const percentage = calculateProgressPercentage(completed, total);
-    if (percentage < 34) return 'color-black-sr';
-    if (percentage < 67) return 'color-red-sr';
-    return 'color-gold-sr';
+    if (percentage < 34) return 'bg-de-black';
+    if (percentage < 67) return 'bg-de-red';
+    return 'bg-de-gold';
 }
 
 /**

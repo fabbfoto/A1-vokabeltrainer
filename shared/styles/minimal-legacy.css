@@ -1,0 +1,4 @@
+/* Nur noch benötigte Legacy-Regeln */
+.hidden-view { 
+    display: none !important; 
+}
