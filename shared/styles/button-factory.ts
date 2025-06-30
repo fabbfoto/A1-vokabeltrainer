@@ -12,14 +12,14 @@ export function createTopicButton(
     progressColorClass: string
 ): HTMLButtonElement {
     const button = document.createElement('button');
-    button.className = 'relative flex flex-col items-center justify-center p-4 text-center cursor-pointer font-medium transition-all duration-300 border rounded-lg whitespace-normal break-words bg-btn-bg text-btn-text border-btn-border shadow-sm hover:bg-btn-bg-hover hover:shadow-md min-h-[70px]';
+    button.className = 'relative flex flex-col items-center justify-between p-3 text-center cursor-pointer font-medium transition-all duration-300 border rounded-lg bg-btn-bg text-btn-text border-btn-border shadow-sm hover:bg-btn-bg-hover hover:shadow-lg hover:scale-[1.02] min-h-[90px] max-h-[110px]';
 
     const textSpan = document.createElement('span');
-    textSpan.className = 'button-text-label';
+    textSpan.className = 'button-text-label flex-1 flex items-center justify-center text-sm font-semibold leading-tight px-1 overflow-hidden';
     textSpan.innerHTML = text;
 
     const progressContainer = document.createElement('div');
-    progressContainer.className = 'w-full mt-2 bg-progress-bg h-[8px] rounded-[4px] overflow-hidden';
+    progressContainer.className = 'w-full mt-1 bg-progress-bg h-[6px] rounded-full overflow-hidden';
 
     const progressBar = document.createElement('div');
     progressBar.className = `h-full transition-all duration-500 ${progressColorClass}`;
@@ -44,7 +44,7 @@ export function createActionButton(
 ): HTMLButtonElement {
     const button = document.createElement('button');
     
-    const baseClasses = 'col-span-full flex flex-col items-center justify-center text-white font-bold py-4 px-6 rounded-lg border-none cursor-pointer transition-all duration-300 relative overflow-hidden min-h-[70px]';
+    const baseClasses = 'col-span-full flex flex-col items-center justify-center text-white font-bold py-3 px-4 rounded-lg border-none cursor-pointer transition-all duration-300 relative overflow-hidden h-[80px] hover:scale-[1.02]';
     
     const styles: Record<ActionButtonType, { id: string; classes: string; innerHTML: string }> = {
         'global-test': {

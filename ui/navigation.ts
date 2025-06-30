@@ -51,7 +51,6 @@ export function displayMainTopics(
     dom.navigationContainerEl.innerHTML = '';
     
     // Grid-Layout für 3 Spalten
-    // Grid Layout - 3 Spalten für Desktop, responsive für Mobile
     dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
     
     const numberOfModes = Object.keys(learningModes).length;
@@ -128,7 +127,6 @@ export function displaySubTopics(
     dom.backToMainTopicsButton.classList.remove('hidden');
     dom.navigationContainerEl.innerHTML = '';
 
-    // WICHTIG: Gleiche Grid-Layout wie Hauptthemen - 3 Spalten!
     dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
 
     const subTopics = Object.keys(vokabular[mainTopicName]);
