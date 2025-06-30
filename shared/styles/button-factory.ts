@@ -49,23 +49,23 @@ export function createActionButton(
     
     // 🔧 WICHTIGE ÄNDERUNG: h-[80px] → min-h-[90px] max-h-[110px] 
     // Dadurch haben alle Buttons die GLEICHE HÖHE!
-    const baseClasses = 'col-span-full flex flex-col items-center justify-center text-white font-bold py-3 px-4 rounded-lg border-none cursor-pointer transition-all duration-300 relative overflow-hidden min-h-[90px] max-h-[110px] hover:scale-[1.02]';
+    const baseClasses = 'col-span-full flex flex-col items-center justify-center text-white font-bold py-2 px-4 rounded-lg border-none cursor-pointer transition-all duration-300 relative overflow-hidden min-h-[45px] max-h-[55px] hover:scale-[1.02]';
     
     const styles: Record<ActionButtonType, { id: string; classes: string; innerHTML: string }> = {
         'global-test': {
             id: 'start-test-mode-btn',
             classes: 'bg-gradient-to-br from-gray-600 to-gray-800 hover:from-gray-700 hover:to-gray-900 hover:-translate-y-0.5 hover:shadow-xl',
-            innerHTML: `<span>🎯</span> <span>${text}</span>`
+            innerHTML: `<div class="flex items-center justify-center gap-2"><span class="text-lg">🎯</span><span class="text-base font-medium">${text}</span></div>`
         },
         'main-topic-test': {
             id: '', // ID is not needed, dataset is used
             classes: 'bg-gradient-to-br from-de-black via-de-red to-de-gold hover:brightness-125 hover:-translate-y-0.5 hover:shadow-xl',
-            innerHTML: `<div class="flex items-center justify-center gap-2"><span>🎯</span><span class="text-sm font-semibold">${text}</span></div><div class="text-xs opacity-90 mt-1">${subtext || ''}</div>`
+            innerHTML: `<div class="flex items-center justify-center gap-2"><span class="text-lg">🎯</span><span class="text-sm font-medium">${text}</span><span class="text-xs opacity-75">${subtext || ''}</span></div>`
         },
         'sync': {
             id: 'device-sync-btn',
             classes: 'bg-gradient-to-r from-de-black via-de-red to-de-gold hover:brightness-125',
-            innerHTML: `<div class="flex items-center justify-center gap-2"><span>📱🇩🇪</span><span>${text}</span></div>`
+            innerHTML: `<div class="flex items-center justify-center gap-2"><span class="text-lg">📱🇩🇪</span><span class="text-base font-medium">${text}</span></div>`
         }
     };
     
@@ -90,4 +90,22 @@ export function optimizeSubTopicGrid(container: HTMLElement): void {
             button.classList.add('min-h-[90px]', 'max-h-[110px]');
         }
     });
+}
+// 🔧 OPTIONAL: Button Factory global verfügbar machen
+// Füge das am Ende von shared/styles/button-factory.ts hinzu:
+
+// Mache Funktionen global verfügbar für Debugging
+declare global {
+  interface Window {
+    createTopicButton: typeof createTopicButton;
+    createActionButton: typeof createActionButton;
+    optimizeSubTopicGrid: typeof optimizeSubTopicGrid;
+  }
+}
+
+// Export für globalen Zugriff (nur in Development)
+if (typeof window !== 'undefined') {
+  window.createTopicButton = createTopicButton;
+  window.createActionButton = createActionButton;
+  window.optimizeSubTopicGrid = optimizeSubTopicGrid;
 }

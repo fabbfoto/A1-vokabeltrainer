@@ -12,6 +12,28 @@ type VocabularyStructure = any;
 type LearningModes = any;
 type UICallbacks = any;
 
+/**
+ * 🎯 GRID-STABILITÄT: Fülle Grid mit unsichtbaren Platzhaltern auf 12 Slots
+ * Verhindert Layout-Springen zwischen verschiedenen Themen-Anzahlen
+ */
+function fillGridWithPlaceholders(container: HTMLElement, currentItemCount: number, maxGridSlots: number = 12): void {
+    // Entferne alte Platzhalter falls vorhanden
+    const oldPlaceholders = container.querySelectorAll('[data-placeholder="true"]');
+    oldPlaceholders.forEach(placeholder => placeholder.remove());
+    
+    const missingSlots = maxGridSlots - currentItemCount;
+    
+    for (let i = 0; i < missingSlots; i++) {
+        const placeholder = document.createElement('div');
+        // Unsichtbarer Platzhalter mit gleicher Höhe wie echte Buttons
+        placeholder.className = 'min-h-[90px] max-h-[110px] opacity-0 pointer-events-none';
+        placeholder.setAttribute('data-placeholder', 'true');
+        container.appendChild(placeholder);
+    }
+    
+    console.log(`📐 Grid gefüllt: ${currentItemCount} echte + ${missingSlots} Platzhalter = ${maxGridSlots} Slots`);
+}
+
 // Hilfsfunktionen (bereits in shared/utils/helfer.ts, aber hier für Konsistenz)
 function calculateProgressPercentage(completed: number, total: number): number {
     if (total === 0) return 0;
@@ -192,6 +214,14 @@ export function displaySubTopics(
 
     // 🎯 GRID-OPTIMIERUNG: Stelle sicher, dass alle Buttons perfekt aligned sind
     optimizeSubTopicGrid(dom.navigationContainerEl);
+    
+    // 🎯 NEUE LOGIK: Grid-Plätze auffüllen
+    const subTopicCount = subTopics.length;
+    const actionButtonCount = 1; // Hauptthema-Test Button
+    const totalContentItems = subTopicCount + actionButtonCount;
+
+    // Fülle auf 12 Slots auf für Konsistenz mit Hauptthemen-Ansicht
+    fillGridWithPlaceholders(dom.navigationContainerEl, totalContentItems, 12);
     
     console.log(`✅ Unterthemen-Grid für "${mainTopicName}" optimiert:`, {
         subtopics: subTopics.length,
