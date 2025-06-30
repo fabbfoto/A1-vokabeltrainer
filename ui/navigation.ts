@@ -17,11 +17,18 @@ function calculateProgressPercentage(completed: number, total: number): number {
     return Math.round((completed / total) * 100);
 }
 
+// Hilfsfunktion für Deutschland-Farben bei Fortschrittsbalken
 function getProgressColorClass(completed: number, total: number): string {
     const percentage = calculateProgressPercentage(completed, total);
-    if (percentage < 34) return 'color-black-sr';
-    if (percentage < 67) return 'color-red-sr';
-    return 'color-gold-sr';
+
+    // Original CSS Farben
+    if (percentage < 34) {
+        return 'color-black-sr'; // Wird zu #1f2937
+    } else if (percentage < 67) {
+        return 'color-red-sr';   // Wird zu #dc2626
+    } else {
+        return 'color-gold-sr';   // Wird zu #f59e0b
+    }
 }
 
 /**
@@ -35,63 +42,141 @@ export function displayMainTopics(
 ): void {
     NavigationEvents.dispatchRoot();
     
+    state.currentMainTopic = null;
+    state.currentSubTopic = null;
     dom.navigationViewEl.classList.remove('hidden-view');
     dom.trainerMainViewEl.classList.add('hidden-view');
     dom.navigationTitleEl.textContent = 'Themen';
     dom.backToMainTopicsButton.classList.add('hidden');
     dom.navigationContainerEl.innerHTML = '';
-
-    const mainTopics = Object.keys(vokabular);
     
-    mainTopics.forEach(mainTopicName => {
+    // Grid-Layout für 3 Spalten
+    // Grid Layout - 3 Spalten für Desktop, responsive für Mobile
+    dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
+    
+    const numberOfModes = Object.keys(learningModes).length;
+    
+    // Hauptthemen erstellen - ORIGINAL WORTGRUPPE-BUTTON STYLE
+    Object.keys(vokabular).forEach(mainTopicName => {
         const button = document.createElement('button');
-        button.className = 'topic-button w-full p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow';
-        button.innerHTML = `
-          <div class="topic-title text-lg font-semibold text-gray-700"></div>
-          <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-            <div class="topic-progress-bar h-2 rounded-full transition-all duration-300"></div>
-          </div>
-        `;
-        button.dataset.mainTopic = mainTopicName;
         
-        const title = button.querySelector('.topic-title');
-        const progressBar = button.querySelector('.topic-progress-bar') as HTMLElement;
+        // Original CSS: min-height: 70px (rechteckig, nicht quadratisch!)
+        button.className = 'wortgruppe-button relative flex flex-col items-center justify-center p-4 text-center cursor-pointer font-medium transition-all duration-300 border rounded-lg whitespace-normal break-words';
         
-        title.textContent = mainTopicName;
+        // Original Farben exakt
+        button.style.backgroundColor = '#e9e9ed';
+        button.style.color = '#374151';
+        button.style.borderColor = '#d1d5db';
+        button.style.minHeight = '70px'; // WICHTIG: Rechteckig, nicht quadratisch!
         
-        // Fortschritt berechnen
-        const subTopics = Object.keys(vokabular[mainTopicName]);
+        // Berechne Fortschritt
         let totalWords = 0;
         let totalMastered = 0;
         
-        subTopics.forEach(subTopicName => {
+        Object.keys(vokabular[mainTopicName]).forEach(subTopicName => {
             const words = vokabular[mainTopicName][subTopicName];
             const progressKey = `${mainTopicName}|${subTopicName}`;
             const progressForKey = state.globalProgress[progressKey] || {};
             
+            totalWords += words.length * numberOfModes;
             Object.keys(learningModes).forEach(modeId => {
-                totalWords += words.length;
                 const masteredInMode = progressForKey[modeId]?.size || 0;
                 totalMastered += masteredInMode;
             });
         });
         
         const percentage = calculateProgressPercentage(totalMastered, totalWords);
-        const colorClass = getProgressColorClass(totalMastered, totalWords);
+        const progressColorClass = getProgressColorClass(totalMastered, totalWords);
         
+        // Button Inhalt - EXAKT wie Original
+        const textSpan = document.createElement('span');
+        textSpan.className = 'button-text-label';
+        textSpan.textContent = mainTopicName;
+        
+        const progressContainer = document.createElement('div');
+        progressContainer.className = 'progress-bar-container w-full mt-2';
+        progressContainer.style.backgroundColor = '#d1d5db'; // Grauer Hintergrund für Balken
+        progressContainer.style.height = '8px';
+        progressContainer.style.borderRadius = '4px';
+        progressContainer.style.overflow = 'hidden';
+        
+        const progressBar = document.createElement('div');
+        progressBar.className = `progress-bar-fill ${progressColorClass}`;
         progressBar.style.width = `${percentage}%`;
-        progressBar.classList.add(colorClass);
-        progressBar.setAttribute('aria-valuenow', percentage.toString());
+        progressBar.style.height = '100%';
+        progressBar.style.transition = 'width 0.5s ease-in-out';
         
+        progressContainer.appendChild(progressBar);
+        button.appendChild(textSpan);
+        button.appendChild(progressContainer);
+        
+        // Hover-Effekt - WICHTIG: Balken bleibt sichtbar!
+        button.addEventListener('mouseenter', () => {
+            button.style.backgroundColor = '#d1d5db';
+            // Balken-Container bekommt dunkleren Hintergrund beim Hover
+            progressContainer.style.backgroundColor = '#b5b5bd';
+        });
+        
+        button.addEventListener('mouseleave', () => {
+            button.style.backgroundColor = '#e9e9ed';
+            progressContainer.style.backgroundColor = '#d1d5db';
+        });
+        
+        button.dataset.mainTopic = mainTopicName;
         dom.navigationContainerEl.appendChild(button);
     });
-
-    // Globaler Test-Button
+    
+    // Globaler Test Button - Original Style
     const globalTestButton = document.createElement('button');
     globalTestButton.id = 'start-test-mode-btn';
-    globalTestButton.className = 'w-full bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow hover:bg-gray-700 transition-colors duration-200';
-    globalTestButton.textContent = '🎯 Globaler Test (Alle Themen)';
+    globalTestButton.className = 'col-span-full text-white font-semibold py-3 px-6 rounded-lg border-none cursor-pointer transition-all duration-300';
+    globalTestButton.style.background = 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
+    globalTestButton.innerHTML = '<span>🎯</span> Globaler Test';
+    
+    globalTestButton.addEventListener('mouseenter', () => {
+        globalTestButton.style.background = 'linear-gradient(135deg, #9ca3af 0%, #4b5563 100%)';
+        globalTestButton.style.transform = 'translateY(-2px)';
+        globalTestButton.style.boxShadow = '0 4px 12px 0 rgba(0, 0, 0, 0.15)';
+    });
+    
+    globalTestButton.addEventListener('mouseleave', () => {
+        globalTestButton.style.background = 'linear-gradient(135deg, #6b7280 0%, #374151 100%)';
+        globalTestButton.style.transform = 'translateY(0)';
+        globalTestButton.style.boxShadow = 'none';
+    });
+    
     dom.navigationContainerEl.appendChild(globalTestButton);
+    
+    // Geräte verbinden Button
+    const syncButton = document.createElement('button');
+    syncButton.id = 'device-sync-btn';
+    syncButton.className = 'col-span-full text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2';
+    syncButton.style.background = 'linear-gradient(to right, #000000 0%, #DD0000 50%, #FFCE00 100%)';
+    syncButton.innerHTML = '<span>📱🇩🇪</span><span>Geräte verbinden</span>';
+    
+    syncButton.addEventListener('mouseenter', () => {
+        syncButton.style.background = 'linear-gradient(to right, #1a1a1a 0%, #ff0000 50%, #ffd700 100%)';
+    });
+    
+    syncButton.addEventListener('mouseleave', () => {
+        syncButton.style.background = 'linear-gradient(to right, #000000 0%, #DD0000 50%, #FFCE00 100%)';
+    });
+    
+    dom.navigationContainerEl.appendChild(syncButton);
+
+    // Copyright nur auf Hauptseite anzeigen
+    const existingFooter = dom.navigationViewEl.querySelector('.copyright-footer');
+    if (existingFooter) {
+        existingFooter.remove();
+    }
+
+    const footerDiv = document.createElement('div');
+    footerDiv.className = 'copyright-footer mt-8 text-center text-xs text-gray-400';
+    footerDiv.innerHTML = `
+        <p>© 2025 Frank Burkert - A1 Vokabeltrainer</p>
+        <p class="mt-1">Nur für Bildungszwecke · v2.0</p>
+    `;
+    dom.navigationContainerEl.parentElement.appendChild(footerDiv);
 }
 
 /**
@@ -112,24 +197,16 @@ export function displaySubTopics(
     dom.navigationTitleEl.textContent = mainTopicName;
     dom.backToMainTopicsButton.classList.remove('hidden');
     dom.navigationContainerEl.innerHTML = '';
+    
+    // Grid-Layout konsistent mit Hauptansicht
+    dom.navigationContainerEl.className = 'grid grid-cols-2 gap-4';
 
     const subTopics = Object.keys(vokabular[mainTopicName]);
     
     subTopics.forEach(subTopicName => {
         const button = document.createElement('button');
-        button.className = 'topic-button w-full p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow';
-        button.innerHTML = `
-          <div class="topic-title text-lg font-semibold text-gray-700"></div>
-          <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-            <div class="topic-progress-bar h-2 rounded-full transition-all duration-300"></div>
-          </div>
-        `;
-        button.dataset.subTopic = subTopicName;
-        
-        const title = button.querySelector('.topic-title');
-        const progressBar = button.querySelector('.topic-progress-bar') as HTMLElement;
-        
-        title.textContent = subTopicName;
+        // Exakt gleicher Style für Konsistenz
+        button.className = 'relative min-h-[70px] flex flex-col items-center justify-center p-4 text-center cursor-pointer font-medium transition-all duration-300 border rounded';
         
         // Fortschritt berechnen
         const words = vokabular[mainTopicName][subTopicName];
@@ -146,20 +223,53 @@ export function displaySubTopics(
         });
         
         const percentage = calculateProgressPercentage(totalMastered, totalWords);
-        const colorClass = getProgressColorClass(totalMastered, totalWords);
+        const progressColorClass = getProgressColorClass(totalMastered, totalWords);
         
-        progressBar.style.width = `${percentage}%`;
-        progressBar.classList.add(colorClass);
-        progressBar.setAttribute('aria-valuenow', percentage.toString());
+        button.innerHTML = `
+            <div class="w-full">
+                <div class="text-lg font-semibold text-gray-800 mb-3 text-center">${subTopicName}</div>
+                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-500 ${progressColorClass}" 
+                         style="width: ${percentage}%">
+                    </div>
+                </div>
+            </div>
+        `;
         
+        button.dataset.subTopic = subTopicName;
+        
+        button.style.backgroundColor = '#e9e9ed';
+        button.style.color = '#374151';
+        button.style.borderColor = '#d1d5db';
+        
+        button.addEventListener('mouseenter', () => {
+            button.style.backgroundColor = '#d1d5db';
+        });
+        button.addEventListener('mouseleave', () => {
+            button.style.backgroundColor = '#e9e9ed';
+        });
         dom.navigationContainerEl.appendChild(button);
     });
 
-    // Hauptthema-Test Button
+    // Hauptthema-Test Button - KORREKTUR: Deutschland-Farben statt Orange
     const mainTopicTestButton = document.createElement('button');
-    mainTopicTestButton.className = 'w-full bg-gradient-to-r from-orange-500 to-red-500 text-white font-semibold py-3 px-6 rounded-lg shadow hover:from-orange-600 hover:to-red-600 transition-all duration-200 transform hover:scale-105';
     mainTopicTestButton.dataset.testMainTopicOnly = mainTopicName;
-    mainTopicTestButton.innerHTML = `🎯 Test: ${mainTopicName} <span class="text-sm">(Alle Unterthemen)</span>`;
+    mainTopicTestButton.innerHTML = `<span>🎯</span><span>Test: ${mainTopicName}</span><span class="text-sm opacity-90">(Alle Unterthemen)</span>`;
+    mainTopicTestButton.className = 'col-span-full text-white font-bold py-3 px-6 rounded border-none cursor-pointer transition-all duration-300 relative overflow-hidden';
+    mainTopicTestButton.style.background = 'linear-gradient(135deg, #f59e0b 0%, #dc2626 50%, #1f2937 100%)';
+    
+    // Hover-Effekt
+    mainTopicTestButton.addEventListener('mouseenter', () => {
+        mainTopicTestButton.style.background = 'linear-gradient(135deg, #fbbf24 0%, #ef4444 50%, #374151 100%)';
+        mainTopicTestButton.style.transform = 'translateY(-2px)';
+        mainTopicTestButton.style.boxShadow = '0 6px 20px 0 rgba(0, 0, 0, 0.25)';
+    });
+    mainTopicTestButton.addEventListener('mouseleave', () => {
+        mainTopicTestButton.style.background = 'linear-gradient(135deg, #f59e0b 0%, #dc2626 50%, #1f2937 100%)';
+        mainTopicTestButton.style.transform = 'translateY(0)';
+        mainTopicTestButton.style.boxShadow = 'none';
+    });
+    
     dom.navigationContainerEl.appendChild(mainTopicTestButton);
 }
 

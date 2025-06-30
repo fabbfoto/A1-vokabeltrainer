@@ -257,3 +257,152 @@ ls -la
 - Source Maps ermöglichen TypeScript-Debugging
 
 **WICHTIG:** Der Trainer ist fast fertig migriert! Nur noch das Startup-Problem lösen, dann läuft alles mit moderner TypeScript/Vite Entwicklungsumgebung. 🚀
+# Kontext: Themen-Trainer - Status & Strategie (29.06.2025)
+
+## 🎯 **AKTUELLER STATUS**
+
+### ✅ Was funktioniert:
+1. **Navigation** - Hauptthemen und Unterthemen werden angezeigt
+2. **Globaler Test** - Funktioniert vollständig mit allen 4 Modi
+3. **splitSentence Fehler** - GELÖST! 
+4. **UI-Module** - Erfolgreich auf TypeScript migriert
+5. **Vite Development Server** - Läuft stabil auf Port 5183
+
+### ⚠️ Was teilweise funktioniert:
+1. **Zurück-Button** - Event-Listener wurde hinzugefügt, muss getestet werden
+2. **Lernmodi** - Code ist da, aber noch nicht vollständig getestet
+3. **DOM-Elemente** - Einige Statistik-Elemente fehlen in HTML (nicht kritisch)
+
+### ❌ Was NICHT funktioniert:
+1. **Firebase Authentication** - Komplett deaktiviert
+2. **Daten-Synchronisation** - Keine Cloud-Speicherung
+3. **Hauptthemen-Tests** - Noch nicht implementiert
+
+## 🚀 **MIGRATION STRATEGIE**
+
+### Phase 1: STABILISIERUNG (JETZT) ✅
+**Ziel:** Trainer vollständig funktionsfähig ohne Firebase
+
+1. ✅ TypeScript-Migration der Kern-Module
+2. ✅ Import-Pfade korrigieren  
+3. ✅ Fehlende Funktionen wiederherstellen
+4. ⏳ Alle Lernmodi testen
+5. ⏳ Navigation vollständig testen
+
+### Phase 2: FIREBASE VORBEREITUNG (Diese Woche)
+**Ziel:** Firebase-Module für TypeScript vorbereiten
+
+1. **Option A: Firebase als External Script**
+   ```html
+   <!-- In index.html -->
+   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+   ```
+
+2. **Option B: Firebase SDK über NPM**
+   ```bash
+   npm install firebase
+   ```
+   Dann normale ES6 imports verwenden
+
+3. **Option C: Firebase-Module auf TypeScript migrieren**
+   - `shared/auth/` → TypeScript
+   - `shared/services/` → TypeScript
+   - Typen definieren für alle Firebase-Funktionen
+
+### Phase 3: FIREBASE INTEGRATION (Nächste Woche)
+**Ziel:** Authentication und Sync wieder aktivieren
+
+1. Firebase Config aktualisieren
+2. Auth Service testen
+3. Sync Service implementieren
+4. UI für Login/Logout
+
+### Phase 4: FEATURE COMPLETION (In 2 Wochen)
+**Ziel:** Alle Features vollständig
+
+1. Hauptthemen-Tests implementieren
+2. Statistik-Anzeigen vervollständigen
+3. Error Handling verbessern
+4. Performance optimieren
+
+## 💡 **WARUM DIESE STRATEGIE?**
+
+### Warum Firebase später?
+1. **Komplexität reduzieren** - Ein Problem nach dem anderen lösen
+2. **TypeScript-First** - Erst alles auf TypeScript, dann externe Dependencies
+3. **Testbarkeit** - Trainer muss auch offline funktionieren
+4. **Schrittweise Migration** - Weniger Fehler, bessere Kontrolle
+
+### Warum nicht alles auf einmal?
+- Firebase + TypeScript + Vite = Zu viele bewegliche Teile
+- Debugging wird exponentiell schwieriger
+- Gefahr von Regression (funktionierende Teile kaputt machen)
+
+## 📋 **NÄCHSTE SCHRITTE (SOFORT)**
+
+1. **Trainer vollständig testen**
+   - Alle Hauptthemen durchklicken
+   - Jeden Lernmodus testen
+   - Zurück-Navigation überprüfen
+
+2. **Fehlende Features dokumentieren**
+   - Was genau funktioniert nicht?
+   - Welche Buttons/Features fehlen?
+
+3. **Entscheidung treffen**
+   - Firebase über NPM installieren? (Empfehlung)
+   - Oder erstmal ohne Cloud-Features leben?
+
+## 🛠️ **TECHNISCHE DETAILS**
+
+### Dateistruktur (Aktuell)
+```
+├── trainer.ts          ✅ (Hauptlogik)
+├── dom.ts             ✅ (DOM-Referenzen)
+├── vokabular.js       ✅ (Daten)
+├── /ui/               ✅ (TypeScript Module)
+│   ├── index.ts       
+│   ├── navigation.ts  
+│   ├── statistics.ts  
+│   ├── test-modal.ts  
+│   ├── feedback.ts    
+│   └── umlaut-buttons.ts
+├── /shared/
+│   ├── /utils/
+│   │   ├── helfer.ts  ✅
+│   │   └── ui-modes.js ✅
+│   ├── /auth/         ❌ (Noch JavaScript)
+│   ├── /services/     ❌ (Noch JavaScript)
+│   └── /events/       ✅ (JavaScript, funktioniert)
+```
+
+### Import-Probleme gelöst
+- `splitSentence` → Export/Import korrigiert
+- UI-Module → Pfade angepasst
+- NavigationEvents → Funktionsnamen korrigiert
+
+### Firebase-Problem
+- Module sind JavaScript (.js)
+- TypeScript erwartet .ts Module
+- CDN-URLs funktionieren nicht mit Vite
+- **Lösung:** NPM-Installation oder Compat-Mode
+
+## ✨ **ZUSAMMENFASSUNG**
+
+**Status:** Der Trainer läuft wieder! 🎉
+
+**Strategie:** Schritt für Schritt
+1. Erst Kernfunktionen ✅
+2. Dann Firebase-Integration
+3. Dann neue Features
+
+**Priorität:** Stabilität > Features
+
+**Zeitrahmen:** 
+- Heute: Basis läuft ✅
+- Diese Woche: Vollständig ohne Firebase
+- Nächste Woche: Firebase integriert
+- In 2 Wochen: Alle Features
+
+Der Trainer ist auf einem guten Weg! Die TypeScript-Migration war erfolgreich, jetzt müssen wir nur noch die letzten Puzzleteile zusammenfügen. 💪
