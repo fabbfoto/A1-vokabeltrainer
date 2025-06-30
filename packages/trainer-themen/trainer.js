@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let barColor = '#374151'; 
                 if (percentage > 66) { barColor = '#d69e2e'; } else if (percentage > 33) { barColor = '#ef4444'; }
                 progressBar.style.width = `${percentage}%`;
-                progressBar.className = `h-full transition-all duration-500 ${colorClass}`;
+                progressBar.style.backgroundColor = barColor;
             } else if (progressBar) {
                 progressBar.style.width = '0%';
                 progressBar.style.backgroundColor = '#374151';

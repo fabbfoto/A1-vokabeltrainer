@@ -147,20 +147,26 @@ export const dom: DOMElements = {
     continueButton: getElement<HTMLButtonElement>('continue-button'),
     messageBoxEl: getElement<HTMLElement>('message-box'),
     
-    // Practice Statistics
+    // Practice Statistics - 🔧 FIX: Korrekte IDs verwenden
     practiceStatsViewEl: getElement<HTMLElement>('practice-stats-view'),
     correctInRoundPracticeEl: getElement<HTMLElement>('correct-in-round-practice'),
     attemptedInRoundPracticeEl: getElement<HTMLElement>('attempted-in-round-practice'),
-    accuracyInRoundPracticeEl: getElement<HTMLElement>('accuracy-in-round-practice'),
+    // 🔧 FIX: 'accuracy-in-round-practice' existiert nicht → verwende 'accuracy-bar'
+    accuracyInRoundPracticeEl: getElement<HTMLElement>('accuracy-bar'),
     categoryStatsContainerEl: getElement<HTMLElement>('category-stats-container'),
     
-    // Test Statistics
+    // Test Statistics - 🔧 FIX: Korrekte IDs aus index.html verwenden
     testStatsViewEl: getElement<HTMLElement>('test-stats-view'),
-    testProgressEl: getElement<HTMLElement>('test-progress'),
-    testAccuracyEl: getElement<HTMLElement>('test-accuracy'),
-    correctInRoundTestEl: getElement<HTMLElement>('correct-in-round-test'),
-    attemptedInRoundTestEl: getElement<HTMLElement>('attempted-in-round-test'),
-    accuracyInRoundTestEl: getElement<HTMLElement>('accuracy-in-round-test'),
+    // 🔧 FIX: 'test-progress' → 'test-progress-bar'
+    testProgressEl: getElement<HTMLElement>('test-progress-bar'),
+    // 🔧 FIX: 'test-accuracy' → 'test-accuracy-bar'
+    testAccuracyEl: getElement<HTMLElement>('test-accuracy-bar'),
+    // 🔧 FIX: 'correct-in-round-test' → 'test-progress-text' (repurpose)
+    correctInRoundTestEl: getElement<HTMLElement>('test-progress-text'),
+    // 🔧 FIX: 'attempted-in-round-test' → 'test-progress-text' (same element)
+    attemptedInRoundTestEl: getElement<HTMLElement>('test-progress-text'),
+    // 🔧 FIX: 'accuracy-in-round-test' → 'test-accuracy-text'
+    accuracyInRoundTestEl: getElement<HTMLElement>('test-accuracy-text'),
     
     // Test Modal
     testSelectionModalEl: getElement<HTMLElement>('test-selection-modal'),
