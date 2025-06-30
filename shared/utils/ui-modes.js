@@ -19,11 +19,20 @@ export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
     // Anzeige des Beispielsatzes (ggf. mit Kasus-Farben)
     dom.exampleSentenceDisplayEl.innerHTML = ''; // Vorherigen Inhalt löschen
     if (Array.isArray(state.currentWordData.example_de)) {
+        const kasusColorMap = {
+            nominativ: 'text-green-600',
+            akkusativ: 'text-blue-600',
+            dativ: 'text-red-600',
+            genitiv: 'text-yellow-600',
+            verb: 'text-pink-600',
+            none: ''
+        };
+
         state.currentWordData.example_de.forEach(part => {
             const span = document.createElement('span');
             span.textContent = part.text;
             if (part.kasus && part.kasus !== 'none') {
-                span.className = `kasus-${part.kasus}`;
+                span.className = kasusColorMap[part.kasus] || '';
             }
             dom.exampleSentenceDisplayEl.appendChild(span);
         });
@@ -52,7 +61,7 @@ export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
     dom.mcAnswersContainerEl.innerHTML = '';
     options.forEach(option => {
         const button = document.createElement('button');
-        button.className = 'answer-button w-full border border-gray-300 text-gray-700 font-medium py-3 px-4 rounded-lg';
+        button.className = 'w-full border border-gray-300 text-gray-700 font-medium py-3 px-4 rounded-lg transition-colors hover:bg-gray-200 disabled:opacity-50';
         button.textContent = option;
         button.onclick = () => processAnswer(option === correctAnswerEN, correctAnswerEN);
         dom.mcAnswersContainerEl.appendChild(button);
@@ -165,7 +174,7 @@ export function setupClozeAdjDeMode(dom, state, processAnswer) {
         dom.clozeSentenceContainerEl.append(document.createTextNode(cloze_parts[0]));
         const input = document.createElement('input');
         input.type = 'text';
-        input.className = 'cloze-input inline-block w-48 text-center border-b-2 border-gray-400 focus:border-blue-500 outline-none';
+        input.className = 'inline-block w-48 text-center border-b-2 border-gray-300 focus:border-blue-500 outline-none bg-transparent transition';
         input.autocapitalize = 'off';
         input.addEventListener('focus', () => state.activeTextInput = input);
 
@@ -215,7 +224,7 @@ export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
     wordsForLayout.forEach((word) => {
         const input = document.createElement('input');
         input.type = 'text';
-        input.className = 'word-input-box input-field';
+        input.className = 'border border-gray-300 rounded-md text-center p-2 transition';
         input.style.width = `${Math.max(word.length, 3) + 2}ch` ;
         input.addEventListener('keydown', handleEnter);
         input.addEventListener('focus', () => state.activeTextInput = input);
@@ -234,12 +243,12 @@ export function setupSentenceTranslationEnDeMode(dom, state, processAnswer) {
             const userAnswer = input.value ;
             const correctAnswer = correctWords[index] || ""; 
             const isWordCorrect = vergleicheAntwort(userAnswer, correctAnswer);
-
-            input.classList.remove('correct-user-input', 'incorrect-user-input');
+            
+            input.classList.remove('bg-green-100', 'border-green-500', 'bg-red-100', 'border-red-500');
             if (isWordCorrect) {
-                input.classList.add('correct-user-input');
+                input.classList.add('bg-green-100', 'border-green-500');
             } else {
-                input.classList.add('incorrect-user-input');
+                input.classList.add('bg-red-100', 'border-red-500');
                 allCorrect = false;
             }
         });

@@ -5,6 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Goethe A1 Vokabeltrainer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Zentrale Farb-Konfiguration für Tailwind
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              // Button Farben
+              'btn-bg': '#e9e9ed',
+              'btn-bg-hover': '#d1d5db',
+              'btn-text': '#374151',
+              'btn-border': '#d1d5db',
+              // Fortschrittsbalken
+              'progress-bg': '#d1d5db',
+              'de-black': '#1f2937',
+              'de-red': '#dc2626',
+              'de-gold': '#f59e0b',
+            }
+          }
+        }
+      }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <link rel="manifest" href="manifest.json"> 
@@ -12,25 +33,8 @@
     <link rel="stylesheet" href="./shared/styles/design-tokens.css">
     <link rel="stylesheet" href="./shared/styles/components.css">
     <link rel="stylesheet" href="./shared/utils/style.css">
-    <style>
-        .color-black-sr {
-            background-color: #1f2937;
-        }
-
-        .color-red-sr {
-            background-color: #dc2626;
-        }
-
-        .color-gold-sr {
-            background-color: #f59e0b;
-        }
-
-        .progress-bar-container {
-            position: relative;
-        }
-    </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-100 font-['Inter'] flex flex-col justify-start items-center min-h-screen p-4">
 
     <!-- NAVIGATION VIEW -->
     <div id="navigation-view" class="p-4 max-w-2xl mx-auto">
@@ -45,7 +49,7 @@
     </div>
 
     <!-- TRAINER MAIN VIEW -->
-    <div id="trainer-main-view" class="hidden-view p-4 max-w-2xl mx-auto flex flex-col items-center">
+    <div id="trainer-main-view" class="hidden p-4 max-w-2xl mx-auto flex flex-col items-center">
         <!-- Header mit Zurück-Button und Titel -->
         <div class="p-2 bg-white rounded-lg shadow-md mb-4 w-full">
             <div class="flex justify-between items-center mb-2">
@@ -54,28 +58,28 @@
             </div>
             
             <!-- Lernmodus-Buttons Grid -->
-            <div id="mode-button-grid" class="button-grid">
+            <div id="mode-button-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div class="flex flex-col gap-2">
-                    <button id="mode-mc-de-en" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Bedeutung</button>
-                    <button id="mode-repeat-mc-de-en" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm">
+                    <button id="mode-mc-de-en" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Bedeutung</button>
+                    <button id="mode-repeat-mc-de-en" class="w-full px-3 py-2 rounded-md text-sm font-bold bg-red-100 text-red-500 transition-colors hover:enabled:bg-red-200 disabled:opacity-50">
                         <span class="count-display">0</span>
                     </button>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <button id="mode-type-de-adj" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Schreibweise</button>
-                    <button id="mode-repeat-type-de-adj" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm">
+                    <button id="mode-type-de-adj" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Schreibweise</button>
+                    <button id="mode-repeat-type-de-adj" class="w-full px-3 py-2 rounded-md text-sm font-bold bg-red-100 text-red-500 transition-colors hover:enabled:bg-red-200 disabled:opacity-50">
                         <span class="count-display">0</span>
                     </button>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <button id="mode-cloze-adj-de" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Lückentext</button>
-                    <button id="mode-repeat-cloze-adj-de" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm">
+                    <button id="mode-cloze-adj-de" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Lückentext</button>
+                    <button id="mode-repeat-cloze-adj-de" class="w-full px-3 py-2 rounded-md text-sm font-bold bg-red-100 text-red-500 transition-colors hover:enabled:bg-red-200 disabled:opacity-50">
                         <span class="count-display">0</span>
                     </button>
                 </div>
                 <div class="flex flex-col gap-2">
-                    <button id="mode-sentence-translation-en-de" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Satzübersetzung</button>
-                    <button id="mode-repeat-sentence-translation-en-de" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm">
+                    <button id="mode-sentence-translation-en-de" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Satzübersetzung</button>
+                    <button id="mode-repeat-sentence-translation-en-de" class="w-full px-3 py-2 rounded-md text-sm font-bold bg-red-100 text-red-500 transition-colors hover:enabled:bg-red-200 disabled:opacity-50">
                         <span class="count-display">0</span>
                     </button>
                 </div>
@@ -83,17 +87,17 @@
         </div>
 
         <!-- Haupt-Trainer-Card -->
-        <div class="card w-full">
+        <div class="w-full max-w-2xl mt-4 bg-white p-8 rounded-xl shadow-lg">
             <!-- Audio-Container für Wort und Satz -->
-            <div id="word-line-container" class="audio-line-container">
-                <div id="question-display-area"></div>
-                <button id="audio-word-button" class="audio-button" title="Wort vorspielen"></button>
+            <div id="word-line-container" class="flex justify-center items-center gap-3 w-full">
+                <div id="question-display-area" class="min-h-[2em] text-center text-[1.75rem] font-semibold text-gray-900"></div>
+                <button id="audio-word-button" class="bg-transparent border-none cursor-pointer p-0 leading-none flex items-center justify-center text-gray-500 transition-colors duration-200 w-7 h-7 hover:text-gray-900" title="Wort vorspielen"></button>
             </div>
-            <div id="sentence-line-container" class="audio-line-container">
-                <div id="example-sentence-display"></div>
-                <button id="audio-sentence-button" class="audio-button" title="Satz vorspielen"></button>
+            <div id="sentence-line-container" class="flex justify-center items-center gap-3 w-full">
+                <div id="example-sentence-display" class="italic text-gray-600 text-center min-h-[1.5em] text-lg"></div>
+                <button id="audio-sentence-button" class="bg-transparent border-none cursor-pointer p-0 leading-none flex items-center justify-center text-gray-500 transition-colors duration-200 w-7 h-7 hover:text-gray-900" title="Satz vorspielen"></button>
             </div>
-            <div id="task-prompt-area"></div>
+            <div id="task-prompt-area" class="text-xl text-gray-900 mb-4 text-center min-h-[1.5em]"></div>
 
             <!-- MULTIPLE CHOICE MODE -->
             <div id="mc-de-en-ui" class="ui-mode my-4">
@@ -103,52 +107,52 @@
             </div>
             
             <!-- SPELLING MODE -->
-            <div id="spelling-mode-ui" class="ui-mode my-4 space-y-3">
+            <div id="spelling-mode-ui" class="ui-mode my-4 space-y-3 flex flex-col justify-center min-h-[150px]">
                 <div id="single-input-container" class="w-full flex">
-                    <input type="text" id="spelling-input-single" class="single-word-input w-full" 
+                    <input type="text" id="spelling-input-single" class="w-full border border-gray-300 rounded-md text-center p-2 transition" 
                            autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
                 </div>
                 <div id="noun-input-container" class="hidden flex items-center gap-2">
-                    <input type="text" id="spelling-input-noun-1" class="single-word-input flex-grow" 
+                    <input type="text" id="spelling-input-noun-1" class="flex-grow border border-gray-300 rounded-md text-center p-2 transition" 
                            autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
-                    <input type="text" id="spelling-input-noun-2" class="single-word-input flex-grow" 
+                    <input type="text" id="spelling-input-noun-2" class="flex-grow border border-gray-300 rounded-md text-center p-2 transition" 
                            autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
                 </div>
-                <button id="check-spelling-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
+                <button id="check-spelling-button" class="w-full font-semibold py-2 px-4 rounded-lg shadow bg-blue-500 text-white transition-colors hover:bg-blue-600 disabled:opacity-60">Auswerten</button>
             </div>
 
             <!-- Umlaut-Buttons -->
             <div id="umlaut-buttons-container" class="mt-4 flex justify-center space-x-2" style="display: none;">
-                <button class="umlaut-button" title="Shift für Caps">ä</button>
-                <button class="umlaut-button" title="Shift für Caps">ö</button>
-                <button class="umlaut-button" title="Shift für Caps">ü</button>
-                <button class="umlaut-button" title="Shift für Caps">ß</button>
+                <button class="px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ä</button>
+                <button class="px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ö</button>
+                <button class="px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ü</button>
+                <button class="px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ß</button>
             </div>
 
             <!-- CLOZE MODE -->
             <div id="cloze-adj-de-ui" class="ui-mode my-4 space-y-3">
                 <div id="cloze-hint-container" class="text-center text-lg text-gray-500 mb-2" style="display: none;"></div>
-                <div id="cloze-sentence-container" class="text-center text-xl"></div>
-                <button id="check-cloze-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
+                <div id="cloze-sentence-container" class="text-center text-xl flex items-center justify-center gap-1"></div>
+                <button id="check-cloze-button" class="w-full font-semibold py-2 px-4 rounded-lg shadow bg-blue-500 text-white transition-colors hover:bg-blue-600 disabled:opacity-60">Auswerten</button>
             </div>
 
             <!-- SENTENCE TRANSLATION MODE -->
             <div id="sentence-translation-en-de-ui" class="ui-mode my-4 space-y-3">
-                <div id="sentence-word-input-container" class="word-input-row text-xl"></div>
-                <button id="check-sentence-translation-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
+                <div id="sentence-word-input-container" class="flex gap-1 justify-center flex-wrap text-xl"></div>
+                <button id="check-sentence-translation-button" class="w-full font-semibold py-2 px-4 rounded-lg shadow bg-blue-500 text-white transition-colors hover:bg-blue-600 disabled:opacity-60">Auswerten</button>
             </div>
 
             <!-- Feedback Container -->
             <div id="feedback-container" class="my-6 text-center min-h-[3rem] flex flex-col justify-center items-center"></div>
-            <button id="continue-button" class="action-button hidden w-full bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg mt-4">Weiter</button>
+            <button id="continue-button" class="hidden w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg mt-4 transition-colors">Weiter</button>
 
             <!-- Statistiken -->
             <div id="stats-container" class="mt-6 space-y-3">
                 <!-- Practice Stats -->
                 <div id="practice-stats-view">
                     <p class="text-sm text-gray-600 text-center">Richtig in dieser Runde: <span id="correct-in-round-practice">0</span> / <span id="attempted-in-round-practice">0</span></p>
-                    <div class="stats-bar-container">
-                        <div id="accuracy-bar" class="stats-bar" style="width: 0%;"></div>
+                    <div class="bg-gray-200 rounded-lg overflow-hidden h-5">
+                        <div id="accuracy-bar" class="bg-blue-500 h-full transition-all duration-500 ease-in-out" style="width: 0%;"></div>
                     </div>
                     <hr class="my-2">
                     <p class="text-xs text-gray-500 text-center mb-1">Fortschritt pro Übungsmodus:</p>
@@ -158,13 +162,13 @@
                 <!-- Test Stats -->
                 <div id="test-stats-view" class="hidden">
                     <p class="text-sm text-gray-600 text-center">Gesamtfortschritt: <span id="test-progress-text">0 / 36</span></p>
-                    <div class="stats-bar-container">
-                        <div id="test-progress-bar" class="stats-bar bg-green-500" style="width: 0%;"></div>
+                    <div class="bg-gray-200 rounded-lg overflow-hidden h-5">
+                        <div id="test-progress-bar" class="bg-green-500 h-full transition-all duration-500 ease-in-out" style="width: 0%;"></div>
                     </div>
                     <hr class="my-2">
                     <p class="text-sm text-gray-600 text-center">Genauigkeit: <span id="test-accuracy-text">0 / 0</span></p>
-                    <div class="stats-bar-container">
-                        <div id="test-accuracy-bar" class="stats-bar bg-blue-500" style="width: 0%;"></div>
+                    <div class="bg-gray-200 rounded-lg overflow-hidden h-5">
+                        <div id="test-accuracy-bar" class="bg-blue-500 h-full transition-all duration-500 ease-in-out" style="width: 0%;"></div>
                     </div>
                 </div>
             </div>
@@ -183,7 +187,7 @@
     </div>
     
     <!-- TEST SELECTION MODAL -->
-    <div id="test-selection-modal" class="hidden-view fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-40">
+    <div id="test-selection-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-40">
         <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto">
             <div class="p-6">
                 <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Test auswählen</h2>
@@ -191,7 +195,7 @@
                     <!-- Test-Optionen werden hier dynamisch eingefügt -->
                 </div>
                 <button class="mt-4 w-full px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg transition-colors" 
-                        onclick="document.getElementById('test-selection-modal').classList.add('hidden-view')">
+                        onclick="document.getElementById('test-selection-modal').classList.add('hidden')">
                     Abbrechen
                 </button>
             </div>

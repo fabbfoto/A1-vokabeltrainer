@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (isCorrect) {
             console.log('[processAnswer] Antwort ist KORREKT');
             state.correctInRound++;
-            dom.feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
+            dom.feedbackContainerEl.innerHTML = `<span class="text-green-500 font-bold text-2xl">Richtig!</span>`;
             
             if (wordId && !state.isTestModeActive && state.currentMainTopic && state.currentSubTopic && state.currentMode) {
                 const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             setTimeout(() => { loadNextTask(); }, 1200);
         } else {
             console.log('[processAnswer] Antwort ist FALSCH');
-            dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">${correctAnswer}</span>`;
+            dom.feedbackContainerEl.innerHTML = `<span class="text-red-500 font-bold text-2xl">${correctAnswer}</span>`;
             
             if (wordId && state.currentMode) {
                 if (!state.wordsToRepeatByMode[state.currentMode]) {
@@ -374,12 +374,26 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         state.attemptedInRound = 0;
 
         // Button-Styles aktualisieren
+        // Alle Buttons auf Standard zurücksetzen
         document.querySelectorAll('#mode-button-grid .mode-button').forEach(btn => {
-            btn.classList.remove('active', 'repeat-active');
+            if (!btn.id.includes('repeat')) {
+                btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
+                btn.classList.add('border-gray-300');
+            } else {
+                btn.classList.remove('bg-red-500', 'text-white');
+                btn.classList.add('bg-red-100', 'text-red-500');
+            }
         });
-        document.getElementById(`mode-${modeId}`)?.classList.add('active');
+
+        // Aktiven Button hervorheben
         if (isRepeat) {
-            document.getElementById(`mode-repeat-${modeId}`)?.classList.add('repeat-active');
+            const repeatButton = document.getElementById(`mode-repeat-${modeId}`);
+            repeatButton?.classList.remove('bg-red-100', 'text-red-500');
+            repeatButton?.classList.add('bg-red-500', 'text-white');
+        } else {
+            const modeButton = document.getElementById(`mode-${modeId}`);
+            modeButton?.classList.remove('border-gray-300');
+            modeButton?.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
         }
 
         loadNextTask();
@@ -390,8 +404,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     function startTestUI(testTitle: string, modus: string): void {
         authUI.hide();
         ui.hideAllUIs(dom);
-        dom.trainerMainViewEl.classList.remove('hidden-view');
-        dom.navigationViewEl.classList.add('hidden-view');
+        dom.trainerMainViewEl.classList.remove('hidden');
+        dom.navigationViewEl.classList.add('hidden');
         
         const modusName = learningModes[modus]?.name || "Test";
         dom.currentTrainingTitleEl.textContent = `${testTitle} - ${modusName}`;
@@ -451,8 +465,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 ui.displayMainTopics(dom, state, vokabular, learningModes);
             }
             
-            dom.trainerMainViewEl.classList.add('hidden-view');
-            dom.navigationViewEl.classList.remove('hidden-view');
+            dom.trainerMainViewEl.classList.add('hidden');
+            dom.navigationViewEl.classList.remove('hidden');
         }, 3000);
     }
 
@@ -574,8 +588,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         dom.testStatsViewEl.classList.add('hidden');
         dom.modeButtonGridEl.classList.remove('hidden');
         dom.currentTrainingTitleEl.textContent = subTopicName;
-        dom.navigationViewEl.classList.add('hidden-view');
-        dom.trainerMainViewEl.classList.remove('hidden-view');
+        dom.navigationViewEl.classList.add('hidden');
+        dom.trainerMainViewEl.classList.remove('hidden');
 
         ui.updatePracticeStats(dom, state, learningModes);
         ui.updateErrorCounts(dom, state, learningModes);
@@ -601,7 +615,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             }
         } else if (testButton) {
             ui.updateTestModeProgressBars(dom, state);
-            dom.testSelectionModalEl.classList.remove('hidden-view');
+            dom.testSelectionModalEl.classList.remove('hidden');
         }
     }
 
@@ -647,8 +661,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             } else {
                 ui.displayMainTopics(dom, state, vokabular, learningModes);
             }
-            dom.navigationViewEl.classList.remove('hidden-view');
-            dom.trainerMainViewEl.classList.add('hidden-view');
+            dom.navigationViewEl.classList.remove('hidden');
+            dom.trainerMainViewEl.classList.add('hidden');
         });
 
 
