@@ -181,6 +181,7 @@ export function displayMainTopics(
 
 /**
  * Zeigt die Unterthemen eines Hauptthemas an.
+ * KORRIGIERT: Verwendet jetzt das gleiche 3-Spalten-Layout wie die Hauptthemen
  */
 export function displaySubTopics(
     dom: DOMElements,
@@ -198,74 +199,100 @@ export function displaySubTopics(
     dom.backToMainTopicsButton.classList.remove('hidden');
     dom.navigationContainerEl.innerHTML = '';
     
-    // Grid-Layout konsistent mit Hauptansicht
-    dom.navigationContainerEl.className = 'grid grid-cols-2 gap-4';
+    // WICHTIG: Gleiche Grid-Layout wie Hauptthemen - 3 Spalten!
+    dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4';
 
     const subTopics = Object.keys(vokabular[mainTopicName]);
+    const numberOfModes = Object.keys(learningModes).length;
     
     subTopics.forEach(subTopicName => {
         const button = document.createElement('button');
-        // Exakt gleicher Style für Konsistenz
-        button.className = 'relative min-h-[70px] flex flex-col items-center justify-center p-4 text-center cursor-pointer font-medium transition-all duration-300 border rounded';
+        
+        // EXAKT gleiche Klassen wie bei Hauptthemen
+        button.className = 'wortgruppe-button relative flex flex-col items-center justify-center p-4 text-center cursor-pointer font-medium transition-all duration-300 border rounded-lg whitespace-normal break-words';
+        
+        // EXAKT gleiche Styles wie bei Hauptthemen
+        button.style.backgroundColor = '#e9e9ed';
+        button.style.color = '#374151';
+        button.style.borderColor = '#d1d5db';
+        button.style.minHeight = '70px'; // Rechteckig wie Hauptthemen
         
         // Fortschritt berechnen
         const words = vokabular[mainTopicName][subTopicName];
+        const totalPossibleTasks = words.length * numberOfModes;
         const progressKey = `${mainTopicName}|${subTopicName}`;
         const progressForKey = state.globalProgress[progressKey] || {};
         
-        let totalWords = 0;
-        let totalMastered = 0;
-        
-        Object.keys(learningModes).forEach(modeId => {
-            totalWords += words.length;
-            const masteredInMode = progressForKey[modeId]?.size || 0;
-            totalMastered += masteredInMode;
+        let completedTasks = 0;
+        Object.values(progressForKey).forEach((masteredSet: any) => {
+            completedTasks += (masteredSet.size || masteredSet.length || 0);
         });
         
-        const percentage = calculateProgressPercentage(totalMastered, totalWords);
-        const progressColorClass = getProgressColorClass(totalMastered, totalWords);
+        const percentage = calculateProgressPercentage(completedTasks, totalPossibleTasks);
+        const progressColorClass = getProgressColorClass(completedTasks, totalPossibleTasks);
         
+        // EXAKT gleiche HTML-Struktur wie bei Hauptthemen
         button.innerHTML = `
-            <div class="w-full">
-                <div class="text-lg font-semibold text-gray-800 mb-3 text-center">${subTopicName}</div>
-                <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-                    <div class="h-full rounded-full transition-all duration-500 ${progressColorClass}" 
+            <div class="text-base font-medium mb-2">${subTopicName.replace(/\//g, '/<br>')}</div>
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-auto">
+                <div class="h-full rounded-full transition-all duration-300 ${progressColorClass}" 
                          style="width: ${percentage}%">
                     </div>
-                </div>
             </div>
         `;
         
         button.dataset.subTopic = subTopicName;
         
-        button.style.backgroundColor = '#e9e9ed';
-        button.style.color = '#374151';
-        button.style.borderColor = '#d1d5db';
-        
+        // Hover-Effekte wie bei Hauptthemen
         button.addEventListener('mouseenter', () => {
             button.style.backgroundColor = '#d1d5db';
         });
         button.addEventListener('mouseleave', () => {
             button.style.backgroundColor = '#e9e9ed';
         });
+        
+        button.addEventListener('click', () => {
+            button.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                button.style.transform = 'scale(1)';
+            }, 100);
+        });
+        
         dom.navigationContainerEl.appendChild(button);
     });
 
-    // Hauptthema-Test Button - KORREKTUR: Deutschland-Farben statt Orange
+    // Hauptthema-Test Button - überspannt alle 3 Spalten
     const mainTopicTestButton = document.createElement('button');
     mainTopicTestButton.dataset.testMainTopicOnly = mainTopicName;
-    mainTopicTestButton.innerHTML = `<span>🎯</span><span>Test: ${mainTopicName}</span><span class="text-sm opacity-90">(Alle Unterthemen)</span>`;
-    mainTopicTestButton.className = 'col-span-full text-white font-bold py-3 px-6 rounded border-none cursor-pointer transition-all duration-300 relative overflow-hidden';
-    mainTopicTestButton.style.background = 'linear-gradient(135deg, #f59e0b 0%, #dc2626 50%, #1f2937 100%)';
     
-    // Hover-Effekt
+    // WICHTIG: Position nach den Unterthemen-Buttons
+    mainTopicTestButton.style.gridColumn = '1 / -1'; // Überspannt alle Spalten
+    mainTopicTestButton.style.marginTop = '1rem'; // Abstand nach oben
+    
+    // Flexbox Layout für bessere Zentrierung
+    mainTopicTestButton.innerHTML = `
+        <div class="flex items-center justify-center gap-2">
+            <span>🎯</span>
+            <span>${mainTopicName} Gesamttest</span>
+        </div>
+        <div class="text-xs opacity-90 mt-1">(Alle Unterthemen)</div>
+    `;
+    
+    // Klassen für den Test-Button
+    mainTopicTestButton.className = 'col-span-full flex flex-col items-center justify-center text-white font-bold py-4 px-6 rounded-lg border-none cursor-pointer transition-all duration-300 relative overflow-hidden';
+    
+    // Deutschland-Farben Gradient statt Orange
+    mainTopicTestButton.style.background = 'linear-gradient(135deg, #1f2937 0%, #dc2626 50%, #f59e0b 100%)';
+    mainTopicTestButton.style.minHeight = '70px';
+    
+    // Hover-Effekt mit helleren Deutschland-Farben
     mainTopicTestButton.addEventListener('mouseenter', () => {
-        mainTopicTestButton.style.background = 'linear-gradient(135deg, #fbbf24 0%, #ef4444 50%, #374151 100%)';
+        mainTopicTestButton.style.background = 'linear-gradient(135deg, #374151 0%, #ef4444 50%, #fbbf24 100%)';
         mainTopicTestButton.style.transform = 'translateY(-2px)';
         mainTopicTestButton.style.boxShadow = '0 6px 20px 0 rgba(0, 0, 0, 0.25)';
     });
     mainTopicTestButton.addEventListener('mouseleave', () => {
-        mainTopicTestButton.style.background = 'linear-gradient(135deg, #f59e0b 0%, #dc2626 50%, #1f2937 100%)';
+        mainTopicTestButton.style.background = 'linear-gradient(135deg, #1f2937 0%, #dc2626 50%, #f59e0b 100%)';
         mainTopicTestButton.style.transform = 'translateY(0)';
         mainTopicTestButton.style.boxShadow = 'none';
     });
