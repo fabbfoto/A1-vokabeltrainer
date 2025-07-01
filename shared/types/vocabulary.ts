@@ -2,7 +2,6 @@
 // Professional vocabulary type system with discriminated unions
 
 // ========== BRANDED TYPES FOR TYPE SAFETY ==========
-import { vokabularLernen } from './vokabular_lernen.js'; // ✅ .ts
 export type WordId = string & { __brand: 'WordId' };
 export type TopicId = string & { __brand: 'TopicId' };
 export type SubTopicId = string & { __brand: 'SubTopicId' };
