@@ -67,55 +67,10 @@
     }
 }
 
-/* ✅ ACTION BUTTONS: Bündige Ausrichtung mit Grid */
+/* 🔧 ACTION BUTTONS: Überspannen alle Spalten */
+#navigation-container > button[data-test-main-topic-only],
 #navigation-container > button#start-test-mode-btn,
-#navigation-container > button#device-sync-btn,
-#navigation-container > button[data-test-main-topic-only] {
-    /* Höhe wie gewünscht halbiert */
-    min-height: 45px !important;
-    max-height: 55px !important;
-    
-    /* NEUE AUSRICHTUNG: Bündig mit Grid-Kanten */
-    margin: 0 !important;
-    align-self: start !important; /* Oben am Grid-Slot ausrichten */
-    
-    /* Kompaktere Innenabstände */
-    padding: 8px 16px !important;
-    
-    /* Überspanne alle Spalten aber bleibe im Grid */
+#navigation-container > button#device-sync-btn {
     grid-column: 1 / -1 !important;
-    
-    /* Entferne eventuelle Abstände die das Grid stören */
-    transform: none !important;
-}
-
-/* ✅ GRID-CONTAINER: Bessere Slot-Kontrolle */
-#navigation-container {
-    /* Explizite Grid-Zeilen für bessere Kontrolle */
-    grid-auto-rows: auto !important;
-    
-    /* Entferne Gaps die Action-Buttons verschieben könnten */
-    row-gap: 1rem !important;
-    column-gap: 1rem !important;
-    
-    /* Alle Items am Grid-Start ausrichten */
-    align-items: start !important;
-    justify-items: stretch !important;
-}
-
-/* ✅ THEMEN-BUTTONS: Gleiche Ausrichtung */
-#navigation-container > button:not([data-test-main-topic-only]):not(#start-test-mode-btn):not(#device-sync-btn) {
-    /* Alle Topic-Buttons auch oben ausrichten */
-    align-self: start !important;
-    margin: 0 !important;
-}
-
-/* ✅ PLATZHALTER: Korrekte Grid-Integration */
-#navigation-container > div[data-placeholder] {
-    visibility: hidden;
-    min-height: 90px;
-    max-height: 110px;
-    pointer-events: none;
-    margin: 0 !important;
-    align-self: start !important;
+    min-width: 100% !important;
 }

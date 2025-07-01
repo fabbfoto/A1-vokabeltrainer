@@ -32,7 +32,7 @@
     <meta name="theme-color" content="#3b82f6">
     <link rel="stylesheet" href="./shared/styles/minimal-legacy.css">
 </head>
-<body class="bg-gray-100 font-['Inter'] flex flex-col justify-start items-center min-h-screen p-4">
+<body class="bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 font-['Inter'] flex flex-col justify-start items-center min-h-screen p-4">
 
     <!-- NAVIGATION VIEW -->
     <div id="navigation-view" class="p-4 max-w-2xl mx-auto">
@@ -49,7 +49,7 @@
     <!-- TRAINER MAIN VIEW -->
     <div id="trainer-main-view" class="hidden p-4 max-w-2xl mx-auto flex flex-col items-center">
         <!-- Header mit Zurück-Button und Titel -->
-        <div class="p-2 bg-white rounded-lg shadow-md mb-4 w-full">
+        <div class="p-4 bg-white/20 backdrop-blur-lg rounded-2xl shadow-[0_8px_32px_rgba(31,38,135,0.37)] border border-white/30 mb-4 w-full">
             <div class="flex justify-between items-center mb-2">
                 <button id="back-to-subtopics" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&larr; Zurück</button>
                 <h2 id="current-training-title" class="text-lg font-semibold text-gray-700">Training</h2>
@@ -85,7 +85,7 @@
         </div>
 
         <!-- Haupt-Trainer-Card -->
-        <div class="w-full max-w-2xl mt-4 bg-white p-8 rounded-xl shadow-lg">
+        <div class="w-full max-w-2xl mt-4 bg-white/20 backdrop-blur-lg p-8 rounded-2xl shadow-[0_8px_32px_rgba(31,38,135,0.37)] border border-white/30">
             <!-- Audio-Container für Wort und Satz -->
             <div id="word-line-container" class="flex justify-center items-center gap-3 w-full">
                 <div id="question-display-area" class="min-h-[2em] text-center text-[1.75rem] font-semibold text-gray-900"></div>
@@ -111,10 +111,22 @@
                            autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
                 </div>
                 <div id="noun-input-container" class="hidden flex items-center gap-2">
-                    <input type="text" id="spelling-input-noun-1" class="flex-grow border border-gray-300 rounded-md text-center p-2 transition" 
-                           autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
-                    <input type="text" id="spelling-input-noun-2" class="flex-grow border border-gray-300 rounded-md text-center p-2 transition" 
-                           autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
+                    <input type="text" 
+                           id="spelling-input-noun-1" 
+                           class="flex-grow border border-gray-300 rounded-md text-center p-2 transition" 
+                           placeholder="der/die/das + Singular"
+                           autocapitalize="off" 
+                           autocorrect="off" 
+                           autocomplete="off" 
+                           spellcheck="false">
+                    <input type="text" 
+                           id="spelling-input-noun-2" 
+                           class="flex-grow border border-gray-300 rounded-md text-center p-2 transition" 
+                           placeholder="Plural"
+                           autocapitalize="off" 
+                           autocorrect="off" 
+                           autocomplete="off" 
+                           spellcheck="false">
                 </div>
                 <button id="check-spelling-button" class="w-full font-semibold py-2 px-4 rounded-lg shadow bg-blue-500 text-white transition-colors hover:bg-blue-600 disabled:opacity-60">Auswerten</button>
             </div>

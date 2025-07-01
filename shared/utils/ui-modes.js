@@ -85,10 +85,12 @@ export function setupTypeDeAdjMode(dom, state, processAnswer) {
     dom.spellingInputNoun2El.value = '';
     
     let correctAnswer = "";
+    let inputToFocus = null;
     
     // Prüfe auf nomen_notation
     if (state.currentWordData.nomen_notation && typeof parseNounString === 'function') {
         dom.nounInputContainerEl.style.display = 'flex';
+        inputToFocus = dom.spellingInputNoun1El;
         const parsed = parseNounString(state.currentWordData.nomen_notation);
         if (parsed) {
             if (parsed.isPluralOnly) {
@@ -103,6 +105,7 @@ export function setupTypeDeAdjMode(dom, state, processAnswer) {
     } else {
         // Für andere Wortarten oder wenn parseNounString nicht verfügbar ist
         dom.singleInputContainerEl.style.display = 'block';
+        inputToFocus = dom.spellingInputSingleEl;
         correctAnswer = state.currentWordData.german;
     }
     
@@ -135,24 +138,17 @@ export function setupTypeDeAdjMode(dom, state, processAnswer) {
         }
     };
     
-    // Event-Listener und Fokus setzen
-    if (dom.nounInputContainerEl.style.display === 'flex') {
-        dom.spellingInputNoun1El.addEventListener('keydown', handleEnter);
-        dom.spellingInputNoun2El.addEventListener('keydown', handleEnter);
-        dom.spellingInputNoun1El.addEventListener('focus', () => state.activeTextInput = dom.spellingInputNoun1El);
-        dom.spellingInputNoun2El.addEventListener('focus', () => state.activeTextInput = dom.spellingInputNoun2El);
-        
+    // Event-Listener für alle Eingabefelder hinzufügen
+    [dom.spellingInputSingleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El].forEach(input => {
+        input.addEventListener('keydown', handleEnter);
+        input.addEventListener('focus', () => state.activeTextInput = input);
+    });
+
+    // Fokus auf das korrekte Eingabefeld setzen
+    if (inputToFocus) {
         setTimeout(() => {
-            dom.spellingInputNoun1El.focus();
-            state.activeTextInput = dom.spellingInputNoun1El;
-        }, 100);
-    } else {
-        dom.spellingInputSingleEl.addEventListener('keydown', handleEnter);
-        dom.spellingInputSingleEl.addEventListener('focus', () => state.activeTextInput = dom.spellingInputSingleEl);
-        
-        setTimeout(() => {
-            dom.spellingInputSingleEl.focus();
-            state.activeTextInput = dom.spellingInputSingleEl;
+            inputToFocus.focus();
+            state.activeTextInput = inputToFocus;
         }, 100);
     }
 }
