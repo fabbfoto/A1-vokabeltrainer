@@ -1,68 +1,21 @@
-// ui-modes.ts - TypeScript Version mit vollständiger Type-Safety
+// ui-modes.ts - TypeScript Version mit globalen Types
+// Alle Lernmodus-Setup-Funktionen mit vollständiger Type-Safety
 
+// ✅ IMPORT GLOBALE TYPES (statt lokale Definitionen)
+import type { 
+    Word, 
+    TrainerState, 
+    ModeId
+} from '../types/index';
+
+// Import DOMElements from the correct location to avoid conflicts
+import type { DOMElements } from '../../dom';
+
+// Import der Helfer-Funktionen
 import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence } from './helfer';
 
-// Type Definitions
-interface Word {
-    id: string;
-    german: string;
-    english: string;
-    artikel?: string;
-    plural?: string;
-    wortart?: string;
-    nomen_notation?: string;
-    example_de?: any[] | string;
-    example_en?: string;
-    cloze_parts?: string[];
-    cloze_answers?: string[];
-    [key: string]: any;
-}
-
-interface TrainerState {
-    currentWordData: Word;
-    activeTextInput: HTMLInputElement | null;
-    [key: string]: any;
-}
-
-interface DOMElements {
-    // Multiple Choice
-    mcUiEl: HTMLElement;
-    mcAnswersContainerEl: HTMLElement;
-    questionDisplayEl: HTMLElement;
-    exampleSentenceDisplayEl: HTMLElement;
-    audioWordButtonEl: HTMLButtonElement;
-    audioSentenceButtonEl: HTMLButtonElement;
-    wordLineContainerEl: HTMLElement;
-    sentenceLineContainerEl: HTMLElement;
-    SVG_SPEAKER_ICON: string;
-    
-    // Spelling Mode
-    spellingModeUiEl: HTMLElement;
-    checkSpellingButton: HTMLButtonElement;
-    singleInputContainerEl: HTMLElement;
-    spellingInputSingleEl: HTMLInputElement;
-    nounInputContainerEl: HTMLElement;
-    spellingInputNoun1El: HTMLInputElement;
-    spellingInputNoun2El: HTMLInputElement;
-    umlautButtonsContainerEl?: HTMLElement;
-    umlautButtonsContainer?: HTMLElement;
-    
-    // Cloze Mode
-    clozeUiEl: HTMLElement;
-    checkClozeButton: HTMLButtonElement;
-    clozeHintContainerEl: HTMLElement;
-    clozeSentenceContainerEl: HTMLElement;
-    
-    // Sentence Translation Mode
-    sentenceUiEl?: HTMLElement;
-    sentenceTranslationUiEl?: HTMLElement;
-    checkSentenceButton: HTMLButtonElement;
-    sentenceWordInputContainerEl: HTMLElement;
-    
-    [key: string]: any;
-}
-
-type ProcessAnswerFunction = (isCorrect: boolean, correctAnswer: string) => void;
+// ✅ KORREKTE PROCESS-ANSWER-FUNCTION TYPE
+type ProcessAnswerFunction = (isCorrect: boolean, correctAnswer?: string, timeSpent?: number) => void;
 
 // Lokale insertTextAtCursor Funktion
 function insertTextAtCursor(inputElement: HTMLInputElement | null, text: string): void {
@@ -77,20 +30,31 @@ function insertTextAtCursor(inputElement: HTMLInputElement | null, text: string)
     inputElement.dispatchEvent(event);
 }
 
-export function setupMcDeEnMode(
+// ✅ MULTIPLE CHOICE MODE - mit korrekten Property-Namen
+export function setupMultipleChoiceMode(
     dom: DOMElements, 
     state: TrainerState, 
-    alleVokabeln: Word[], 
     processAnswer: ProcessAnswerFunction
 ): void {
+    console.log('[setupMultipleChoiceMode] Starting - korrekte globale Types');
+    
+    // UI Setup
     dom.mcUiEl.style.display = 'block';
     if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'none';
     
-    const germanWordForDisplay = state.currentWordData.german || "";
+    // ✅ KORREKT: currentWord statt currentWordData
+    const currentWord = state.currentWord;
+    if (!currentWord) {
+        console.error('[setupMultipleChoiceMode] Kein currentWord gefunden!');
+        return;
+    }
+    
+    const germanWordForDisplay = currentWord.german || "";
     let displayGermanWord = germanWordForDisplay;
     
-    if (state.currentWordData.nomen_notation && typeof parseNounString === 'function') {
-        const parsed = parseNounString(state.currentWordData.nomen_notation); 
+    // Nomen-Notation handling
+    if ('nomen_notation' in currentWord && typeof parseNounString === 'function') {
+        const parsed = parseNounString((currentWord as any).nomen_notation); 
         if (parsed) {
             displayGermanWord = parsed.isPluralOnly 
                 ? `die ${parsed.singular} (Pl.)` 
@@ -100,75 +64,112 @@ export function setupMcDeEnMode(
 
     dom.questionDisplayEl.textContent = displayGermanWord;
 
-    // Anzeige des Beispielsatzes (ggf. mit Kasus-Farben)
-    dom.exampleSentenceDisplayEl.innerHTML = '';
-    if (Array.isArray(state.currentWordData.example_de)) {
-        const kasusColorMap: Record<string, string> = {
-            nominativ: 'text-green-600',
-            akkusativ: 'text-blue-600',
-            dativ: 'text-red-600',
-            genitiv: 'text-yellow-600',
-            verb: 'text-pink-600',
-            none: ''
-        };
-
-        state.currentWordData.example_de.forEach((part: any) => {
-            const span = document.createElement('span');
-            span.textContent = part.text;
-            if (part.kasus && part.kasus !== 'none') {
-                span.className = kasusColorMap[part.kasus] || '';
-            }
-            dom.exampleSentenceDisplayEl.appendChild(span);
-        });
-    } else {
-        dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_de as string;
+    // Beispielsatz anzeigen
+    if ('example_de' in currentWord) {
+        const exampleDe = (currentWord as any).example_de;
+        if (Array.isArray(exampleDe)) {
+            dom.exampleSentenceDisplayEl.innerHTML = exampleDe.map(part => 
+                `<span class="kasus-${part.kasus || 'none'}">${part.text}</span>`
+            ).join('');
+        } else if (typeof exampleDe === 'string') {
+            dom.exampleSentenceDisplayEl.textContent = exampleDe;
+        }
     }
 
+    // Audio-Buttons setup
     dom.audioWordButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
-    dom.audioWordButtonEl.onclick = () => speak(germanWordForDisplay);
-    dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
+    dom.audioWordButtonEl.onclick = () => speak(currentWord.german);
     
-    const sentenceForSpeech = Array.isArray(state.currentWordData.example_de)
-        ? state.currentWordData.example_de.map((part: any) => part.text).join('')
-        : state.currentWordData.example_de;
-    dom.audioSentenceButtonEl.onclick = () => speak(sentenceForSpeech as string, 'de-DE');
+    dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
+    dom.audioSentenceButtonEl.onclick = () => {
+        if ('example_de' in currentWord) {
+            const exampleDe = (currentWord as any).example_de;
+            if (Array.isArray(exampleDe)) {
+                speak(exampleDe.map(part => part.text).join(''));
+            } else if (typeof exampleDe === 'string') {
+                speak(exampleDe);
+            }
+        }
+    };
 
-    dom.audioWordButtonEl.style.display = 'inline-flex';
-    dom.audioSentenceButtonEl.style.display = 'inline-flex';
+    // Container visibility
     dom.wordLineContainerEl.style.display = 'flex';
     dom.sentenceLineContainerEl.style.display = 'flex';
-    
-    const correctAnswerEN = (state.currentWordData.english || "").split(',')[0].trim();
-    const allPossibleAnswers = alleVokabeln.map(v => (v.english || "").split(',')[0].trim());
-    const distractors = shuffleArray(allPossibleAnswers.filter(e => e && e !== correctAnswerEN)).slice(0, 3);
-    const options = shuffleArray([correctAnswerEN, ...distractors]);
-    
+
+    // Multiple Choice Antworten generieren
+    generateMultipleChoiceAnswers(dom, state, processAnswer);
+}
+
+function generateMultipleChoiceAnswers(
+    dom: DOMElements, 
+    state: TrainerState, 
+    processAnswer: ProcessAnswerFunction
+): void {
     dom.mcAnswersContainerEl.innerHTML = '';
-    options.forEach(option => {
+    
+    const currentWord = state.currentWord;
+    if (!currentWord) return;
+    
+    const correctAnswerEN = currentWord.english;
+    const wrongAnswers: string[] = [];
+    
+    // ✅ KORREKT: shuffledWordsForMode statt shuffledVocabForMode
+    const shuffledWords = shuffleArray([...state.shuffledWordsForMode]);
+    
+    for (const word of shuffledWords) {
+        if (word.id !== currentWord.id && wrongAnswers.length < 3) {
+            wrongAnswers.push(word.english);
+        }
+    }
+    
+    // Fallback falls nicht genug falsche Antworten
+    while (wrongAnswers.length < 3) {
+        wrongAnswers.push(`Falsche Antwort ${wrongAnswers.length + 1}`);
+    }
+    
+    const allAnswers = [correctAnswerEN, ...wrongAnswers];
+    const shuffledAnswers = shuffleArray(allAnswers);
+    
+    shuffledAnswers.forEach(answer => {
         const button = document.createElement('button');
-        button.className = 'answer-button w-full border border-gray-300 text-gray-700 font-medium py-3 px-4 rounded-lg';
-        button.textContent = option;
-        button.onclick = () => processAnswer(option === correctAnswerEN, correctAnswerEN);
+        button.className = 'mc-answer-button w-full p-4 text-left border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors';
+        button.textContent = answer;
+        button.onclick = () => {
+            const isCorrect = answer === correctAnswerEN;
+            processAnswer(isCorrect, correctAnswerEN);
+        };
         dom.mcAnswersContainerEl.appendChild(button);
     });
 }
 
+// ✅ SPELLING MODE - mit korrekten Property-Namen
 export function setupSpellingMode(
     dom: DOMElements, 
     state: TrainerState, 
-    alleVokabeln: Word[], 
     processAnswer: ProcessAnswerFunction
 ): void {
-    console.log('[setupSpellingMode] Starting - TypeScript version');
+    console.log('[setupSpellingMode] Starting - globale Types');
     
     dom.checkSpellingButton.disabled = false;
     
-    const umlautContainer = dom.umlautButtonsContainerEl || dom.umlautButtonsContainer;
+    const umlautContainer = dom.umlautButtonsContainerEl;
     if (umlautContainer) umlautContainer.style.display = 'flex';
     
     dom.spellingModeUiEl.style.display = 'block';
-    dom.questionDisplayEl.textContent = (state.currentWordData.english || "").split(',')[0].trim();
-    dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_en || "";
+    
+    // ✅ KORREKT: currentWord statt currentWordData
+    const currentWord = state.currentWord;
+    if (!currentWord) {
+        console.error('[setupSpellingMode] Kein currentWord gefunden!');
+        return;
+    }
+    
+    dom.questionDisplayEl.textContent = currentWord.english.split(',')[0].trim();
+    
+    if ('example_en' in currentWord) {
+        dom.exampleSentenceDisplayEl.textContent = (currentWord as any).example_en || "";
+    }
+    
     dom.wordLineContainerEl.style.display = 'flex';
     dom.sentenceLineContainerEl.style.display = 'flex';
     
@@ -177,8 +178,8 @@ export function setupSpellingMode(
         if(input) input.classList.remove('correct-user-input', 'incorrect-user-input');
     });
     
-    const isNounWithPlural = state.currentWordData && typeof state.currentWordData.plural !== 'undefined';
-    console.log('[setupSpellingMode] Is noun:', isNounWithPlural);
+    // Check if noun with plural
+    const isNounWithPlural = 'plural' in currentWord && currentWord.plural !== undefined;
     
     if (isNounWithPlural) {
         // Nomen-Modus: Zwei Felder
@@ -196,236 +197,202 @@ export function setupSpellingMode(
         
         // Button Click Handler
         dom.checkSpellingButton.onclick = () => {
-            console.log('[setupSpellingMode] Noun button clicked');
-            const correctAnswerSingular = `${state.currentWordData.artikel} ${state.currentWordData.german}`;
-            const correctAnswerPluralWord = state.currentWordData.plural!;
+            const artikel = 'artikel' in currentWord ? (currentWord as any).artikel : '';
+            const correctAnswerSingular = `${artikel} ${currentWord.german}`;
+            const correctAnswerPluralWord = (currentWord as any).plural!;
+            
             const userInputSingular = dom.spellingInputNoun1El.value.trim();
             const userInputPlural = dom.spellingInputNoun2El.value.trim();
+            
             const isSingularCorrect = vergleicheAntwort(userInputSingular, correctAnswerSingular);
             const isPluralCorrect = vergleicheAntwort(userInputPlural, correctAnswerPluralWord);
+            
             dom.spellingInputNoun1El.classList.add(isSingularCorrect ? 'correct-user-input' : 'incorrect-user-input');
             dom.spellingInputNoun2El.classList.add(isPluralCorrect ? 'correct-user-input' : 'incorrect-user-input');
-            const isOverallCorrect = isSingularCorrect && isPluralCorrect;
-            const combinedCorrectAnswer = `${correctAnswerSingular} / ${correctAnswerPluralWord}`;
-            console.log('[setupSpellingMode] Calling processAnswer with:', isOverallCorrect);
-            processAnswer(isOverallCorrect, combinedCorrectAnswer);
+            
+            const isFullyCorrect = isSingularCorrect && isPluralCorrect;
+            const correctAnswer = `${correctAnswerSingular} / ${correctAnswerPluralWord}`;
+            
+            processAnswer(isFullyCorrect, correctAnswer);
         };
-        
-        // Enter Key Handlers
-        dom.spellingInputNoun1El.onkeydown = (event: KeyboardEvent) => {
-            if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) {
-                event.preventDefault();
-                dom.checkSpellingButton.click();
-            }
-        };
-        dom.spellingInputNoun2El.onkeydown = (event: KeyboardEvent) => {
-            if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) {
-                event.preventDefault();
-                dom.checkSpellingButton.click();
-            }
-        };
-        
-        // Focus setzen
-        setTimeout(() => {
-            dom.spellingInputNoun1El.focus();
-            state.activeTextInput = dom.spellingInputNoun1El;
-        }, 100);
-
     } else {
-        // Einzelwort-Modus
+        // Single-Input-Modus
         dom.singleInputContainerEl.classList.remove('hidden');
         dom.nounInputContainerEl.classList.add('hidden');
         
         dom.spellingInputSingleEl.value = '';
         dom.spellingInputSingleEl.disabled = false;
+        
+        // Focus Handler
         dom.spellingInputSingleEl.addEventListener('focus', () => state.activeTextInput = dom.spellingInputSingleEl);
         
         // Button Click Handler
         dom.checkSpellingButton.onclick = () => {
-            console.log('[setupSpellingMode] Single button clicked');
-            const correctAnswer = state.currentWordData.german;
-            const isCorrect = vergleicheAntwort(dom.spellingInputSingleEl.value.trim(), correctAnswer);
+            const userInput = dom.spellingInputSingleEl.value.trim();
+            const correctAnswer = currentWord.german;
+            const isCorrect = vergleicheAntwort(userInput, correctAnswer);
+            
             dom.spellingInputSingleEl.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
-            console.log('[setupSpellingMode] Calling processAnswer with:', isCorrect);
             processAnswer(isCorrect, correctAnswer);
         };
-        
-        dom.spellingInputSingleEl.onkeydown = (event: KeyboardEvent) => {
-            if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) {
-                event.preventDefault();
-                dom.checkSpellingButton.click();
-            }
-        };
-        
-        setTimeout(() => {
-            dom.spellingInputSingleEl.focus();
-            state.activeTextInput = dom.spellingInputSingleEl;
-        }, 100);
     }
-    
-    // Umlaut-Buttons Setup (vereinfacht)
-    if (umlautContainer) {
-        const buttons = umlautContainer.querySelectorAll('button');
-        buttons.forEach(button => {
-            (button as HTMLButtonElement).onclick = (event: MouseEvent) => {
-                event.preventDefault();
-                if (state.activeTextInput) {
-                    const char = event.shiftKey ? button.textContent!.toUpperCase() : button.textContent!;
-                    insertTextAtCursor(state.activeTextInput, char);
-                } else {
-                    console.log('[setupSpellingMode] No active input for umlaut');
-                }
-            };
-        });
-    }
-    
-    console.log('[setupSpellingMode] Setup complete');
 }
 
-export function setupClozeAdjDeMode(
+// ✅ CLOZE MODE - mit korrekten Property-Namen
+export function setupClozeMode(
     dom: DOMElements, 
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    console.log('[setupClozeMode] Starting - globale Types');
+    
     dom.checkClozeButton.disabled = false;
     
-    const umlautContainer = dom.umlautButtonsContainerEl || dom.umlautButtonsContainer;
+    const umlautContainer = dom.umlautButtonsContainerEl;
     if (umlautContainer) umlautContainer.style.display = 'flex';
     
     dom.clozeUiEl.style.display = 'block';
-    dom.questionDisplayEl.textContent = '';
-    dom.exampleSentenceDisplayEl.textContent = '';
-    dom.wordLineContainerEl.style.display = 'none';
+    
+    // ✅ KORREKT: currentWord statt currentWordData
+    const currentWord = state.currentWord;
+    if (!currentWord) {
+        console.error('[setupClozeMode] Kein currentWord gefunden!');
+        return;
+    }
+    
+    dom.questionDisplayEl.textContent = currentWord.english;
+    dom.wordLineContainerEl.style.display = 'flex';
     dom.sentenceLineContainerEl.style.display = 'none';
-    
-    const { cloze_parts, cloze_answers, english } = state.currentWordData;
-    const correctAnswer = cloze_answers?.[0] || "";
-    
-    dom.clozeSentenceContainerEl.innerHTML = '';
-    
-    if (cloze_parts && cloze_parts.length === 2 && correctAnswer) {
-        dom.clozeHintContainerEl.textContent = english || "";
-        dom.clozeHintContainerEl.style.display = 'block';
-        
-        dom.clozeSentenceContainerEl.append(document.createTextNode(cloze_parts[0]));
-        
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'inline-block w-48 text-center border-b-2 border-gray-300 focus:border-blue-500 outline-none bg-transparent transition';
-        input.autocapitalize = 'off';
-        input.addEventListener('focus', () => state.activeTextInput = input);
 
-        dom.clozeSentenceContainerEl.append(input);
-        dom.clozeSentenceContainerEl.append(document.createTextNode(cloze_parts[1]));
+    // Cloze-spezifische Logik
+    if ('cloze_parts' in currentWord && 'cloze_answers' in currentWord) {
+        const clozeParts = (currentWord as any).cloze_parts;
+        const clozeAnswers = (currentWord as any).cloze_answers;
         
-        const handleCheckAnswer = (): void => {
-            const isCorrect = vergleicheAntwort(input.value, correctAnswer);
-            input.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
-            processAnswer(isCorrect, correctAnswer);
-        };
-        
-        const handleEnter = (event: KeyboardEvent): void => {
-            if (event.key === 'Enter' && !dom.checkClozeButton.disabled) {
-                event.preventDefault();
-                handleCheckAnswer();
-            }
-        };
-        
-        input.addEventListener('keydown', handleEnter);
-        dom.checkClozeButton.onclick = handleCheckAnswer;
-        
-        setTimeout(() => {
-            input.focus();
-            state.activeTextInput = input;
-        }, 100);
-    } else {
-        dom.clozeSentenceContainerEl.textContent = 'Für dieses Wort ist kein Lückentext verfügbar.';
-        dom.checkClozeButton.onclick = null;
+        if (Array.isArray(clozeParts) && Array.isArray(clozeAnswers)) {
+            generateClozeUI(dom, clozeParts, clozeAnswers, processAnswer);
+        }
     }
 }
 
+function generateClozeUI(
+    dom: DOMElements, 
+    clozeParts: string[], 
+    clozeAnswers: string[], 
+    processAnswer: ProcessAnswerFunction
+): void {
+    dom.clozeSentenceContainerEl.innerHTML = '';
+    
+    clozeParts.forEach((part, index) => {
+        const span = document.createElement('span');
+        span.textContent = part;
+        dom.clozeSentenceContainerEl.appendChild(span);
+        
+        if (index < clozeAnswers.length) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'cloze-input px-2 py-1 border-2 border-gray-300 rounded mx-1';
+            input.placeholder = '___';
+            dom.clozeSentenceContainerEl.appendChild(input);
+        }
+    });
+    
+    dom.checkClozeButton.onclick = () => {
+        const inputs = dom.clozeSentenceContainerEl.querySelectorAll('.cloze-input') as NodeListOf<HTMLInputElement>;
+        let allCorrect = true;
+        
+        inputs.forEach((input, index) => {
+            const userAnswer = input.value.trim();
+            const correctAnswer = clozeAnswers[index];
+            const isCorrect = vergleicheAntwort(userAnswer, correctAnswer);
+            
+            input.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
+            if (!isCorrect) allCorrect = false;
+        });
+        
+        processAnswer(allCorrect, clozeAnswers.join(', '));
+    };
+}
+
+// ✅ SENTENCE TRANSLATION MODE - mit korrekten Property-Namen
 export function setupSentenceTranslationEnDeMode(
     dom: DOMElements, 
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    console.log('[setupSentenceTranslationEnDeMode] Starting - globale Types');
+    
     dom.checkSentenceButton.disabled = false;
     
-    const umlautContainer = dom.umlautButtonsContainerEl || dom.umlautButtonsContainer;
+    const umlautContainer = dom.umlautButtonsContainerEl;
     if (umlautContainer) umlautContainer.style.display = 'flex';
     
-    const sentenceUi = dom.sentenceTranslationUiEl || dom.sentenceUiEl;
+    const sentenceUi = dom.sentenceUiEl;
     if (sentenceUi) sentenceUi.style.display = 'block';
     
-    dom.questionDisplayEl.textContent = state.currentWordData.example_en || "";
+    // ✅ KORREKT: currentWord statt currentWordData
+    const currentWord = state.currentWord;
+    if (!currentWord) {
+        console.error('[setupSentenceTranslationEnDeMode] Kein currentWord gefunden!');
+        return;
+    }
+    
+    if ('example_en' in currentWord) {
+        dom.questionDisplayEl.textContent = (currentWord as any).example_en;
+    }
+    
     dom.wordLineContainerEl.style.display = 'flex';
     dom.sentenceLineContainerEl.style.display = 'none';
 
+    // Deutschen Satz für Vergleich vorbereiten
     let fullGermanSentence = "";
-    if (Array.isArray(state.currentWordData.example_de)) {
-        fullGermanSentence = state.currentWordData.example_de.map((part: any) => part.text).join("");
-    } else {
-        fullGermanSentence = state.currentWordData.example_de as string || "";
+    if ('example_de' in currentWord) {
+        const exampleDe = (currentWord as any).example_de;
+        if (Array.isArray(exampleDe)) {
+            fullGermanSentence = exampleDe.map(part => part.text).join("");
+        } else if (typeof exampleDe === 'string') {
+            fullGermanSentence = exampleDe;
+        }
     }
 
-    const wordsForLayout = splitSentence(fullGermanSentence.replace(/[.,;:!?'"„"»«]+$/, ''));
-    const correctWords = splitSentence(fullGermanSentence);
-
-    dom.sentenceWordInputContainerEl.innerHTML = '';
-
-    const handleEnter = (event: KeyboardEvent): void => {
-        if (event.key === 'Enter' && !dom.checkSentenceButton.disabled) {
-            event.preventDefault();
-            handleCheckAnswer();
-        }
-    };
-
-    wordsForLayout.forEach((word) => {
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'border border-gray-300 rounded-md text-center p-2 transition';
-        input.style.width = `${Math.max(word.length, 3) + 2}ch`;
-        input.addEventListener('keydown', handleEnter);
-        input.addEventListener('focus', () => state.activeTextInput = input);
-        dom.sentenceWordInputContainerEl.appendChild(input);
-    });
-
-    const handleCheckAnswer = (): void => {
-        const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input') as NodeListOf<HTMLInputElement>;
-        let allCorrect = true;
-
-        if (inputs.length !== correctWords.length) {
-            allCorrect = false;
-        }
-
-        inputs.forEach((input, index) => {
-            const userAnswer = input.value;
-            const correctAnswer = correctWords[index] || "";
-            const isWordCorrect = vergleicheAntwort(userAnswer, correctAnswer);
-            
-            input.classList.remove('bg-green-100', 'border-green-500', 'bg-red-100', 'border-red-500');
-            if (isWordCorrect) {
-                input.classList.add('bg-green-100', 'border-green-500');
-            } else {
-                input.classList.add('bg-red-100', 'border-red-500');
-                allCorrect = false;
-            }
-        });
-        
-        processAnswer(allCorrect, fullGermanSentence);
-    };
-
-    dom.checkSentenceButton.onclick = handleCheckAnswer;
-
-    if (dom.sentenceWordInputContainerEl.firstChild) {
-        setTimeout(() => {
-            (dom.sentenceWordInputContainerEl.firstChild as HTMLInputElement).focus();
-            state.activeTextInput = dom.sentenceWordInputContainerEl.firstChild as HTMLInputElement;
-        }, 100);
-    }
+    // Wörter für Layout extrahieren (ohne Satzzeichen am Ende)
+    const wordsForLayout = splitSentence(fullGermanSentence.replace(/[.,;:!?]+$/, ''));
+    
+    // Sentence-Input-Container generieren
+    generateSentenceInputs(dom, wordsForLayout, fullGermanSentence, processAnswer);
 }
 
-// Alias für Rückwärtskompatibilität
-export const setupTypeDeAdjMode = setupSpellingMode;
-export const setupClozeMode = setupClozeAdjDeMode;
-export const setupSentenceTranslationMode = setupSentenceTranslationEnDeMode;
+function generateSentenceInputs(
+    dom: DOMElements, 
+    wordsForLayout: string[], 
+    fullGermanSentence: string, 
+    processAnswer: ProcessAnswerFunction
+): void {
+    dom.sentenceWordInputContainerEl.innerHTML = '';
+    
+    wordsForLayout.forEach((word, index) => {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'sentence-word-input px-2 py-1 border-2 border-gray-300 rounded mx-1 my-1';
+        input.placeholder = word;
+        input.dataset.expectedWord = word;
+        dom.sentenceWordInputContainerEl.appendChild(input);
+    });
+    
+    dom.checkSentenceButton.onclick = () => {
+        const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('.sentence-word-input') as NodeListOf<HTMLInputElement>;
+        const userSentence = Array.from(inputs).map(input => input.value.trim()).join(' ');
+        
+        const isCorrect = vergleicheAntwort(userSentence, fullGermanSentence.replace(/[.,;:!?]+$/, ''));
+        
+        inputs.forEach((input, index) => {
+            const userWord = input.value.trim();
+            const expectedWord = input.dataset.expectedWord || '';
+            const wordCorrect = vergleicheAntwort(userWord, expectedWord);
+            
+            input.classList.add(wordCorrect ? 'correct-user-input' : 'incorrect-user-input');
+        });
+        
+        processAnswer(isCorrect, fullGermanSentence);
+    };
+}

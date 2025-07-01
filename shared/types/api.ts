@@ -1,6 +1,43 @@
 // shared/types/api.ts
 // Professional API and Firebase integration types
 
+// ========== FIREBASE MOCK FÜR MIGRATION ==========
+// Da Firebase temporär deaktiviert ist, mocken wir die Types
+declare namespace FirebaseFirestore {
+  interface Timestamp {
+    toDate(): Date;
+    toMillis(): number;
+  }
+  
+  interface DocumentReference {
+    id: string;
+    path: string;
+  }
+  
+  interface CollectionReference {
+    id: string;
+    path: string;
+  }
+  
+  interface QuerySnapshot {
+    docs: DocumentSnapshot[];
+    size: number;
+    empty: boolean;
+  }
+  
+  interface DocumentSnapshot {
+    id: string;
+    exists: boolean;
+    data(): any;
+  }
+  
+  function Timestamp(): Timestamp;
+  namespace Timestamp {
+    function fromDate(date: Date): Timestamp;
+    function now(): Timestamp;
+  }
+}
+
 import type { WordId, TopicId, SubTopicId } from './vocabulary.js';
 import type { Progress, TestScore, SessionStats, ModeId } from './trainer.js';
 
