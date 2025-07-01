@@ -228,25 +228,25 @@ export interface LearningModeSetup {
 }
 
 export interface MultipleChoiceSetup extends LearningModeSetup {
-  mode: 'multipleChoice';
+  mode: ModeId; // should be ModeId, not string literal
   optionsCount: number;
   shuffleOptions: boolean;
 }
 
 export interface SpellingModeSetup extends LearningModeSetup {
-  mode: 'spelling';
+  mode: ModeId;
   showHints: boolean;
   enableUmlauts: boolean;
 }
 
 export interface ClozeSetup extends LearningModeSetup {
-  mode: 'cloze';
+  mode: ModeId;
   showContext: boolean;
   highlightTarget: boolean;
 }
 
 export interface SentenceTranslationSetup extends LearningModeSetup {
-  mode: 'sentenceTranslation';
+  mode: ModeId;
   wordByWord: boolean;
   enableUmlauts: boolean;
 }

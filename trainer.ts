@@ -43,6 +43,53 @@ let globalAuthUI: AuthUI | null = null;
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     console.log('🚀 DOMContentLoaded Event gefeuert');
 
+    // DOM-Elemente für die UI-Module bündeln
+    const dom = {
+        mcUiEl: document.getElementById('mc-de-en-ui') as HTMLElement,
+        mcAnswersContainerEl: document.getElementById('mc-answers-container') as HTMLElement,
+        questionDisplayEl: document.getElementById('question-display-area') as HTMLElement,
+        exampleSentenceDisplayEl: document.getElementById('example-sentence-display') as HTMLElement,
+        audioWordButtonEl: document.getElementById('audio-word-button') as HTMLElement,
+        audioSentenceButtonEl: document.getElementById('audio-sentence-button') as HTMLElement,
+        wordLineContainerEl: document.getElementById('word-line-container') as HTMLElement,
+        sentenceLineContainerEl: document.getElementById('sentence-line-container') as HTMLElement,
+        SVG_SPEAKER_ICON: `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.858 12H4a1 1 0 00-1 1v2a1 1 0 001 1h1.858l4.47 4.47A1 1 0 0012 20V4a1 1 0 00-1.672-.748L5.858 12z" /></svg>`,
+        spellingModeUiEl: document.getElementById('spelling-mode-ui') as HTMLElement,
+        checkSpellingButton: document.getElementById('check-spelling-button') as HTMLButtonElement,
+        singleInputContainerEl: document.getElementById('single-input-container') as HTMLElement,
+        nounInputContainerEl: document.getElementById('noun-input-container') as HTMLElement,
+        spellingInputSingleEl: document.getElementById('spelling-input-single') as HTMLInputElement,
+        spellingInputNoun1El: document.getElementById('spelling-input-noun-1') as HTMLInputElement,
+        spellingInputNoun2El: document.getElementById('spelling-input-noun-2') as HTMLInputElement,
+        clozeUiEl: document.getElementById('cloze-adj-de-ui') as HTMLElement,
+        clozeHintContainerEl: document.getElementById('cloze-hint-container') as HTMLElement,
+        clozeSentenceContainerEl: document.getElementById('cloze-sentence-container') as HTMLElement,
+        checkClozeButton: document.getElementById('check-cloze-button') as HTMLButtonElement,
+        sentenceUiEl: document.getElementById('sentence-translation-en-de-ui') as HTMLElement,
+        sentenceWordInputContainerEl: document.getElementById('sentence-word-input-container') as HTMLElement,
+        checkSentenceButton: document.getElementById('check-sentence-translation-button') as HTMLButtonElement,
+        umlautButtonsContainerEl: document.getElementById('umlaut-buttons-container') as HTMLElement,
+        trainerMainViewEl: document.getElementById('trainer-main-view') as HTMLElement,
+        navigationViewEl: document.getElementById('navigation-view') as HTMLElement,
+        currentTrainingTitleEl: document.getElementById('current-training-title') as HTMLElement,
+        practiceStatsViewEl: document.getElementById('practice-stats-view') as HTMLElement,
+        testStatsViewEl: document.getElementById('test-stats-view') as HTMLElement,
+        modeButtonGridEl: document.getElementById('mode-button-grid') as HTMLElement,
+        feedbackContainerEl: document.getElementById('feedback-container') as HTMLElement,
+        continueButton: document.getElementById('continue-button') as HTMLButtonElement,
+        messageBoxEl: document.getElementById('message-box') as HTMLElement,
+        correctInRoundPracticeEl: document.getElementById('correct-in-round-practice') as HTMLElement,
+        attemptedInRoundPracticeEl: document.getElementById('attempted-in-round-practice') as HTMLElement,
+        accuracyBarEl: document.getElementById('accuracy-bar') as HTMLElement,
+        categoryStatsContainerEl: document.getElementById('category-stats-container') as HTMLElement,
+        testProgressTextEl: document.getElementById('test-progress-text') as HTMLElement,
+        testProgressEl: document.getElementById('test-progress-bar') as HTMLElement,
+        testAccuracyTextEl: document.getElementById('test-accuracy-text') as HTMLElement,
+        testAccuracyBarEl: document.getElementById('test-accuracy-bar') as HTMLElement,
+        testSelectionModalEl: document.getElementById('test-selection-modal') as HTMLElement,
+        testOptionsGridEl: document.getElementById('test-options-grid') as HTMLElement,
+    };
+
     // Firebase Auth und Sync initialisieren
     console.log('📱 Initialisiere Firebase...');
     // Temporär auskommentieren

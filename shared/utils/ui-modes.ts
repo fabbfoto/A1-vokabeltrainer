@@ -40,7 +40,7 @@ export function setupMultipleChoiceMode(
     
     // UI Setup
     dom.mcUiEl.style.display = 'block';
-    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'none';
+    if (dom.umlautButtonsContainer) dom.umlautButtonsContainer.style.display = 'none';
     
     // ✅ KORREKT: currentWord statt currentWordData
     const currentWord = state.currentWord;
@@ -152,7 +152,7 @@ export function setupSpellingMode(
     
     dom.checkSpellingButton.disabled = false;
     
-    const umlautContainer = dom.umlautButtonsContainerEl;
+    const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
     
     dom.spellingModeUiEl.style.display = 'block';
