@@ -24,7 +24,7 @@
     "*.ts",
     "shared/**/*",
     "packages/**/*"
-, "vokabular_person.backup.js"  ],
+, "vokabular_person.backup.js", "vokabular_lernen.js"  ],
   "exclude": [
     "node_modules",
     "dist"
