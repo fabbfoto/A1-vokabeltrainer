@@ -2,11 +2,9 @@
 // Navigation und Themen-Anzeige Funktionen
 // 🔧 KORRIGIERT: Einheitliche Button-Höhen für perfektes Grid-Layout
 
-import { NavigationEvents } from '../shared/events/navigation-events.js';
-import { createTopicButton, createActionButton } from '../shared/styles/button-factory.js';
-
-// Type imports (temporär any, später aus shared/types)
-type DOMElements = any;
+import { NavigationEvents } from '../shared/events/navigation-events';
+import { createTopicButton, createActionButton } from '../shared/styles/button-factory';
+import type { DOMElements } from '../dom';
 type TrainerState = any;
 type VocabularyStructure = any;
 type LearningModes = any;

@@ -16,22 +16,22 @@ import type {
     SubTopicId,
     WordId,
     TestScore
-} from './shared/types/index.js';
+} from './shared/types/index';
 
 // Import DOMElements from dom.ts to avoid interface conflicts
-import type { DOMElements } from './dom.js';
+import type { DOMElements } from './dom';
 // Import des kombinierten Vokabulars
-import { vokabular } from './vokabular.js';
+import { vokabular } from './vokabular';
 
 // Import der Helfer- und UI-Funktionen
-import { shuffleArray, speak, vergleicheAntwort } from './shared/utils/helfer.js';
+import { shuffleArray, speak, vergleicheAntwort } from './shared/utils/helfer';
 import * as uiModes from './shared/utils/ui-modes';
-import { dom } from './dom.js';
-import * as ui from './ui/index.js';
+import { dom } from './dom';
+import * as ui from './ui/index';
 
 // Import der Auth- und Sync-Funktionen
-import { initializeAuth } from './shared/auth/index.js';
-import { NavigationEvents } from './shared/events/navigation-events.js';
+import { initializeAuth } from './shared/auth/index';
+import { NavigationEvents } from './shared/events/navigation-events';
 
 // Direkt nach dem Import
 console.log('📚 Vokabular importiert:', vokabular);
