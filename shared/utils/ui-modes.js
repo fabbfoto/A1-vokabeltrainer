@@ -2,6 +2,19 @@
 
 import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence } from './helfer';
 
+// Lokale insertTextAtCursor Funktion
+function insertTextAtCursor(inputElement, text) {
+    if (!inputElement) return;
+    const start = inputElement.selectionStart || 0;
+    const end = inputElement.selectionEnd || 0;
+    const oldValue = inputElement.value;
+    inputElement.value = oldValue.substring(0, start) + text + oldValue.substring(end);
+    inputElement.selectionStart = inputElement.selectionEnd = start + text.length;
+    inputElement.focus();
+    const event = new Event('input', { bubbles: true, cancelable: true });
+    inputElement.dispatchEvent(event);
+}
+
 export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
     dom.mcUiEl.style.display = 'block';
     if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'none';
@@ -71,105 +84,125 @@ export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
 }
 
 export function setupSpellingMode(dom, state, alleVokabeln, processAnswer) {
-    console.log('[setupSpellingMode] Starting setup...');
+    console.log('[setupSpellingMode] Starting - copying pattern from working modes...');
     
-    // ===== KORREKTUR =====
+    // Kopiere das exakte Muster von setupClozeAdjDeMode (das funktioniert)
     dom.checkSpellingButton.disabled = false;
-    console.log('[setupSpellingMode] Button enabled');
-
-    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex';
+    
+    const umlautContainer = dom.umlautButtonsContainerEl || dom.umlautButtonsContainer;
+    if (umlautContainer) umlautContainer.style.display = 'flex';
+    
     dom.spellingModeUiEl.style.display = 'block';
     dom.questionDisplayEl.textContent = (state.currentWordData.english || "").split(',')[0].trim();
     dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_en || "";
     dom.wordLineContainerEl.style.display = 'flex';
     dom.sentenceLineContainerEl.style.display = 'flex';
     
-    const resetInputStyles = (...inputs) => { 
-        inputs.forEach(input => { 
-            if(input) input.classList.remove('correct-user-input', 'incorrect-user-input'); 
-        }); 
-    };
-    resetInputStyles(dom.spellingInputSingleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El);
+    // Reset styles
+    [dom.spellingInputSingleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El].forEach(input => {
+        if(input) input.classList.remove('correct-user-input', 'incorrect-user-input');
+    });
     
     const isNounWithPlural = state.currentWordData && typeof state.currentWordData.plural !== 'undefined';
-    console.log('[setupSpellingMode] Is noun with plural:', isNounWithPlural);
+    console.log('[setupSpellingMode] Is noun:', isNounWithPlural);
     
     if (isNounWithPlural) {
-        console.log('[setupSpellingMode] Setting up noun inputs');
+        // Nomen-Modus: Zwei Felder
         dom.nounInputContainerEl.classList.remove('hidden');
         dom.singleInputContainerEl.classList.add('hidden');
         
-        const inputs = [dom.spellingInputNoun1El, dom.spellingInputNoun2El];
-        inputs.forEach(input => { 
-            input.value = ''; 
-            input.disabled = false; 
-            input.addEventListener('focus', () => state.activeTextInput = input);
-        });
+        dom.spellingInputNoun1El.value = '';
+        dom.spellingInputNoun1El.disabled = false;
+        dom.spellingInputNoun2El.value = '';
+        dom.spellingInputNoun2El.disabled = false;
         
-        const handleEnter = (event) => { 
-            console.log('[setupSpellingMode] Enter pressed');
-            if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) { 
-                event.preventDefault(); 
-                console.log('[setupSpellingMode] Triggering button click');
-                dom.checkSpellingButton.click(); 
-            } 
-        };
-        inputs.forEach(input => { input.addEventListener('keydown', handleEnter); });
+        // Focus Handler
+        dom.spellingInputNoun1El.addEventListener('focus', () => state.activeTextInput = dom.spellingInputNoun1El);
+        dom.spellingInputNoun2El.addEventListener('focus', () => state.activeTextInput = dom.spellingInputNoun2El);
         
+        // EXAKT wie Cloze-Modus: direkte onclick Zuweisung
         dom.checkSpellingButton.onclick = () => {
-            console.log('[setupSpellingMode] Button clicked');
+            console.log('[setupSpellingMode] Noun button clicked');
             const correctAnswerSingular = `${state.currentWordData.artikel} ${state.currentWordData.german}`;
             const correctAnswerPluralWord = state.currentWordData.plural;
-            const userInputSingular = dom.spellingInputNoun1El.value;
-            const userInputPlural = dom.spellingInputNoun2El.value;
+            const userInputSingular = dom.spellingInputNoun1El.value.trim();
+            const userInputPlural = dom.spellingInputNoun2El.value.trim();
             const isSingularCorrect = vergleicheAntwort(userInputSingular, correctAnswerSingular);
             const isPluralCorrect = vergleicheAntwort(userInputPlural, correctAnswerPluralWord);
             dom.spellingInputNoun1El.classList.add(isSingularCorrect ? 'correct-user-input' : 'incorrect-user-input');
             dom.spellingInputNoun2El.classList.add(isPluralCorrect ? 'correct-user-input' : 'incorrect-user-input');
             const isOverallCorrect = isSingularCorrect && isPluralCorrect;
             const combinedCorrectAnswer = `${correctAnswerSingular} / ${correctAnswerPluralWord}`;
-            console.log('[setupSpellingMode] Calling processAnswer');
+            console.log('[setupSpellingMode] Calling processAnswer with:', isOverallCorrect);
             processAnswer(isOverallCorrect, combinedCorrectAnswer);
         };
         
+        // EXAKT wie Cloze-Modus: onkeydown statt addEventListener
+        dom.spellingInputNoun1El.onkeydown = (event) => {
+            if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) {
+                event.preventDefault();
+                dom.checkSpellingButton.click();
+            }
+        };
+        dom.spellingInputNoun2El.onkeydown = (event) => {
+            if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) {
+                event.preventDefault();
+                dom.checkSpellingButton.click();
+            }
+        };
+        
+        // Focus setzen
         setTimeout(() => {
             dom.spellingInputNoun1El.focus();
             state.activeTextInput = dom.spellingInputNoun1El;
-            console.log('[setupSpellingMode] Focus set to noun1');
         }, 100);
+
     } else {
-        console.log('[setupSpellingMode] Setting up single input');
+        // Einzelwort-Modus
         dom.singleInputContainerEl.classList.remove('hidden');
         dom.nounInputContainerEl.classList.add('hidden');
         
-        const input = dom.spellingInputSingleEl;
-        input.value = ''; 
-        input.disabled = false;
-        input.addEventListener('focus', () => state.activeTextInput = input);
-
+        dom.spellingInputSingleEl.value = '';
+        dom.spellingInputSingleEl.disabled = false;
+        dom.spellingInputSingleEl.addEventListener('focus', () => state.activeTextInput = dom.spellingInputSingleEl);
+        
+        // EXAKT wie Cloze-Modus
         dom.checkSpellingButton.onclick = () => {
             console.log('[setupSpellingMode] Single button clicked');
             const correctAnswer = state.currentWordData.german;
-            const isCorrect = vergleicheAntwort(input.value, correctAnswer);
-            input.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
-            console.log('[setupSpellingMode] Calling processAnswer for single');
+            const isCorrect = vergleicheAntwort(dom.spellingInputSingleEl.value.trim(), correctAnswer);
+            dom.spellingInputSingleEl.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
+            console.log('[setupSpellingMode] Calling processAnswer with:', isCorrect);
             processAnswer(isCorrect, correctAnswer);
         };
         
-        input.onkeydown = (event) => { 
-            console.log('[setupSpellingMode] Single input keydown');
-            if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) { 
-                event.preventDefault(); 
-                console.log('[setupSpellingMode] Single input enter -> click');
-                dom.checkSpellingButton.click(); 
-            } 
+        dom.spellingInputSingleEl.onkeydown = (event) => {
+            if (event.key === 'Enter' && !dom.checkSpellingButton.disabled) {
+                event.preventDefault();
+                dom.checkSpellingButton.click();
+            }
         };
         
         setTimeout(() => {
-            input.focus();
-            state.activeTextInput = input;
-            console.log('[setupSpellingMode] Focus set to single input');
+            dom.spellingInputSingleEl.focus();
+            state.activeTextInput = dom.spellingInputSingleEl;
         }, 100);
+    }
+    
+    // Umlaut-Buttons Setup (vereinfacht)
+    if (umlautContainer) {
+        const buttons = umlautContainer.querySelectorAll('button');
+        buttons.forEach(button => {
+            button.onclick = (event) => {
+                event.preventDefault();
+                if (state.activeTextInput) {
+                    const char = event.shiftKey ? button.textContent.toUpperCase() : button.textContent;
+                    insertTextAtCursor(state.activeTextInput, char);
+                } else {
+                    console.log('[setupSpellingMode] No active input for umlaut');
+                }
+            };
+        });
     }
     
     console.log('[setupSpellingMode] Setup complete');
