@@ -291,6 +291,8 @@ export interface UIStateCallbacks {
 
 export interface UICallbacks extends NavigationCallbacks, LearningCallbacks, TestCallbacks, UIStateCallbacks {
   updateProgress: (wordId: WordId, mode: ModeId, correct: boolean) => void;
+  // ✅ HINZUGEFÜGT:
+  startRepeatSession: (mode: string) => void;
 }
 
 export type MessageType = 'success' | 'error' | 'info' | 'warning';

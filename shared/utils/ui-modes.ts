@@ -248,7 +248,7 @@ export function setupClozeMode(
     
     dom.checkClozeButton.disabled = false;
     
-    const umlautContainer = dom.umlautButtonsContainerEl;
+    const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
     
     dom.clozeUiEl.style.display = 'block';
@@ -324,7 +324,7 @@ export function setupSentenceTranslationEnDeMode(
     
     dom.checkSentenceButton.disabled = false;
     
-    const umlautContainer = dom.umlautButtonsContainerEl;
+    const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
     
     const sentenceUi = dom.sentenceUiEl;

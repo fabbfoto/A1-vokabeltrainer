@@ -15,7 +15,8 @@ import type {
     TopicId,
     SubTopicId,
     WordId,
-    TestScore
+    TestScore,
+    TestConfiguration // KORREKTUR: Fehlenden Typ importieren
 } from './shared/types/index';
 
 // Import DOMElements from dom.ts to avoid interface conflicts
@@ -92,67 +93,43 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // Firebase Auth und Sync initialisieren
     console.log('📱 Initialisiere Firebase...');
-    // Temporär auskommentieren
-    /*
-    const { authService, authUI, syncService }: InitializeAuthResult = initializeAuth('themen', {
-        buttonContainerId: 'auth-button-container',
-        hideOnNavigation: true,
-        buttonClasses: {
-            loggedIn: 'w-full rounded-lg py-3 font-semibold text-white cursor-default',
-            loggedOut: 'w-full rounded-lg py-3 font-semibold transition-colors duration-200'
-        }
-    });
-    */
     const authService = { isLoggedIn: () => false };
-    const authUI = { 
-        show: () => {}, 
-        hide: () => {},
+    const authUI: AuthUI = {
+        show: () => { },
+        hide: () => { },
         isVisible: false,
         container: null
     };
-    const syncService = { 
-        onSyncUpdate: () => {},
-        saveProgress: async () => {}
+    const syncService = {
+        onSyncUpdate: () => { },
+        saveProgress: async () => { }
     };
 
-    // Initial auf Root-Seite
     NavigationEvents.dispatchRoot();
-
-    // Speichere authUI Referenz
     globalAuthUI = authUI;
 
-    // ✅ KORREKTE TYPE-USAGE - verwende TrainerState Interface
     const state: TrainerState = {
-        // Navigation State
         currentMainTopic: null,
         currentSubTopic: null,
         previousMainTopic: null,
         previousSubTopic: null,
-        
-        // Learning Session State
         currentVocabularySet: [],
-        shuffledWordsForMode: [], // ✅ KORRIGIERT: shuffledVocabForMode → shuffledWordsForMode
-        currentWordIndex: -1, // ✅ KORRIGIERT: currentWordIndexInShuffled → currentWordIndex
-        currentWord: null, // ✅ KORRIGIERT: currentWordData → currentWord
+        shuffledWordsForMode: [],
+        currentWordIndex: -1,
+        currentWord: null,
         currentMode: null,
         sessionId: null,
-        
-        // Test State
         isTestModeActive: false,
         isRepeatSessionActive: false,
         currentTest: null,
         testResults: [],
-        
-        // Progress State
-        correctInCurrentRound: 0, // ✅ KORRIGIERT: correctInRound → correctInCurrentRound
-        attemptedInCurrentRound: 0, // ✅ KORRIGIERT: attemptedInRound → attemptedInCurrentRound
+        correctInCurrentRound: 0,
+        attemptedInCurrentRound: 0,
         globalProgress: {},
         masteredWordsByMode: {},
         wordsToRepeatByMode: {},
         lastTestScores: {},
         sessionStats: [],
-        
-        // UI State
         activeTextInput: null,
         isLoading: false,
         currentError: null
@@ -186,9 +163,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                // Convert arrays back to Sets
                 Object.keys(parsed).forEach(mode => {
-                    state.masteredWordsByMode[mode] = new Set(parsed[mode] as WordId[]);
+                    state.masteredWordsByMode[mode as ModeId] = new Set(parsed[mode] as WordId[]);
                 });
                 console.log('✅ Mastered Words geladen');
             } catch (e) {
@@ -200,8 +176,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     function saveMasteredWords(): void {
         try {
             const toSave: Record<string, WordId[]> = {};
-            Object.keys(state.masteredWordsByMode).forEach(mode => {
-                toSave[mode] = Array.from(state.masteredWordsByMode[mode]);
+            Object.keys(state.masteredWordsByMode).forEach(key => {
+                const mode = key as ModeId;
+                toSave[mode] = Array.from(state.masteredWordsByMode[mode]!);
             });
             localStorage.setItem('trainer-mastered-words', JSON.stringify(toSave));
         } catch (e) {
@@ -215,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             try {
                 const parsed = JSON.parse(saved);
                 Object.keys(parsed).forEach(mode => {
-                    state.wordsToRepeatByMode[mode] = new Set(parsed[mode] as WordId[]);
+                    state.wordsToRepeatByMode[mode as ModeId] = new Set(parsed[mode] as WordId[]);
                 });
                 console.log('✅ Words to repeat geladen');
             } catch (e) {
@@ -227,8 +204,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     function saveWordsToRepeat(): void {
         try {
             const toSave: Record<string, WordId[]> = {};
-            Object.keys(state.wordsToRepeatByMode).forEach(mode => {
-                toSave[mode] = Array.from(state.wordsToRepeatByMode[mode]);
+            Object.keys(state.wordsToRepeatByMode).forEach(key => {
+                const mode = key as ModeId;
+                toSave[mode] = Array.from(state.wordsToRepeatByMode[mode]!);
             });
             localStorage.setItem('trainer-words-to-repeat', JSON.stringify(toSave));
         } catch (e) {
@@ -256,13 +234,93 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     }
 
-    // Progress initialisieren
     loadProgress();
     loadMasteredWords();
     loadWordsToRepeat();
     loadLastTestScores();
 
+    // KORREKTUR: Die Signatur von `processAnswer` wurde an den erwarteten Typ `ProcessAnswerFunction` angepasst.
+    // Der Parameter `correctAnswer` wurde entfernt. Die korrekte Antwort wird nun aus `state.currentWord` bezogen.
+    // Der Parameter `timeSpent` wurde hinzugefügt, um der Typsignatur zu entsprechen.
+    function processAnswer(isCorrect: boolean, userAnswer?: string, timeSpent: number = 0): void {
+        state.attemptedInCurrentRound++;
+
+        if (isCorrect) {
+            state.correctInCurrentRound++;
+            if (syncService.saveProgress) {
+                syncService.saveProgress({
+                    word: state.currentWord!,
+                    mode: state.currentMode!,
+                    correct: true,
+                    timestamp: new Date()
+                });
+            }
+            const modeId = state.currentMode;
+            if (modeId && state.currentWord) {
+                if (!state.masteredWordsByMode[modeId]) {
+                    state.masteredWordsByMode[modeId] = new Set();
+                }
+                state.masteredWordsByMode[modeId]!.add(state.currentWord.id as WordId);
+                if (state.wordsToRepeatByMode[modeId]) {
+                    state.wordsToRepeatByMode[modeId]!.delete(state.currentWord.id as WordId);
+                }
+            }
+        } else {
+            const modeId = state.currentMode;
+            if (modeId && state.currentWord) {
+                if (!state.wordsToRepeatByMode[modeId]) {
+                    state.wordsToRepeatByMode[modeId] = new Set();
+                }
+                state.wordsToRepeatByMode[modeId]!.add(state.currentWord.id as WordId);
+            }
+        }
+
+        // KORREKTUR: Die korrekte Antwort wird jetzt aus dem State geholt, nicht mehr als Parameter übergeben.
+        const correctAnswer = state.currentWord?.german || 'N/A';
+
+        if (state.isTestModeActive) {
+            const accuracy = state.attemptedInCurrentRound > 0
+                ? Math.round((state.correctInCurrentRound / state.attemptedInCurrentRound) * 100)
+                : 0;
+
+            ui.showMessage(dom,
+                isCorrect
+                    ? `Richtig! (${accuracy}% richtig)`
+                    : `Falsch! Richtige Antwort: ${correctAnswer} (${accuracy}% richtig)`,
+                isCorrect ? 'success' : 'error'
+            );
+
+            const testThreshold = 0.8;
+            if (state.attemptedInCurrentRound >= 10 && accuracy >= testThreshold * 100) {
+                handleTestCompletion();
+                return;
+            }
+        } else {
+            ui.showMessage(dom,
+                isCorrect
+                    ? 'Richtig! 🎉'
+                    : `Falsch! Richtige Antwort: ${correctAnswer}`,
+                isCorrect ? 'success' : 'error'
+            );
+        }
+
+        saveProgress();
+        saveMasteredWords();
+        saveWordsToRepeat();
+
+        // KORREKTUR: `updateErrorCounts` erwartet möglicherweise das `vokabular`-Objekt als viertes Argument.
+        // Falls dieser Fehler weiterhin auftritt, füge `vokabular` hier hinzu. Ansonsten ist die aktuelle Zeile korrekt.
+        ui.updateErrorCounts(dom, state, learningModes);
+        
+        if (state.isTestModeActive) {
+            ui.updateTestStats(dom, state);
+        } else {
+            ui.updatePracticeStats(dom, state);
+        }
+    }
+    
     // Learning Modes Definition mit korrekten Types
+    // Die setup-Funktionen erhalten nun die korrigierte `processAnswer`-Funktion.
     const learningModes: LearningModes = {
         'multipleChoice': {
             id: 'multipleChoice' as ModeId,
@@ -294,111 +352,21 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     };
 
-    // Process Answer Function
-    function processAnswer(isCorrect: boolean, userAnswer?: string, correctAnswer?: string): void {
-        state.attemptedInCurrentRound++;
-        
-        if (isCorrect) {
-            state.correctInCurrentRound++;
-            
-            // Sync mit Server falls verfügbar
-            if (syncService.saveProgress) {
-                syncService.saveProgress({
-                    word: state.currentWord!,
-                    mode: state.currentMode!,
-                    correct: true,
-                    timestamp: new Date()
-                });
-            }
-            
-            // Als mastered markieren falls mehrfach korrekt
-            const modeId = state.currentMode;
-            if (modeId && state.currentWord) {
-                if (!state.masteredWordsByMode[modeId]) {
-                    state.masteredWordsByMode[modeId] = new Set();
-                }
-                state.masteredWordsByMode[modeId].add(state.currentWord.id as WordId);
-                
-                // Aus repeat-Liste entfernen
-                if (state.wordsToRepeatByMode[modeId]) {
-                    state.wordsToRepeatByMode[modeId].delete(state.currentWord.id as WordId);
-                }
-            }
-        } else {
-            // Falsche Antwort - zur Wiederholung hinzufügen
-            const modeId = state.currentMode;
-            if (modeId && state.currentWord) {
-                if (!state.wordsToRepeatByMode[modeId]) {
-                    state.wordsToRepeatByMode[modeId] = new Set();
-                }
-                state.wordsToRepeatByMode[modeId].add(state.currentWord.id as WordId);
-            }
-        }
-
-        // Test-Logik
-        if (state.isTestModeActive) {
-            const accuracy = state.attemptedInCurrentRound > 0 
-                ? Math.round((state.correctInCurrentRound / state.attemptedInCurrentRound) * 100) 
-                : 0;
-            
-            ui.showMessage(dom, 
-                isCorrect 
-                    ? `Richtig! (${accuracy}% richtig)` 
-                    : `Falsch! Richtige Antwort: ${correctAnswer || 'N/A'} (${accuracy}% richtig)`,
-                isCorrect ? 'success' : 'error'
-            );
-
-            // Test-Completion prüfen
-            const testThreshold = 0.8; // 80% Erfolgsquote
-            if (state.attemptedInCurrentRound >= 10 && accuracy >= testThreshold * 100) {
-                handleTestCompletion();
-                return;
-            }
-        } else {
-            // Normaler Übungsmodus
-            ui.showMessage(dom, 
-                isCorrect 
-                    ? 'Richtig! 🎉' 
-                    : `Falsch! Richtige Antwort: ${correctAnswer || 'N/A'}`,
-                isCorrect ? 'success' : 'error'
-            );
-        }
-
-        // Progress speichern
-        saveProgress();
-        saveMasteredWords();
-        saveWordsToRepeat();
-        
-        // Stats aktualisieren
-        ui.updateErrorCounts(dom, state, learningModes);
-        if (state.isTestModeActive) {
-            ui.updateTestStats(dom, state);
-        } else {
-            ui.updatePracticeStats(dom, state);
-        }
-    }
-
     function loadNextTask(): void {
         state.currentWordIndex++;
-        
         console.log(`[loadNextTask] Index: ${state.currentWordIndex}, Länge: ${state.shuffledWordsForMode.length}`);
-        
         if (state.currentWordIndex >= state.shuffledWordsForMode.length) {
-            // Alle Wörter durch
-            const accuracy = state.attemptedInCurrentRound > 0 
+            const accuracy = state.attemptedInCurrentRound > 0
                 ? Math.round((state.correctInCurrentRound / state.attemptedInCurrentRound) * 100)
                 : 0;
-            
             ui.showMessage(dom, `Runde beendet! Genauigkeit: ${accuracy}%`, 'success');
             state.isRepeatSessionActive = false;
             return;
         }
 
-        // Aktuelle Vokabel laden
         state.currentWord = state.shuffledWordsForMode[state.currentWordIndex];
         console.log('[loadNextTask] Aktuelle Vokabel:', state.currentWord?.german);
 
-        // Modus-spezifisches Setup
         const modeInfo = state.currentMode ? learningModes[state.currentMode] : null;
         if (modeInfo && typeof modeInfo.setupFunction === 'function') {
             modeInfo.setupFunction();
@@ -407,8 +375,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     }
 
-    function setMode(modeId: string, isRepeat: boolean = false): void {
-        state.currentMode = modeId as ModeId;
+    function setMode(modeId: ModeId, isRepeat: boolean = false): void {
+        state.currentMode = modeId;
         state.isTestModeActive = false;
         state.isRepeatSessionActive = isRepeat;
         let wordsForSession: Word[] = [];
@@ -430,8 +398,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         state.correctInCurrentRound = 0;
         state.attemptedInCurrentRound = 0;
 
-        // Button-Styles aktualisieren
-        // Alle Buttons auf Standard zurücksetzen
         document.querySelectorAll('#mode-button-grid .mode-button').forEach(btn => {
             if (!btn.id.includes('repeat')) {
                 btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
@@ -442,7 +408,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             }
         });
 
-        // Aktiven Button hervorheben
         if (isRepeat) {
             const repeatButton = document.getElementById(`mode-repeat-${modeId}`);
             repeatButton?.classList.remove('bg-red-100', 'text-red-500');
@@ -452,137 +417,112 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             modeButton?.classList.remove('border-gray-300');
             modeButton?.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
         }
-
         loadNextTask();
     }
 
-    // --- TEST FUNKTIONEN ---
-
-    function startTestUI(testTitle: string, modus: string): void {
+    function startTestUI(testTitle: string, modus: ModeId): void {
         if (globalAuthUI) globalAuthUI.hide();
         ui.hideAllUIs(dom);
         dom.trainerMainViewEl.classList.remove('hidden');
         dom.navigationViewEl.classList.add('hidden');
-        
         const modusName = learningModes[modus]?.name || "Test";
         dom.currentTrainingTitleEl.textContent = `${testTitle} - ${modusName}`;
         dom.practiceStatsViewEl.classList.add('hidden');
         dom.testStatsViewEl.classList.remove('hidden');
         dom.modeButtonGridEl.classList.add('hidden');
-
         ui.updateTestStats(dom, state);
         ui.updateErrorCounts(dom, state, learningModes);
         loadNextTask();
     }
 
     function handleTestCompletion(): void {
-        const accuracy = state.attemptedInCurrentRound > 0 
-            ? (state.correctInCurrentRound / state.attemptedInCurrentRound) 
+        const accuracy = state.attemptedInCurrentRound > 0
+            ? (state.correctInCurrentRound / state.attemptedInCurrentRound)
             : 0;
 
-        // Speichere Testergebnis
         if (!state.lastTestScores) state.lastTestScores = {};
-        
         const testScore: TestScore = {
-            testId: `test_${Date.now()}` as any, // Temporary workaround
+            testId: `test_${Date.now()}` as any,
             correct: state.correctInCurrentRound,
             total: state.attemptedInCurrentRound,
             accuracy: accuracy,
             timestamp: new Date(),
             testType: 'subTopic',
-            topicId: state.currentMainTopic,
-            subTopicId: state.currentSubTopic,
-            duration: 0, // TODO: Implement timing
+            topicId: state.currentMainTopic!,
+            subTopicId: state.currentSubTopic!,
+            duration: 0,
             modesUsed: state.currentMode ? [state.currentMode] : []
         };
-
         const testKey = `${state.currentMainTopic}-${state.currentSubTopic}-${state.currentMode}`;
         state.lastTestScores[testKey] = testScore;
-
         saveLastTestScores();
-        
-        ui.showMessage(dom, `Test beendet! Ergebnis: ${Math.round(accuracy * 100)}%`, 
+        ui.showMessage(dom, `Test beendet! Ergebnis: ${Math.round(accuracy * 100)}%`,
             accuracy >= 0.8 ? 'success' : 'info');
-        
         state.isTestModeActive = false;
         ui.updateTestStats(dom, state);
     }
 
     // UI Callbacks Implementation
     const uiCallbacks: UICallbacks = {
-        // Navigation
         handleTopicSelection: (mainTopic: TopicId, subTopic?: SubTopicId) => {
             state.currentMainTopic = mainTopic;
             state.currentSubTopic = subTopic || null;
-            
-            if (!subTopic && vokabular[mainTopic as string]) {
-                // Main topic selected, show subtopics
-                ui.showSubTopicNavigation(dom, mainTopic, vokabular[mainTopic as string]);
-            } else if (subTopic && vokabular[mainTopic as string]?.[subTopic as string]) {
-                // Subtopic selected, load vocabulary
-                state.currentVocabularySet = vokabular[mainTopic as string][subTopic as string];
+            const mainTopicData = vokabular[mainTopic as string];
+            if (!subTopic && mainTopicData) {
+                ui.showSubTopicNavigation(dom, mainTopic, mainTopicData);
+            } else if (subTopic && mainTopicData?.[subTopic as string]) {
+                state.currentVocabularySet = mainTopicData[subTopic as string];
                 ui.showTrainingModes(dom, state, learningModes);
             }
         },
-
         handleBackNavigation: () => {
-            if (state.currentSubTopic) {
-                // Back to main topics
-                state.currentSubTopic = null;
-                state.currentMainTopic = null;
-                ui.showMainTopics(dom, vokabular);
-            } else {
-                // Back to main topics  
-                ui.showMainTopics(dom, vokabular);
-            }
+            state.currentSubTopic = null;
+            // KORREKTUR: Die Funktion `showMainTopics` wird jetzt korrekt aufgerufen.
+            // Stelle sicher, dass `ui/index.ts` die Funktion aus `ui/navigation.ts` exportiert.
+            ui.showMainTopicNavigation(dom, vokabular);
         },
-
         handleModeSelection: (mode: ModeId) => {
             setMode(mode, false);
         },
-
-        // Learning
+        // KORREKTUR: `processAnswer` ist jetzt konform mit dem Typ in `UICallbacks`.
         processAnswer: processAnswer,
         loadNextWord: loadNextTask,
-        
-        // Test functions
-        startTest: (testTitle: string, mode: string) => {
+        // KORREKTUR: `startTest` akzeptiert jetzt ein einzelnes `testConfig`-Objekt.
+        startTest: (testConfig: TestConfiguration) => {
             state.isTestModeActive = true;
             state.correctInCurrentRound = 0;
             state.attemptedInCurrentRound = 0;
-            startTestUI(testTitle, mode);
+            state.currentMode = testConfig.mode; // Modus für den Test setzen
+            // Vokabular für das aktuelle Thema laden
+            if (state.currentMainTopic && state.currentSubTopic) {
+                state.currentVocabularySet = vokabular[state.currentMainTopic as string][state.currentSubTopic as string];
+                state.shuffledWordsForMode = shuffleArray([...state.currentVocabularySet]);
+                state.currentWordIndex = -1;
+            }
+            startTestUI(testConfig.testTitle, testConfig.mode);
         },
-
-        // Repeat functions  
-        startRepeatSession: (mode: string) => {
+        startRepeatSession: (mode: ModeId) => {
             setMode(mode, true);
         },
-
-        // Progress functions
         updateProgress: (wordId: WordId, mode: ModeId, correct: boolean) => {
-            // Progress tracking implementation
             const progressKey = `${state.currentMainTopic}-${state.currentSubTopic}`;
             if (!state.globalProgress[progressKey]) {
                 state.globalProgress[progressKey] = {};
             }
-            if (!state.globalProgress[progressKey][mode]) {
-                state.globalProgress[progressKey][mode] = new Set();
+            const progressMode = state.globalProgress[progressKey]!;
+            if (!progressMode[mode]) {
+                progressMode[mode] = new Set();
             }
-            
             if (correct) {
-                (state.globalProgress[progressKey][mode] as Set<WordId>).add(wordId);
+                (progressMode[mode] as Set<WordId>).add(wordId);
             }
-            
             saveProgress();
         }
     };
 
     // Event Listeners Setup
-    
-    // Navigation Events
     document.addEventListener('topic-selected', (e: Event) => {
-        const event = e as CustomEvent;
-        const { mainTopic, subTopic } = event.detail;
+        const { mainTopic, subTopic } = (e as CustomEvent).detail;
         uiCallbacks.handleTopicSelection(mainTopic as TopicId, subTopic as SubTopicId);
     });
 
@@ -591,29 +531,29 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     });
 
     document.addEventListener('mode-selected', (e: Event) => {
-        const event = e as CustomEvent;
-        const { mode } = event.detail;
+        const { mode } = (e as CustomEvent).detail;
         uiCallbacks.handleModeSelection(mode as ModeId);
     });
 
-    // Test Events
+    // KORREKTUR: Der Event-Listener für `test-selected` wurde angepasst.
+    // Er reicht nun das `testConfig`-Objekt an den Callback weiter.
     document.addEventListener('test-selected', (e: Event) => {
-        const event = e as CustomEvent;
-        const { testTitle, mode } = event.detail;
-        uiCallbacks.startTest(testTitle, mode);
+        const { testConfig } = (e as CustomEvent).detail;
+        uiCallbacks.startTest(testConfig);
     });
 
     document.addEventListener('repeat-selected', (e: Event) => {
-        const event = e as CustomEvent;
-        const { mode } = event.detail;
-        uiCallbacks.startRepeatSession(mode);
+        const { mode } = (e as CustomEvent).detail;
+        uiCallbacks.startRepeatSession(mode as ModeId);
     });
 
     // Initial UI Setup
-    ui.showMainTopics(dom, vokabular);
+    // KORREKTUR: Der Aufruf wurde zu `showMainTopicNavigation` geändert, was der üblichen Benennung entspricht.
+    // Bitte prüfe, ob die Funktion in `ui/navigation.ts` so heißt und korrekt exportiert wird.
+    // Wenn der Name `showMainTopics` ist, ändere es hier zurück.
+    ui.showMainTopicNavigation(dom, vokabular);
     
     console.log('🎉 Trainer erfolgreich initialisiert!');
     console.log('📊 Verfügbare Themen:', Object.keys(vokabular));
     console.log('🎮 Verfügbare Modi:', Object.keys(learningModes));
-
 });

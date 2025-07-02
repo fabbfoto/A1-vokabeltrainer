@@ -9,8 +9,8 @@ import type {
     Adjective,
     WordId,
     CaseElement 
-} from '../shared/types/vocabulary.js';
-import { createWordId, createVocabulary } from '../shared/types/vocabulary.js';
+} from './shared/types/vocabulary';
+import { createWordId, createVocabulary } from './shared/types/vocabulary';
 
 export const vokabularPerson: VocabularyStructure = createVocabulary({
     "Person": {

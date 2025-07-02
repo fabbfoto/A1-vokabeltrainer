@@ -1,5 +1,5 @@
 // shared/types/vocabulary.ts
-// Professional vocabulary type system with discriminated unions
+// Professional vocabulary type system with discriminated unions - KORRIGIERT
 
 // ========== BRANDED TYPES FOR TYPE SAFETY ==========
 export type WordId = string & { __brand: 'WordId' };
@@ -177,39 +177,59 @@ export function getSubTopics(vocabulary: VocabularyStructure, mainTopic: string)
   return vocabulary[mainTopic] ? Object.keys(vocabulary[mainTopic]) : [];
 }
 
-export function getWordCount(vocabulary: VocabularyStructure): number {
-  let total = 0;
-  for (const mainTopic of Object.values(vocabulary)) {
-    for (const subTopic of Object.values(mainTopic)) {
-      total += subTopic.length;
+export function getWords(vocabulary: VocabularyStructure, mainTopic: string, subTopic: string): Word[] {
+  return vocabulary[mainTopic]?.[subTopic] || [];
+}
+
+export function getAllWords(vocabulary: VocabularyStructure): Word[] {
+  const allWords: Word[] = [];
+  
+  for (const mainTopic of Object.keys(vocabulary)) {
+    for (const subTopic of Object.keys(vocabulary[mainTopic])) {
+      allWords.push(...vocabulary[mainTopic][subTopic]);
     }
   }
-  return total;
+  
+  return allWords;
 }
 
-export function getTopicCounts(vocabulary: VocabularyStructure): { main: number; sub: number } {
-  const mainCount = Object.keys(vocabulary).length;
-  let subCount = 0;
-  
-  for (const mainTopic of Object.values(vocabulary)) {
-    subCount += Object.keys(mainTopic).length;
-  }
-  
-  return { main: mainCount, sub: subCount };
+export function getWordById(vocabulary: VocabularyStructure, wordId: WordId): Word | undefined {
+  const allWords = getAllWords(vocabulary);
+  return allWords.find(word => word.id === wordId);
 }
 
-// ========== WORD VALIDATION ==========
-export function validateWord(word: Partial<Word>): word is Word {
-  if (!word.id || !word.german || !word.english || !word.wordType) {
-    return false;
+export function getWordsByType<T extends WordType>(vocabulary: VocabularyStructure, type: T): Extract<Word, { wordType: T }>[] {
+  const allWords = getAllWords(vocabulary);
+  return allWords.filter((word): word is Extract<Word, { wordType: T }> => word.wordType === type);
+}
+
+// ========== STATISTICS HELPERS ==========
+export function getVocabularyStats(vocabulary: VocabularyStructure): {
+  totalMainTopics: number;
+  totalSubTopics: number;
+  totalWords: number;
+  wordsByType: Record<WordType, number>;
+} {
+  const allWords = getAllWords(vocabulary);
+  const wordsByType: Record<WordType, number> = {
+    noun: 0,
+    verb: 0,
+    adjective: 0,
+    adverb: 0,
+    preposition: 0,
+    pronoun: 0,
+    conjunction: 0,
+    interjection: 0
+  };
+
+  for (const word of allWords) {
+    wordsByType[word.wordType]++;
   }
-  
-  switch (word.wordType) {
-    case 'noun':
-      return !!(word as Noun).article;
-    case 'verb':
-      return typeof (word as Verb).separable === 'boolean';
-    default:
-      return true;
-  }
+
+  return {
+    totalMainTopics: Object.keys(vocabulary).length,
+    totalSubTopics: Object.values(vocabulary).reduce((sum, mainTopic) => sum + Object.keys(mainTopic).length, 0),
+    totalWords: allWords.length,
+    wordsByType
+  };
 }

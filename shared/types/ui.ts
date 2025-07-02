@@ -3,6 +3,83 @@
 
 import type { Word, TopicId, SubTopicId } from './vocabulary.js';
 import type { TrainerState, ModeId, TestConfiguration } from './trainer.js';
+// ========== DOM ELEMENTS INTERFACE - HINZUGEFÜGT ==========
+export interface DOMElements {
+    // Navigation Views
+    navigationViewEl: HTMLElement;
+    trainerMainViewEl: HTMLElement;
+    navigationContainerEl: HTMLElement;
+    backToMainTopicsButton: HTMLButtonElement;
+    navigationTitleEl: HTMLElement;
+    
+    // Trainer Header
+    backToSubtopicsButton: HTMLButtonElement;
+    currentTrainingTitleEl: HTMLElement;
+    modeButtonGridEl: HTMLElement;
+    
+    // Question & Display Areas
+    questionDisplayEl: HTMLElement;
+    exampleSentenceDisplayEl: HTMLElement;
+    wordLineContainerEl: HTMLElement;
+    sentenceLineContainerEl: HTMLElement;
+    
+    // Audio Buttons
+    audioWordButtonEl: HTMLButtonElement;
+    audioSentenceButtonEl: HTMLButtonElement;
+    
+    // Multiple Choice UI
+    mcUiEl: HTMLElement;
+    mcAnswersContainerEl: HTMLElement;
+    
+    // Spelling Mode UI
+    spellingModeUiEl: HTMLElement;
+    singleInputContainerEl: HTMLElement;
+    spellingInputSingleEl: HTMLInputElement;
+    nounInputContainerEl: HTMLElement;
+    spellingInputNoun1El: HTMLInputElement;
+    spellingInputNoun2El: HTMLInputElement;
+    checkSpellingButton: HTMLButtonElement;
+    
+    // Cloze Mode UI
+    clozeUiEl: HTMLElement;
+    clozeHintContainerEl: HTMLElement;
+    clozeSentenceContainerEl: HTMLElement;
+    checkClozeButton: HTMLButtonElement;
+    
+    // Sentence Translation UI
+    sentenceUiEl: HTMLElement;
+    sentenceWordInputContainerEl: HTMLElement;
+    checkSentenceButton: HTMLButtonElement;
+    
+    // Feedback & Continue
+    feedbackContainerEl: HTMLElement;
+    continueButton: HTMLButtonElement;
+    messageBoxEl: HTMLElement;
+    
+    // Practice Statistics
+    practiceStatsViewEl: HTMLElement;
+    correctInRoundPracticeEl: HTMLElement;
+    attemptedInRoundPracticeEl: HTMLElement;
+    accuracyInRoundPracticeEl: HTMLElement;
+    categoryStatsContainerEl: HTMLElement;
+    
+    // Test Statistics
+    testStatsViewEl: HTMLElement;
+    testProgressEl: HTMLElement;
+    testAccuracyEl: HTMLElement;
+    correctInRoundTestEl: HTMLElement;
+    attemptedInRoundTestEl: HTMLElement;
+    accuracyInRoundTestEl: HTMLElement;
+    
+    // Test Modal
+    testSelectionModalEl: HTMLElement;
+    
+    // Umlaut Buttons
+    umlautButtonsContainer: HTMLElement;
+    
+    // SVG Icons
+    SVG_SPEAKER_ICON: string;
+}
 
 // ========== UI CALLBACK INTERFACES ==========
 export interface NavigationCallbacks {

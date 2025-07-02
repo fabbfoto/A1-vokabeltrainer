@@ -5,7 +5,9 @@
 export {
     displayMainTopics,
     displaySubTopics,
-    initNavigationListeners
+    initNavigationListeners,
+    showSubTopicNavigation,
+    showTrainingModes
 } from './navigation';
 
 // Statistics exports
