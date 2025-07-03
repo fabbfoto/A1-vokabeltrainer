@@ -169,11 +169,13 @@ export type TestType = 'subTopic' | 'mainTopic' | 'global' | 'custom';
 export interface TestConfiguration {
   id: TestId;
   type: TestType;
-  name: string;
+  name: string; // General name for the configuration
+  testTitle: string; // The title displayed during the test run
   topicId?: TopicId;
   subTopicId?: SubTopicId;
   wordIds?: WordId[];
-  modes: ModeId[];
+  modes: ModeId[]; // All possible modes for this test configuration
+  mode: ModeId; // The single mode selected for this specific test run
   minAccuracy: number;
   maxAttempts: number;
 }

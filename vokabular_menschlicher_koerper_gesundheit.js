@@ -1,787 +1,791 @@
-// packages/trainer-themen/vokabular_menschlicher_koerper_gesundheit.js
+// packages/trainer-themen/vokabular_menschlicher_koerper_gesundheit.ts
+// VOLLSTÄNDIGE TypeScript Migration von vokabular_menschlicher_koerper_gesundheit.js
 
-export const vokabularMenschlicherKoerperGesundheit = {
+import type { VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary';
+import { createWordId, createVocabulary } from './shared/types/vocabulary';
+
+export const vokabularMenschlicherKoerperGesundheit: VocabularyStructure = createVocabulary({
     "Menschlicher Körper und Gesundheit": {
 
-        // --- UNTER-THEMA: Körperteile ---
+        // --- UNTER-THEMA: Körperteile (13 Wörter) ---
         "Körperteile": [
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-001",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-001"),
+                wordType: "noun",
                 german: "Arm",
-                artikel: "der", // Inferred
-                plural: "Arme", // Inferred
+                article: "der",
+                plural: "Arme",
                 english: "arm",
-                example_de: [
-                    { "text": "Mein Arm", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "tut", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "weh", "kasus": "verb" }, // Part of "wehtun"
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Mein Arm", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "tut", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "weh", case: "verb" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "My arm hurts.",
-                cloze_parts: ["Mein ", " tut weh."],
-                cloze_answers: ["Arm"]
-            },
+                exampleEnglish: "My arm hurts.",
+                clozeParts: ["Mein ", " tut weh."],
+                clozeAnswers: ["Arm"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-002",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-002"),
+                wordType: "noun",
                 german: "Auge",
-                artikel: "das", // Inferred
-                plural: "Augen", // Inferred
+                article: "das",
+                plural: "Augen",
                 english: "eye",
-                example_de: [
-                    { "text": "Seine Augen", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "sind", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "grün", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Seine Augen", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "sind", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "grün", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "His eyes are green.",
-                cloze_parts: ["Seine ", " sind grün."],
-                cloze_answers: ["Augen"]
-            },
+                exampleEnglish: "His eyes are green.",
+                clozeParts: ["Seine ", " sind grün."],
+                clozeAnswers: ["Augen"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-003",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-003"),
+                wordType: "noun",
                 german: "Bauch",
-                artikel: "der", // Inferred
-                plural: "Bäuche", // Inferred
+                article: "der",
+                plural: "Bäuche",
                 english: "belly / stomach",
-                example_de: [
-                    { "text": "Mein Bauch", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "tut", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "weh", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Mein Bauch", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "tut", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "weh", case: "verb" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "My stomach hurts.",
-                cloze_parts: ["Mein ", " tut weh."],
-                cloze_answers: ["Bauch"]
-            },
+                exampleEnglish: "My stomach hurts.",
+                clozeParts: ["Mein ", " tut weh."],
+                clozeAnswers: ["Bauch"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-004",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-004"),
+                wordType: "noun",
                 german: "Fuß",
-                artikel: "der", // Inferred
-                plural: "Füße", // Inferred
+                article: "der",
+                plural: "Füße",
                 english: "foot",
-                example_de: [
-                    { "text": "Mein Fuß", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "tut", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "weh", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Mein Fuß", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "tut", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "weh", case: "verb" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "My foot hurts.",
-                cloze_parts: ["Mein ", " tut weh."],
-                cloze_answers: ["Fuß"]
-            },
+                exampleEnglish: "My foot hurts.",
+                clozeParts: ["Mein ", " tut weh."],
+                clozeAnswers: ["Fuß"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-005",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-005"),
+                wordType: "noun",
                 german: "Haar",
-                artikel: "das", // Inferred (often used in plural "die Haare")
-                plural: "Haare", // Inferred
+                article: "das",
+                plural: "Haare",
                 english: "hair",
-                example_de: [
-                    { "text": "Sie", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "hat", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "lange Haare", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Sie", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "hat", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "lange Haare", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "She has long hair.",
-                cloze_parts: ["Sie hat lange ", "."],
-                cloze_answers: ["Haare"]
-            },
+                exampleEnglish: "She has long hair.",
+                clozeParts: ["Sie hat lange ", "."],
+                clozeAnswers: ["Haare"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-006",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-006"),
+                wordType: "noun",
                 german: "Kopf",
-                artikel: "der", // Inferred
-                plural: "Köpfe", // Inferred
+                article: "der",
+                plural: "Köpfe",
                 english: "head",
-                example_de: [
-                    { "text": "Mein Kopf", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "tut", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "weh", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Mein Kopf", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "tut", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "weh", case: "verb" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "My head hurts.",
-                cloze_parts: ["Mein ", " tut weh."],
-                cloze_answers: ["Kopf"]
-            },
+                exampleEnglish: "My head hurts.",
+                clozeParts: ["Mein ", " tut weh."],
+                clozeAnswers: ["Kopf"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-007",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-007"),
+                wordType: "noun",
                 german: "Mund",
-                artikel: "der", // Inferred
-                plural: "Münder", // Inferred
+                article: "der",
+                plural: "Münder",
                 english: "mouth",
-                example_de: [
-                    { "text": "Öffne", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "bitte", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "den Mund", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Öffne", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "bitte", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "den Mund", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "Please open your mouth.",
-                cloze_parts: ["Öffne bitte den ", "."],
-                cloze_answers: ["Mund"]
-            },
+                exampleEnglish: "Please open your mouth.",
+                clozeParts: ["Öffne bitte den ", "."],
+                clozeAnswers: ["Mund"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-008",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-008"),
+                wordType: "noun",
                 german: "Nase",
-                artikel: "die", // Inferred
-                plural: "Nasen", // Inferred
+                article: "die",
+                plural: "Nasen",
                 english: "nose",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "habe", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "eine laufende Nase", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "habe", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "eine laufende Nase", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I have a runny nose.",
-                cloze_parts: ["Ich habe eine laufende ", "."],
-                cloze_answers: ["Nase"]
-            },
+                exampleEnglish: "I have a runny nose.",
+                clozeParts: ["Ich habe eine laufende ", "."],
+                clozeAnswers: ["Nase"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-009",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-009"),
+                wordType: "noun",
                 german: "Ohr",
-                artikel: "das", // Inferred
-                plural: "Ohren", // Inferred
+                article: "das",
+                plural: "Ohren",
                 english: "ear",
-                example_de: [
-                    { "text": "Mein Ohr", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "tut", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "weh", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Mein Ohr", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "tut", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "weh", case: "verb" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "My ear hurts.",
-                cloze_parts: ["Mein ", " tut weh."],
-                cloze_answers: ["Ohr"]
-            },
+                exampleEnglish: "My ear hurts.",
+                clozeParts: ["Mein ", " tut weh."],
+                clozeAnswers: ["Ohr"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-010",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-010"),
+                wordType: "noun",
                 german: "Hand",
-                artikel: "die", // Inferred
-                plural: "Hände", // Inferred
+                article: "die",
+                plural: "Hände",
                 english: "hand",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "wasche", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "meine Hände", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "wasche", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "meine Hände", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I wash my hands.",
-                cloze_parts: ["Ich wasche meine ", "."],
-                cloze_answers: ["Hände"]
-            },
+                exampleEnglish: "I wash my hands.",
+                clozeParts: ["Ich wasche meine ", "."],
+                clozeAnswers: ["Hände"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-011",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-011"),
+                wordType: "noun",
                 german: "Bein",
-                artikel: "das", // Inferred
-                plural: "Beine", // Inferred
+                article: "das",
+                plural: "Beine",
                 english: "leg",
-                example_de: [
-                    { "text": "Mein Bein", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "tut", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "weh", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Mein Bein", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "tut", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "weh", case: "verb" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "My leg hurts.",
-                cloze_parts: ["Mein ", " tut weh."],
-                cloze_answers: ["Bein"]
-            },
+                exampleEnglish: "My leg hurts.",
+                clozeParts: ["Mein ", " tut weh."],
+                clozeAnswers: ["Bein"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-012",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-012"),
+                wordType: "noun",
                 german: "Körper",
-                artikel: "der", // Inferred
-                plural: "Körper", // Inferred
+                article: "der",
+                plural: "Körper",
                 english: "body",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "wasche", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "meinen Körper", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "wasche", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "meinen Körper", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I wash my body.",
-                cloze_parts: ["Ich wasche meinen ", "."],
-                cloze_answers: ["Körper"]
-            },
+                exampleEnglish: "I wash my body.",
+                clozeParts: ["Ich wasche meinen ", "."],
+                clozeAnswers: ["Körper"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-koerperteile-013",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperteile-013"),
+                wordType: "noun",
                 german: "Zahn",
-                artikel: "der",
+                article: "der",
                 plural: "Zähne",
                 english: "tooth",
-                example_de: [
-                    { "text": "Mir", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "tut", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "der Zahn", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "weh", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Mir", case: "dativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "tut", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "der Zahn", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "weh", case: "verb" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "My tooth hurts.",
-                cloze_parts: ["Mir tut der ", " weh."],
-                cloze_answers: ["Zahn"]
-            }
+                exampleEnglish: "My tooth hurts.",
+                clozeParts: ["Mir tut der ", " weh."],
+                clozeAnswers: ["Zahn"]
+            } as Noun
         ],
 
-        // --- UNTER-THEMA: Körperpflege/Hygiene ---
+        // --- UNTER-THEMA: Körperpflege/Hygiene (4 Wörter) ---
         "Körperpflege/Hygiene": [
             {
-                id: "menschlicher-koerper-gesundheit-koerperpflege-001",
-                wortart: "Verb",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperpflege-001"),
+                wordType: "verb",
                 german: "duschen",
                 english: "to shower",
-                trennbar: false,
-                hilfsverb_perfekt: "haben", // Common
-                partizip_ii: "geduscht", // Common
-                konjugation_praesens: {}, // Needs manual fill
-                imperativ: {}, // Needs manual fill
-                example_de: [
-                    { "text": "Erst", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "dusche", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ich", "kasus": "nominativ" },
-                    { "text": ",", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "dann", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gehe", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "zum Frühstück", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "geduscht",
+                presentConjugation: {},
+                imperative: {},
+                exampleGerman: [
+                    { text: "Erst", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "dusche", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "ich", case: "nominativ" } as CaseElement,
+                    { text: ",", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "dann", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "gehe", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "zum Frühstück", case: "dativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "First I shower, then I go to breakfast.",
-                cloze_parts: ["Erst ", " ich, dann gehe ich zum Frühstück."],
-                cloze_answers: ["dusche"]
-            },
+                exampleEnglish: "First I shower, then I go to breakfast.",
+                clozeParts: ["Erst ", " ich, dann gehe ich zum Frühstück."],
+                clozeAnswers: ["dusche"]
+            } as Verb,
             {
-                id: "menschlicher-koerper-gesundheit-koerperpflege-002",
-                wortart: "Verb",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperpflege-002"),
+                wordType: "verb",
                 german: "waschen",
                 english: "to wash",
-                trennbar: false,
-                hilfsverb_perfekt: "haben", // Common
-                partizip_ii: "gewaschen", // Common
-                konjugation_praesens: {}, // Needs manual fill
-                imperativ: {}, // Needs manual fill
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "wasche", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "meine Hände", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "gewaschen",
+                presentConjugation: {},
+                imperative: {},
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "wasche", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "meine Hände", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I wash my hands.",
-                cloze_parts: ["Ich ", " meine Hände."],
-                cloze_answers: ["wasche"]
-            },
+                exampleEnglish: "I wash my hands.",
+                clozeParts: ["Ich ", " meine Hände."],
+                clozeAnswers: ["wasche"]
+            } as Verb,
             {
-                id: "menschlicher-koerper-gesundheit-koerperpflege-003",
-                wortart: "Phrase", // Verb + Nomen
+                id: createWordId("menschlicher-koerper-gesundheit-koerperpflege-003"),
+                wordType: "verb",
                 german: "Zähne putzen",
                 english: "to brush teeth",
-                trennbar: false, // Treated as unit
-                hilfsverb_perfekt: "haben", // Common for putzen
-                partizip_ii: "geputzt", // Common for putzen
-                konjugation_praesens: {}, // Needs manual fill
-                imperativ: {}, // Needs manual fill
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "putze", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "meine Zähne", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "geputzt",
+                presentConjugation: {},
+                imperative: {},
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "putze", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "meine Zähne", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I brush my teeth.",
-                cloze_parts: ["Ich ", " meine Zähne."],
-                cloze_answers: ["putze"] // Cloze on verb part
-            },
+                exampleEnglish: "I brush my teeth.",
+                clozeParts: ["Ich ", " meine Zähne."],
+                clozeAnswers: ["putze"]
+            } as Verb,
             {
-                id: "menschlicher-koerper-gesundheit-koerperpflege-004",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-koerperpflege-004"),
+                wordType: "adjective",
                 german: "sauber",
                 english: "clean",
-                example_de: [
-                    { "text": "Das Handtuch", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ist", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "sauber", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Das Handtuch", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "ist", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "sauber", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "The towel is clean.",
-                cloze_parts: ["Das Handtuch ist ", "."],
-                cloze_answers: ["sauber"]
-            }
+                exampleEnglish: "The towel is clean.",
+                clozeParts: ["Das Handtuch ist ", "."],
+                clozeAnswers: ["sauber"]
+            } as Adjective
         ],
 
-        // --- UNTER-THEMA: Befinden ---
+        // --- UNTER-THEMA: Befinden (10 Wörter) ---
         "Befinden": [
             {
-                id: "menschlicher-koerper-gesundheit-befinden-001",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-befinden-001"),
+                wordType: "adjective",
                 german: "gut",
                 english: "good / well",
-                example_de: [
-                    { "text": "Wie", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "geht", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "es", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "dir", "kasus": "dativ" },
-                    { "text": "?", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "–", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Mir", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "geht", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "es", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gut", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Wie", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "geht", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "es", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "dir", case: "dativ" } as CaseElement,
+                    { text: "?", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "–", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "Mir", case: "dativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "geht", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "es", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "gut", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "How are you? – I am well.",
-                cloze_parts: ["Mir geht es ", "."],
-                cloze_answers: ["gut"]
-            },
+                exampleEnglish: "How are you? – I am well.",
+                clozeParts: ["Mir geht es ", "."],
+                clozeAnswers: ["gut"]
+            } as Adjective,
             {
-                id: "menschlicher-koerper-gesundheit-befinden-002",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-befinden-002"),
+                wordType: "adjective",
                 german: "schlecht",
                 english: "bad / poorly",
-                example_de: [
-                    { "text": "Mir", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "geht", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "es", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "schlecht", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Mir", case: "dativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "geht", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "es", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "schlecht", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I am doing poorly.",
-                cloze_parts: ["Mir geht es ", "."],
-                cloze_answers: ["schlecht"]
-            },
+                exampleEnglish: "I am doing poorly.",
+                clozeParts: ["Mir geht es ", "."],
+                clozeAnswers: ["schlecht"]
+            } as Adjective,
             {
-                id: "menschlicher-koerper-gesundheit-befinden-003",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-befinden-003"),
+                wordType: "adjective",
                 german: "müde",
                 english: "tired",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "bin", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "müde", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "bin", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "müde", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I am tired.",
-                cloze_parts: ["Ich bin ", "."],
-                cloze_answers: ["müde"]
-            },
+                exampleEnglish: "I am tired.",
+                clozeParts: ["Ich bin ", "."],
+                clozeAnswers: ["müde"]
+            } as Adjective,
             {
-                id: "menschlicher-koerper-gesundheit-befinden-004",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-befinden-004"),
+                wordType: "adjective",
                 german: "krank",
                 english: "sick / ill",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "bin", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "krank", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "bin", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "krank", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I am sick.",
-                cloze_parts: ["Ich bin ", "."],
-                cloze_answers: ["krank"]
-            },
+                exampleEnglish: "I am sick.",
+                clozeParts: ["Ich bin ", "."],
+                clozeAnswers: ["krank"]
+            } as Adjective,
             {
-                id: "menschlicher-koerper-gesundheit-befinden-005",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-befinden-005"),
+                wordType: "adjective",
                 german: "besser",
                 english: "better",
-                example_de: [
-                    { "text": "Hoffentlich", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "geht", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "es", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "dir", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "bald", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "besser", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Hoffentlich", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "geht", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "es", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "dir", case: "dativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "bald", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "besser", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "Hopefully you will feel better soon.",
-                cloze_parts: ["Hoffentlich geht es dir bald ", "."],
-                cloze_answers: ["besser"]
-            },
+                exampleEnglish: "Hopefully you will feel better soon.",
+                clozeParts: ["Hoffentlich geht es dir bald ", "."],
+                clozeAnswers: ["besser"]
+            } as Adjective,
             {
-                id: "menschlicher-koerper-gesundheit-befinden-006",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-befinden-006"),
+                wordType: "noun",
                 german: "Angst",
-                artikel: "die", // Inferred
-                plural: "Ängste", // Inferred
+                article: "die",
+                plural: "Ängste",
                 english: "fear / anxiety",
-                example_de: [
-                    { "text": "Er", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "hat", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Angst", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Er", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "hat", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "Angst", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "He is afraid. (Literally: He has fear.)",
-                cloze_parts: ["Er hat ", "."],
-                cloze_answers: ["Angst"]
-            },
+                exampleEnglish: "He is afraid. (Literally: He has fear.)",
+                clozeParts: ["Er hat ", "."],
+                clozeAnswers: ["Angst"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-befinden-007",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-befinden-007"),
+                wordType: "adjective",
                 german: "froh",
                 english: "happy / glad",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "bin", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "froh", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "bin", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "froh", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I am glad.",
-                cloze_parts: ["Ich bin ", "."],
-                cloze_answers: ["froh"]
-            },
+                exampleEnglish: "I am glad.",
+                clozeParts: ["Ich bin ", "."],
+                clozeAnswers: ["froh"]
+            } as Adjective,
             {
-                id: "menschlicher-koerper-gesundheit-befinden-008",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-befinden-008"),
+                wordType: "adjective",
                 german: "fit",
                 english: "fit",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "bin", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "fit", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "bin", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "fit", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I am fit.",
-                cloze_parts: ["Ich bin ", "."],
-                cloze_answers: ["fit"]
-            },
+                exampleEnglish: "I am fit.",
+                clozeParts: ["Ich bin ", "."],
+                clozeAnswers: ["fit"]
+            } as Adjective,
             {
-                id: "menschlicher-koerper-gesundheit-befinden-009",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-befinden-009"),
+                wordType: "adjective",
                 german: "stark",
                 english: "strong",
-                example_de: [
-                    { "text": "Er", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ist", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "stark", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Er", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "ist", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "stark", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "He is strong.",
-                cloze_parts: ["Er ist ", "."],
-                cloze_answers: ["stark"]
-            },
+                exampleEnglish: "He is strong.",
+                clozeParts: ["Er ist ", "."],
+                clozeAnswers: ["stark"]
+            } as Adjective,
             {
-                id: "menschlicher-koerper-gesundheit-befinden-010",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-befinden-010"),
+                wordType: "adjective",
                 german: "schwach",
                 english: "weak",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "bin", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "schwach", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "bin", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "schwach", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I am weak.",
-                cloze_parts: ["Ich bin ", "."],
-                cloze_answers: ["schwach"]
-            }
+                exampleEnglish: "I am weak.",
+                clozeParts: ["Ich bin ", "."],
+                clozeAnswers: ["schwach"]
+            } as Adjective
         ],
 
-        // --- UNTER-THEMA: Gesundheit/Krankheit ---
+        // --- UNTER-THEMA: Gesundheit/Krankheit (13 Wörter) ---
         "Gesundheit/Krankheit": [
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-001",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-001"),
+                wordType: "noun",
                 german: "Arzt",
-                artikel: "der", // Inferred
-                plural: "Ärzte", // Inferred
+                article: "der",
+                plural: "Ärzte",
                 english: "doctor (male)",
-                example_de: [
-                    { "text": "Er", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "war", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "beim Arzt", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Er", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "war", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "beim Arzt", case: "dativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "He was at the doctor's.",
-                cloze_parts: ["Er war beim ", "."],
-                cloze_answers: ["Arzt"]
-            },
+                exampleEnglish: "He was at the doctor's.",
+                clozeParts: ["Er war beim ", "."],
+                clozeAnswers: ["Arzt"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-002",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-002"),
+                wordType: "noun",
                 german: "Ärztin",
-                artikel: "die", // Inferred
-                plural: "Ärztinnen", // Inferred
+                article: "die",
+                plural: "Ärztinnen",
                 english: "doctor (female)",
-                example_de: [
-                    { "text": "Die Ärztin", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "arbeitet", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "im Krankenhaus", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Die Ärztin", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "arbeitet", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "im Krankenhaus", case: "dativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "The doctor (female) works in the hospital.",
-                cloze_parts: ["Die ", " arbeitet im Krankenhaus."],
-                cloze_answers: ["Ärztin"]
-            },
+                exampleEnglish: "The doctor (female) works in the hospital.",
+                clozeParts: ["Die ", " arbeitet im Krankenhaus."],
+                clozeAnswers: ["Ärztin"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-003",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-003"),
+                wordType: "noun",
                 german: "Apotheke",
-                artikel: "die", // Inferred
-                plural: "Apotheken", // Inferred
+                article: "die",
+                plural: "Apotheken",
                 english: "pharmacy",
-                example_de: [
-                    { "text": "Aspirin", "kasus": "nominativ" },
-                    { "text": "?", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Das", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "bekommen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Sie", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "in der Apotheke", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Aspirin", case: "nominativ" } as CaseElement,
+                    { text: "?", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "Das", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "bekommen", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "Sie", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "in der Apotheke", case: "dativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "Aspirin? You can get that at the pharmacy.",
-                cloze_parts: ["Aspirin? Das bekommen Sie in der ", "."],
-                cloze_answers: ["Apotheke"]
-            },
+                exampleEnglish: "Aspirin? You can get that at the pharmacy.",
+                clozeParts: ["Aspirin? Das bekommen Sie in der ", "."],
+                clozeAnswers: ["Apotheke"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-004",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-004"),
+                wordType: "noun",
                 german: "Medikament",
-                artikel: "das", // Inferred
-                plural: "Medikamente", // Inferred
+                article: "das",
+                plural: "Medikamente",
                 english: "medication / medicine",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "brauche", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ein Medikament", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "brauche", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "ein Medikament", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I need a medication.",
-                cloze_parts: ["Ich brauche ein ", "."],
-                cloze_answers: ["Medikament"]
-            },
+                exampleEnglish: "I need a medication.",
+                clozeParts: ["Ich brauche ein ", "."],
+                clozeAnswers: ["Medikament"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-005",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-005"),
+                wordType: "noun",
                 german: "Kopfschmerzen",
-                artikel: "die", // Plural
-                plural: "Kopfschmerzen", // Plural only
+                article: "die",
+                plural: "Kopfschmerzen",
                 english: "headache",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "habe", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Kopfschmerzen", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "habe", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "Kopfschmerzen", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I have a headache.",
-                cloze_parts: ["Ich habe ", "."],
-                cloze_answers: ["Kopfschmerzen"]
-            },
+                exampleEnglish: "I have a headache.",
+                clozeParts: ["Ich habe ", "."],
+                clozeAnswers: ["Kopfschmerzen"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-006",
-                wortart: "Adjektiv",
-                german: "krank", // Duplicate word
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-006"),
+                wordType: "adjective",
+                german: "krank",
                 english: "sick / ill",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "bin", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "krank", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "bin", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "krank", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I am sick.",
-                cloze_parts: ["Ich bin ", "."],
-                cloze_answers: ["krank"]
-            },
+                exampleEnglish: "I am sick.",
+                clozeParts: ["Ich bin ", "."],
+                clozeAnswers: ["krank"]
+            } as Adjective,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-007",
-                wortart: "Adjektiv",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-007"),
+                wordType: "adjective",
                 german: "gesund",
                 english: "healthy",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "bin", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "wieder", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gesund", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "bin", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "wieder", case: "none" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "gesund", case: "none" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I am healthy again.",
-                cloze_parts: ["Ich bin wieder ", "."],
-                cloze_answers: ["gesund"]
-            },
+                exampleEnglish: "I am healthy again.",
+                clozeParts: ["Ich bin wieder ", "."],
+                clozeAnswers: ["gesund"]
+            } as Adjective,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-008",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-008"),
+                wordType: "noun",
                 german: "Fieber",
-                artikel: "das", // Inferred
-                plural: null, // Often no plural
+                article: "das",
+                plural: null,
                 english: "fever",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "habe", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Fieber", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "habe", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "Fieber", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I have a fever.",
-                cloze_parts: ["Ich habe ", "."],
-                cloze_answers: ["Fieber"]
-            },
+                exampleEnglish: "I have a fever.",
+                clozeParts: ["Ich habe ", "."],
+                clozeAnswers: ["Fieber"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-009",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-009"),
+                wordType: "noun",
                 german: "Husten",
-                artikel: "der", // Inferred
-                plural: null, // Often no plural
+                article: "der",
+                plural: null,
                 english: "cough",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "habe", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Husten", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "habe", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "Husten", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I have a cough.",
-                cloze_parts: ["Ich habe ", "."],
-                cloze_answers: ["Husten"]
-            },
+                exampleEnglish: "I have a cough.",
+                clozeParts: ["Ich habe ", "."],
+                clozeAnswers: ["Husten"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-010",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-010"),
+                wordType: "noun",
                 german: "Schnupfen",
-                artikel: "der", // Inferred
-                plural: null, // Often no plural
+                article: "der",
+                plural: null,
                 english: "cold (illness) / sniffles",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "habe", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Schnupfen", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "habe", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "Schnupfen", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I have a cold.",
-                cloze_parts: ["Ich habe ", "."],
-                cloze_answers: ["Schnupfen"]
-            },
+                exampleEnglish: "I have a cold.",
+                clozeParts: ["Ich habe ", "."],
+                clozeAnswers: ["Schnupfen"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-011",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-011"),
+                wordType: "noun",
                 german: "Schmerzen",
-                artikel: "die", // Plural
-                plural: "Schmerzen", // Plural only
+                article: "die",
+                plural: "Schmerzen",
                 english: "pain",
-                example_de: [
-                    { "text": "Mein Arm", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "tut", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "weh", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Mein Arm", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "tut", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "weh", case: "verb" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "My arm hurts.", // Example sentence uses "weh tun", not "Schmerzen" directly
-                cloze_parts: ["Mein Arm tut ", "."], // Cloze for "weh"
-                cloze_answers: ["weh"]
-            },
+                exampleEnglish: "My arm hurts.",
+                clozeParts: ["Mein Arm tut ", "."],
+                clozeAnswers: ["weh"]
+            } as Noun,
             {
-                id: "menschlicher-koerper-gesundheit-gesundheit-012",
-                wortart: "Nomen",
+                id: createWordId("menschlicher-koerper-gesundheit-gesundheit-012"),
+                wordType: "noun",
                 german: "Hilfe",
-                artikel: "die", // Inferred
-                plural: null, // Often no plural
+                article: "die",
+                plural: null,
                 english: "help",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "brauche", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Hilfe", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "brauche", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "Hilfe", case: "akkusativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                example_en: "I need help.",
-                cloze_parts: ["Ich brauche ", "."],
-                cloze_answers: ["Hilfe"]
-            }
+                exampleEnglish: "I need help.",
+                clozeParts: ["Ich brauche ", "."],
+                clozeAnswers: ["Hilfe"]
+            } as Noun
         ]
     }
-};
+});

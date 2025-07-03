@@ -1,9 +1,8 @@
 // ui/navigation.ts
 // Navigation und Themen-Anzeige Funktionen
 
-// KORREKTUR: Echte Typen importieren statt 'any' zu verwenden
 import type { DOMElements } from '../dom';
-import type { TrainerState, VocabularyStructure, LearningModes, UICallbacks } from '../shared/types/index';
+import type { TrainerState, VocabularyStructure, LearningModes, UICallbacks, TopicId, SubTopicId } from '../shared/types/index';
 
 import { NavigationEvents } from '../shared/events/navigation-events';
 import { createTopicButton, createActionButton } from '../shared/styles/button-factory';
@@ -50,7 +49,7 @@ function optimizeSubTopicGrid(container: HTMLElement): void {
  * Rendert die Hauptthemen-Buttons.
  * Wird von showMainTopicNavigation aufgerufen.
  */
-function displayMainTopics(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, learningModes: LearningModes): void {
+export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, learningModes: LearningModes): void {
     dom.navigationContainerEl.innerHTML = '';
     dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max';
     const numberOfModes = Object.keys(learningModes).length;
@@ -64,7 +63,12 @@ function displayMainTopics(dom: DOMElements, state: TrainerState, vokabular: Voc
             const progressForKey = state.globalProgress[progressKey] || {};
             totalWords += words.length * numberOfModes;
             Object.keys(learningModes).forEach(modeId => {
-                totalMastered += progressForKey[modeId]?.size || 0;
+                const masteredSet = progressForKey[modeId];
+                if (masteredSet instanceof Set) {
+                    totalMastered += masteredSet.size;
+                } else if (Array.isArray(masteredSet)) {
+                    totalMastered += masteredSet.length;
+                }
             });
         });
 
@@ -97,7 +101,7 @@ function displayMainTopics(dom: DOMElements, state: TrainerState, vokabular: Voc
  * Rendert die Unterthemen-Buttons.
  * Wird von showSubTopicNavigation aufgerufen.
  */
-function displaySubTopics(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, mainTopicName: string, learningModes: LearningModes): void {
+export function displaySubTopics(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, mainTopicName: TopicId, learningModes: LearningModes): void {
     dom.navigationContainerEl.innerHTML = '';
     dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max';
     const subTopics = Object.keys(vokabular[mainTopicName]);
@@ -149,7 +153,7 @@ export function showMainTopicNavigation(dom: DOMElements, state: TrainerState, v
 /**
  * Zeigt die Unterthemen-Navigation für ein gewähltes Hauptthema an.
  */
-export function showSubTopicNavigation(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, mainTopic: string, learningModes: LearningModes): void {
+export function showSubTopicNavigation(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, mainTopic: TopicId, learningModes: LearningModes): void {
     NavigationEvents.dispatchSub();
     state.currentMainTopic = mainTopic;
     dom.navigationViewEl.classList.remove('hidden');
@@ -181,14 +185,14 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
         const mainTopicTestButton = target.closest('[data-test-main-topic-only]') as HTMLElement;
 
         if (mainTopicButton) {
-            const mainTopic = mainTopicButton.dataset.mainTopic!;
+            const mainTopic = mainTopicButton.dataset.mainTopic! as TopicId;
             showSubTopicNavigation(dom, state, vokabular, mainTopic, learningModes);
         } else if (subTopicButton) {
-            callbacks.handleTopicSelection(state.currentMainTopic!, subTopicButton.dataset.subTopic!);
+            callbacks.handleTopicSelection(state.currentMainTopic!, subTopicButton.dataset.subTopic! as SubTopicId);
         } else if (globalTestButton) {
             window.dispatchEvent(new CustomEvent('showTestModal', { detail: { type: 'global', topic: 'Alle Themen' } }));
         } else if (mainTopicTestButton) {
-            const mainTopic = mainTopicTestButton.dataset.testMainTopicOnly!;
+            const mainTopic = mainTopicTestButton.dataset.testMainTopicOnly! as TopicId;
             window.dispatchEvent(new CustomEvent('showTestModal', { detail: { type: 'mainTopic', topic: mainTopic } }));
         }
     });
