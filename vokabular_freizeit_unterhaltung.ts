@@ -1,6 +1,7 @@
 // packages/trainer-themen/vokabular_freizeit_unterhaltung.ts
 
-import type { Word } from '../shared/types/index';
+import type { VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary';
+import { createWordId, createVocabulary } from './shared/types/vocabulary';
 
 export const vokabularFreizeitUnterhaltung: Record<string, Record<string, Word[]>> = {
     "Freizeit und Unterhaltung": {
@@ -21,1167 +22,6 @@ export const vokabularFreizeitUnterhaltung: Record<string, Record<string, Word[]
                     { "text": " ", "kasus": "none" },
                     { "text": "Fußball", "kasus": "nominativ" },
                     { "text": ".", "kasus": "none" }
-                ],
-                example_en: "The players are on the field.",
-                cloze_parts: ["Die ", " sind auf dem Platz."],
-                cloze_answers: ["Spieler"]
-            },
-            {
-                id: "freizeit-unterhaltung-sport-009",
-                wortart: "Nomen",
-                german: "Ball",
-                artikel: "der",
-                plural: "Bälle",
-                english: "ball",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "spielen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "mit dem Ball", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are playing with the ball.",
-                cloze_parts: ["Wir spielen mit dem ", "."],
-                cloze_answers: ["Ball"]
-            },
-            {
-                id: "freizeit-unterhaltung-sport-010",
-                wortart: "Verb",
-                german: "gewinnen",
-                english: "to win",
-                trennbar: false,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "gewonnen",
-                konjugation_praesens: { 
-                    ich: "gewinne", 
-                    du: "gewinnst", 
-                    er_sie_es: "gewinnt", 
-                    wir: "gewinnen", 
-                    ihr: "gewinnt", 
-                    sie_Sie: "gewinnen" 
-                },
-                imperativ: { 
-                    du: "Gewinn!", 
-                    ihr: "Gewinnt!" 
-                },
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "möchte", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gewinnen", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I want to win.",
-                cloze_parts: ["Ich möchte ", "."],
-                cloze_answers: ["gewinnen"]
-            },
-            {
-                id: "freizeit-unterhaltung-sport-011",
-                wortart: "Verb",
-                german: "verlieren",
-                english: "to lose",
-                trennbar: false,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "verloren",
-                konjugation_praesens: { 
-                    ich: "verliere", 
-                    du: "verlierst", 
-                    er_sie_es: "verliert", 
-                    wir: "verlieren", 
-                    ihr: "verliert", 
-                    sie_Sie: "verlieren" 
-                },
-                imperativ: { 
-                    du: "Verlier!", 
-                    ihr: "Verliert!" 
-                },
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "habe", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "verloren", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I have lost.",
-                cloze_parts: ["Ich habe ", "."],
-                cloze_answers: ["verloren"]
-            },
-            {
-                id: "freizeit-unterhaltung-sport-012",
-                wortart: "Nomen",
-                german: "Punkt",
-                artikel: "der",
-                plural: "Punkte",
-                english: "point",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "haben", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "zehn Punkte", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We have ten points.",
-                cloze_parts: ["Wir haben zehn ", "."],
-                cloze_answers: ["Punkte"]
-            },
-            {
-                id: "freizeit-unterhaltung-sport-013",
-                wortart: "Nomen",
-                german: "Tennis",
-                artikel: "das",
-                plural: null, // oft ohne Plural
-                english: "tennis",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "spiele", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Tennis", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I play tennis.",
-                cloze_parts: ["Ich spiele ", "."],
-                cloze_answers: ["Tennis"]
-            },
-            {
-                id: "freizeit-unterhaltung-sport-014",
-                wortart: "Nomen",
-                german: "Tischtennis",
-                artikel: "das",
-                plural: null, // oft ohne Plural
-                english: "table tennis",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "spielen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Tischtennis", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We play table tennis.",
-                cloze_parts: ["Wir spielen ", "."],
-                cloze_answers: ["Tischtennis"]
-            },
-            {
-                id: "freizeit-unterhaltung-sport-015",
-                wortart: "Phrase", // Verb + Nomen
-                german: "Rad fahren",
-                english: "to cycle / to ride a bike",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "fahre", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "mit dem Rad", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "zur Schule", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I ride my bike to school.",
-                cloze_parts: ["Ich fahre mit dem ", " zur Schule."],
-                cloze_answers: ["Rad"]
-            },
-            {
-                id: "freizeit-unterhaltung-sport-016",
-                wortart: "Verb",
-                german: "tanzen", // Duplicate from Hobbys
-                english: "to dance",
-                trennbar: false,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "getanzt",
-                konjugation_praesens: { 
-                    ich: "tanze", 
-                    du: "tanzt", 
-                    er_sie_es: "tanzt", 
-                    wir: "tanzen", 
-                    ihr: "tanzt", 
-                    sie_Sie: "tanzen" 
-                },
-                imperativ: { 
-                    du: "Tanz!", 
-                    ihr: "Tanzt!" 
-                },
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "tanze", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gern", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I like to dance.",
-                cloze_parts: ["Ich ", " gern."],
-                cloze_answers: ["tanze"]
-            },
-            {
-                id: "freizeit-unterhaltung-sport-017",
-                wortart: "Verb",
-                german: "wandern", // Duplicate from Hobbys
-                english: "to hike",
-                trennbar: false,
-                hilfsverb_perfekt: "sein",
-                partizip_ii: "gewandert",
-                konjugation_praesens: { 
-                    ich: "wandere", 
-                    du: "wanderst", 
-                    er_sie_es: "wandert", 
-                    wir: "wandern", 
-                    ihr: "wandert", 
-                    sie_Sie: "wandern" 
-                },
-                imperativ: { 
-                    du: "Wandere!", 
-                    ihr: "Wandert!" 
-                },
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "wandern", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "in den Bergen", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We hike in the mountains.",
-                cloze_parts: ["Wir ", " in den Bergen."],
-                cloze_answers: ["wandern"]
-            }
-        ],
-
-        // --- UNTER-THEMA: Ausgehen (Disco) ---
-        "Ausgehen (Disco)": [
-            {
-                id: "freizeit-unterhaltung-ausgehen-001",
-                wortart: "Nomen",
-                german: "Disco/Diskothek",
-                artikel: "die",
-                plural: "Discos/Diskotheken",
-                english: "disco / discotheque",
-                example_de: [
-                    { "text": "Sie", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "geht", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gern", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "in die Diskothek", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "She likes to go to the discotheque.",
-                cloze_parts: ["Sie geht gern in die ", "."],
-                cloze_answers: ["Diskothek"]
-            },
-            {
-                id: "freizeit-unterhaltung-ausgehen-002",
-                wortart: "Verb",
-                german: "tanzen", // Duplicate
-                english: "to dance",
-                trennbar: false,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "getanzt",
-                konjugation_praesens: { 
-                    ich: "tanze", 
-                    du: "tanzt", 
-                    er_sie_es: "tanzt", 
-                    wir: "tanzen", 
-                    ihr: "tanzt", 
-                    sie_Sie: "tanzen" 
-                },
-                imperativ: { 
-                    du: "Tanz!", 
-                    ihr: "Tanzt!" 
-                },
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "tanze", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gern", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I like to dance.",
-                cloze_parts: ["Ich ", " gern."],
-                cloze_answers: ["tanze"]
-            },
-            {
-                id: "freizeit-unterhaltung-ausgehen-003",
-                wortart: "Verb",
-                german: "treffen",
-                english: "to meet",
-                trennbar: false,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "getroffen",
-                konjugation_praesens: { 
-                    ich: "treffe", 
-                    du: "triffst", 
-                    er_sie_es: "trifft", 
-                    wir: "treffen", 
-                    ihr: "trefft", 
-                    sie_Sie: "treffen" 
-                },
-                imperativ: { 
-                    du: "Triff!", 
-                    ihr: "Trefft!" 
-                },
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "treffen uns", "kasus": "verb" }, // reflexiv
-                    { "text": " ", "kasus": "none" },
-                    { "text": "im Café", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are meeting at the cafe.",
-                cloze_parts: ["Wir ", " uns im Café."],
-                cloze_answers: ["treffen"]
-            },
-            {
-                id: "freizeit-unterhaltung-ausgehen-004",
-                wortart: "Nomen",
-                german: "Party",
-                artikel: "die",
-                plural: "Partys",
-                english: "party",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "machen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "eine Party", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are having a party.",
-                cloze_parts: ["Wir machen eine ", "."],
-                cloze_answers: ["Party"]
-            },
-            {
-                id: "freizeit-unterhaltung-ausgehen-005",
-                wortart: "Verb",
-                german: "feiern",
-                english: "to celebrate",
-                trennbar: false,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "gefeiert",
-                konjugation_praesens: { 
-                    ich: "feiere", 
-                    du: "feierst", 
-                    er_sie_es: "feiert", 
-                    wir: "feiern", 
-                    ihr: "feiert", 
-                    sie_Sie: "feiern" 
-                },
-                imperativ: { 
-                    du: "Feiere!", 
-                    ihr: "Feiert!" 
-                },
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "feiern", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "meinen Geburtstag", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are celebrating my birthday.",
-                cloze_parts: ["Wir ", " meinen Geburtstag."],
-                cloze_answers: ["feiern"]
-            },
-            {
-                id: "freizeit-unterhaltung-ausgehen-006",
-                wortart: "Nomen",
-                german: "Einladung",
-                artikel: "die",
-                plural: "Einladungen",
-                english: "invitation",
-                example_de: [
-                    { "text": "Das", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ist", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "eine Einladung", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "zur Geburtstagsparty", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "This is an invitation to the birthday party.",
-                cloze_parts: ["Das ist eine ", " zur Geburtstagsparty."],
-                cloze_answers: ["Einladung"]
-            },
-            {
-                id: "freizeit-unterhaltung-ausgehen-007",
-                wortart: "Verb",
-                german: "einladen",
-                english: "to invite",
-                trennbar: true,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "eingeladen",
-                konjugation_praesens: { 
-                    ich: "lade ein", 
-                    du: "lädst ein", 
-                    er_sie_es: "lädt ein", 
-                    wir: "laden ein", 
-                    ihr: "ladet ein", 
-                    sie_Sie: "laden ein" 
-                },
-                imperativ: { 
-                    du: "Lade ein!", 
-                    ihr: "Ladet ein!" 
-                },
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "lade", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "dich", "kasus": "akkusativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ein", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I invite you.",
-                cloze_parts: ["Ich ", " dich ", "."],
-                cloze_answers: ["lade", "ein"]
-            },
-            {
-                id: "freizeit-unterhaltung-ausgehen-008",
-                wortart: "Nomen",
-                german: "Café",
-                artikel: "das",
-                plural: "Cafés",
-                english: "cafe",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "treffen uns", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "im Café", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are meeting at the cafe.",
-                cloze_parts: ["Wir treffen uns im ", "."],
-                cloze_answers: ["Café"]
-            },
-            {
-                id: "freizeit-unterhaltung-ausgehen-009",
-                wortart: "Nomen",
-                german: "Restaurant",
-                artikel: "das",
-                plural: "Restaurants",
-                english: "restaurant",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gehen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ins Restaurant", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are going to the restaurant.",
-                cloze_parts: ["Wir gehen ins ", "."],
-                cloze_answers: ["Restaurant"]
-            },
-            {
-                id: "freizeit-unterhaltung-ausgehen-010",
-                wortart: "Nomen",
-                german: "Kino", // Duplicate
-                artikel: "das",
-                plural: "Kinos",
-                english: "cinema / movie theater",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gehen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ins Kino", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are going to the cinema.",
-                cloze_parts: ["Wir gehen ins ", "."],
-                cloze_answers: ["Kino"]
-            }
-        ],
-
-        // --- UNTER-THEMA: Feste/Feiern ---
-        "Feste/Feiern": [
-            {
-                id: "freizeit-unterhaltung-feste-001",
-                wortart: "Nomen",
-                german: "Fest",
-                artikel: "das",
-                plural: "Feste",
-                english: "festival / party / celebration",
-                example_de: [
-                    { "text": "Das Fest", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "war", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "schön", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "The festival was nice.",
-                cloze_parts: ["Das ", " war schön."],
-                cloze_answers: ["Fest"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-002",
-                wortart: "Verb",
-                german: "feiern", // Duplicate
-                english: "to celebrate",
-                trennbar: false,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "gefeiert",
-                konjugation_praesens: { 
-                    ich: "feiere", 
-                    du: "feierst", 
-                    er_sie_es: "feiert", 
-                    wir: "feiern", 
-                    ihr: "feiert", 
-                    sie_Sie: "feiern" 
-                },
-                imperativ: { 
-                    du: "Feiere!", 
-                    ihr: "Feiert!" 
-                },
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "feiern", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "meinen Geburtstag", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are celebrating my birthday.",
-                cloze_parts: ["Wir ", " meinen Geburtstag."],
-                cloze_answers: ["feiern"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-003",
-                wortart: "Nomen",
-                german: "Party", // Duplicate
-                artikel: "die",
-                plural: "Partys",
-                english: "party",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "machen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "eine Party", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are having a party.",
-                cloze_parts: ["Wir machen eine ", "."],
-                cloze_answers: ["Party"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-004",
-                wortart: "Verb",
-                german: "einladen", // Duplicate
-                english: "to invite",
-                trennbar: true,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "eingeladen",
-                konjugation_praesens: { 
-                    ich: "lade ein", 
-                    du: "lädst ein", 
-                    er_sie_es: "lädt ein", 
-                    wir: "laden ein", 
-                    ihr: "ladet ein", 
-                    sie_Sie: "laden ein" 
-                },
-                imperativ: { 
-                    du: "Lade ein!", 
-                    ihr: "Ladet ein!" 
-                },
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "lade", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "dich", "kasus": "akkusativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ein", "kasus": "verb" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I invite you.",
-                cloze_parts: ["Ich ", " dich ", "."],
-                cloze_answers: ["lade", "ein"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-005",
-                wortart: "Nomen",
-                german: "Einladung", // Duplicate
-                artikel: "die",
-                plural: "Einladungen",
-                english: "invitation",
-                example_de: [
-                    { "text": "Das", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ist", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "eine Einladung", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "zur Geburtstagsparty", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "This is an invitation to the birthday party.",
-                cloze_parts: ["Das ist eine ", " zur Geburtstagsparty."],
-                cloze_answers: ["Einladung"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-006",
-                wortart: "Nomen",
-                german: "Geschenk",
-                artikel: "das",
-                plural: "Geschenke",
-                english: "present / gift",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "habe", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ein Geschenk", "kasus": "akkusativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "für dich", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I have a present for you.",
-                cloze_parts: ["Ich habe ein ", " für dich."],
-                cloze_answers: ["Geschenk"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-007",
-                wortart: "Nomen",
-                german: "Weihnachten",
-                artikel: "das", // (sächlich, aber oft ohne Artikel)
-                plural: null, // oft ohne Plural
-                english: "Christmas",
-                example_de: [
-                    { "text": "Frohe Weihnachten", "kasus": "akkusativ" }, // Feste Wendung
-                    { "text": "!", "kasus": "none" }
-                ],
-                example_en: "Merry Christmas!",
-                cloze_parts: ["Frohe ", "!"],
-                cloze_answers: ["Weihnachten"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-008",
-                wortart: "Nomen",
-                german: "Ostern",
-                artikel: "das", // (sächlich, aber oft ohne Artikel)
-                plural: null, // oft ohne Plural
-                english: "Easter",
-                example_de: [
-                    { "text": "Zu Ostern", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gibt", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "es", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Schokolade", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "There is chocolate at Easter.",
-                cloze_parts: ["Zu ", " gibt es Schokolade."],
-                cloze_answers: ["Ostern"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-009",
-                wortart: "Nomen",
-                german: "Karneval",
-                artikel: "der",
-                plural: "Karnevale", // oder Karnevals
-                english: "carnival",
-                example_de: [
-                    { "text": "An Karneval", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "verkleiden", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "uns", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We dress up for Carnival.",
-                cloze_parts: ["An ", " verkleiden wir uns."],
-                cloze_answers: ["Karneval"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-010",
-                wortart: "Nomen",
-                german: "Geburtstag",
-                artikel: "der",
-                plural: "Geburtstage",
-                english: "birthday",
-                example_de: [
-                    { "text": "Wann", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "hast", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "du", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Geburtstag", "kasus": "akkusativ" },
-                    { "text": "?", "kasus": "none" }
-                ],
-                example_en: "When is your birthday?",
-                cloze_parts: ["Wann hast du ", "?"],
-                cloze_answers: ["Geburtstag"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-011",
-                wortart: "Nomen",
-                german: "Silvester",
-                artikel: "das", // (sächlich, aber oft ohne Artikel)
-                plural: null, // oft ohne Plural
-                english: "New Year's Eve",
-                example_de: [
-                    { "text": "An Silvester", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "machen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ein Feuerwerk", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "On New Year's Eve we have fireworks.",
-                cloze_parts: ["An ", " machen wir ein Feuerwerk."],
-                cloze_answers: ["Silvester"]
-            },
-            {
-                id: "freizeit-unterhaltung-feste-012",
-                wortart: "Nomen",
-                german: "Feuerwerk",
-                artikel: "das",
-                plural: "Feuerwerke",
-                english: "fireworks",
-                example_de: [
-                    { "text": "Das Feuerwerk", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "war", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "schön", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "The fireworks were beautiful.",
-                cloze_parts: ["Das ", " war schön."],
-                cloze_answers: ["Feuerwerk"]
-            }
-        ],
-
-        // --- UNTER-THEMA: Ferien ---
-        "Ferien": [
-            {
-                id: "freizeit-unterhaltung-ferien-001",
-                wortart: "Nomen",
-                german: "Ferien",
-                artikel: "die", // Plural
-                plural: "Ferien", // Plural only
-                english: "holidays / vacation (school)",
-                example_de: [
-                    { "text": "Was", "kasus": "akkusativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "macht", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ihr", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "in den Ferien", "kasus": "dativ" },
-                    { "text": "?", "kasus": "none" }
-                ],
-                example_en: "What are you (plural) doing during the holidays?",
-                cloze_parts: ["Was macht ihr in den ", "?"],
-                cloze_answers: ["Ferien"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-002",
-                wortart: "Nomen",
-                german: "Urlaub",
-                artikel: "der",
-                plural: "Urlaube",
-                english: "holiday / vacation",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "machen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Urlaub", "kasus": "akkusativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "in Italien", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are on holiday in Italy.",
-                cloze_parts: ["Wir machen ", " in Italien."],
-                cloze_answers: ["Urlaub"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-003",
-                wortart: "Nomen",
-                german: "Reise",
-                artikel: "die",
-                plural: "Reisen",
-                english: "journey / trip",
-                example_de: [
-                    { "text": "Die Reise", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "nach Spanien", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "war", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "toll", "kasus": "none" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "The trip to Spain was great.",
-                cloze_parts: ["Die ", " nach Spanien war toll."],
-                cloze_answers: ["Reise"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-004",
-                wortart: "Verb",
-                german: "reisen", // Duplicate
-                english: "to travel",
-                trennbar: false,
-                hilfsverb_perfekt: "sein",
-                partizip_ii: "gereist",
-                konjugation_praesens: { 
-                    ich: "reise", 
-                    du: "reist", 
-                    er_sie_es: "reist", 
-                    wir: "reisen", 
-                    ihr: "reist", 
-                    sie_Sie: "reisen" 
-                },
-                imperativ: { 
-                    du: "Reis!", 
-                    ihr: "Reist!" 
-                },
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "reisen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "oft", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "nach Frankreich", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We often travel to France.",
-                cloze_parts: ["Wir ", " oft nach Frankreich."],
-                cloze_answers: ["reisen"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-005",
-                wortart: "Nomen",
-                german: "Ausflug",
-                artikel: "der",
-                plural: "Ausflüge",
-                english: "trip / excursion",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "machen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "mit der Schule", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "einen Ausflug", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are going on a trip with the school.",
-                cloze_parts: ["Wir machen mit der Schule einen ", "."],
-                cloze_answers: ["Ausflug"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-006",
-                wortart: "Verb",
-                german: "wandern", // Duplicate
-                english: "to hike",
-                trennbar: false,
-                hilfsverb_perfekt: "sein",
-                partizip_ii: "gewandert",
-                konjugation_praesens: { 
-                    ich: "wandere", 
-                    du: "wanderst", 
-                    er_sie_es: "wandert", 
-                    wir: "wandern", 
-                    ihr: "wandert", 
-                    sie_Sie: "wandern" 
-                },
-                imperativ: { 
-                    du: "Wandere!", 
-                    ihr: "Wandert!" 
-                },
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "wandern", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "in den Bergen", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We hike in the mountains.",
-                cloze_parts: ["Wir ", " in den Bergen."],
-                cloze_answers: ["wandern"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-007",
-                wortart: "Verb",
-                german: "schwimmen", // Duplicate
-                english: "to swim",
-                trennbar: false,
-                hilfsverb_perfekt: "sein",
-                partizip_ii: "geschwommen",
-                konjugation_praesens: { 
-                    ich: "schwimme", 
-                    du: "schwimmst", 
-                    er_sie_es: "schwimmt", 
-                    wir: "schwimmen", 
-                    ihr: "schwimmt", 
-                    sie_Sie: "schwimmen" 
-                },
-                imperativ: { 
-                    du: "Schwimm!", 
-                    ihr: "Schwimmt!" 
-                },
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "schwimme", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gern", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "im Sommer", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I like to swim in the summer.",
-                cloze_parts: ["Ich ", " gern im Sommer."],
-                cloze_answers: ["schwimme"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-008",
-                wortart: "Verb",
-                german: "zelten",
-                english: "to camp (in a tent)",
-                trennbar: false,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "gezeltet",
-                konjugation_praesens: { 
-                    ich: "zelte", 
-                    du: "zeltest", 
-                    er_sie_es: "zeltet", 
-                    wir: "zelten", 
-                    ihr: "zeltet", 
-                    sie_Sie: "zelten" 
-                },
-                imperativ: { 
-                    du: "Zelte!", 
-                    ihr: "Zeltet!" 
-                },
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "schlafen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "im Zelt", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We sleep in the tent.", // Example uses "schlafen im Zelt"
-                cloze_parts: ["Wir ", " im Zelt."], // Cloze for "schlafen"
-                cloze_answers: ["schlafen"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-009",
-                wortart: "Nomen",
-                german: "Camping",
-                artikel: "das",
-                plural: null, // oft ohne Plural
-                english: "camping",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "machen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "Camping", "kasus": "akkusativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "am See", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are camping at the lake.",
-                cloze_parts: ["Wir machen ", " am See."],
-                cloze_answers: ["Camping"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-010",
-                wortart: "Nomen",
-                german: "Hotel",
-                artikel: "das",
-                plural: "Hotels",
-                english: "hotel",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "schlafen", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "im Hotel", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are sleeping in the hotel.",
-                cloze_parts: ["Wir schlafen im ", "."],
-                cloze_answers: ["Hotel"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-011",
-                wortart: "Nomen",
-                german: "Koffer",
-                artikel: "der",
-                plural: "Koffer",
-                english: "suitcase",
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "packe", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "meinen Koffer", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I am packing my suitcase.",
-                cloze_parts: ["Ich packe meinen ", "."],
-                cloze_answers: ["Koffer"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-012",
-                wortart: "Nomen",
-                german: "Fotoapparat",
-                artikel: "der",
-                plural: "Fotoapparate",
-                english: "camera",
-                example_de: [
-                    { "text": "Sie", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "hat", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "einen teuren Fotoapparat", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "She has an expensive camera.",
-                cloze_parts: ["Sie hat einen teuren ", "."],
-                cloze_answers: ["Fotoapparat"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-013",
-                wortart: "Verb",
-                german: "fotografieren", // Duplicate
-                english: "to photograph",
-                trennbar: false,
-                hilfsverb_perfekt: "haben",
-                partizip_ii: "fotografiert",
-                konjugation_praesens: { 
-                    ich: "fotografiere", 
-                    du: "fotografierst", 
-                    er_sie_es: "fotografiert", 
-                    wir: "fotografieren", 
-                    ihr: "fotografiert", 
-                    sie_Sie: "fotografieren" 
-                },
-                imperativ: { 
-                    du: "Fotografier!", 
-                    ihr: "Fotografiert!" 
-                },
-                example_de: [
-                    { "text": "Ich", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "fotografiere", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "gern", "kasus": "none" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "im Urlaub", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "I like to take photos on holiday.",
-                cloze_parts: ["Ich ", " gern im Urlaub."],
-                cloze_answers: ["fotografiere"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-014",
-                wortart: "Nomen",
-                german: "Sonne",
-                artikel: "die",
-                plural: "Sonnen",
-                english: "sun",
-                example_de: [
-                    { "text": "Die Sonne", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "scheint", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "im Urlaub", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "The sun shines on holiday.",
-                cloze_parts: ["Die ", " scheint im Urlaub."],
-                cloze_answers: ["Sonne"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-015",
-                wortart: "Nomen",
-                german: "Meer",
-                artikel: "das",
-                plural: "Meere",
-                english: "sea / ocean",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "fahren", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "ans Meer", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We are going to the sea.",
-                cloze_parts: ["Wir fahren ans ", "."],
-                cloze_answers: ["Meer"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-016",
-                wortart: "Nomen",
-                german: "See",
-                artikel: "der",
-                plural: "Seen",
-                english: "lake",
-                example_de: [
-                    { "text": "Am Wochenende", "kasus": "dativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "fahren", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "an den See", "kasus": "akkusativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "At the weekend we are going to the lake.",
-                cloze_parts: ["Am Wochenende fahren wir an den ", "."],
-                cloze_answers: ["See"]
-            },
-            {
-                id: "freizeit-unterhaltung-ferien-017",
-                wortart: "Nomen",
-                german: "Berge",
-                artikel: "die", // Plural
-                plural: "Berge", // Plural only
-                english: "mountains",
-                example_de: [
-                    { "text": "Wir", "kasus": "nominativ" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "wandern", "kasus": "verb" },
-                    { "text": " ", "kasus": "none" },
-                    { "text": "in den Bergen", "kasus": "dativ" },
-                    { "text": ".", "kasus": "none" }
-                ],
-                example_en: "We hike in the mountains.",
-                cloze_parts: ["Wir wandern in den ", "."],
-                cloze_answers: ["Bergen"]
-            }
-        ]
-    }
-};asus": "none" }
                 ],
                 example_en: "My hobby is football.",
                 cloze_parts: ["Mein ", " ist Fußball."],
@@ -2393,4 +1233,1165 @@ export const vokabularFreizeitUnterhaltung: Record<string, Record<string, Word[]
                     { "text": "sind", "kasus": "verb" },
                     { "text": " ", "kasus": "none" },
                     { "text": "auf dem Platz", "kasus": "dativ" },
-                    { "text": ".", "k
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "The players are on the field.",
+                cloze_parts: ["Die ", " sind auf dem Platz."],
+                cloze_answers: ["Spieler"]
+            },
+            {
+                id: "freizeit-unterhaltung-sport-009",
+                wortart: "Nomen",
+                german: "Ball",
+                artikel: "der",
+                plural: "Bälle",
+                english: "ball",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "spielen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "mit dem Ball", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are playing with the ball.",
+                cloze_parts: ["Wir spielen mit dem ", "."],
+                cloze_answers: ["Ball"]
+            },
+            {
+                id: "freizeit-unterhaltung-sport-010",
+                wortart: "Verb",
+                german: "gewinnen",
+                english: "to win",
+                trennbar: false,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "gewonnen",
+                konjugation_praesens: { 
+                    ich: "gewinne", 
+                    du: "gewinnst", 
+                    er_sie_es: "gewinnt", 
+                    wir: "gewinnen", 
+                    ihr: "gewinnt", 
+                    sie_Sie: "gewinnen" 
+                },
+                imperativ: { 
+                    du: "Gewinn!", 
+                    ihr: "Gewinnt!" 
+                },
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "möchte", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "gewinnen", "kasus": "verb" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I want to win.",
+                cloze_parts: ["Ich möchte ", "."],
+                cloze_answers: ["gewinnen"]
+            },
+            {
+                id: "freizeit-unterhaltung-sport-011",
+                wortart: "Verb",
+                german: "verlieren",
+                english: "to lose",
+                trennbar: false,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "verloren",
+                konjugation_praesens: { 
+                    ich: "verliere", 
+                    du: "verlierst", 
+                    er_sie_es: "verliert", 
+                    wir: "verlieren", 
+                    ihr: "verliert", 
+                    sie_Sie: "verlieren" 
+                },
+                imperativ: { 
+                    du: "Verlier!", 
+                    ihr: "Verliert!" 
+                },
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "habe", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "verloren", "kasus": "verb" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I have lost.",
+                cloze_parts: ["Ich habe ", "."],
+                cloze_answers: ["verloren"]
+            },
+            {
+                id: "freizeit-unterhaltung-sport-012",
+                wortart: "Nomen",
+                german: "Punkt",
+                artikel: "der",
+                plural: "Punkte",
+                english: "point",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "haben", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "zehn Punkte", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We have ten points.",
+                cloze_parts: ["Wir haben zehn ", "."],
+                cloze_answers: ["Punkte"]
+            },
+            {
+                id: "freizeit-unterhaltung-sport-013",
+                wortart: "Nomen",
+                german: "Tennis",
+                artikel: "das",
+                plural: null, // oft ohne Plural
+                english: "tennis",
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "spiele", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "Tennis", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I play tennis.",
+                cloze_parts: ["Ich spiele ", "."],
+                cloze_answers: ["Tennis"]
+            },
+            {
+                id: "freizeit-unterhaltung-sport-014",
+                wortart: "Nomen",
+                german: "Tischtennis",
+                artikel: "das",
+                plural: null, // oft ohne Plural
+                english: "table tennis",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "spielen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "Tischtennis", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We play table tennis.",
+                cloze_parts: ["Wir spielen ", "."],
+                cloze_answers: ["Tischtennis"]
+            },
+            {
+                id: "freizeit-unterhaltung-sport-015",
+                wortart: "Phrase", // Verb + Nomen
+                german: "Rad fahren",
+                english: "to cycle / to ride a bike",
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "fahre", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "mit dem Rad", "kasus": "dativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "zur Schule", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I ride my bike to school.",
+                cloze_parts: ["Ich fahre mit dem ", " zur Schule."],
+                cloze_answers: ["Rad"]
+            },
+            {
+                id: "freizeit-unterhaltung-sport-016",
+                wortart: "Verb",
+                german: "tanzen", // Duplicate from Hobbys
+                english: "to dance",
+                trennbar: false,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "getanzt",
+                konjugation_praesens: { 
+                    ich: "tanze", 
+                    du: "tanzt", 
+                    er_sie_es: "tanzt", 
+                    wir: "tanzen", 
+                    ihr: "tanzt", 
+                    sie_Sie: "tanzen" 
+                },
+                imperativ: { 
+                    du: "Tanz!", 
+                    ihr: "Tanzt!" 
+                },
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "tanze", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "gern", "kasus": "none" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I like to dance.",
+                cloze_parts: ["Ich ", " gern."],
+                cloze_answers: ["tanze"]
+            },
+            {
+                id: "freizeit-unterhaltung-sport-017",
+                wortart: "Verb",
+                german: "wandern", // Duplicate from Hobbys
+                english: "to hike",
+                trennbar: false,
+                hilfsverb_perfekt: "sein",
+                partizip_ii: "gewandert",
+                konjugation_praesens: { 
+                    ich: "wandere", 
+                    du: "wanderst", 
+                    er_sie_es: "wandert", 
+                    wir: "wandern", 
+                    ihr: "wandert", 
+                    sie_Sie: "wandern" 
+                },
+                imperativ: { 
+                    du: "Wandere!", 
+                    ihr: "Wandert!" 
+                },
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "wandern", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "in den Bergen", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We hike in the mountains.",
+                cloze_parts: ["Wir ", " in den Bergen."],
+                cloze_answers: ["wandern"]
+            }
+        ],
+
+        // --- UNTER-THEMA: Ausgehen (Disco) ---
+        "Ausgehen (Disco)": [
+            {
+                id: "freizeit-unterhaltung-ausgehen-001",
+                wortart: "Nomen",
+                german: "Disco/Diskothek",
+                artikel: "die",
+                plural: "Discos/Diskotheken",
+                english: "disco / discotheque",
+                example_de: [
+                    { "text": "Sie", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "geht", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "gern", "kasus": "none" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "in die Diskothek", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "She likes to go to the discotheque.",
+                cloze_parts: ["Sie geht gern in die ", "."],
+                cloze_answers: ["Diskothek"]
+            },
+            {
+                id: "freizeit-unterhaltung-ausgehen-002",
+                wortart: "Verb",
+                german: "tanzen", // Duplicate
+                english: "to dance",
+                trennbar: false,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "getanzt",
+                konjugation_praesens: { 
+                    ich: "tanze", 
+                    du: "tanzt", 
+                    er_sie_es: "tanzt", 
+                    wir: "tanzen", 
+                    ihr: "tanzt", 
+                    sie_Sie: "tanzen" 
+                },
+                imperativ: { 
+                    du: "Tanz!", 
+                    ihr: "Tanzt!" 
+                },
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "tanze", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "gern", "kasus": "none" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I like to dance.",
+                cloze_parts: ["Ich ", " gern."],
+                cloze_answers: ["tanze"]
+            },
+            {
+                id: "freizeit-unterhaltung-ausgehen-003",
+                wortart: "Verb",
+                german: "treffen",
+                english: "to meet",
+                trennbar: false,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "getroffen",
+                konjugation_praesens: { 
+                    ich: "treffe", 
+                    du: "triffst", 
+                    er_sie_es: "trifft", 
+                    wir: "treffen", 
+                    ihr: "trefft", 
+                    sie_Sie: "treffen" 
+                },
+                imperativ: { 
+                    du: "Triff!", 
+                    ihr: "Trefft!" 
+                },
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "treffen uns", "kasus": "verb" }, // reflexiv
+                    { "text": " ", "kasus": "none" },
+                    { "text": "im Café", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are meeting at the cafe.",
+                cloze_parts: ["Wir ", " uns im Café."],
+                cloze_answers: ["treffen"]
+            },
+            {
+                id: "freizeit-unterhaltung-ausgehen-004",
+                wortart: "Nomen",
+                german: "Party",
+                artikel: "die",
+                plural: "Partys",
+                english: "party",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "machen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "eine Party", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are having a party.",
+                cloze_parts: ["Wir machen eine ", "."],
+                cloze_answers: ["Party"]
+            },
+            {
+                id: "freizeit-unterhaltung-ausgehen-005",
+                wortart: "Verb",
+                german: "feiern",
+                english: "to celebrate",
+                trennbar: false,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "gefeiert",
+                konjugation_praesens: { 
+                    ich: "feiere", 
+                    du: "feierst", 
+                    er_sie_es: "feiert", 
+                    wir: "feiern", 
+                    ihr: "feiert", 
+                    sie_Sie: "feiern" 
+                },
+                imperativ: { 
+                    du: "Feiere!", 
+                    ihr: "Feiert!" 
+                },
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "feiern", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "meinen Geburtstag", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are celebrating my birthday.",
+                cloze_parts: ["Wir ", " meinen Geburtstag."],
+                cloze_answers: ["feiern"]
+            },
+            {
+                id: "freizeit-unterhaltung-ausgehen-006",
+                wortart: "Nomen",
+                german: "Einladung",
+                artikel: "die",
+                plural: "Einladungen",
+                english: "invitation",
+                example_de: [
+                    { "text": "Das", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "ist", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "eine Einladung", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "zur Geburtstagsparty", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "This is an invitation to the birthday party.",
+                cloze_parts: ["Das ist eine ", " zur Geburtstagsparty."],
+                cloze_answers: ["Einladung"]
+            },
+            {
+                id: "freizeit-unterhaltung-ausgehen-007",
+                wortart: "Verb",
+                german: "einladen",
+                english: "to invite",
+                trennbar: true,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "eingeladen",
+                konjugation_praesens: { 
+                    ich: "lade ein", 
+                    du: "lädst ein", 
+                    er_sie_es: "lädt ein", 
+                    wir: "laden ein", 
+                    ihr: "ladet ein", 
+                    sie_Sie: "laden ein" 
+                },
+                imperativ: { 
+                    du: "Lade ein!", 
+                    ihr: "Ladet ein!" 
+                },
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "lade", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "dich", "kasus": "akkusativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "ein", "kasus": "verb" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I invite you.",
+                cloze_parts: ["Ich ", " dich ", "."],
+                cloze_answers: ["lade", "ein"]
+            },
+            {
+                id: "freizeit-unterhaltung-ausgehen-008",
+                wortart: "Nomen",
+                german: "Café",
+                artikel: "das",
+                plural: "Cafés",
+                english: "cafe",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "treffen uns", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "im Café", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are meeting at the cafe.",
+                cloze_parts: ["Wir treffen uns im ", "."],
+                cloze_answers: ["Café"]
+            },
+            {
+                id: "freizeit-unterhaltung-ausgehen-009",
+                wortart: "Nomen",
+                german: "Restaurant",
+                artikel: "das",
+                plural: "Restaurants",
+                english: "restaurant",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "gehen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "ins Restaurant", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are going to the restaurant.",
+                cloze_parts: ["Wir gehen ins ", "."],
+                cloze_answers: ["Restaurant"]
+            },
+            {
+                id: "freizeit-unterhaltung-ausgehen-010",
+                wortart: "Nomen",
+                german: "Kino", // Duplicate
+                artikel: "das",
+                plural: "Kinos",
+                english: "cinema / movie theater",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "gehen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "ins Kino", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are going to the cinema.",
+                cloze_parts: ["Wir gehen ins ", "."],
+                cloze_answers: ["Kino"]
+            }
+        ],
+
+        // --- UNTER-THEMA: Feste/Feiern ---
+        "Feste/Feiern": [
+            {
+                id: "freizeit-unterhaltung-feste-001",
+                wortart: "Nomen",
+                german: "Fest",
+                artikel: "das",
+                plural: "Feste",
+                english: "festival / party / celebration",
+                example_de: [
+                    { "text": "Das Fest", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "war", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "schön", "kasus": "none" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "The festival was nice.",
+                cloze_parts: ["Das ", " war schön."],
+                cloze_answers: ["Fest"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-002",
+                wortart: "Verb",
+                german: "feiern", // Duplicate
+                english: "to celebrate",
+                trennbar: false,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "gefeiert",
+                konjugation_praesens: { 
+                    ich: "feiere", 
+                    du: "feierst", 
+                    er_sie_es: "feiert", 
+                    wir: "feiern", 
+                    ihr: "feiert", 
+                    sie_Sie: "feiern" 
+                },
+                imperativ: { 
+                    du: "Feiere!", 
+                    ihr: "Feiert!" 
+                },
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "feiern", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "meinen Geburtstag", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are celebrating my birthday.",
+                cloze_parts: ["Wir ", " meinen Geburtstag."],
+                cloze_answers: ["feiern"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-003",
+                wortart: "Nomen",
+                german: "Party", // Duplicate
+                artikel: "die",
+                plural: "Partys",
+                english: "party",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "machen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "eine Party", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are having a party.",
+                cloze_parts: ["Wir machen eine ", "."],
+                cloze_answers: ["Party"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-004",
+                wortart: "Verb",
+                german: "einladen", // Duplicate
+                english: "to invite",
+                trennbar: true,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "eingeladen",
+                konjugation_praesens: { 
+                    ich: "lade ein", 
+                    du: "lädst ein", 
+                    er_sie_es: "lädt ein", 
+                    wir: "laden ein", 
+                    ihr: "ladet ein", 
+                    sie_Sie: "laden ein" 
+                },
+                imperativ: { 
+                    du: "Lade ein!", 
+                    ihr: "Ladet ein!" 
+                },
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "lade", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "dich", "kasus": "akkusativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "ein", "kasus": "verb" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I invite you.",
+                cloze_parts: ["Ich ", " dich ", "."],
+                cloze_answers: ["lade", "ein"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-005",
+                wortart: "Nomen",
+                german: "Einladung", // Duplicate
+                artikel: "die",
+                plural: "Einladungen",
+                english: "invitation",
+                example_de: [
+                    { "text": "Das", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "ist", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "eine Einladung", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "zur Geburtstagsparty", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "This is an invitation to the birthday party.",
+                cloze_parts: ["Das ist eine ", " zur Geburtstagsparty."],
+                cloze_answers: ["Einladung"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-006",
+                wortart: "Nomen",
+                german: "Geschenk",
+                artikel: "das",
+                plural: "Geschenke",
+                english: "present / gift",
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "habe", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "ein Geschenk", "kasus": "akkusativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "für dich", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I have a present for you.",
+                cloze_parts: ["Ich habe ein ", " für dich."],
+                cloze_answers: ["Geschenk"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-007",
+                wortart: "Nomen",
+                german: "Weihnachten",
+                artikel: "das", // (sächlich, aber oft ohne Artikel)
+                plural: null, // oft ohne Plural
+                english: "Christmas",
+                example_de: [
+                    { "text": "Frohe Weihnachten", "kasus": "akkusativ" }, // Feste Wendung
+                    { "text": "!", "kasus": "none" }
+                ],
+                example_en: "Merry Christmas!",
+                cloze_parts: ["Frohe ", "!"],
+                cloze_answers: ["Weihnachten"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-008",
+                wortart: "Nomen",
+                german: "Ostern",
+                artikel: "das", // (sächlich, aber oft ohne Artikel)
+                plural: null, // oft ohne Plural
+                english: "Easter",
+                example_de: [
+                    { "text": "Zu Ostern", "kasus": "dativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "gibt", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "es", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "Schokolade", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "There is chocolate at Easter.",
+                cloze_parts: ["Zu ", " gibt es Schokolade."],
+                cloze_answers: ["Ostern"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-009",
+                wortart: "Nomen",
+                german: "Karneval",
+                artikel: "der",
+                plural: "Karnevale", // oder Karnevals
+                english: "carnival",
+                example_de: [
+                    { "text": "An Karneval", "kasus": "dativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "verkleiden", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "uns", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We dress up for Carnival.",
+                cloze_parts: ["An ", " verkleiden wir uns."],
+                cloze_answers: ["Karneval"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-010",
+                wortart: "Nomen",
+                german: "Geburtstag",
+                artikel: "der",
+                plural: "Geburtstage",
+                english: "birthday",
+                example_de: [
+                    { "text": "Wann", "kasus": "none" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "hast", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "du", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "Geburtstag", "kasus": "akkusativ" },
+                    { "text": "?", "kasus": "none" }
+                ],
+                example_en: "When is your birthday?",
+                cloze_parts: ["Wann hast du ", "?"],
+                cloze_answers: ["Geburtstag"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-011",
+                wortart: "Nomen",
+                german: "Silvester",
+                artikel: "das", // (sächlich, aber oft ohne Artikel)
+                plural: null, // oft ohne Plural
+                english: "New Year's Eve",
+                example_de: [
+                    { "text": "An Silvester", "kasus": "dativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "machen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "ein Feuerwerk", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "On New Year's Eve we have fireworks.",
+                cloze_parts: ["An ", " machen wir ein Feuerwerk."],
+                cloze_answers: ["Silvester"]
+            },
+            {
+                id: "freizeit-unterhaltung-feste-012",
+                wortart: "Nomen",
+                german: "Feuerwerk",
+                artikel: "das",
+                plural: "Feuerwerke",
+                english: "fireworks",
+                example_de: [
+                    { "text": "Das Feuerwerk", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "war", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "schön", "kasus": "none" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "The fireworks were beautiful.",
+                cloze_parts: ["Das ", " war schön."],
+                cloze_answers: ["Feuerwerk"]
+            }
+        ],
+
+        // --- UNTER-THEMA: Ferien ---
+        "Ferien": [
+            {
+                id: "freizeit-unterhaltung-ferien-001",
+                wortart: "Nomen",
+                german: "Ferien",
+                artikel: "die", // Plural
+                plural: "Ferien", // Plural only
+                english: "holidays / vacation (school)",
+                example_de: [
+                    { "text": "Was", "kasus": "akkusativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "macht", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "ihr", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "in den Ferien", "kasus": "dativ" },
+                    { "text": "?", "kasus": "none" }
+                ],
+                example_en: "What are you (plural) doing during the holidays?",
+                cloze_parts: ["Was macht ihr in den ", "?"],
+                cloze_answers: ["Ferien"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-002",
+                wortart: "Nomen",
+                german: "Urlaub",
+                artikel: "der",
+                plural: "Urlaube",
+                english: "holiday / vacation",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "machen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "Urlaub", "kasus": "akkusativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "in Italien", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are on holiday in Italy.",
+                cloze_parts: ["Wir machen ", " in Italien."],
+                cloze_answers: ["Urlaub"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-003",
+                wortart: "Nomen",
+                german: "Reise",
+                artikel: "die",
+                plural: "Reisen",
+                english: "journey / trip",
+                example_de: [
+                    { "text": "Die Reise", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "nach Spanien", "kasus": "dativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "war", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "toll", "kasus": "none" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "The trip to Spain was great.",
+                cloze_parts: ["Die ", " nach Spanien war toll."],
+                cloze_answers: ["Reise"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-004",
+                wortart: "Verb",
+                german: "reisen", // Duplicate
+                english: "to travel",
+                trennbar: false,
+                hilfsverb_perfekt: "sein",
+                partizip_ii: "gereist",
+                konjugation_praesens: { 
+                    ich: "reise", 
+                    du: "reist", 
+                    er_sie_es: "reist", 
+                    wir: "reisen", 
+                    ihr: "reist", 
+                    sie_Sie: "reisen" 
+                },
+                imperativ: { 
+                    du: "Reis!", 
+                    ihr: "Reist!" 
+                },
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "reisen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "oft", "kasus": "none" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "nach Frankreich", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We often travel to France.",
+                cloze_parts: ["Wir ", " oft nach Frankreich."],
+                cloze_answers: ["reisen"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-005",
+                wortart: "Nomen",
+                german: "Ausflug",
+                artikel: "der",
+                plural: "Ausflüge",
+                english: "trip / excursion",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "machen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "mit der Schule", "kasus": "dativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "einen Ausflug", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are going on a trip with the school.",
+                cloze_parts: ["Wir machen mit der Schule einen ", "."],
+                cloze_answers: ["Ausflug"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-006",
+                wortart: "Verb",
+                german: "wandern", // Duplicate
+                english: "to hike",
+                trennbar: false,
+                hilfsverb_perfekt: "sein",
+                partizip_ii: "gewandert",
+                konjugation_praesens: { 
+                    ich: "wandere", 
+                    du: "wanderst", 
+                    er_sie_es: "wandert", 
+                    wir: "wandern", 
+                    ihr: "wandert", 
+                    sie_Sie: "wandern" 
+                },
+                imperativ: { 
+                    du: "Wandere!", 
+                    ihr: "Wandert!" 
+                },
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "wandern", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "in den Bergen", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We hike in the mountains.",
+                cloze_parts: ["Wir ", " in den Bergen."],
+                cloze_answers: ["wandern"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-007",
+                wortart: "Verb",
+                german: "schwimmen", // Duplicate
+                english: "to swim",
+                trennbar: false,
+                hilfsverb_perfekt: "sein",
+                partizip_ii: "geschwommen",
+                konjugation_praesens: { 
+                    ich: "schwimme", 
+                    du: "schwimmst", 
+                    er_sie_es: "schwimmt", 
+                    wir: "schwimmen", 
+                    ihr: "schwimmt", 
+                    sie_Sie: "schwimmen" 
+                },
+                imperativ: { 
+                    du: "Schwimm!", 
+                    ihr: "Schwimmt!" 
+                },
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "schwimme", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "gern", "kasus": "none" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "im Sommer", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I like to swim in the summer.",
+                cloze_parts: ["Ich ", " gern im Sommer."],
+                cloze_answers: ["schwimme"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-008",
+                wortart: "Verb",
+                german: "zelten",
+                english: "to camp (in a tent)",
+                trennbar: false,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "gezeltet",
+                konjugation_praesens: { 
+                    ich: "zelte", 
+                    du: "zeltest", 
+                    er_sie_es: "zeltet", 
+                    wir: "zelten", 
+                    ihr: "zeltet", 
+                    sie_Sie: "zelten" 
+                },
+                imperativ: { 
+                    du: "Zelte!", 
+                    ihr: "Zeltet!" 
+                },
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "schlafen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "im Zelt", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We sleep in the tent.", // Example uses "schlafen im Zelt"
+                cloze_parts: ["Wir ", " im Zelt."], // Cloze for "schlafen"
+                cloze_answers: ["schlafen"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-009",
+                wortart: "Nomen",
+                german: "Camping",
+                artikel: "das",
+                plural: null, // oft ohne Plural
+                english: "camping",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "machen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "Camping", "kasus": "akkusativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "am See", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are camping at the lake.",
+                cloze_parts: ["Wir machen ", " am See."],
+                cloze_answers: ["Camping"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-010",
+                wortart: "Nomen",
+                german: "Hotel",
+                artikel: "das",
+                plural: "Hotels",
+                english: "hotel",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "schlafen", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "im Hotel", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are sleeping in the hotel.",
+                cloze_parts: ["Wir schlafen im ", "."],
+                cloze_answers: ["Hotel"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-011",
+                wortart: "Nomen",
+                german: "Koffer",
+                artikel: "der",
+                plural: "Koffer",
+                english: "suitcase",
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "packe", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "meinen Koffer", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I am packing my suitcase.",
+                cloze_parts: ["Ich packe meinen ", "."],
+                cloze_answers: ["Koffer"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-012",
+                wortart: "Nomen",
+                german: "Fotoapparat",
+                artikel: "der",
+                plural: "Fotoapparate",
+                english: "camera",
+                example_de: [
+                    { "text": "Sie", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "hat", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "einen teuren Fotoapparat", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "She has an expensive camera.",
+                cloze_parts: ["Sie hat einen teuren ", "."],
+                cloze_answers: ["Fotoapparat"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-013",
+                wortart: "Verb",
+                german: "fotografieren", // Duplicate
+                english: "to photograph",
+                trennbar: false,
+                hilfsverb_perfekt: "haben",
+                partizip_ii: "fotografiert",
+                konjugation_praesens: { 
+                    ich: "fotografiere", 
+                    du: "fotografierst", 
+                    er_sie_es: "fotografiert", 
+                    wir: "fotografieren", 
+                    ihr: "fotografiert", 
+                    sie_Sie: "fotografieren" 
+                },
+                imperativ: { 
+                    du: "Fotografier!", 
+                    ihr: "Fotografiert!" 
+                },
+                example_de: [
+                    { "text": "Ich", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "fotografiere", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "gern", "kasus": "none" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "im Urlaub", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "I like to take photos on holiday.",
+                cloze_parts: ["Ich ", " gern im Urlaub."],
+                cloze_answers: ["fotografiere"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-014",
+                wortart: "Nomen",
+                german: "Sonne",
+                artikel: "die",
+                plural: "Sonnen",
+                english: "sun",
+                example_de: [
+                    { "text": "Die Sonne", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "scheint", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "im Urlaub", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "The sun shines on holiday.",
+                cloze_parts: ["Die ", " scheint im Urlaub."],
+                cloze_answers: ["Sonne"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-015",
+                wortart: "Nomen",
+                german: "Meer",
+                artikel: "das",
+                plural: "Meere",
+                english: "sea / ocean",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "fahren", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "ans Meer", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We are going to the sea.",
+                cloze_parts: ["Wir fahren ans ", "."],
+                cloze_answers: ["Meer"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-016",
+                wortart: "Nomen",
+                german: "See",
+                artikel: "der",
+                plural: "Seen",
+                english: "lake",
+                example_de: [
+                    { "text": "Am Wochenende", "kasus": "dativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "fahren", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "an den See", "kasus": "akkusativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "At the weekend we are going to the lake.",
+                cloze_parts: ["Am Wochenende fahren wir an den ", "."],
+                cloze_answers: ["See"]
+            },
+            {
+                id: "freizeit-unterhaltung-ferien-017",
+                wortart: "Nomen",
+                german: "Berge",
+                artikel: "die", // Plural
+                plural: "Berge", // Plural only
+                english: "mountains",
+                example_de: [
+                    { "text": "Wir", "kasus": "nominativ" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "wandern", "kasus": "verb" },
+                    { "text": " ", "kasus": "none" },
+                    { "text": "in den Bergen", "kasus": "dativ" },
+                    { "text": ".", "kasus": "none" }
+                ],
+                example_en: "We hike in the mountains.",
+                cloze_parts: ["Wir wandern in den ", "."],
+                cloze_answers: ["Bergen"]
+            }
+        ]
+    }
+};

@@ -6,7 +6,7 @@ import { vokabularMenschlicherKoerperGesundheit } from './vokabular_menschlicher
 import { vokabularWohnen } from './vokabular_wohnen'; // NEU: Import für Wohnen
 import { vokabularUmwelt } from './vokabular_umwelt'; // NEU: Import für Umwelt
 import { vokabularEssenTrinken } from './vokabular_essen_trinken';
-import { vokabularKommunikationsmittel } from './vokabular_kommunikationsmittel'; // NEU: Import für Kommunikationsmittel
+import { vokabularKommunikationsmittel } from './vokabular_Kommunikationsmittel'; // NEU: Import für Kommunikationsmittel
 import { vokabularReisenVerkehr } from './vokabular_reisen_verkehr'; // NEU: Import für Reisen und Verkehr
 import { vokabularEinkaufen } from './vokabular_einkaufen'; // NEU: Import für Einkaufen
 import { vokabularLernen } from './vokabular_lernen'; // NEU: Import für Lernen
