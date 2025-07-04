@@ -30,16 +30,40 @@ function insertTextAtCursor(inputElement: HTMLInputElement | null, text: string)
     inputElement.dispatchEvent(event);
 }
 
+// Hilfsfunktion für Tailwind-Kasus-Farben und Formatierung
+function getTailwindCaseClass(kasus: string): string {
+  switch (kasus) {
+    case 'nominativ': return 'bg-yellow-100 text-black font-bold';
+    case 'akkusativ': return 'bg-blue-200 text-black font-bold';
+    case 'dativ': return 'bg-red-200 text-black font-bold';
+    case 'genitiv': return 'bg-yellow-200 text-black font-bold';
+    case 'verb': return 'bg-purple-100 text-black italic';
+    default: return 'bg-gray-100 text-black';
+  }
+}
+
+// Hilfsfunktion: Hole das Beispielsatzfeld (exampleGerman oder example_de)
+function getExampleSentence(currentWord: any): any {
+  if ('exampleGerman' in currentWord) return currentWord.exampleGerman;
+  if ('example_de' in currentWord) return currentWord.example_de;
+  return null;
+}
+
 // ✅ MULTIPLE CHOICE MODE - mit korrekten Property-Namen
 export function setupMultipleChoiceMode(
     dom: DOMElements, 
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    // Sichtbarkeitsumschaltung
+    dom.mcUiEl.style.display = 'block';
+    dom.spellingModeUiEl.style.display = 'none';
+    dom.clozeUiEl.style.display = 'none';
+    dom.sentenceUiEl.style.display = 'none';
+    
     console.log('[setupMultipleChoiceMode] Starting - korrekte globale Types');
     
     // UI Setup
-    dom.mcUiEl.style.display = 'block';
     if (dom.umlautButtonsContainer) dom.umlautButtonsContainer.style.display = 'none';
     
     // ✅ KORREKT: currentWord statt currentWordData
@@ -64,16 +88,22 @@ export function setupMultipleChoiceMode(
 
     dom.questionDisplayEl.textContent = displayGermanWord;
 
-    // Beispielsatz anzeigen
-    if ('example_de' in currentWord) {
-        const exampleDe = (currentWord as any).example_de;
-        if (Array.isArray(exampleDe)) {
-            dom.exampleSentenceDisplayEl.innerHTML = exampleDe.map(part => 
-                `<span class="kasus-${part.kasus || 'none'}">${part.text}</span>`
+    // Beispielsatz anzeigen (mit Tailwind-Farben, Times New Roman, größer)
+    const exampleSentence = getExampleSentence(currentWord);
+    if (exampleSentence) {
+        if (Array.isArray(exampleSentence)) {
+            dom.exampleSentenceDisplayEl.innerHTML = exampleSentence.map(part =>
+                `<span class="${getTailwindCaseClass(part.case || part.kasus)} px-1 rounded" style="font-family: 'Times New Roman', Times, serif; font-size: 1.35rem;">${part.text}</span>`
             ).join('');
-        } else if (typeof exampleDe === 'string') {
-            dom.exampleSentenceDisplayEl.textContent = exampleDe;
+            dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
+            dom.exampleSentenceDisplayEl.style.fontSize = '1.35rem';
+        } else if (typeof exampleSentence === 'string') {
+            dom.exampleSentenceDisplayEl.textContent = exampleSentence;
+            dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
+            dom.exampleSentenceDisplayEl.style.fontSize = '1.35rem';
         }
+    } else {
+        dom.exampleSentenceDisplayEl.textContent = '';
     }
 
     // Audio-Buttons setup
@@ -148,14 +178,18 @@ export function setupSpellingMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    // Sichtbarkeitsumschaltung
+    dom.mcUiEl.style.display = 'none';
+    dom.spellingModeUiEl.style.display = 'block';
+    dom.clozeUiEl.style.display = 'none';
+    dom.sentenceUiEl.style.display = 'none';
+    
     console.log('[setupSpellingMode] Starting - globale Types');
     
     dom.checkSpellingButton.disabled = false;
     
     const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
-    
-    dom.spellingModeUiEl.style.display = 'block';
     
     // ✅ KORREKT: currentWord statt currentWordData
     const currentWord = state.currentWord;
@@ -244,14 +278,18 @@ export function setupClozeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    // Sichtbarkeitsumschaltung
+    dom.mcUiEl.style.display = 'none';
+    dom.spellingModeUiEl.style.display = 'none';
+    dom.clozeUiEl.style.display = 'block';
+    dom.sentenceUiEl.style.display = 'none';
+    
     console.log('[setupClozeMode] Starting - globale Types');
     
     dom.checkClozeButton.disabled = false;
     
     const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
-    
-    dom.clozeUiEl.style.display = 'block';
     
     // ✅ KORREKT: currentWord statt currentWordData
     const currentWord = state.currentWord;
@@ -320,6 +358,12 @@ export function setupSentenceTranslationEnDeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    // Sichtbarkeitsumschaltung
+    dom.mcUiEl.style.display = 'none';
+    dom.spellingModeUiEl.style.display = 'none';
+    dom.clozeUiEl.style.display = 'none';
+    dom.sentenceUiEl.style.display = 'block';
+    
     console.log('[setupSentenceTranslationEnDeMode] Starting - globale Types');
     
     dom.checkSentenceButton.disabled = false;

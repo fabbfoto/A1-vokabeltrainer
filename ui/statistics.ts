@@ -86,11 +86,11 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
  * Aktualisiert die Haupt-Statistiken in der Übungsrunde.
  */
 export function updatePracticeStats(dom: DOMElements, state: TrainerState, learningModes: LearningModes): void {
-    dom.correctInRoundPracticeEl.textContent = state.correctInRound.toString();
-    dom.attemptedInRoundPracticeEl.textContent = state.attemptedInRound.toString();
+    dom.correctInRoundPracticeEl.textContent = state.correctInCurrentRound.toString();
+    dom.attemptedInRoundPracticeEl.textContent = state.attemptedInCurrentRound.toString();
     
-    const accuracy = state.attemptedInRound > 0 
-        ? (state.correctInRound / state.attemptedInRound) * 100 
+    const accuracy = state.attemptedInCurrentRound > 0 
+        ? (state.correctInCurrentRound / state.attemptedInCurrentRound) * 100 
         : 0;
     
     dom.accuracyInRoundPracticeEl.textContent = `${accuracy.toFixed(0)}%`;
@@ -111,9 +111,9 @@ export function updatePracticeStats(dom: DOMElements, state: TrainerState, learn
  * Aktualisiert die Test-Statistiken während eines Tests.
  */
 export function updateTestStats(dom: DOMElements, state: TrainerState): void {
-    const correct = state.correctInRound;
-    const total = state.shuffledVocabForMode.length;
-    const attempted = state.attemptedInRound;
+    const correct = state.correctInCurrentRound;
+    const total = state.shuffledWordsForMode.length;
+    const attempted = state.attemptedInCurrentRound;
     const progress = calculateProgressPercentage(attempted, total);
     const accuracy = attempted > 0 ? (correct / attempted) * 100 : 0;
 

@@ -16,7 +16,7 @@ import type {
 } from './shared/types/index';
 
 import { dom } from './dom';
-import type { DOMElements } from './dom';
+import type { DOMElements } from './shared/types/ui';
 import { vokabular } from './vokabular';
 import { shuffleArray } from './shared/utils/helfer';
 import * as uiModes from './shared/utils/ui-modes';
@@ -182,12 +182,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (isCorrect) {
             state.correctInCurrentRound++;
             if (syncService.saveProgress) {
-                syncService.saveProgress({
-                    word: state.currentWord!,
-                    mode: state.currentMode!,
-                    correct: true,
-                    timestamp: new Date()
-                });
+                syncService.saveProgress();
             }
             const modeId = state.currentMode;
             if (modeId && state.currentWord) {
@@ -198,6 +193,17 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 if (state.wordsToRepeatByMode[modeId]) {
                     state.wordsToRepeatByMode[modeId]!.delete(state.currentWord.id as WordId);
                 }
+                const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+                if (!state.globalProgress[progressKey]) {
+                    state.globalProgress[progressKey] = {};
+                }
+                if (!state.globalProgress[progressKey][modeId]) {
+                    state.globalProgress[progressKey][modeId] = new Set();
+                }
+                if (Array.isArray(state.globalProgress[progressKey][modeId])) {
+                    state.globalProgress[progressKey][modeId] = new Set(state.globalProgress[progressKey][modeId]);
+                }
+                (state.globalProgress[progressKey][modeId] as Set<WordId>).add(state.currentWord.id as WordId);
             }
         } else {
             const modeId = state.currentMode;
@@ -231,19 +237,24 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         saveProgress();
         saveMasteredWords();
         saveWordsToRepeat();
-        ui.updateErrorCounts(dom, state, learningModes, vokabular);
+        ui.updateErrorCounts(dom, state, learningModes);
         if (state.isTestModeActive) {
             ui.updateTestStats(dom, state);
         } else {
-            ui.updatePracticeStats(dom, state);
+            ui.updatePracticeStats(dom, state, learningModes);
         }
+        // Nächste Aufgabe nach kurzer Verzögerung laden
+        setTimeout(() => {
+            loadNextTask();
+        }, 600);
+        console.log('[DEBUG][processAnswer] isCorrect:', isCorrect, 'currentWordIndex:', state.currentWordIndex, 'shuffledWordsForMode.length:', state.shuffledWordsForMode.length, 'currentWord:', state.currentWord);
     }
 
     const learningModes: LearningModes = {
-        'multipleChoice': { id: 'multipleChoice' as ModeId, name: 'Multiple Choice (DE→EN)', type: 'multipleChoice', setupFunction: () => uiModes.setupMultipleChoiceMode(dom, state, processAnswer), isActive: false },
-        'spelling': { id: 'spelling' as ModeId, name: 'Rechtschreibung (EN→DE)', type: 'spelling', setupFunction: () => uiModes.setupSpellingMode(dom, state, processAnswer), isActive: false },
-        'cloze': { id: 'cloze' as ModeId, name: 'Lückentext', type: 'cloze', setupFunction: () => uiModes.setupClozeMode(dom, state, processAnswer), isActive: false },
-        'sentenceTranslation': { id: 'sentenceTranslation' as ModeId, name: 'Satz-Übersetzung (EN→DE)', type: 'sentenceTranslation', setupFunction: () => uiModes.setupSentenceTranslationEnDeMode(dom, state, processAnswer), isActive: false }
+        'mc-de-en': { id: 'mc-de-en' as ModeId, name: 'Bedeutung', type: 'multipleChoice', setupFunction: () => uiModes.setupMultipleChoiceMode(dom, state, processAnswer), isActive: false },
+        'type-de-adj': { id: 'type-de-adj' as ModeId, name: 'Schreibweise', type: 'spelling', setupFunction: () => uiModes.setupSpellingMode(dom, state, processAnswer), isActive: false },
+        'cloze-adj-de': { id: 'cloze-adj-de' as ModeId, name: 'Lückentext', type: 'cloze', setupFunction: () => uiModes.setupClozeMode(dom, state, processAnswer), isActive: false },
+        'sentence-translation-en-de': { id: 'sentence-translation-en-de' as ModeId, name: 'Satzübersetzung', type: 'sentenceTranslation', setupFunction: () => uiModes.setupSentenceTranslationEnDeMode(dom, state, processAnswer), isActive: false }
     };
 
     function loadNextTask(): void {
@@ -256,13 +267,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             return;
         }
         state.currentWord = state.shuffledWordsForMode[state.currentWordIndex];
-        console.log('[loadNextTask] Aktuelle Vokabel:', state.currentWord?.german);
+        console.log('[DEBUG] shuffledWordsForMode:', state.shuffledWordsForMode);
+        console.log('[DEBUG] currentWord:', state.currentWord);
         const modeInfo = state.currentMode ? learningModes[state.currentMode] : null;
         if (modeInfo && typeof modeInfo.setupFunction === 'function') {
             modeInfo.setupFunction();
         } else {
             console.error(`Keine Setup-Funktion für Modus "${state.currentMode}" gefunden`);
         }
+        ui.updatePracticeStats(dom, state, learningModes);
+        console.log('[DEBUG][loadNextTask] currentWordIndex:', state.currentWordIndex, 'shuffledWordsForMode.length:', state.shuffledWordsForMode.length, 'currentWord:', state.currentWord);
     }
 
     function setMode(modeId: ModeId, isRepeat: boolean = false): void {
@@ -317,7 +331,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         dom.testStatsViewEl.classList.remove('hidden');
         dom.modeButtonGridEl.classList.add('hidden');
         ui.updateTestStats(dom, state);
-        ui.updateErrorCounts(dom, state, learningModes, vokabular);
+        ui.updateErrorCounts(dom, state, learningModes);
         loadNextTask();
     }
 
@@ -355,8 +369,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 ui.showSubTopicNavigation(dom, state, vokabular, mainTopic, learningModes);
             } else if (subTopic && mainTopicData?.[subTopic as string]) {
                 state.currentVocabularySet = mainTopicData[subTopic as string];
+                console.log('[DEBUG] currentVocabularySet:', state.currentVocabularySet);
                 // KORREKTUR: Nur 2 Argumente benötigt
                 ui.showTrainingModes(dom, state);
+                // Event-Listener für Modus-Buttons setzen
+                Object.keys(learningModes).forEach(modeId => {
+                    const button = document.getElementById(`mode-${modeId}`);
+                    if (button) button.addEventListener('click', () => setMode(modeId, false));
+                });
             }
         },
         handleBackNavigation: () => {
@@ -397,7 +417,15 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 (progressMode[mode] as Set<WordId>).add(wordId);
             }
             saveProgress();
-        }
+        },
+        speakWord: (word: string) => {},
+        speakSentence: (sentence: string) => {},
+        submitTestAnswer: (isCorrect: boolean, timeSpent: number) => {},
+        completeTest: () => {},
+        showLoading: (message?: string) => {},
+        hideLoading: () => {},
+        showError: (error: string) => {},
+        clearError: () => {},
     };
 
     document.addEventListener('topic-selected', (e: Event) => {
@@ -420,9 +448,19 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         uiCallbacks.startRepeatSession!(mode as ModeId);
     });
 
+    // Navigation Event Listeners initialisieren
+    ui.initNavigationListeners(dom, state, uiCallbacks, learningModes, vokabular);
+
     // Initial UI Setup
     // KORREKTUR: Alle 4 Argumente werden jetzt übergeben
     ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
+
+    // Event-Listener für Zurück-Button im Trainingsmodus (zurück zu Subthemen)
+    dom.backToSubtopicsButton.addEventListener('click', () => {
+        if (state.currentMainTopic) {
+            ui.showSubTopicNavigation(dom, state, vokabular, state.currentMainTopic, learningModes);
+        }
+    });
 
     console.log('🎉 Trainer erfolgreich initialisiert!');
     console.log('📊 Verfügbare Themen:', Object.keys(vokabular));
