@@ -262,15 +262,17 @@ export function setupSpellingMode(
         console.error('[setupSpellingMode] Kein currentWord gefunden!');
         return;
     }
-    
+
+    // Zeige das englische Wort oben
     dom.questionDisplayEl.textContent = currentWord.english.split(',')[0].trim();
-    
-    if ('example_en' in currentWord) {
-        dom.exampleSentenceDisplayEl.textContent = (currentWord as any).example_en || "";
-    }
-    
-    dom.wordLineContainerEl.style.display = 'flex';
-    dom.sentenceLineContainerEl.style.display = 'flex';
+
+    // Zeige den englischen Beispielsatz darunter
+    const englishExample = (currentWord as any).exampleEnglish || (currentWord as any).example_en || "";
+    dom.exampleSentenceDisplayEl.textContent = englishExample;
+
+    // Zeige beide Container
+    dom.wordLineContainerEl.style.display = 'flex';  // Zeigt das englische Wort
+    dom.sentenceLineContainerEl.style.display = englishExample ? 'flex' : 'none'; // Zeigt den englischen Satz wenn vorhanden
     
     // Reset styles
     [dom.spellingInputSingleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El].forEach(input => {
