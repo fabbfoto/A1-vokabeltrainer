@@ -1,7 +1,7 @@
 // ui/navigation.ts
 // Navigation und Themen-Anzeige Funktionen
 
-import type { DOMElements } from '../dom';
+import type { DOMElements } from '../shared/types/ui';
 import type { TrainerState, VocabularyStructure, LearningModes, UICallbacks, TopicId, SubTopicId } from '../shared/types/index';
 
 import { NavigationEvents } from '../shared/events/navigation-events';
@@ -80,10 +80,12 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
     });
 
     const globalTestButton = createActionButton('global-test', 'Globaler Test');
+    globalTestButton.className = '';
     globalTestButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2');
     dom.navigationContainerEl.appendChild(globalTestButton);
 
     const syncButton = createActionButton('sync', 'Geräte verbinden');
+    syncButton.className = '';
     syncButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2');
     dom.navigationContainerEl.appendChild(syncButton);
     

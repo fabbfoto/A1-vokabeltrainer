@@ -79,7 +79,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                state.globalProgress = parsed;
+                // Umwandlung aller Arrays in Sets
+                Object.keys(parsed).forEach(progressKey => {
+                    Object.keys(parsed[progressKey]).forEach(modeId => {
+                        const value = parsed[progressKey][modeId];
+                        if (Array.isArray(value)) {
+                            parsed[progressKey][modeId] = new Set(value);
+                        }
+                    });
+                });
+                state.globalProgress = parsed as any;
                 console.log('✅ Progress geladen:', Object.keys(state.globalProgress).length, 'Einträge');
             } catch (e) {
                 console.warn('⚠️ Fehler beim Laden des Progress:', e);
@@ -178,6 +187,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     loadLastTestScores();
 
     function processAnswer(isCorrect: boolean, userAnswer?: string, timeSpent: number = 0): void {
+        console.log('[DEBUG][processAnswer] Antwort war', isCorrect ? 'richtig' : 'falsch');
         state.attemptedInCurrentRound++;
         if (isCorrect) {
             state.correctInCurrentRound++;
@@ -197,13 +207,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 if (!state.globalProgress[progressKey]) {
                     state.globalProgress[progressKey] = {};
                 }
-                if (!state.globalProgress[progressKey][modeId]) {
-                    state.globalProgress[progressKey][modeId] = new Set();
+                let progressSet = state.globalProgress[progressKey][modeId];
+                if (!progressSet) {
+                    progressSet = new Set();
+                } else if (Array.isArray(progressSet)) {
+                    progressSet = new Set(progressSet);
                 }
-                if (Array.isArray(state.globalProgress[progressKey][modeId])) {
-                    state.globalProgress[progressKey][modeId] = new Set(state.globalProgress[progressKey][modeId]);
-                }
-                (state.globalProgress[progressKey][modeId] as Set<WordId>).add(state.currentWord.id as WordId);
+                progressSet.add(state.currentWord.id as WordId);
+                state.globalProgress[progressKey][modeId] = progressSet;
             }
         } else {
             const modeId = state.currentMode;
@@ -245,6 +256,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
         // Nächste Aufgabe nach kurzer Verzögerung laden
         setTimeout(() => {
+            console.log('[DEBUG][processAnswer] Starte loadNextTask() nach Antwort:', isCorrect ? 'richtig' : 'falsch');
             loadNextTask();
         }, 600);
         console.log('[DEBUG][processAnswer] isCorrect:', isCorrect, 'currentWordIndex:', state.currentWordIndex, 'shuffledWordsForMode.length:', state.shuffledWordsForMode.length, 'currentWord:', state.currentWord);
@@ -259,7 +271,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     function loadNextTask(): void {
         state.currentWordIndex++;
-        console.log(`[loadNextTask] Index: ${state.currentWordIndex}, Länge: ${state.shuffledWordsForMode.length}`);
+        console.log('[DEBUG][loadNextTask] Nach Antwort: currentWordIndex:', state.currentWordIndex, 'shuffledWordsForMode.length:', state.shuffledWordsForMode.length);
         if (state.currentWordIndex >= state.shuffledWordsForMode.length) {
             const accuracy = state.attemptedInCurrentRound > 0 ? Math.round((state.correctInCurrentRound / state.attemptedInCurrentRound) * 100) : 0;
             ui.showMessage(dom, `Runde beendet! Genauigkeit: ${accuracy}%`, 'success');
@@ -267,8 +279,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             return;
         }
         state.currentWord = state.shuffledWordsForMode[state.currentWordIndex];
-        console.log('[DEBUG] shuffledWordsForMode:', state.shuffledWordsForMode);
-        console.log('[DEBUG] currentWord:', state.currentWord);
+        console.log('[DEBUG][loadNextTask] Neuer currentWord:', state.currentWord);
         const modeInfo = state.currentMode ? learningModes[state.currentMode] : null;
         if (modeInfo && typeof modeInfo.setupFunction === 'function') {
             modeInfo.setupFunction();

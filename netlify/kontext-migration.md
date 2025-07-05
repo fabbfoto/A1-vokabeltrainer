@@ -24,7 +24,7 @@ Der A1-Vokabeltrainer ist eine modulare Lernanwendung für Deutsch als Fremdspra
 | Fortschrittsbalken            |    ✔️    |    ✔️    | OK            |
 | Beispiel-Satz (Kasus-Farbe)   |    ✔️    |    ✔️    | OK            |
 | Umlaut-Buttons                |    ✔️    |    ✔️    | OK            |
-| Navigation "Zurück"           |    ✔️    |    ✔️    | OK            |
+| Navigation „Zurück“           |    ✔️    |    ✔️    | OK            |
 | Statistiken                   |    ✔️    |    ✔️    | OK            |
 | Globaler Test                 |    ✔️    |    ✔️    | OK            |
 | Geräte-Sync (Firebase)        |    ✔️    |    ❌    | Ausstehend    |

@@ -9,7 +9,7 @@ import type {
 } from '../types/index';
 
 // Import DOMElements from the correct location to avoid conflicts
-import type { DOMElements } from '../../dom';
+import type { DOMElements } from '../types/ui';
 
 // Import der Helfer-Funktionen
 import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence } from './helfer';
@@ -30,23 +30,23 @@ function insertTextAtCursor(inputElement: HTMLInputElement | null, text: string)
     inputElement.dispatchEvent(event);
 }
 
-// Hilfsfunktion für Tailwind-Kasus-Farben und Formatierung
-function getTailwindCaseClass(kasus: string): string {
-  switch (kasus) {
-    case 'nominativ': return 'bg-yellow-100 text-black font-bold';
-    case 'akkusativ': return 'bg-blue-200 text-black font-bold';
-    case 'dativ': return 'bg-red-200 text-black font-bold';
-    case 'genitiv': return 'bg-yellow-200 text-black font-bold';
-    case 'verb': return 'bg-purple-100 text-black italic';
-    default: return 'bg-gray-100 text-black';
-  }
-}
-
 // Hilfsfunktion: Hole das Beispielsatzfeld (exampleGerman oder example_de)
 function getExampleSentence(currentWord: any): any {
   if ('exampleGerman' in currentWord) return currentWord.exampleGerman;
   if ('example_de' in currentWord) return currentWord.example_de;
   return null;
+}
+
+// Neue Hilfsfunktion: Tailwind-Klasse für Kasus als Schriftfarbe
+function getTailwindCaseClass(kasus: string): string {
+  switch (kasus) {
+    case 'nominativ': return 'text-green-700 font-bold';
+    case 'genitiv':   return 'text-yellow-600 font-bold';
+    case 'dativ':     return 'text-blue-700 font-bold';
+    case 'akkusativ': return 'text-red-700 font-bold';
+    case 'verb':      return 'text-purple-700 italic';
+    default:          return 'text-gray-900';
+  }
 }
 
 // ✅ MULTIPLE CHOICE MODE - mit korrekten Property-Namen
@@ -66,43 +66,72 @@ export function setupMultipleChoiceMode(
     // UI Setup
     if (dom.umlautButtonsContainer) dom.umlautButtonsContainer.style.display = 'none';
     
-    // ✅ KORREKT: currentWord statt currentWordData
+    // KORREKT: currentWord statt currentWordData
     const currentWord = state.currentWord;
     if (!currentWord) {
         console.error('[setupMultipleChoiceMode] Kein currentWord gefunden!');
         return;
     }
     
-    const germanWordForDisplay = currentWord.german || "";
-    let displayGermanWord = germanWordForDisplay;
+    // DEBUG: Zeige aktuelles Wort und seine Eigenschaften
+    console.log('[DEBUG][setupMultipleChoiceMode] Aktuelles Wort:', {
+        german: currentWord.german,
+        english: currentWord.english,
+        id: currentWord.id,
+        hasExampleGerman: 'exampleGerman' in currentWord,
+        hasExampleDe: 'example_de' in currentWord,
+        exampleGerman: (currentWord as any).exampleGerman,
+        example_de: (currentWord as any).example_de
+    });
     
-    // Nomen-Notation handling
-    if ('nomen_notation' in currentWord && typeof parseNounString === 'function') {
-        const parsed = parseNounString((currentWord as any).nomen_notation); 
-        if (parsed) {
-            displayGermanWord = parsed.isPluralOnly 
-                ? `die ${parsed.singular} (Pl.)` 
-                : `${{ 'r': 'der', 'e': 'die', 's': 'das' }[parsed.genus] || ''} ${parsed.singular}, ${parsed.pluralInfo}`;
-        }
+    // Genus und Plural anzeigen
+    let displayGermanWord = currentWord.german || "";
+    if ('article' in currentWord && 'plural' in currentWord) {
+        displayGermanWord = `${currentWord.article} ${currentWord.german}, ${currentWord.plural || '-'}`;
     }
-
     dom.questionDisplayEl.textContent = displayGermanWord;
 
-    // Beispielsatz anzeigen (mit Tailwind-Farben, Times New Roman, größer)
-    const exampleSentence = getExampleSentence(currentWord);
-    if (exampleSentence) {
+    try {
+        // Beispielsatz anzeigen (mit Tailwind-Farben, Times New Roman, größer, SCHRIFTFARBE)
+        const exampleSentence = getExampleSentence(currentWord);
+        console.log('[DEBUG][setupMultipleChoiceMode] Gefundener Beispielsatz:', exampleSentence);
+        // Sicherheits-Check: Beispielsatz muss zum deutschen Wort passen
+        let showExample = true;
         if (Array.isArray(exampleSentence)) {
-            dom.exampleSentenceDisplayEl.innerHTML = exampleSentence.map(part =>
-                `<span class="${getTailwindCaseClass(part.case || part.kasus)} px-1 rounded" style="font-family: 'Times New Roman', Times, serif; font-size: 1.35rem;">${part.text}</span>`
-            ).join('');
-            dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
-            dom.exampleSentenceDisplayEl.style.fontSize = '1.35rem';
+            const joined = exampleSentence.map(part => part.text).join('');
+            if (!joined.includes(currentWord.german)) {
+                showExample = false;
+                console.error('[SICHERHEIT][setupMultipleChoiceMode] Beispielsatz passt NICHT zum deutschen Wort:', currentWord.german, exampleSentence);
+            }
         } else if (typeof exampleSentence === 'string') {
-            dom.exampleSentenceDisplayEl.textContent = exampleSentence;
-            dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
-            dom.exampleSentenceDisplayEl.style.fontSize = '1.35rem';
+            if (!exampleSentence.includes(currentWord.german)) {
+                showExample = false;
+                console.error('[SICHERHEIT][setupMultipleChoiceMode] Beispielsatz (String) passt NICHT zum deutschen Wort:', currentWord.german, exampleSentence);
+            }
         }
-    } else {
+        if (showExample && exampleSentence) {
+            if (Array.isArray(exampleSentence)) {
+                dom.exampleSentenceDisplayEl.innerHTML = exampleSentence.map(part => {
+                    try {
+                        console.log('[DEBUG][Kasus]', part.text, '→', part.case || part.kasus);
+                        return `<span class="${getTailwindCaseClass(part.case || part.kasus)}" style="font-family: 'Times New Roman', Times, serif; font-size: 2.5rem;">${part.text}</span>`;
+                    } catch (e) {
+                        console.error('[FEHLER][Kasus-Färbung]', part, e);
+                        return `<span>${part.text}</span>`;
+                    }
+                }).join('');
+                dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
+                dom.exampleSentenceDisplayEl.style.fontSize = '2.5rem';
+            } else if (typeof exampleSentence === 'string') {
+                dom.exampleSentenceDisplayEl.textContent = exampleSentence;
+                dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
+                dom.exampleSentenceDisplayEl.style.fontSize = '2.5rem';
+            }
+        } else {
+            dom.exampleSentenceDisplayEl.textContent = '';
+        }
+    } catch (e) {
+        console.error('[FEHLER][setupMultipleChoiceMode] Fehler bei der Beispielsatz-Anzeige:', e);
         dom.exampleSentenceDisplayEl.textContent = '';
     }
 
@@ -143,24 +172,31 @@ function generateMultipleChoiceAnswers(
     const correctAnswerEN = currentWord.english;
     const wrongAnswers: string[] = [];
     
-    // ✅ KORREKT: shuffledWordsForMode statt shuffledVocabForMode
-    const shuffledWords = shuffleArray([...state.shuffledWordsForMode]);
-    
-    for (const word of shuffledWords) {
-        if (word.id !== currentWord.id && wrongAnswers.length < 3) {
-            wrongAnswers.push(word.english);
+    // Sammle alle englischen Bedeutungen aus dem gesamten Vokabular
+    let allEnglish: string[] = [];
+    if (state.currentVocabularySet && state.currentVocabularySet.length > 0) {
+        // Hole alle Vokabeln aus dem gesamten Vokabular (flach)
+        if ((window as any).vokabular) {
+            const vokabular = (window as any).vokabular;
+            allEnglish = Object.values(vokabular)
+                .flatMap((mainTopic: any) => Object.values(mainTopic))
+                .flatMap((subTopic: any) => Array.isArray(subTopic) ? subTopic : [])
+                .map((word: any) => word.english)
+                .filter((en: string) => en && en !== correctAnswerEN);
+        } else {
+            // Fallback: alle aus currentVocabularySet
+            allEnglish = state.currentVocabularySet
+                .filter(word => word.english && word.english !== correctAnswerEN)
+                .map(word => word.english);
         }
     }
+    // Shuffle und filtere Duplikate
+    const uniqueDistractors = Array.from(new Set(allEnglish));
+    const shuffledDistractors = shuffleArray(uniqueDistractors).slice(0, 3);
     
-    // Fallback falls nicht genug falsche Antworten
-    while (wrongAnswers.length < 3) {
-        wrongAnswers.push(`Falsche Antwort ${wrongAnswers.length + 1}`);
-    }
+    const allAnswers = shuffleArray([correctAnswerEN, ...shuffledDistractors]);
     
-    const allAnswers = [correctAnswerEN, ...wrongAnswers];
-    const shuffledAnswers = shuffleArray(allAnswers);
-    
-    shuffledAnswers.forEach(answer => {
+    allAnswers.forEach(answer => {
         const button = document.createElement('button');
         button.className = 'mc-answer-button w-full p-4 text-left border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors';
         button.textContent = answer;
