@@ -12,7 +12,7 @@ import type {
 import type { DOMElements } from '../types/ui';
 
 // Import der Helfer-Funktionen
-import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence } from './helfer';
+import { vergleicheAntwort, shuffleArray, speak, parseNounString } from './helfer';
 import { registerInputForUmlauts } from '../../ui/umlaut-buttons';
 
 // ✅ KORREKTE PROCESS-ANSWER-FUNCTION TYPE
@@ -48,6 +48,23 @@ function getTailwindCaseClass(kasus: string): string {
     case 'verb':      return 'text-purple-700 italic';
     default:          return 'text-gray-900';
   }
+}
+
+// Neue splitSentence Funktion
+function splitSentence(sentence: string): string[] {
+    const punctuationMatch = sentence.match(/[.,;:!?]+$/);
+    const punctuation = punctuationMatch ? punctuationMatch[0] : '';
+    
+    const words = sentence
+        .replace(/[.,;:!?]+$/, '')
+        .split(' ')
+        .filter(word => word.length > 0);
+    
+    if (punctuation && words.length > 0) {
+        words[words.length - 1] = words[words.length - 1] + punctuation;
+    }
+    
+    return words;
 }
 
 // ✅ MULTIPLE CHOICE MODE - mit korrekten Property-Namen
@@ -384,9 +401,9 @@ export function setupClozeMode(
     dom.sentenceLineContainerEl.style.display = 'none';
 
     // Cloze-spezifische Logik
-    if ('cloze_parts' in currentWord && 'cloze_answers' in currentWord) {
-        const clozeParts = (currentWord as any).cloze_parts;
-        const clozeAnswers = (currentWord as any).cloze_answers;
+    if ('clozeParts' in currentWord && 'clozeAnswers' in currentWord) {
+        const clozeParts = (currentWord as any).clozeParts;
+        const clozeAnswers = (currentWord as any).clozeAnswers;
         
         if (Array.isArray(clozeParts) && Array.isArray(clozeAnswers)) {
             generateClozeUI(dom, clozeParts, clozeAnswers, processAnswer, state);
@@ -411,7 +428,7 @@ function generateClozeUI(
         if (index < clozeAnswers.length) {
             const input = document.createElement('input');
             input.type = 'text';
-            input.className = 'cloze-input px-2 py-1 border-2 border-gray-300 rounded mx-1';
+            input.className = 'px-4 py-2 mx-2 text-xl text-center border-2 border-gray-300 rounded-lg min-w-[180px] focus:border-blue-500 focus:outline-none focus:shadow-lg transition-all duration-200';
             input.placeholder = '___';
             dom.clozeSentenceContainerEl.appendChild(input);
             
@@ -422,7 +439,7 @@ function generateClozeUI(
     });
     
     dom.checkClozeButton.onclick = () => {
-        const inputs = dom.clozeSentenceContainerEl.querySelectorAll('.cloze-input') as NodeListOf<HTMLInputElement>;
+        const inputs = dom.clozeSentenceContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
         let allCorrect = true;
         
         inputs.forEach((input, index) => {
@@ -437,7 +454,7 @@ function generateClozeUI(
         processAnswer(allCorrect, clozeAnswers.join(', '));
     };
     setTimeout(() => {
-        const firstInput = dom.clozeSentenceContainerEl.querySelector('.cloze-input') as HTMLInputElement;
+        const firstInput = dom.clozeSentenceContainerEl.querySelector('input[type="text"]') as HTMLInputElement;
         if (firstInput) { firstInput.focus(); state.activeTextInput = firstInput; }
     }, 0);
 }
@@ -475,8 +492,9 @@ export function setupSentenceTranslationEnDeMode(
         return;
     }
     
-    if ('example_en' in currentWord) {
-        dom.questionDisplayEl.textContent = (currentWord as any).example_en;
+    if ('exampleEnglish' in currentWord) {
+        dom.questionDisplayEl.textContent = (currentWord as any).exampleEnglish;
+        dom.questionDisplayEl.className = 'text-center text-3xl font-semibold text-gray-900 mb-6';
     }
     
     dom.wordLineContainerEl.style.display = 'flex';
@@ -484,17 +502,17 @@ export function setupSentenceTranslationEnDeMode(
 
     // Deutschen Satz für Vergleich vorbereiten
     let fullGermanSentence = "";
-    if ('example_de' in currentWord) {
-        const exampleDe = (currentWord as any).example_de;
-        if (Array.isArray(exampleDe)) {
-            fullGermanSentence = exampleDe.map(part => part.text).join("");
-        } else if (typeof exampleDe === 'string') {
-            fullGermanSentence = exampleDe;
+    if ('exampleGerman' in currentWord) {
+        const exampleGerman = (currentWord as any).exampleGerman;
+        if (Array.isArray(exampleGerman)) {
+            fullGermanSentence = exampleGerman.map((part: any) => part.text).join("");
+        } else if (typeof exampleGerman === 'string') {
+            fullGermanSentence = exampleGerman;
         }
     }
 
-    // Wörter für Layout extrahieren (ohne Satzzeichen am Ende)
-    const wordsForLayout = splitSentence(fullGermanSentence.replace(/[.,;:!?]+$/, ''));
+    // Wörter für Layout extrahieren (jetzt inkl. Satzzeichen)
+    const wordsForLayout = splitSentence(fullGermanSentence);
     
     // Sentence-Input-Container generieren
     generateSentenceInputs(dom, wordsForLayout, fullGermanSentence, processAnswer, state);
@@ -512,34 +530,38 @@ function generateSentenceInputs(
     wordsForLayout.forEach((word, index) => {
         const input = document.createElement('input');
         input.type = 'text';
-        input.className = 'sentence-word-input px-2 py-1 border-2 border-gray-300 rounded mx-1 my-1';
-        input.placeholder = word;
+        input.className = 'px-4 py-3 text-lg text-center border-2 border-gray-300 rounded-lg min-w-[120px] focus:border-blue-500 focus:outline-none focus:shadow-lg transition-all duration-200';
+        const minWidth = Math.max(120, word.length * 12);
+        input.style.width = `${minWidth}px`;
+        // Optional: Letztes Wort mit Satzzeichen breiter
+        if (index === wordsForLayout.length - 1 && word.match(/[.,;:!?]+$/)) {
+            input.style.width = `${minWidth + 20}px`;
+        }
+        // Kein Placeholder
         input.dataset.expectedWord = word;
         dom.sentenceWordInputContainerEl.appendChild(input);
-        
         input.addEventListener('focus', () => {
             state.activeTextInput = input;
         });
     });
     
     dom.checkSentenceButton.onclick = () => {
-        const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('.sentence-word-input') as NodeListOf<HTMLInputElement>;
+        const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
         const userSentence = Array.from(inputs).map(input => input.value.trim()).join(' ');
         
-        const isCorrect = vergleicheAntwort(userSentence, fullGermanSentence.replace(/[.,;:!?]+$/, ''));
+        const isCorrect = vergleicheAntwort(userSentence, fullGermanSentence);
         
         inputs.forEach((input, index) => {
             const userWord = input.value.trim();
             const expectedWord = input.dataset.expectedWord || '';
             const wordCorrect = vergleicheAntwort(userWord, expectedWord);
-            
             input.classList.add(wordCorrect ? 'correct-user-input' : 'incorrect-user-input');
         });
         
         processAnswer(isCorrect, fullGermanSentence);
     };
     setTimeout(() => {
-        const firstInput = dom.sentenceWordInputContainerEl.querySelector('.sentence-word-input') as HTMLInputElement;
+        const firstInput = dom.sentenceWordInputContainerEl.querySelector('input[type="text"]') as HTMLInputElement;
         if (firstInput) { firstInput.focus(); state.activeTextInput = firstInput; }
     }, 0);
 }
