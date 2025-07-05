@@ -3,6 +3,7 @@
 import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence, formatGermanNoun, displayFormattedSentence } from './utils/helfer';
 
 export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
+    document.getElementById('umlaut-buttons-container').style.display = 'none';
     dom.mcUiEl.style.display = 'block';
     if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'none'; // Umlaut-Buttons ausblenden
 
@@ -43,6 +44,8 @@ export function setupMcDeEnMode(dom, state, alleVokabeln, processAnswer) {
 }
 
 export function setupSpellingMode(dom, state, alleVokabeln, processAnswer) {
+    document.getElementById('umlaut-buttons-container').style.display = 'flex';
+    setTimeout(() => initUmlautButtons(), 100);
     // ===== KORREKTUR =====
     dom.checkSpellingButton.disabled = false ;
 
@@ -114,6 +117,7 @@ export function setupSpellingMode(dom, state, alleVokabeln, processAnswer) {
 }
 
 export function setupClozeAdjDeMode(dom, state, alleVokabeln, processAnswer) {
+    document.getElementById('umlaut-buttons-container').style.display = 'flex';
     // ===== KORREKTUR =====
     dom.checkClozeButton.disabled = false ;
 
@@ -159,6 +163,7 @@ export function setupClozeAdjDeMode(dom, state, alleVokabeln, processAnswer) {
 }
 
 export function setupSentenceTranslationEnDeMode(dom, state, alleVokabeln, processAnswer) {
+    document.getElementById('umlaut-buttons-container').style.display = 'flex';
     // ===== KORREKTUR =====
     dom.checkSentenceButton.disabled = false ;
     

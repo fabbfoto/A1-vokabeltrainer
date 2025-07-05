@@ -488,6 +488,55 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     setupUmlautButtons(dom, state);
 
+    // Globale initUmlautButtons Funktion für die Browser-Lösung
+    (window as any).initUmlautButtons = function() {
+        let lastFocusedInput: HTMLInputElement | null = null;
+        
+        // Focus-Listener für beide Noun-Inputs
+        const noun1 = document.getElementById('spelling-input-noun-1') as HTMLInputElement;
+        const noun2 = document.getElementById('spelling-input-noun-2') as HTMLInputElement;
+        
+        if (noun1) {
+            noun1.addEventListener('focus', () => {
+                lastFocusedInput = noun1;
+                console.log('Focus auf linkes Feld');
+            });
+        }
+        
+        if (noun2) {
+            noun2.addEventListener('focus', () => {
+                lastFocusedInput = noun2;
+                console.log('Focus auf rechtes Feld');
+            });
+        }
+        
+        // Umlaut-Buttons
+        const umlautBtns = document.getElementById('umlaut-buttons-container')?.getElementsByTagName('button');
+        
+        if (umlautBtns) {
+            Array.from(umlautBtns).forEach(btn => {
+                btn.onclick = function(event) {
+                    // Finde das richtige Input
+                    const single = document.getElementById('spelling-input-single') as HTMLInputElement;
+                    let targetInput: HTMLInputElement | null = null;
+                    
+                    if (single && single.offsetParent !== null) {
+                        targetInput = single;
+                    } else if (noun1 && noun1.offsetParent !== null) {
+                        targetInput = lastFocusedInput || noun1;
+                    }
+                    
+                    if (targetInput && !targetInput.disabled) {
+                        const charToInsert = (event as MouseEvent).shiftKey ? (this as HTMLButtonElement).textContent?.toUpperCase() : (this as HTMLButtonElement).textContent;
+                        targetInput.value += charToInsert;
+                        targetInput.focus();
+                        console.log('Umlaut eingefügt in:', targetInput.id);
+                    }
+                };
+            });
+        }
+    };
+
     console.log('🎉 Trainer erfolgreich initialisiert!');
     console.log('📊 Verfügbare Themen:', Object.keys(vokabular));
     console.log('🎮 Verfügbare Modi:', Object.keys(learningModes));

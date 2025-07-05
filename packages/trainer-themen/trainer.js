@@ -34,6 +34,8 @@ document.addEventListener('DOMContentLoaded', () => {
         activeTextInput: null, // NEU: Für Umlaut-Buttons
     };
 
+    let lastFocusedInput = null;
+
     // Direkte Zuweisung der DOM-Elemente zu Variablen 
     const navigationViewEl = document.getElementById('navigation-view');
     const trainerMainViewEl = document.getElementById('trainer-main-view');
@@ -448,55 +450,48 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (subTopicButton) { startTraining(subTopicButton.dataset.subTopic); }
         else if (testButton) { updateTestModeProgressBars(); testSelectionModalEl.classList.remove('hidden'); }
     }
-    
-    let lastFocusedInput = null;
 
     function initUmlautButtons() {
-        console.log('Initialisiere Umlaut-Buttons...');
-        // Focus-Listener für alle relevanten Input-Felder
-        const inputs = [
-            dom.spellingInputSingleEl,
-            dom.spellingInputNoun1El,
-            dom.spellingInputNoun2El
-        ].filter(input => input);
-        inputs.forEach(input => {
-            input.addEventListener('focus', () => {
-                lastFocusedInput = input;
-                state.activeTextInput = input;
-                console.log('Input fokussiert:', input.id);
+        // Focus-Listener für beide Noun-Inputs
+        const noun1 = document.getElementById('spelling-input-noun-1');
+        const noun2 = document.getElementById('spelling-input-noun-2');
+        
+        if (noun1) {
+            noun1.addEventListener('focus', () => {
+                lastFocusedInput = noun1;
+                console.log('Focus auf linkes Feld');
             });
-        });
-        // Umlaut-Buttons Setup
-        const buttons = dom.umlautButtonsContainerEl?.querySelectorAll('.umlaut-button');
-        if (!buttons || buttons.length === 0) {
-            console.warn('Keine Umlaut-Buttons gefunden!');
-            return;
         }
-        buttons.forEach(button => {
-            const newButton = button.cloneNode(true);
-            button.parentNode.replaceChild(newButton, button);
-            newButton.addEventListener('click', (event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                let targetInput = lastFocusedInput || state.activeTextInput;
-                if (!targetInput || targetInput.disabled || targetInput.offsetParent === null) {
-                    const visibleInputs = [
-                        dom.spellingInputSingleEl,
-                        dom.spellingInputNoun1El,
-                        dom.spellingInputNoun2El
-                    ].filter(input => input && !input.disabled && input.offsetParent !== null);
-                    targetInput = visibleInputs[0];
-                }
-                if (targetInput) {
-                    const charToInsert = event.shiftKey ? newButton.textContent.toUpperCase() : newButton.textContent;
-                    insertTextAtCursor(targetInput, charToInsert);
-                    console.log('Umlaut eingefügt:', charToInsert, 'in', targetInput.id);
-                } else {
-                    console.error('Kein aktives Input-Feld gefunden!');
-                }
+        
+        if (noun2) {
+            noun2.addEventListener('focus', () => {
+                lastFocusedInput = noun2;
+                console.log('Focus auf rechtes Feld');
             });
+        }
+        
+        // Umlaut-Buttons
+        const umlautBtns = document.getElementById('umlaut-buttons-container').getElementsByTagName('button');
+        
+        Array.from(umlautBtns).forEach(btn => {
+            btn.onclick = function() {
+                // Finde das richtige Input
+                const single = document.getElementById('spelling-input-single');
+                let targetInput = null;
+                
+                if (single && single.offsetParent !== null) {
+                    targetInput = single;
+                } else if (noun1 && noun1.offsetParent !== null) {
+                    targetInput = lastFocusedInput || noun1;
+                }
+                
+                if (targetInput && !targetInput.disabled) {
+                    targetInput.value += this.textContent;
+                    targetInput.focus();
+                    console.log('Umlaut eingefügt in:', targetInput.id);
+                }
+            };
         });
-        console.log('Umlaut-Buttons erfolgreich initialisiert');
     }
 
     function insertTextAtCursor(inputElement, text) {

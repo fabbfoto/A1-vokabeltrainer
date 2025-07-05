@@ -56,6 +56,7 @@ export function setupMultipleChoiceMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    document.getElementById('umlaut-buttons-container')!.style.display = 'none';
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'block';
     dom.spellingModeUiEl.style.display = 'none';
@@ -215,6 +216,12 @@ export function setupSpellingMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    document.getElementById('umlaut-buttons-container')!.style.display = 'flex';
+    setTimeout(() => {
+        if (typeof (window as any).initUmlautButtons === 'function') {
+            (window as any).initUmlautButtons();
+        }
+    }, 100);
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'none';
     dom.spellingModeUiEl.style.display = 'block';
@@ -327,6 +334,7 @@ export function setupClozeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    document.getElementById('umlaut-buttons-container')!.style.display = 'flex';
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'none';
     dom.spellingModeUiEl.style.display = 'none';
@@ -416,6 +424,7 @@ export function setupSentenceTranslationEnDeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    document.getElementById('umlaut-buttons-container')!.style.display = 'flex';
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'none';
     dom.spellingModeUiEl.style.display = 'none';
