@@ -80,6 +80,9 @@ export interface DOMElements {
     
     // SVG Icons
     SVG_SPEAKER_ICON: string;
+
+    // Loading Indicator
+    loadingIndicatorEl: HTMLElement;
 }
 
 // ========== UI CALLBACK INTERFACES ==========

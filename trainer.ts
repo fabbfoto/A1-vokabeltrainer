@@ -24,6 +24,7 @@ import * as ui from './ui/index';
 import { initializeAuth } from './shared/auth/index';
 import { NavigationEvents } from './shared/events/navigation-events';
 import { setupUmlautButtons } from './ui/umlaut-buttons';
+import { updateErrorCounts } from './ui/statistics';
 
 console.log('📚 Vokabular importiert:', vokabular);
 console.log('📚 Anzahl Hauptthemen:', Object.keys(vokabular).length);
@@ -181,6 +182,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         } catch (e) {
             console.warn('⚠️ Fehler beim Speichern test scores:', e);
         }
+    }
+
+    function updateRepeatButtons() {
+        ui.updateErrorCounts(dom, state, learningModes);
     }
 
     loadProgress();
@@ -383,108 +388,83 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         ui.updateTestStats(dom, state);
     }
 
-    const uiCallbacks: UICallbacks = {
-        handleTopicSelection: (mainTopic: TopicId, subTopic?: SubTopicId) => {
+    const callbacks: UICallbacks = {
+        handleTopicSelection: (mainTopic: TopicId, subTopic: SubTopicId) => {
             state.currentMainTopic = mainTopic;
-            state.currentSubTopic = subTopic || null;
-            const mainTopicData = vokabular[mainTopic as string];
-            if (!subTopic && mainTopicData) {
-                ui.showSubTopicNavigation(dom, state, vokabular, mainTopic, learningModes);
-            } else if (subTopic && mainTopicData?.[subTopic as string]) {
-                state.currentVocabularySet = mainTopicData[subTopic as string];
-                const key = getTopicKey(mainTopic, subTopic as SubTopicId);
-                const defaultMode: ModeId = "mc-de-en" as ModeId;
-                const startMode: ModeId = state.lastUsedModeByTopic?.[key] || defaultMode;
-                setMode(startMode, false);
-                ui.showTrainingModes(dom, state);
-                Object.keys(learningModes).forEach(modeId => {
-                    const button = document.getElementById(`mode-${modeId}`);
-                    if (button) button.addEventListener('click', () => setMode(modeId as ModeId, false));
-                });
+            state.currentSubTopic = subTopic;
+            
+            const topicVokabular = vokabular[mainTopic]?.[subTopic] || [];
+            if (!topicVokabular) {
+                console.error(`Kein Vokabular für ${mainTopic} > ${subTopic} gefunden.`);
+                return;
             }
+            state.currentVocabularySet = topicVokabular;
+            
+            ui.showTrainingModes(dom, state);
+            updateRepeatButtons();
         },
         handleBackNavigation: () => {
-            state.currentSubTopic = null;
-            ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
+            if (state.currentSubTopic && state.currentMainTopic) {
+                ui.showSubTopicNavigation(dom, state, vokabular, state.currentMainTopic, learningModes);
+            } else {
+                ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
+            }
         },
-        handleModeSelection: (mode: ModeId) => {
-            setMode(mode, false);
-        },
+        handleModeSelection: setMode,
+        setMode: setMode,
         processAnswer: processAnswer,
         loadNextWord: loadNextTask,
+        speakWord: (word: string) => console.log('Spreche Wort:', word),
+        speakSentence: (sentence: string) => console.log('Spreche Satz:', sentence),
         startTest: (testConfig: TestConfiguration) => {
-            state.isTestModeActive = true;
-            state.correctInCurrentRound = 0;
-            state.attemptedInCurrentRound = 0;
-            state.currentMode = testConfig.mode;
-            if (state.currentMainTopic && state.currentSubTopic) {
-                state.currentVocabularySet = vokabular[state.currentMainTopic as string][state.currentSubTopic as string];
-                state.shuffledWordsForMode = shuffleArray([...state.currentVocabularySet]);
-                state.currentWordIndex = -1;
-            }
-            startTestUI(testConfig.testTitle, testConfig.mode);
+            console.log('Starte Test mit Konfiguration:', testConfig);
         },
-        startRepeatSession: (mode: ModeId) => {
-            setMode(mode, true);
+        submitTestAnswer: (isCorrect: boolean, timeSpent: number) => {
+            console.log(`Testantwort: ${isCorrect}, Zeit: ${timeSpent}`);
         },
+        completeTest: (result: any) => {
+            console.log('Test abgeschlossen:', result);
+        },
+        showLoading: () => dom.loadingIndicatorEl.classList.remove('hidden'),
+        hideLoading: () => dom.loadingIndicatorEl.classList.add('hidden'),
+        showError: (error: string) => alert(error),
+        clearError: () => { /* Nichts zu tun */ },
         updateProgress: (wordId: WordId, mode: ModeId, correct: boolean) => {
-            const progressKey = `${state.currentMainTopic}-${state.currentSubTopic}`;
-            if (!state.globalProgress[progressKey]) {
-                state.globalProgress[progressKey] = {};
-            }
-            const progressMode = state.globalProgress[progressKey]!;
-            if (!progressMode[mode]) {
-                progressMode[mode] = new Set();
-            }
-            if (correct) {
-                (progressMode[mode] as Set<WordId>).add(wordId);
-            }
-            saveProgress();
+            console.log(`Update Progress: ${wordId} in ${mode} war ${correct}`);
         },
-        speakWord: (word: string) => {},
-        speakSentence: (sentence: string) => {},
-        submitTestAnswer: (isCorrect: boolean, timeSpent: number) => {},
-        completeTest: () => {},
-        showLoading: (message?: string) => {},
-        hideLoading: () => {},
-        showError: (error: string) => {},
-        clearError: () => {},
+        startRepeatSession: (mode: string) => setMode(mode as ModeId, true),
     };
 
     document.addEventListener('topic-selected', (e: Event) => {
         const { mainTopic, subTopic } = (e as CustomEvent).detail;
-        uiCallbacks.handleTopicSelection(mainTopic as TopicId, subTopic as SubTopicId);
+        callbacks.handleTopicSelection(mainTopic as TopicId, subTopic as SubTopicId);
     });
     document.addEventListener('back-navigation', () => {
-        uiCallbacks.handleBackNavigation();
+        callbacks.handleBackNavigation();
     });
     document.addEventListener('mode-selected', (e: Event) => {
         const { mode } = (e as CustomEvent).detail;
-        uiCallbacks.handleModeSelection(mode as ModeId);
+        callbacks.handleModeSelection(mode as ModeId);
     });
     document.addEventListener('test-selected', (e: Event) => {
         const { testConfig } = (e as CustomEvent).detail;
-        uiCallbacks.startTest!(testConfig);
+        callbacks.startTest!(testConfig);
     });
     document.addEventListener('repeat-selected', (e: Event) => {
         const { mode } = (e as CustomEvent).detail;
-        uiCallbacks.startRepeatSession!(mode as ModeId);
+        callbacks.startRepeatSession!(mode as ModeId);
     });
 
     // Navigation Event Listeners initialisieren
-    ui.initNavigationListeners(dom, state, uiCallbacks, learningModes, vokabular);
-
-    // Initial UI Setup
+    ui.initNavigationListeners(dom, state, callbacks, learningModes, vokabular);
+    ui.initializeModeButtons(callbacks, learningModes);
+    ui.initializeRepeatButtons(callbacks, learningModes);
+    
+    // Initialansicht
     ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
 
-    // Event-Listener für Zurück-Button im Trainingsmodus (zurück zu Subthemen)
-    dom.backToSubtopicsButton.addEventListener('click', () => {
-        if (state.currentMainTopic) {
-            ui.showSubTopicNavigation(dom, state, vokabular, state.currentMainTopic, learningModes);
-        }
-    });
-
-    setupUmlautButtons(dom, state);
+    // Initialen Fehlerzählerstand anzeigen
+    updateRepeatButtons();
 
     // Globale initUmlautButtons Funktion für die Browser-Lösung
     (window as any).initUmlautButtons = function() {

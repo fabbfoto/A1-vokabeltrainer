@@ -6,6 +6,8 @@ export {
     displayMainTopics,
     displaySubTopics,
     initNavigationListeners,
+    initializeModeButtons,
+    initializeRepeatButtons,
     showSubTopicNavigation,
     showTrainingModes,
     showMainTopicNavigation

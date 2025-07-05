@@ -2,7 +2,7 @@
 // Navigation und Themen-Anzeige Funktionen
 
 import type { DOMElements } from '../shared/types/ui';
-import type { TrainerState, VocabularyStructure, LearningModes, UICallbacks, TopicId, SubTopicId } from '../shared/types/index';
+import type { TrainerState, VocabularyStructure, LearningModes, UICallbacks, TopicId, SubTopicId, ModeId } from '../shared/types/index';
 
 import { NavigationEvents } from '../shared/events/navigation-events';
 import { createTopicButton, createActionButton } from '../shared/styles/button-factory';
@@ -173,6 +173,35 @@ export function showTrainingModes(dom: DOMElements, state: TrainerState): void {
     dom.navigationViewEl.classList.add('hidden');
     dom.trainerMainViewEl.classList.remove('hidden');
     dom.currentTrainingTitleEl.textContent = `${state.currentMainTopic} > ${state.currentSubTopic}`;
+}
+
+/**
+ * Initialisiert die Klick-Handler für die normalen Lernmodus-Buttons.
+ */
+export function initializeModeButtons(callbacks: UICallbacks, learningModes: LearningModes): void {
+    Object.keys(learningModes).forEach(modeId => {
+        const button = document.getElementById(`mode-${modeId}`);
+        if (button) {
+            button.addEventListener('click', () => callbacks.setMode(modeId as ModeId, false));
+        }
+    });
+}
+
+/**
+ * Initialisiert die Klick-Handler für die Fehler-Wiederholungs-Buttons.
+ */
+export function initializeRepeatButtons(callbacks: UICallbacks, learningModes: LearningModes): void {
+    Object.keys(learningModes).forEach(modeId => {
+        const repeatButton = document.getElementById(`mode-repeat-${modeId}`);
+        if (repeatButton) {
+            repeatButton.addEventListener('click', () => {
+                // Nur ausführen, wenn der Button nicht deaktiviert ist
+                if (!(repeatButton as HTMLButtonElement).disabled) {
+                    callbacks.setMode(modeId as ModeId, true);
+                }
+            });
+        }
+    });
 }
 
 /**
