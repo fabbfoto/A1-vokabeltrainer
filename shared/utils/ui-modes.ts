@@ -300,8 +300,8 @@ export function setupSpellingMode(
         
         // Button Click Handler
         dom.checkSpellingButton.onclick = () => {
-            const artikel = 'artikel' in currentWord ? (currentWord as any).artikel : '';
-            const correctAnswerSingular = `${artikel} ${currentWord.german}`;
+            const article = (currentWord as any).article || '';
+            const correctAnswerSingular = article ? `${article} ${currentWord.german}` : currentWord.german;
             const correctAnswerPluralWord = (currentWord as any).plural!;
             
             const userInputSingular = dom.spellingInputNoun1El.value.trim();

@@ -11,7 +11,7 @@ export type Wortart =
   | 'Konjunktion' 
   | 'Interjektion';
 
-export type Artikel = 'der' | 'die' | 'das' | 'der/die' | 'der/das' | 'die/das';
+export type Article = 'der' | 'die' | 'das' | 'der/die' | 'der/das' | 'die/das';
 
 export type Hilfsverb = 'haben' | 'sein';
 
@@ -49,7 +49,7 @@ export interface BaseWord {
 // Spezifische Interfaces für verschiedene Wortarten
 export interface Nomen extends BaseWord {
   wortart: 'Nomen';
-  artikel: Artikel;
+  article: Article;
   plural: string | null;
 }
 
