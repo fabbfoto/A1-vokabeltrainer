@@ -78,6 +78,9 @@ export function setupMultipleChoiceMode(
         return;
     }
     
+    // HIER: exampleSentence einmal holen und für die ganze Funktion verwenden
+    const exampleSentence = getExampleSentence(currentWord);
+    
     // DEBUG: Zeige aktuelles Wort und seine Eigenschaften
     console.log('[DEBUG][setupMultipleChoiceMode] Aktuelles Wort:', {
         german: currentWord.german,
@@ -98,7 +101,6 @@ export function setupMultipleChoiceMode(
 
     try {
         // Beispielsatz anzeigen (mit Tailwind-Farben, Times New Roman, größer, SCHRIFTFARBE)
-        const exampleSentence = getExampleSentence(currentWord);
         console.log('[DEBUG][setupMultipleChoiceMode] Gefundener Beispielsatz:', exampleSentence);
         // Sicherheits-Check: Beispielsatz muss zum deutschen Wort passen
         let showExample = true;
@@ -140,16 +142,29 @@ export function setupMultipleChoiceMode(
         dom.exampleSentenceDisplayEl.textContent = '';
     }
 
+    // Sichtbarkeit des Satz-Containers abhängig vom Beispielsatz
+    if (
+        (Array.isArray(exampleSentence) && exampleSentence.length > 0 && exampleSentence.some(part => part.text && part.text.trim() !== '')) ||
+        (typeof exampleSentence === 'string' && exampleSentence.trim() !== '')
+    ) {
+        dom.sentenceLineContainerEl.style.display = 'flex';
+    } else {
+        dom.sentenceLineContainerEl.style.display = 'none';
+    }
+
     // Audio-Buttons setup mit besserem Layout
     dom.audioWordButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
     dom.audioWordButtonEl.onclick = () => speak(currentWord.german);
     dom.audioWordButtonEl.style.display = 'inline-flex';
-    dom.audioWordButtonEl.style.width = '32px';
-    dom.audioWordButtonEl.style.height = '32px';
-    dom.audioWordButtonEl.style.marginLeft = '12px';
-    dom.audioWordButtonEl.style.alignItems = 'center';
-    dom.audioWordButtonEl.style.justifyContent = 'center';
-    dom.audioWordButtonEl.style.flexShrink = '0';
+    dom.audioWordButtonEl.style.width = '40px';
+    dom.audioWordButtonEl.style.height = '40px';
+    dom.audioWordButtonEl.style.marginLeft = '0';
+    dom.audioWordButtonEl.style.marginRight = '0';
+    dom.audioWordButtonEl.style.background = 'transparent';
+    dom.audioWordButtonEl.style.borderRadius = '50%';
+    dom.audioWordButtonEl.style.transition = 'background 0.2s';
+    dom.audioWordButtonEl.onmouseover = () => dom.audioWordButtonEl.style.background = '#e0e7ff';
+    dom.audioWordButtonEl.onmouseout = () => dom.audioWordButtonEl.style.background = 'transparent';
 
     dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
     const sentenceForSpeech = Array.isArray(exampleSentence) 
@@ -157,20 +172,29 @@ export function setupMultipleChoiceMode(
         : exampleSentence || '';
     dom.audioSentenceButtonEl.onclick = () => speak(sentenceForSpeech, 'de-DE');
     dom.audioSentenceButtonEl.style.display = 'inline-flex';
-    dom.audioSentenceButtonEl.style.width = '32px';
-    dom.audioSentenceButtonEl.style.height = '32px';
-    dom.audioSentenceButtonEl.style.marginLeft = '12px';
-    dom.audioSentenceButtonEl.style.alignItems = 'center';
-    dom.audioSentenceButtonEl.style.justifyContent = 'center';
-    dom.audioSentenceButtonEl.style.flexShrink = '0';
+    dom.audioSentenceButtonEl.style.width = '40px';
+    dom.audioSentenceButtonEl.style.height = '40px';
+    dom.audioSentenceButtonEl.style.marginLeft = '0';
+    dom.audioSentenceButtonEl.style.marginRight = '0';
+    dom.audioSentenceButtonEl.style.background = 'transparent';
+    dom.audioSentenceButtonEl.style.borderRadius = '50%';
+    dom.audioSentenceButtonEl.style.transition = 'background 0.2s';
+    dom.audioSentenceButtonEl.onmouseover = () => dom.audioSentenceButtonEl.style.background = '#e0e7ff';
+    dom.audioSentenceButtonEl.onmouseout = () => dom.audioSentenceButtonEl.style.background = 'transparent';
 
     // Container Layout verbessern
     dom.wordLineContainerEl.style.display = 'flex';
+    dom.wordLineContainerEl.style.flexDirection = 'row';
     dom.wordLineContainerEl.style.alignItems = 'center';
+    dom.wordLineContainerEl.style.justifyContent = 'center';
+    dom.wordLineContainerEl.style.gap = '16px';
     dom.wordLineContainerEl.style.marginBottom = '8px';
 
     dom.sentenceLineContainerEl.style.display = 'flex';
+    dom.sentenceLineContainerEl.style.flexDirection = 'row';
     dom.sentenceLineContainerEl.style.alignItems = 'center';
+    dom.sentenceLineContainerEl.style.justifyContent = 'center';
+    dom.sentenceLineContainerEl.style.gap = '16px';
     dom.sentenceLineContainerEl.style.marginBottom = '16px';
 
     // Multiple Choice Antworten generieren
