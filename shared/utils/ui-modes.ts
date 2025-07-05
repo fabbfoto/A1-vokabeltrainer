@@ -227,6 +227,24 @@ export function setupSpellingMode(
     const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
     
+    // Umlaut-Buttons Event-Handling (robust, inkl. Shift für Großbuchstaben)
+    if (umlautContainer) {
+        const umlautButtons = umlautContainer.querySelectorAll('.umlaut-button');
+        umlautButtons.forEach(btn => {
+            // Vorherige Event-Listener entfernen durch Clonen
+            const newBtn = btn.cloneNode(true) as HTMLButtonElement;
+            btn.parentNode?.replaceChild(newBtn, btn);
+            newBtn.addEventListener('click', (e: MouseEvent) => {
+                if (!state.activeTextInput) return;
+                const isShift = e.shiftKey;
+                const char = newBtn.textContent || '';
+                const toInsert = isShift ? char.toUpperCase() : char;
+                insertTextAtCursor(state.activeTextInput, toInsert);
+            });
+            newBtn.title = 'Shift für Großbuchstaben';
+        });
+    }
+    
     // ✅ KORREKT: currentWord statt currentWordData
     const currentWord = state.currentWord;
     if (!currentWord) {
@@ -285,6 +303,8 @@ export function setupSpellingMode(
             
             processAnswer(isFullyCorrect, correctAnswer);
         };
+        // Automatisch erstes Feld fokussieren
+        setTimeout(() => { dom.spellingInputNoun1El.focus(); state.activeTextInput = dom.spellingInputNoun1El; }, 0);
     } else {
         // Single-Input-Modus
         dom.singleInputContainerEl.classList.remove('hidden');
@@ -305,6 +325,8 @@ export function setupSpellingMode(
             dom.spellingInputSingleEl.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
             processAnswer(isCorrect, correctAnswer);
         };
+        // Automatisch erstes Feld fokussieren
+        setTimeout(() => { dom.spellingInputSingleEl.focus(); state.activeTextInput = dom.spellingInputSingleEl; }, 0);
     }
 }
 
@@ -344,7 +366,7 @@ export function setupClozeMode(
         const clozeAnswers = (currentWord as any).cloze_answers;
         
         if (Array.isArray(clozeParts) && Array.isArray(clozeAnswers)) {
-            generateClozeUI(dom, clozeParts, clozeAnswers, processAnswer);
+            generateClozeUI(dom, clozeParts, clozeAnswers, processAnswer, state);
         }
     }
 }
@@ -353,7 +375,8 @@ function generateClozeUI(
     dom: DOMElements, 
     clozeParts: string[], 
     clozeAnswers: string[], 
-    processAnswer: ProcessAnswerFunction
+    processAnswer: ProcessAnswerFunction,
+    state: TrainerState
 ): void {
     dom.clozeSentenceContainerEl.innerHTML = '';
     
@@ -386,6 +409,10 @@ function generateClozeUI(
         
         processAnswer(allCorrect, clozeAnswers.join(', '));
     };
+    setTimeout(() => {
+        const firstInput = dom.clozeSentenceContainerEl.querySelector('.cloze-input') as HTMLInputElement;
+        if (firstInput) { firstInput.focus(); state.activeTextInput = firstInput; }
+    }, 0);
 }
 
 // ✅ SENTENCE TRANSLATION MODE - mit korrekten Property-Namen
@@ -406,6 +433,24 @@ export function setupSentenceTranslationEnDeMode(
     
     const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
+    
+    // Umlaut-Buttons Event-Handling (robust, inkl. Shift für Großbuchstaben)
+    if (umlautContainer) {
+        const umlautButtons = umlautContainer.querySelectorAll('.umlaut-button');
+        umlautButtons.forEach(btn => {
+            // Vorherige Event-Listener entfernen durch Clonen
+            const newBtn = btn.cloneNode(true) as HTMLButtonElement;
+            btn.parentNode?.replaceChild(newBtn, btn);
+            newBtn.addEventListener('click', (e: MouseEvent) => {
+                if (!state.activeTextInput) return;
+                const isShift = e.shiftKey;
+                const char = newBtn.textContent || '';
+                const toInsert = isShift ? char.toUpperCase() : char;
+                insertTextAtCursor(state.activeTextInput, toInsert);
+            });
+            newBtn.title = 'Shift für Großbuchstaben';
+        });
+    }
     
     const sentenceUi = dom.sentenceUiEl;
     if (sentenceUi) sentenceUi.style.display = 'block';
@@ -439,14 +484,15 @@ export function setupSentenceTranslationEnDeMode(
     const wordsForLayout = splitSentence(fullGermanSentence.replace(/[.,;:!?]+$/, ''));
     
     // Sentence-Input-Container generieren
-    generateSentenceInputs(dom, wordsForLayout, fullGermanSentence, processAnswer);
+    generateSentenceInputs(dom, wordsForLayout, fullGermanSentence, processAnswer, state);
 }
 
 function generateSentenceInputs(
     dom: DOMElements, 
     wordsForLayout: string[], 
     fullGermanSentence: string, 
-    processAnswer: ProcessAnswerFunction
+    processAnswer: ProcessAnswerFunction,
+    state: TrainerState
 ): void {
     dom.sentenceWordInputContainerEl.innerHTML = '';
     
@@ -475,4 +521,8 @@ function generateSentenceInputs(
         
         processAnswer(isCorrect, fullGermanSentence);
     };
+    setTimeout(() => {
+        const firstInput = dom.sentenceWordInputContainerEl.querySelector('.sentence-word-input') as HTMLInputElement;
+        if (firstInput) { firstInput.focus(); state.activeTextInput = firstInput; }
+    }, 0);
 }

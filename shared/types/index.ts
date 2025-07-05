@@ -250,6 +250,7 @@ export interface TrainerState {
   activeTextInput: HTMLInputElement | null;
   isLoading: boolean;
   currentError: string | null;
+  lastUsedModeByTopic?: { [key: string]: ModeId };
 }
 
 export type TrainerAction = 

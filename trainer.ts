@@ -71,7 +71,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         sessionStats: [],
         activeTextInput: null,
         isLoading: false,
-        currentError: null
+        currentError: null,
+        lastUsedModeByTopic: {},
     };
 
     function loadProgress(): void {
@@ -290,10 +291,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         console.log('[DEBUG][loadNextTask] currentWordIndex:', state.currentWordIndex, 'shuffledWordsForMode.length:', state.shuffledWordsForMode.length, 'currentWord:', state.currentWord);
     }
 
+    function getTopicKey(main: TopicId|null, sub: SubTopicId|null) {
+        return main && sub ? `${main}|${sub}` : '';
+    }
+
     function setMode(modeId: ModeId, isRepeat: boolean = false): void {
         state.currentMode = modeId;
         state.isTestModeActive = false;
         state.isRepeatSessionActive = isRepeat;
+        const key = getTopicKey(state.currentMainTopic, state.currentSubTopic);
+        if (key) state.lastUsedModeByTopic[key] = modeId;
         let wordsForSession: Word[] = [];
         if (isRepeat) {
             const wordIdsToRepeat = state.wordsToRepeatByMode[modeId] || new Set<WordId>();
@@ -329,6 +336,13 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             modeButton?.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
         }
         loadNextTask();
+        // Umlaut-Buttons nach jedem Moduswechsel initialisieren
+        const umlautModes = ['type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'];
+        if (umlautModes.includes(modeId)) {
+            if (ui.setupUmlautButtons) ui.setupUmlautButtons(dom, state);
+        } else {
+            if (ui.hideUmlautButtons) ui.hideUmlautButtons(dom);
+        }
     }
 
     function startTestUI(testTitle: string, modus: ModeId): void {
@@ -376,23 +390,22 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             state.currentSubTopic = subTopic || null;
             const mainTopicData = vokabular[mainTopic as string];
             if (!subTopic && mainTopicData) {
-                // KORREKTUR: Alle 5 Argumente werden jetzt übergeben
                 ui.showSubTopicNavigation(dom, state, vokabular, mainTopic, learningModes);
             } else if (subTopic && mainTopicData?.[subTopic as string]) {
                 state.currentVocabularySet = mainTopicData[subTopic as string];
-                console.log('[DEBUG] currentVocabularySet:', state.currentVocabularySet);
-                // KORREKTUR: Nur 2 Argumente benötigt
+                const key = getTopicKey(mainTopic, subTopic as SubTopicId);
+                const defaultMode: ModeId = "bedeutung" as ModeId;
+                const startMode: ModeId = state.lastUsedModeByTopic?.[key] || defaultMode;
+                setMode(startMode, false);
                 ui.showTrainingModes(dom, state);
-                // Event-Listener für Modus-Buttons setzen
                 Object.keys(learningModes).forEach(modeId => {
                     const button = document.getElementById(`mode-${modeId}`);
-                    if (button) button.addEventListener('click', () => setMode(modeId, false));
+                    if (button) button.addEventListener('click', () => setMode(modeId as ModeId, false));
                 });
             }
         },
         handleBackNavigation: () => {
             state.currentSubTopic = null;
-            // KORREKTUR: Alle 4 Argumente werden jetzt übergeben
             ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
         },
         handleModeSelection: (mode: ModeId) => {
@@ -463,7 +476,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     ui.initNavigationListeners(dom, state, uiCallbacks, learningModes, vokabular);
 
     // Initial UI Setup
-    // KORREKTUR: Alle 4 Argumente werden jetzt übergeben
     ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
 
     // Event-Listener für Zurück-Button im Trainingsmodus (zurück zu Subthemen)
