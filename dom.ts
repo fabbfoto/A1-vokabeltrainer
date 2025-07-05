@@ -94,7 +94,7 @@ export const dom: DOMElements = {
     testSelectionModalEl: getElement<HTMLElement>('test-selection-modal'),
     
     // Umlaut Buttons
-    umlautButtonsContainer: getElement<HTMLElement>('umlaut-buttons-container'),
+    umlautButtonsContainerEl: getElement<HTMLElement>('umlaut-buttons-container'),
     
     // SVG Icons
     SVG_SPEAKER_ICON: SVG_SPEAKER_ICON

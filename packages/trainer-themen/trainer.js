@@ -449,32 +449,74 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (testButton) { updateTestModeProgressBars(); testSelectionModalEl.classList.remove('hidden'); }
     }
     
-    // NEU: Funktion zum Einfügen von Text an der Cursorposition
+    let lastFocusedInput = null;
+
+    function initUmlautButtons() {
+        console.log('Initialisiere Umlaut-Buttons...');
+        // Focus-Listener für alle relevanten Input-Felder
+        const inputs = [
+            dom.spellingInputSingleEl,
+            dom.spellingInputNoun1El,
+            dom.spellingInputNoun2El
+        ].filter(input => input);
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                lastFocusedInput = input;
+                state.activeTextInput = input;
+                console.log('Input fokussiert:', input.id);
+            });
+        });
+        // Umlaut-Buttons Setup
+        const buttons = dom.umlautButtonsContainerEl?.querySelectorAll('.umlaut-button');
+        if (!buttons || buttons.length === 0) {
+            console.warn('Keine Umlaut-Buttons gefunden!');
+            return;
+        }
+        buttons.forEach(button => {
+            const newButton = button.cloneNode(true);
+            button.parentNode.replaceChild(newButton, button);
+            newButton.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                let targetInput = lastFocusedInput || state.activeTextInput;
+                if (!targetInput || targetInput.disabled || targetInput.offsetParent === null) {
+                    const visibleInputs = [
+                        dom.spellingInputSingleEl,
+                        dom.spellingInputNoun1El,
+                        dom.spellingInputNoun2El
+                    ].filter(input => input && !input.disabled && input.offsetParent !== null);
+                    targetInput = visibleInputs[0];
+                }
+                if (targetInput) {
+                    const charToInsert = event.shiftKey ? newButton.textContent.toUpperCase() : newButton.textContent;
+                    insertTextAtCursor(targetInput, charToInsert);
+                    console.log('Umlaut eingefügt:', charToInsert, 'in', targetInput.id);
+                } else {
+                    console.error('Kein aktives Input-Feld gefunden!');
+                }
+            });
+        });
+        console.log('Umlaut-Buttons erfolgreich initialisiert');
+    }
+
     function insertTextAtCursor(inputElement, text) {
         if (!inputElement) return;
-        const start = inputElement.selectionStart;
-        const end = inputElement.selectionEnd;
+        const start = inputElement.selectionStart || 0;
+        const end = inputElement.selectionEnd || 0;
         const oldValue = inputElement.value;
         inputElement.value = oldValue.substring(0, start) + text + oldValue.substring(end);
         inputElement.selectionStart = inputElement.selectionEnd = start + text.length;
-        inputElement.focus(); // Wichtig, um den Fokus zu behalten/wiederherzustellen
-        // Manuell ein 'input'-Event auslösen, falls andere Logik darauf hört
+        inputElement.focus();
         const event = new Event('input', { bubbles: true, cancelable: true });
         inputElement.dispatchEvent(event);
     }
 
-    // NEU: Initialisiert die Umlaut-Buttons
-    function initUmlautButtons() {
-        if (dom.umlautButtonsContainerEl) {
-            const buttons = dom.umlautButtonsContainerEl.querySelectorAll('.umlaut-button');
-             buttons.forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const charToInsert = event.shiftKey ? button.textContent.toUpperCase() : button.textContent;
-                    insertTextAtCursor(state.activeTextInput, charToInsert);
-                });
-            });
-         }
+    function debugUmlautButtons() {
+        console.log('Umlaut Container:', dom.umlautButtonsContainerEl);
+        console.log('Umlaut Buttons:', dom.umlautButtonsContainerEl?.querySelectorAll('.umlaut-button'));
+        console.log('Active Input:', state.activeTextInput);
     }
+
     function initTestModeListeners() {
         testSelectionModalEl.addEventListener('click', (event) => { if (event.target === testSelectionModalEl) { testSelectionModalEl.classList.add('hidden'); } });
         if (testOptionsGridEl) {
@@ -516,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(learningModes).forEach(modeId => { const button = document.getElementById(`mode-${modeId}`); const repeatButton = document.getElementById(`mode-repeat-${modeId}`); if (button) button.addEventListener('click', () => setMode(modeId, false)); if (repeatButton) repeatButton.addEventListener('click', () => setMode(modeId, true)); });
         continueButton.addEventListener('click', loadNextTask);
         
-        initUmlautButtons(); // NEU: Umlaut-Buttons initialisieren
+        initUmlautButtons();
         initTestModeListeners();
         displayMainTopics();
     }

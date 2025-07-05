@@ -46,7 +46,14 @@ export function setupSpellingMode(dom, state, alleVokabeln, processAnswer) {
     // ===== KORREKTUR =====
     dom.checkSpellingButton.disabled = false ;
 
-    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
+    if (dom.umlautButtonsContainerEl) {
+        dom.umlautButtonsContainerEl.style.display = 'flex';
+        setTimeout(() => {
+            if (typeof initUmlautButtons === 'function') {
+                initUmlautButtons();
+            }
+        }, 100);
+    }
     dom.spellingModeUiEl.style.display = 'block';
     dom.questionDisplayEl.textContent = (state.currentWordData.english || "").split(',')[0].trim();
     dom.exampleSentenceDisplayEl.textContent = state.currentWordData.example_en || "";
@@ -110,7 +117,14 @@ export function setupClozeAdjDeMode(dom, state, alleVokabeln, processAnswer) {
     // ===== KORREKTUR =====
     dom.checkClozeButton.disabled = false ;
 
-    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
+    if (dom.umlautButtonsContainerEl) {
+        dom.umlautButtonsContainerEl.style.display = 'flex';
+        setTimeout(() => {
+            if (typeof initUmlautButtons === 'function') {
+                initUmlautButtons();
+            }
+        }, 100);
+    }
     dom.clozeUiEl.style.display = 'block';
     dom.wordLineContainerEl.style.display = 'none';
     dom.sentenceLineContainerEl.style.display = 'none';
@@ -148,7 +162,14 @@ export function setupSentenceTranslationEnDeMode(dom, state, alleVokabeln, proce
     // ===== KORREKTUR =====
     dom.checkSentenceButton.disabled = false ;
     
-    if (dom.umlautButtonsContainerEl) dom.umlautButtonsContainerEl.style.display = 'flex'; // Umlaut-Buttons einblenden
+    if (dom.umlautButtonsContainerEl) {
+        dom.umlautButtonsContainerEl.style.display = 'flex';
+        setTimeout(() => {
+            if (typeof initUmlautButtons === 'function') {
+                initUmlautButtons();
+            }
+        }, 100);
+    }
     dom.sentenceUiEl.style.display = 'block';
     dom.questionDisplayEl.textContent = state.currentWordData.example_en;
     dom.wordLineContainerEl.style.display = 'flex';

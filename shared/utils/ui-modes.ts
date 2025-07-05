@@ -265,8 +265,12 @@ export function setupSpellingMode(
         dom.spellingInputNoun2El.disabled = false;
         
         // Focus Handler
-        dom.spellingInputNoun1El.addEventListener('focus', () => state.activeTextInput = dom.spellingInputNoun1El);
-        dom.spellingInputNoun2El.addEventListener('focus', () => state.activeTextInput = dom.spellingInputNoun2El);
+        dom.spellingInputNoun1El.addEventListener('focus', () => {
+            state.activeTextInput = dom.spellingInputNoun1El;
+        });
+        dom.spellingInputNoun2El.addEventListener('focus', () => {
+            state.activeTextInput = dom.spellingInputNoun2El;
+        });
         
         // Button Click Handler
         dom.checkSpellingButton.onclick = () => {
@@ -299,7 +303,9 @@ export function setupSpellingMode(
         dom.spellingInputSingleEl.disabled = false;
         
         // Focus Handler
-        dom.spellingInputSingleEl.addEventListener('focus', () => state.activeTextInput = dom.spellingInputSingleEl);
+        dom.spellingInputSingleEl.addEventListener('focus', () => {
+            state.activeTextInput = dom.spellingInputSingleEl;
+        });
         
         // Button Click Handler
         dom.checkSpellingButton.onclick = () => {
@@ -376,6 +382,10 @@ function generateClozeUI(
             input.className = 'cloze-input px-2 py-1 border-2 border-gray-300 rounded mx-1';
             input.placeholder = '___';
             dom.clozeSentenceContainerEl.appendChild(input);
+            
+            input.addEventListener('focus', () => {
+                state.activeTextInput = input;
+            });
         }
     });
     
@@ -470,6 +480,10 @@ function generateSentenceInputs(
         input.placeholder = word;
         input.dataset.expectedWord = word;
         dom.sentenceWordInputContainerEl.appendChild(input);
+        
+        input.addEventListener('focus', () => {
+            state.activeTextInput = input;
+        });
     });
     
     dom.checkSentenceButton.onclick = () => {
