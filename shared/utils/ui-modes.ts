@@ -67,6 +67,9 @@ export function setupMultipleChoiceMode(
     
     // UI Setup
     if (dom.umlautButtonsContainer) dom.umlautButtonsContainer.style.display = 'none';
+    // Audio-Buttons anzeigen
+    if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'inline-flex';
+    if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'inline-flex';
     
     // KORREKT: currentWord statt currentWordData
     const currentWord = state.currentWord;
@@ -137,25 +140,38 @@ export function setupMultipleChoiceMode(
         dom.exampleSentenceDisplayEl.textContent = '';
     }
 
-    // Audio-Buttons setup
+    // Audio-Buttons setup mit besserem Layout
     dom.audioWordButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
     dom.audioWordButtonEl.onclick = () => speak(currentWord.german);
-    
-    dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
-    dom.audioSentenceButtonEl.onclick = () => {
-        if ('example_de' in currentWord) {
-            const exampleDe = (currentWord as any).example_de;
-            if (Array.isArray(exampleDe)) {
-                speak(exampleDe.map(part => part.text).join(''));
-            } else if (typeof exampleDe === 'string') {
-                speak(exampleDe);
-            }
-        }
-    };
+    dom.audioWordButtonEl.style.display = 'inline-flex';
+    dom.audioWordButtonEl.style.width = '32px';
+    dom.audioWordButtonEl.style.height = '32px';
+    dom.audioWordButtonEl.style.marginLeft = '12px';
+    dom.audioWordButtonEl.style.alignItems = 'center';
+    dom.audioWordButtonEl.style.justifyContent = 'center';
+    dom.audioWordButtonEl.style.flexShrink = '0';
 
-    // Container visibility
+    dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
+    const sentenceForSpeech = Array.isArray(exampleSentence) 
+        ? exampleSentence.map((part: any) => part.text).join('') 
+        : exampleSentence || '';
+    dom.audioSentenceButtonEl.onclick = () => speak(sentenceForSpeech, 'de-DE');
+    dom.audioSentenceButtonEl.style.display = 'inline-flex';
+    dom.audioSentenceButtonEl.style.width = '32px';
+    dom.audioSentenceButtonEl.style.height = '32px';
+    dom.audioSentenceButtonEl.style.marginLeft = '12px';
+    dom.audioSentenceButtonEl.style.alignItems = 'center';
+    dom.audioSentenceButtonEl.style.justifyContent = 'center';
+    dom.audioSentenceButtonEl.style.flexShrink = '0';
+
+    // Container Layout verbessern
     dom.wordLineContainerEl.style.display = 'flex';
+    dom.wordLineContainerEl.style.alignItems = 'center';
+    dom.wordLineContainerEl.style.marginBottom = '8px';
+
     dom.sentenceLineContainerEl.style.display = 'flex';
+    dom.sentenceLineContainerEl.style.alignItems = 'center';
+    dom.sentenceLineContainerEl.style.marginBottom = '16px';
 
     // Multiple Choice Antworten generieren
     generateMultipleChoiceAnswers(dom, state, processAnswer);
@@ -234,6 +250,9 @@ export function setupSpellingMode(
     
     const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
+    // Audio-Buttons verstecken
+    if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
+    if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'none';
     // Buttons erst jetzt initialisieren, wenn sie im DOM sind
     import('../../ui/umlaut-buttons').then(mod => mod.setupUmlautButtons(dom, state));
     
@@ -347,6 +366,9 @@ export function setupClozeMode(
     
     const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
+    // Audio-Buttons verstecken
+    if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
+    if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'none';
     
     // ✅ KORREKT: currentWord statt currentWordData
     const currentWord = state.currentWord;
@@ -437,6 +459,9 @@ export function setupSentenceTranslationEnDeMode(
     
     const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
+    // Audio-Buttons verstecken
+    if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
+    if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'none';
     
     const sentenceUi = dom.sentenceUiEl;
     if (sentenceUi) sentenceUi.style.display = 'block';
