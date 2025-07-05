@@ -465,6 +465,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     ui.initNavigationListeners(dom, state, callbacks, learningModes, vokabular);
     ui.initializeModeButtons(callbacks, learningModes);
     ui.initializeRepeatButtons(callbacks, learningModes);
+
+    // KORREKTUR: Event Listener für den "Zurück"-Button im Trainer explizit hinzufügen
+    dom.backToSubtopicsButton.addEventListener('click', () => {
+        callbacks.handleBackNavigation();
+    });
     
     // Initialansicht
     ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
