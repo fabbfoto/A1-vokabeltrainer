@@ -402,6 +402,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             
             ui.showTrainingModes(dom, state);
             updateRepeatButtons();
+
+            // KORREKTUR: Letzten Modus laden oder Standardmodus starten
+            const topicKey = getTopicKey(mainTopic, subTopic);
+            const lastMode = state.lastUsedModeByTopic[topicKey];
+            const startMode = lastMode || ('mc-de-en' as ModeId);
+            setMode(startMode, false);
         },
         handleBackNavigation: () => {
             if (state.currentSubTopic && state.currentMainTopic) {
