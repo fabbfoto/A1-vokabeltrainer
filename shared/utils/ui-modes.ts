@@ -151,32 +151,12 @@ export function setupMultipleChoiceMode(
     // Audio-Buttons setup mit besserem Layout
     dom.audioWordButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
     dom.audioWordButtonEl.onclick = () => speak(currentWord.german);
-    dom.audioWordButtonEl.style.display = 'inline-flex';
-    dom.audioWordButtonEl.style.width = '40px';
-    dom.audioWordButtonEl.style.height = '40px';
-    dom.audioWordButtonEl.style.marginLeft = '0';
-    dom.audioWordButtonEl.style.marginRight = '0';
-    dom.audioWordButtonEl.style.background = 'transparent';
-    dom.audioWordButtonEl.style.borderRadius = '50%';
-    dom.audioWordButtonEl.style.transition = 'background 0.2s';
-    dom.audioWordButtonEl.onmouseover = () => dom.audioWordButtonEl.style.background = '#e0e7ff';
-    dom.audioWordButtonEl.onmouseout = () => dom.audioWordButtonEl.style.background = 'transparent';
 
     dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
     const sentenceForSpeech = Array.isArray(exampleSentence) 
         ? exampleSentence.map((part: any) => part.text).join('') 
         : exampleSentence || '';
     dom.audioSentenceButtonEl.onclick = () => speak(sentenceForSpeech, 'de-DE');
-    dom.audioSentenceButtonEl.style.display = 'inline-flex';
-    dom.audioSentenceButtonEl.style.width = '40px';
-    dom.audioSentenceButtonEl.style.height = '40px';
-    dom.audioSentenceButtonEl.style.marginLeft = '0';
-    dom.audioSentenceButtonEl.style.marginRight = '0';
-    dom.audioSentenceButtonEl.style.background = 'transparent';
-    dom.audioSentenceButtonEl.style.borderRadius = '50%';
-    dom.audioSentenceButtonEl.style.transition = 'background 0.2s';
-    dom.audioSentenceButtonEl.onmouseover = () => dom.audioSentenceButtonEl.style.background = '#e0e7ff';
-    dom.audioSentenceButtonEl.onmouseout = () => dom.audioSentenceButtonEl.style.background = 'transparent';
 
     // Container Layout verbessern
     dom.wordLineContainerEl.style.display = 'flex';
