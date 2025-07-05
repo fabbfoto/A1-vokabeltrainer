@@ -23,6 +23,7 @@ import * as uiModes from './shared/utils/ui-modes';
 import * as ui from './ui/index';
 import { initializeAuth } from './shared/auth/index';
 import { NavigationEvents } from './shared/events/navigation-events';
+import { setupUmlautButtons } from './ui/umlaut-buttons';
 
 console.log('📚 Vokabular importiert:', vokabular);
 console.log('📚 Anzahl Hauptthemen:', Object.keys(vokabular).length);
@@ -394,7 +395,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             } else if (subTopic && mainTopicData?.[subTopic as string]) {
                 state.currentVocabularySet = mainTopicData[subTopic as string];
                 const key = getTopicKey(mainTopic, subTopic as SubTopicId);
-                const defaultMode: ModeId = "bedeutung" as ModeId;
+                const defaultMode: ModeId = "mc-de-en" as ModeId;
                 const startMode: ModeId = state.lastUsedModeByTopic?.[key] || defaultMode;
                 setMode(startMode, false);
                 ui.showTrainingModes(dom, state);
@@ -484,6 +485,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             ui.showSubTopicNavigation(dom, state, vokabular, state.currentMainTopic, learningModes);
         }
     });
+
+    setupUmlautButtons(dom, state);
 
     console.log('🎉 Trainer erfolgreich initialisiert!');
     console.log('📊 Verfügbare Themen:', Object.keys(vokabular));

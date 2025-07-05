@@ -9,6 +9,7 @@ type TrainerState = any;
  * Fügt Text an der aktuellen Cursor-Position ein.
  */
 export function insertTextAtCursor(input: HTMLInputElement, text: string): void {
+    console.log('[UMLAUT] insertTextAtCursor', input, text);
     if (!input) return;
     
     const start = input.selectionStart || 0;
@@ -31,43 +32,26 @@ export function insertTextAtCursor(input: HTMLInputElement, text: string): void 
  * Setzt die Umlaut-Buttons für die Text-Eingabe auf.
  */
 export function setupUmlautButtons(dom: DOMElements, state: TrainerState): void {
-    if (!dom.umlautButtonsContainer) {
-        console.warn('Umlaut buttons container not found');
-        return;
-    }
-    
-    // Container anzeigen
-    dom.umlautButtonsContainer.style.display = 'flex';
-    
-    // Alle Umlaut-Buttons finden
+    console.log('[UMLAUT] setupUmlautButtons aufgerufen', dom.umlautButtonsContainer);
+    if (!dom.umlautButtonsContainer) return;
     const umlautButtons = dom.umlautButtonsContainer.querySelectorAll('.umlaut-button');
-    
-    umlautButtons.forEach((button: Element) => {
-        const btn = button as HTMLButtonElement;
-        
-        // Entferne alte Event Listener
-        const newButton = btn.cloneNode(true) as HTMLButtonElement;
-        btn.parentNode?.replaceChild(newButton, btn);
-        
-        // Neuer Event Listener
-        newButton.addEventListener('click', (e: MouseEvent) => {
-            e.preventDefault();
-            
-            if (!state.activeTextInput) {
-                console.warn('No active text input found');
-                return;
-            }
-            
-            // Prüfe ob Shift gedrückt ist für Großbuchstaben
-            const isShiftPressed = e.shiftKey;
-            const buttonText = newButton.textContent || '';
-            const charToInsert = isShiftPressed ? buttonText.toUpperCase() : buttonText;
-            
-            insertTextAtCursor(state.activeTextInput, charToInsert);
-        });
-        
-        // Tooltip für Shift-Funktionalität
-        newButton.title = 'Shift für Großbuchstaben';
+    console.log('[UMLAUT] Anzahl gefundener Buttons:', umlautButtons.length);
+    umlautButtons.forEach((btn: HTMLButtonElement) => {
+        console.log('[UMLAUT] Button:', btn.textContent, 'data-umlaut-initialized:', btn.hasAttribute('data-umlaut-initialized'));
+        if (!btn.hasAttribute('data-umlaut-initialized')) {
+            console.log('[UMLAUT] Initialisiere Umlaut-Button:', btn.textContent);
+            btn.addEventListener('click', (e: MouseEvent) => {
+                console.log('[UMLAUT] Button geklickt:', btn.textContent, 'activeTextInput:', state.activeTextInput);
+                e.preventDefault();
+                if (!state.activeTextInput) return;
+                const isShiftPressed = e.shiftKey;
+                const buttonText = btn.textContent || '';
+                const charToInsert = isShiftPressed ? buttonText.toUpperCase() : buttonText;
+                insertTextAtCursor(state.activeTextInput, charToInsert);
+            });
+            btn.setAttribute('data-umlaut-initialized', 'true');
+        }
+        btn.title = 'Shift für Großbuchstaben';
     });
 }
 
@@ -89,16 +73,11 @@ export function registerInputForUmlauts(
     dom: DOMElements
 ): void {
     if (!input) return;
-    
-    // Focus Event - macht dieses Input zum aktiven
     input.addEventListener('focus', () => {
         state.activeTextInput = input;
-        setupUmlautButtons(dom, state);
+        // Buttons werden nur einmalig initialisiert, kein erneutes setup nötig
     });
-    
-    // Blur Event - optional: verstecke Buttons wenn kein Input aktiv
     input.addEventListener('blur', () => {
-        // Verzögerung damit Button-Click noch funktioniert
         setTimeout(() => {
             if (state.activeTextInput === input) {
                 state.activeTextInput = null;

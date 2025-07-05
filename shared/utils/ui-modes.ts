@@ -13,6 +13,7 @@ import type { DOMElements } from '../types/ui';
 
 // Import der Helfer-Funktionen
 import { vergleicheAntwort, shuffleArray, speak, parseNounString, splitSentence } from './helfer';
+import { registerInputForUmlauts } from '../../ui/umlaut-buttons';
 
 // ✅ KORREKTE PROCESS-ANSWER-FUNCTION TYPE
 type ProcessAnswerFunction = (isCorrect: boolean, correctAnswer?: string, timeSpent?: number) => void;
@@ -226,24 +227,8 @@ export function setupSpellingMode(
     
     const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
-    
-    // Umlaut-Buttons Event-Handling (robust, inkl. Shift für Großbuchstaben)
-    if (umlautContainer) {
-        const umlautButtons = umlautContainer.querySelectorAll('.umlaut-button');
-        umlautButtons.forEach(btn => {
-            // Vorherige Event-Listener entfernen durch Clonen
-            const newBtn = btn.cloneNode(true) as HTMLButtonElement;
-            btn.parentNode?.replaceChild(newBtn, btn);
-            newBtn.addEventListener('click', (e: MouseEvent) => {
-                if (!state.activeTextInput) return;
-                const isShift = e.shiftKey;
-                const char = newBtn.textContent || '';
-                const toInsert = isShift ? char.toUpperCase() : char;
-                insertTextAtCursor(state.activeTextInput, toInsert);
-            });
-            newBtn.title = 'Shift für Großbuchstaben';
-        });
-    }
+    // Buttons erst jetzt initialisieren, wenn sie im DOM sind
+    import('../../ui/umlaut-buttons').then(mod => mod.setupUmlautButtons(dom, state));
     
     // ✅ KORREKT: currentWord statt currentWordData
     const currentWord = state.currentWord;
@@ -433,24 +418,6 @@ export function setupSentenceTranslationEnDeMode(
     
     const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
-    
-    // Umlaut-Buttons Event-Handling (robust, inkl. Shift für Großbuchstaben)
-    if (umlautContainer) {
-        const umlautButtons = umlautContainer.querySelectorAll('.umlaut-button');
-        umlautButtons.forEach(btn => {
-            // Vorherige Event-Listener entfernen durch Clonen
-            const newBtn = btn.cloneNode(true) as HTMLButtonElement;
-            btn.parentNode?.replaceChild(newBtn, btn);
-            newBtn.addEventListener('click', (e: MouseEvent) => {
-                if (!state.activeTextInput) return;
-                const isShift = e.shiftKey;
-                const char = newBtn.textContent || '';
-                const toInsert = isShift ? char.toUpperCase() : char;
-                insertTextAtCursor(state.activeTextInput, toInsert);
-            });
-            newBtn.title = 'Shift für Großbuchstaben';
-        });
-    }
     
     const sentenceUi = dom.sentenceUiEl;
     if (sentenceUi) sentenceUi.style.display = 'block';
