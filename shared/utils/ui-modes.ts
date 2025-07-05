@@ -92,6 +92,9 @@ export function setupMultipleChoiceMode(
         example_de: (currentWord as any).example_de
     });
     
+    // DEBUG-Ausgabe für exampleSentence
+    console.log('[DEBUG][setupMultipleChoiceMode] exampleSentence:', exampleSentence);
+    
     // Genus und Plural anzeigen
     let displayGermanWord = currentWord.german || "";
     if ('article' in currentWord && 'plural' in currentWord) {
@@ -101,23 +104,10 @@ export function setupMultipleChoiceMode(
 
     try {
         // Beispielsatz anzeigen (mit Tailwind-Farben, Times New Roman, größer, SCHRIFTFARBE)
-        console.log('[DEBUG][setupMultipleChoiceMode] Gefundener Beispielsatz:', exampleSentence);
-        // Sicherheits-Check: Beispielsatz muss zum deutschen Wort passen
-        let showExample = true;
         if (Array.isArray(exampleSentence)) {
             const joined = exampleSentence.map(part => part.text).join('');
-            if (!joined.includes(currentWord.german)) {
-                showExample = false;
-                console.error('[SICHERHEIT][setupMultipleChoiceMode] Beispielsatz passt NICHT zum deutschen Wort:', currentWord.german, exampleSentence);
-            }
-        } else if (typeof exampleSentence === 'string') {
-            if (!exampleSentence.includes(currentWord.german)) {
-                showExample = false;
-                console.error('[SICHERHEIT][setupMultipleChoiceMode] Beispielsatz (String) passt NICHT zum deutschen Wort:', currentWord.german, exampleSentence);
-            }
-        }
-        if (showExample && exampleSentence) {
-            if (Array.isArray(exampleSentence)) {
+            console.log('[DEBUG][setupMultipleChoiceMode] exampleSentence (joined):', joined);
+            if (joined.trim() !== '') {
                 dom.exampleSentenceDisplayEl.innerHTML = exampleSentence.map(part => {
                     try {
                         console.log('[DEBUG][Kasus]', part.text, '→', part.case || part.kasus);
@@ -129,27 +119,33 @@ export function setupMultipleChoiceMode(
                 }).join('');
                 dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
                 dom.exampleSentenceDisplayEl.style.fontSize = '2.5rem';
-            } else if (typeof exampleSentence === 'string') {
+            } else {
+                dom.exampleSentenceDisplayEl.textContent = '';
+            }
+        } else if (typeof exampleSentence === 'string') {
+            if (exampleSentence.trim() !== '') {
                 dom.exampleSentenceDisplayEl.textContent = exampleSentence;
                 dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
                 dom.exampleSentenceDisplayEl.style.fontSize = '2.5rem';
+            } else {
+                dom.exampleSentenceDisplayEl.textContent = '';
             }
         } else {
             dom.exampleSentenceDisplayEl.textContent = '';
         }
     } catch (e) {
-        console.error('[FEHLER][setupMultipleChoiceMode] Fehler bei der Beispielsatz-Anzeige:', e);
-        dom.exampleSentenceDisplayEl.textContent = '';
+        console.error('[FEHLER][setupMultipleChoiceMode] Fehler bei der Beispielsatz-Anzeige:', e, exampleSentence);
+        dom.exampleSentenceDisplayEl.textContent = '[Fehler beim Anzeigen des Beispielsatzes]';
     }
 
-    // Sichtbarkeit des Satz-Containers abhängig vom Beispielsatz
+    // Sichtbarkeit des gesamten Wort+Satz-Blocks abhängig vom Beispielsatz
     if (
         (Array.isArray(exampleSentence) && exampleSentence.length > 0 && exampleSentence.some(part => part.text && part.text.trim() !== '')) ||
         (typeof exampleSentence === 'string' && exampleSentence.trim() !== '')
     ) {
-        dom.sentenceLineContainerEl.style.display = 'flex';
+        dom.wordSentenceBlockEl.style.display = 'block';
     } else {
-        dom.sentenceLineContainerEl.style.display = 'none';
+        dom.wordSentenceBlockEl.style.display = 'none';
     }
 
     // Audio-Buttons setup mit besserem Layout

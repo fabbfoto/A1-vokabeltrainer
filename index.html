@@ -87,13 +87,15 @@
         <!-- Haupt-Trainer-Card -->
         <div class="w-full max-w-2xl mt-4 bg-white/20 backdrop-blur-lg p-8 rounded-2xl shadow-[0_8px_32px_rgba(31,38,135,0.37)] border border-white/30">
             <!-- Audio-Container für Wort und Satz -->
-            <div id="word-line-container" class="flex justify-center items-center gap-3 w-full">
-                <div id="question-display-area" class="min-h-[2em] text-center text-[1.75rem] font-semibold text-gray-900"></div>
-                <button id="audio-word-button" class="bg-transparent border-none cursor-pointer p-0 leading-none flex items-center justify-center text-gray-500 transition-colors duration-200 w-7 h-7 hover:text-gray-900" title="Wort vorspielen"></button>
-            </div>
-            <div id="sentence-line-container" class="flex justify-center items-center gap-3 w-full">
-                <div id="example-sentence-display" class="italic text-gray-600 text-center min-h-[1.5em] text-lg"></div>
-                <button id="audio-sentence-button" class="bg-transparent border-none cursor-pointer p-0 leading-none flex items-center justify-center text-gray-500 transition-colors duration-200 w-7 h-7 hover:text-gray-900" title="Satz vorspielen"></button>
+            <div id="word-sentence-block">
+              <div id="word-line-container" class="flex justify-center items-center gap-3 w-full">
+                  <div id="question-display-area" class="min-h-[2em] text-center text-[1.75rem] font-semibold text-gray-900"></div>
+                  <button id="audio-word-button" class="bg-transparent border-none cursor-pointer p-0 leading-none flex items-center justify-center text-gray-500 transition-colors duration-200 w-7 h-7 hover:text-gray-900" title="Wort vorspielen"></button>
+              </div>
+              <div id="sentence-line-container" class="flex justify-center items-center gap-3 w-full">
+                  <div id="example-sentence-display" class="italic text-gray-600 text-center min-h-[1.5em] text-lg"></div>
+                  <button id="audio-sentence-button" class="bg-transparent border-none cursor-pointer p-0 leading-none flex items-center justify-center text-gray-500 transition-colors duration-200 w-7 h-7 hover:text-gray-900" title="Satz vorspielen"></button>
+              </div>
             </div>
             <div id="task-prompt-area" class="text-xl text-gray-900 mb-4 text-center min-h-[1.5em]"></div>
 

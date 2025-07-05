@@ -212,8 +212,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 let progressSet = state.globalProgress[progressKey][modeId];
                 if (!progressSet) {
                     progressSet = new Set();
+                    state.globalProgress[progressKey][modeId] = progressSet;
                 } else if (Array.isArray(progressSet)) {
                     progressSet = new Set(progressSet);
+                    state.globalProgress[progressKey][modeId] = progressSet;
                 }
                 progressSet.add(state.currentWord.id as WordId);
                 state.globalProgress[progressKey][modeId] = progressSet;

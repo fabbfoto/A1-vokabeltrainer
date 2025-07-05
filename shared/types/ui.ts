@@ -22,6 +22,7 @@ export interface DOMElements {
     exampleSentenceDisplayEl: HTMLElement;
     wordLineContainerEl: HTMLElement;
     sentenceLineContainerEl: HTMLElement;
+    wordSentenceBlockEl: HTMLElement;
     
     // Audio Buttons
     audioWordButtonEl: HTMLButtonElement;

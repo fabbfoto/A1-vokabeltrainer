@@ -41,6 +41,7 @@ export const dom: DOMElements = {
     exampleSentenceDisplayEl: getElement<HTMLElement>('example-sentence-display'),
     wordLineContainerEl: getElement<HTMLElement>('word-line-container'),
     sentenceLineContainerEl: getElement<HTMLElement>('sentence-line-container'),
+    wordSentenceBlockEl: getElement<HTMLElement>('word-sentence-block'),
     
     // Audio Buttons
     audioWordButtonEl: getElement<HTMLButtonElement>('audio-word-button'),
