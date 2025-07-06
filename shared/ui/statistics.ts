@@ -1,0 +1,10 @@
+export function updateErrorCounts(dom: DOMElements, state: TrainerState, learningModes: LearningModes): void {
+    Object.keys(learningModes).forEach(mode => {
+        const repeatButton = document.getElementById(`mode-repeat-${mode}`);
+        if (!repeatButton) return;
+        const countSpan = repeatButton.querySelector('.count-display');
+        if (!countSpan) return;
+        const errorCount = state.wordsToRepeatByMode[mode]?.size || 0;
+        countSpan.textContent = errorCount.toString();
+    });
+} 

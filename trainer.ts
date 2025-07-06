@@ -79,24 +79,71 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     };
 
     function loadProgress(): void {
-        const saved = localStorage.getItem('trainer-progress');
+        // Versuche zuerst trainer-progress
+        let saved = localStorage.getItem('trainer-progress');
+        
+        // Falls nicht vorhanden, versuche Firebase-Key
+        if (!saved) {
+            const firebaseSaved = localStorage.getItem('a1ThemenProgress');
+            if (firebaseSaved) {
+                console.log('📦 Konvertiere Firebase-Progress zu lokalem Format...');
+                try {
+                    const firebaseData = JSON.parse(firebaseSaved);
+                    const converted: Record<string, Record<string, string[]>> = {};
+                    
+                    // Konvertiere Firebase 3-Ebenen zu lokalem 2-Ebenen Format
+                    for (const hauptthema in firebaseData) {
+                        for (const unterthema in firebaseData[hauptthema]) {
+                            const key = `${hauptthema}|${unterthema}`;
+                            converted[key] = firebaseData[hauptthema][unterthema];
+                        }
+                    }
+                    
+                    saved = JSON.stringify(converted);
+                    console.log('✅ Firebase-Progress konvertiert');
+                } catch (e) {
+                    console.error('❌ Fehler bei Firebase-Konvertierung:', e);
+                }
+            }
+        }
+        
+        // Lade Progress und stelle SICHER dass es Sets sind
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                // Umwandlung aller Arrays in Sets
-                Object.keys(parsed).forEach(progressKey => {
-                    Object.keys(parsed[progressKey]).forEach(modeId => {
-                        const value = parsed[progressKey][modeId];
-                        if (Array.isArray(value)) {
-                            parsed[progressKey][modeId] = new Set(value);
-                        }
-                    });
+                state.globalProgress = {};
+                
+                // WICHTIG: Konvertiere IMMER zu Sets
+                Object.keys(parsed).forEach(topicKey => {
+                    state.globalProgress[topicKey] = {};
+                    
+                    if (typeof parsed[topicKey] === 'object' && parsed[topicKey] !== null) {
+                        Object.keys(parsed[topicKey]).forEach(mode => {
+                            const data = parsed[topicKey][mode];
+                            
+                            // Stelle sicher, dass es ein Set wird
+                            if (Array.isArray(data)) {
+                                state.globalProgress[topicKey][mode] = new Set(data);
+                            } else if (data instanceof Set) {
+                                state.globalProgress[topicKey][mode] = data;
+                            } else {
+                                console.warn(`⚠️ Unerwarteter Datentyp für ${topicKey}/${mode}:`, typeof data);
+                                state.globalProgress[topicKey][mode] = new Set();
+                            }
+                        });
+                    } else {
+                        console.warn(`⚠️ Ungültige Daten für ${topicKey}`);
+                    }
                 });
-                state.globalProgress = parsed as any;
-                console.log('✅ Progress geladen:', Object.keys(state.globalProgress).length, 'Einträge');
+                
+                console.log('✅ Progress geladen mit', Object.keys(state.globalProgress).length, 'Themen');
             } catch (e) {
-                console.warn('⚠️ Fehler beim Laden des Progress:', e);
+                console.error('❌ Fehler beim Laden des Progress:', e);
+                state.globalProgress = {};
             }
+        } else {
+            console.log('ℹ️ Kein gespeicherter Progress gefunden');
+            state.globalProgress = {};
         }
     }
 
@@ -225,13 +272,95 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Normaler Modus (ohne Korrekturmodus)
         if (isCorrect) {
             state.correctInCurrentRound++;
+            
+            // WICHTIG: Spezielle Behandlung für Wiederholungs-Modus
+            if (state.isRepeatSessionActive && state.currentWord && state.currentMode) {
+                // Entferne das Wort aus der Fehlerliste
+                if (state.wordsToRepeatByMode[state.currentMode]) {
+                    state.wordsToRepeatByMode[state.currentMode].delete(state.currentWord.id);
+                    console.log(`✅ Wort ${state.currentWord.id} aus Fehlerliste entfernt`);
+                    
+                    // Speichere aktualisierte Fehlerliste
+                    saveWordsToRepeat();
+                    
+                    // Update Fehler-Buttons
+                    ui.updateErrorCounts(dom, state, learningModes);
+                    
+                    // ZUSÄTZLICH: Wenn keine Fehler mehr, explizit Button zurücksetzen
+                    if (state.wordsToRepeatByMode[state.currentMode].size === 0) {
+                        const repeatButton = document.getElementById(`mode-repeat-${state.currentMode}`);
+                        if (repeatButton) {
+                            // Entferne alle aktiven Styles
+                            repeatButton.classList.remove('bg-red-600', 'text-white', 'hover:bg-red-700');
+                            repeatButton.classList.add('bg-red-100', 'text-red-500');
+                            console.log('✅ Button auf Standard-Styling zurückgesetzt');
+                        }
+                    }
+                }
+                
+                // WICHTIG: Füge das Wort auch zum normalen Progress hinzu
+                const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+                
+                if (!state.globalProgress[progressKey]) {
+                    state.globalProgress[progressKey] = {};
+                }
+                if (!state.globalProgress[progressKey][state.currentMode]) {
+                    state.globalProgress[progressKey][state.currentMode] = new Set();
+                }
+                
+                // Stelle sicher, dass es ein Set ist
+                let progressSet = state.globalProgress[progressKey][state.currentMode];
+                if (!(progressSet instanceof Set)) {
+                    // Konvertiere Array zu Set falls nötig
+                    if (Array.isArray(progressSet)) {
+                        progressSet = new Set(progressSet);
+                        state.globalProgress[progressKey][state.currentMode] = progressSet;
+                        console.log('⚠️ Konvertierte Array zu Set für', state.currentMode);
+                    } else {
+                        progressSet = new Set();
+                        state.globalProgress[progressKey][state.currentMode] = progressSet;
+                        console.log('⚠️ Erstelle neues Set für', state.currentMode);
+                    }
+                }
+                
+                progressSet.add(state.currentWord.id);
+                saveProgress();
+                
+                console.log(`✅ Wort ${state.currentWord.id} zu Progress hinzugefügt`);
+            }
+            // Normale Übungsmodus-Logik
+            else if (!state.isTestModeActive && state.currentWord && state.currentMode) {
+                const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+                
+                if (!state.globalProgress[progressKey]) {
+                    state.globalProgress[progressKey] = {};
+                }
+                if (!state.globalProgress[progressKey][state.currentMode]) {
+                    state.globalProgress[progressKey][state.currentMode] = new Set();
+                }
+                
+                // Stelle sicher, dass es ein Set ist
+                let progressSet = state.globalProgress[progressKey][state.currentMode];
+                if (!(progressSet instanceof Set)) {
+                    // Konvertiere Array zu Set falls nötig
+                    if (Array.isArray(progressSet)) {
+                        progressSet = new Set(progressSet);
+                        state.globalProgress[progressKey][state.currentMode] = progressSet;
+                        console.log('⚠️ Konvertierte Array zu Set für', state.currentMode);
+                    } else {
+                        progressSet = new Set();
+                        state.globalProgress[progressKey][state.currentMode] = progressSet;
+                        console.log('⚠️ Erstelle neues Set für', state.currentMode);
+                    }
+                }
+                
+                progressSet.add(state.currentWord.id);
+                saveProgress();
+            }
+            
             dom.feedbackContainerEl.innerHTML = `
                 <div class="text-green-600 text-2xl font-bold">✓ Richtig!</div>
             `;
-            // Bei richtigen Antworten: Nach 1.5 Sekunden automatisch weiter
-            setTimeout(() => {
-                loadNextTask();
-            }, 1500);
         } else {
             // Bei falschen Antworten: Zeige Korrektur und Weiter-Button
             dom.feedbackContainerEl.innerHTML = `
@@ -247,21 +376,70 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             // Deaktiviere alle Eingabefelder
             const allInputs = document.querySelectorAll('input');
             allInputs.forEach(input => input.disabled = true);
-            // Fehlerwort zum Fehlerstapel hinzufügen:
+            
+            // Bei falscher Antwort (sowohl im normalen als auch im Wiederholungs-Modus)
             if (state.currentWord && state.currentMode) {
                 if (!state.wordsToRepeatByMode[state.currentMode]) {
                     state.wordsToRepeatByMode[state.currentMode] = new Set();
                 }
+                
+                // Im Wiederholungs-Modus: Wort bleibt in der Liste
+                // Im normalen Modus: Wort wird zur Liste hinzugefügt
                 state.wordsToRepeatByMode[state.currentMode].add(state.currentWord.id);
                 saveWordsToRepeat();
+                
+                // Update Fehler-Buttons
+                ui.updateErrorCounts(dom, state, learningModes);
             }
         }
 
-        // Statistiken aktualisieren
+        // UI Updates - IMMER ausführen
         if (state.isTestModeActive) {
             ui.updateTestStats(dom, state);
         } else {
             ui.updatePracticeStats(dom, state, learningModes);
+            ui.updateCategoryStats(dom, state, learningModes); // Wichtig für Balken!
+        }
+        
+        // WICHTIG: Nach korrekter Antwort im Wiederholungsmodus
+        if (isCorrect && state.isRepeatSessionActive) {
+            // Prüfe ob noch Fehler vorhanden sind
+            const remainingErrors = state.wordsToRepeatByMode[state.currentMode]?.size || 0;
+            
+            if (remainingErrors === 0) {
+                // Keine Fehler mehr - wechsle zurück zum normalen Modus
+                console.log('✅ Alle Fehler behoben - wechsle zu normalem Modus');
+                state.isRepeatSessionActive = false;
+                
+                // Lade normale Wortliste
+                state.shuffledWordsForMode = shuffleArray([...state.currentVocabularySet]);
+                state.currentWordIndex = -1; // Wird in loadNextTask erhöht
+                
+                // Update UI
+                const repeatButton = document.getElementById(`mode-repeat-${state.currentMode}`);
+                if (repeatButton) {
+                    repeatButton.classList.remove('bg-red-600', 'text-white');
+                    repeatButton.classList.add('bg-red-100', 'text-red-500');
+                }
+                
+                // Zeige kurze Erfolgsmeldung
+                ui.showMessage(dom, 'Alle Fehler behoben! Weiter mit normalen Übungen.', 'success');
+            }
+            
+            // IMMER zur nächsten Aufgabe
+            setTimeout(() => {
+                loadNextTask();
+            }, isCorrect ? 1500 : 2500); // Kurze Pause für Feedback
+        }
+        // Normaler Modus - existierender Code
+        else if (!state.isCorrectionMode) {
+            if (isCorrect) {
+                setTimeout(() => {
+                    loadNextTask();
+                }, 1500);
+            } else {
+                // Bei Fehler zeige Korrektur-UI (existierender Code bleibt)
+            }
         }
     }
 
@@ -273,16 +451,51 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     };
 
     function loadNextTask(): void {
+        ui.hideAllUIs(dom);
+        
+        // Erhöhe Index
         state.currentWordIndex++;
-
+        
+        // Prüfe ob wir am Ende der Liste sind
         if (state.currentWordIndex >= state.shuffledWordsForMode.length) {
-            const accuracy = state.attemptedInCurrentRound > 0 ? Math.round((state.correctInCurrentRound / state.attemptedInCurrentRound) * 100) : 0;
-            ui.showMessage(dom, `Runde beendet! Genauigkeit: ${accuracy}%`, 'success');
-            state.isRepeatSessionActive = false;
+            if (state.isTestModeActive) {
+                handleTestCompletion();
+                return;
+            }
+            
+            // Shuffle und von vorne beginnen
+            if (state.isRepeatSessionActive) {
+                // Im Wiederholungsmodus: Prüfe ob noch Fehler da sind
+                const remainingErrors = state.wordsToRepeatByMode[state.currentMode]?.size || 0;
+                if (remainingErrors === 0) {
+                    // Automatisch zu normalem Modus wechseln
+                    state.isRepeatSessionActive = false;
+                    state.shuffledWordsForMode = shuffleArray([...state.currentVocabularySet]);
+                    ui.showMessage(dom, 'Super! Alle Fehler behoben. Weiter geht\'s!', 'success');
+                } else {
+                    // Noch Fehler da - shuffle Fehlerliste
+                    const errorWords = state.currentVocabularySet.filter(word => 
+                        state.wordsToRepeatByMode[state.currentMode]?.has(word.id)
+                    );
+                    state.shuffledWordsForMode = shuffleArray(errorWords);
+                }
+            } else {
+                // Normaler Modus - shuffle alle Wörter
+                state.shuffledWordsForMode = shuffleArray([...state.currentVocabularySet]);
+            }
+            
+            state.currentWordIndex = 0;
+        }
+        
+        // Hole nächstes Wort
+        state.currentWord = state.shuffledWordsForMode[state.currentWordIndex];
+        
+        if (!state.currentWord) {
+            console.error('Kein Wort gefunden!');
             return;
         }
-        state.currentWord = state.shuffledWordsForMode[state.currentWordIndex];
-
+        
+        // Setup für den aktuellen Modus
         const modeInfo = state.currentMode ? learningModes[state.currentMode] : null;
         if (modeInfo && typeof modeInfo.setupFunction === 'function') {
             modeInfo.setupFunction();
@@ -290,14 +503,13 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             console.error(`Keine Setup-Funktion für Modus "${state.currentMode}" gefunden`);
         }
         
-        // Fortschrittsbalken bei jedem Aufgabenwechsel aktualisieren
+        // Statistiken aktualisieren
         if (state.isTestModeActive) {
             ui.updateTestStats(dom, state);
         } else {
             ui.updatePracticeStats(dom, state, learningModes);
+            ui.updateCategoryStats(dom, state, learningModes);
         }
-        
-
     }
 
     function getTopicKey(main: TopicId|null, sub: SubTopicId|null) {
@@ -305,9 +517,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     function setMode(modeId: ModeId, isRepeat: boolean = false): void {
-        // Test Fortschrittsbalken
-
-        ui.testProgressBars(dom);
         
         state.currentMode = modeId;
         state.isTestModeActive = false;
@@ -322,8 +531,20 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 state.isRepeatSessionActive = false;
                 return;
             }
-            wordsForSession = state.currentVocabularySet.filter(word => wordIdsToRepeat.has(word.id as WordId));
+            
+            // Filtere Wörter die wiederholt werden müssen
+            wordsForSession = state.currentVocabularySet.filter(word => 
+                wordIdsToRepeat.has(word.id as WordId)
+            );
+            
+            if (wordsForSession.length === 0) {
+                ui.showMessage(dom, 'Fehler beim Laden der Wiederholungswörter.', 'error');
+                return;
+            }
+            
+            console.log(`Starte Wiederholung mit ${wordsForSession.length} Wörtern`);
         } else {
+            // Normaler Modus
             wordsForSession = [...state.currentVocabularySet];
         }
         state.shuffledWordsForMode = shuffleArray(wordsForSession);

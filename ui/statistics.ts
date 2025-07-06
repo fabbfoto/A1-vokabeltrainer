@@ -7,6 +7,53 @@ type TrainerState = any;
 type LearningModes = any;
 
 /**
+ * Entfernt alle Farbklassen von einem Element
+ */
+function removeColorClasses(element: HTMLElement): void {
+    const colorClasses = [
+        'bg-black', 'bg-red-600', 'bg-yellow-400',
+        'bg-red-500', 'bg-yellow-500', 'bg-green-500',
+        'bg-gray-300', 'bg-gray-200'
+    ];
+    element.classList.remove(...colorClasses);
+}
+
+/**
+ * Setzt die Breite eines Fortschrittsbalkens
+ */
+function setProgressBarWidth(element: HTMLElement, percentage: number): void {
+    // Inline-Style für dynamische Breite
+    element.style.width = `${percentage}%`;
+}
+
+/**
+ * Setzt die Farbe eines Fortschrittsbalkens mit Tailwind-Klassen
+ */
+function setProgressBarColor(element: HTMLElement, percentage: number, type: 'german' | 'standard' = 'standard'): void {
+    removeColorClasses(element);
+    
+    if (type === 'german') {
+        // Deutschland-Farben
+        if (percentage < 34) {
+            element.classList.add('bg-black');
+        } else if (percentage < 67) {
+            element.classList.add('bg-red-600');
+        } else {
+            element.classList.add('bg-yellow-400');
+        }
+    } else {
+        // Standard-Farben (rot/gelb/grün)
+        if (percentage < 60) {
+            element.classList.add('bg-red-500');
+        } else if (percentage < 80) {
+            element.classList.add('bg-yellow-500');
+        } else {
+            element.classList.add('bg-green-500');
+        }
+    }
+}
+
+/**
  * Berechnet den Fortschritt in Prozent.
  */
 export function calculateProgressPercentage(completed: number, total: number): number {
@@ -30,13 +77,43 @@ export function getProgressColorClass(completed: number, total: number): string 
 export function updateErrorCounts(dom: DOMElements, state: TrainerState, learningModes: LearningModes): void {
     Object.keys(learningModes).forEach(mode => {
         const repeatButton = document.getElementById(`mode-repeat-${mode}`);
-        if (repeatButton) {
-            const countSpan = repeatButton.querySelector('.count-display');
-            const errorCount = state.wordsToRepeatByMode[mode]?.size || 0;
-            if (countSpan) {
-                countSpan.textContent = errorCount.toString();
+        if (!repeatButton) return;
+        
+        const countSpan = repeatButton.querySelector('.count-display');
+        if (!countSpan) {
+            console.warn(`[updateErrorCounts] Kein count-display in ${mode} gefunden`);
+            return;
+        }
+        
+        const errorCount = state.wordsToRepeatByMode[mode]?.size || 0;
+        
+        // Immer die Zahl anzeigen
+        countSpan.textContent = errorCount.toString();
+        
+        if (errorCount === 0) {
+            // Button deaktivieren
+            repeatButton.classList.add('opacity-50', 'cursor-not-allowed');
+            repeatButton.setAttribute('disabled', 'true');
+            
+            // WICHTIG: Stelle sicher, dass Button NICHT mehr rot ist
+            repeatButton.classList.remove('bg-red-600', 'text-white', 'hover:bg-red-700');
+            repeatButton.classList.add('bg-red-100', 'text-red-500');
+            
+            // Falls das der aktive Wiederholungsmodus war
+            if (state.isRepeatSessionActive && state.currentMode === mode) {
+                state.isRepeatSessionActive = false;
+                console.log('[updateErrorCounts] Wiederholungs-Modus beendet');
             }
-            (repeatButton as HTMLButtonElement).disabled = errorCount === 0;
+        } else {
+            // Button aktivieren
+            repeatButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            repeatButton.removeAttribute('disabled');
+            
+            // Standard-Styling wenn nicht aktiv
+            if (!state.isRepeatSessionActive || state.currentMode !== mode) {
+                repeatButton.classList.remove('bg-red-600', 'text-white', 'hover:bg-red-700');
+                repeatButton.classList.add('bg-red-100', 'text-red-500', 'hover:enabled:bg-red-200');
+            }
         }
     });
 }
@@ -45,6 +122,11 @@ export function updateErrorCounts(dom: DOMElements, state: TrainerState, learnin
  * Aktualisiert die detaillierte Statistik-Ansicht für die aktuelle Kategorie.
  */
 export function updateCategoryStats(dom: DOMElements, state: TrainerState, learningModes: LearningModes): void {
+    if (!dom.categoryStatsContainerEl) {
+        console.error('[updateCategoryStats] Container nicht gefunden!');
+        return;
+    }
+    
     dom.categoryStatsContainerEl.innerHTML = '';
     const totalItemsInSet = state.currentVocabularySet.length;
     if (totalItemsInSet === 0) return;
@@ -59,27 +141,41 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
     
     Object.keys(learningModes).forEach(modeId => {
         const modeInfo = learningModes[modeId];
-        
-        // Verwende den korrekten Progress-Schlüssel für Themen-Trainer
         const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
         const progressData = state.globalProgress[progressKey]?.[modeId];
         const masteredCount = progressData?.size || 0;
         const percentage = calculateProgressPercentage(masteredCount, totalItemsInSet);
 
-        // Verwende Farbschema-System
-        const colorClass = getProgressColorClass(masteredCount, totalItemsInSet);
-
+        // Container für eine Zeile
         const item = document.createElement('div');
-        item.className = 'flex justify-between items-center';
-        item.innerHTML = `
-            <span class="text-xs text-gray-600">${modeInfo.name}: ${masteredCount} / ${totalItemsInSet}</span>
-            <div class="bg-gray-200 rounded-lg overflow-hidden h-3 w-24">
-                <div class="h-full transition-all duration-300 ${colorClass}" style="width: ${percentage}%;"></div>
-            </div>
-        `;
+        item.className = 'flex justify-between items-center gap-2';
+        
+        // Text-Label
+        const label = document.createElement('span');
+        label.className = 'text-xs text-gray-600';
+        label.textContent = `${modeInfo.name}: ${masteredCount} / ${totalItemsInSet}`;
+        
+        // Balken-Container (grauer Hintergrund)
+        const barContainer = document.createElement('div');
+        barContainer.className = 'bg-gray-200 rounded-lg overflow-hidden h-3 w-24';
+        
+        // Innerer Balken
+        const bar = document.createElement('div');
+        bar.className = 'h-full transition-all duration-300 ease-in-out';
+        
+        // Setze Breite und Farbe
+        setProgressBarWidth(bar, percentage);
+        setProgressBarColor(bar, percentage, 'german');
+        
+        // Zusammenbauen
+        barContainer.appendChild(bar);
+        item.appendChild(label);
+        item.appendChild(barContainer);
         itemsContainer.appendChild(item);
     });
+    
     dom.categoryStatsContainerEl.appendChild(itemsContainer);
+    console.log('[updateCategoryStats] Aktualisierung abgeschlossen');
 }
 
 /**
@@ -98,17 +194,13 @@ export function updatePracticeStats(dom: DOMElements, state: TrainerState, learn
         : 0;
     
     if (dom.accuracyInRoundPracticeEl) {
-        dom.accuracyInRoundPracticeEl.style.width = `${accuracy}%`;
-        dom.accuracyInRoundPracticeEl.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
-        if (accuracy >= 80) {
-            dom.accuracyInRoundPracticeEl.classList.add('bg-green-500');
-        } else if (accuracy >= 60) {
-            dom.accuracyInRoundPracticeEl.classList.add('bg-yellow-500');
-        } else {
-            dom.accuracyInRoundPracticeEl.classList.add('bg-red-500');
+        // Stelle sicher, dass alle Tailwind-Klassen gesetzt sind
+        if (!dom.accuracyInRoundPracticeEl.classList.contains('transition-all')) {
+            dom.accuracyInRoundPracticeEl.className = 'h-full transition-all duration-500 ease-in-out';
         }
+        setProgressBarWidth(dom.accuracyInRoundPracticeEl, accuracy);
+        setProgressBarColor(dom.accuracyInRoundPracticeEl, accuracy, 'standard');
     }
-    
     updateCategoryStats(dom, state, learningModes);
 }
 
@@ -123,20 +215,25 @@ export function updateTestStats(dom: DOMElements, state: TrainerState): void {
     const accuracy = attempted > 0 ? (correct / attempted) * 100 : 0;
 
     // Fortschrittsbalken
-    dom.testProgressEl.style.width = `${progress}%`;
-    dom.testProgressEl.classList.remove('bg-de-black', 'bg-de-red', 'bg-de-gold');
-    const colorClass = getProgressColorClass(attempted, total);
-    dom.testProgressEl.classList.add(colorClass);
+    if (dom.testProgressEl) {
+        // Stelle sicher, dass alle Tailwind-Klassen gesetzt sind
+        if (!dom.testProgressEl.classList.contains('transition-all')) {
+            dom.testProgressEl.className = 'h-full transition-all duration-500 ease-in-out';
+        }
+        
+        setProgressBarWidth(dom.testProgressEl, progress);
+        setProgressBarColor(dom.testProgressEl, progress, 'german');
+    }
 
     // Genauigkeitsbalken
-    dom.testAccuracyEl.style.width = `${accuracy}%`;
-    dom.testAccuracyEl.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
-    if (accuracy >= 80) {
-        dom.testAccuracyEl.classList.add('bg-green-500');
-    } else if (accuracy >= 60) {
-        dom.testAccuracyEl.classList.add('bg-yellow-500');
-    } else {
-        dom.testAccuracyEl.classList.add('bg-red-500');
+    if (dom.testAccuracyEl) {
+        // Stelle sicher, dass alle Tailwind-Klassen gesetzt sind
+        if (!dom.testAccuracyEl.classList.contains('transition-all')) {
+            dom.testAccuracyEl.className = 'h-full transition-all duration-500 ease-in-out';
+        }
+        
+        setProgressBarWidth(dom.testAccuracyEl, accuracy);
+        setProgressBarColor(dom.testAccuracyEl, accuracy, 'standard');
     }
 
     // Text-Updates (beide Elemente zeigen auf test-progress-text)

@@ -59,25 +59,25 @@
             <div id="mode-button-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <div class="flex flex-col gap-2">
                     <button id="mode-mc-de-en" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Bedeutung</button>
-                    <button id="mode-repeat-mc-de-en" class="w-full px-3 py-2 rounded-md text-sm font-bold bg-red-100 text-red-500 transition-colors hover:enabled:bg-red-200 disabled:opacity-50">
+                    <button id="mode-repeat-mc-de-en" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">
                         <span class="count-display">0</span>
                     </button>
                 </div>
                 <div class="flex flex-col gap-2">
                     <button id="mode-type-de-adj" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Schreibweise</button>
-                    <button id="mode-repeat-type-de-adj" class="w-full px-3 py-2 rounded-md text-sm font-bold bg-red-100 text-red-500 transition-colors hover:enabled:bg-red-200 disabled:opacity-50">
+                    <button id="mode-repeat-type-de-adj" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">
                         <span class="count-display">0</span>
                     </button>
                 </div>
                 <div class="flex flex-col gap-2">
                     <button id="mode-cloze-adj-de" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Lückentext</button>
-                    <button id="mode-repeat-cloze-adj-de" class="w-full px-3 py-2 rounded-md text-sm font-bold bg-red-100 text-red-500 transition-colors hover:enabled:bg-red-200 disabled:opacity-50">
+                    <button id="mode-repeat-cloze-adj-de" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">
                         <span class="count-display">0</span>
                     </button>
                 </div>
                 <div class="flex flex-col gap-2">
                     <button id="mode-sentence-translation-en-de" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Satzübersetzung</button>
-                    <button id="mode-repeat-sentence-translation-en-de" class="w-full px-3 py-2 rounded-md text-sm font-bold bg-red-100 text-red-500 transition-colors hover:enabled:bg-red-200 disabled:opacity-50">
+                    <button id="mode-repeat-sentence-translation-en-de" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">
                         <span class="count-display">0</span>
                     </button>
                 </div>
@@ -160,7 +160,7 @@
                 <div id="practice-stats-view">
                     <p class="text-sm text-gray-600 text-center">Richtig in dieser Runde: <span id="correct-in-round-practice">0</span> / <span id="attempted-in-round-practice">0</span></p>
                     <div class="bg-gray-200 rounded-lg overflow-hidden h-5">
-                        <div id="accuracy-bar" class="bg-blue-500 h-full transition-all duration-500 ease-in-out" style="width: 0%;"></div>
+                        <div id="accuracy-bar" class="h-full transition-all duration-500 ease-in-out"></div>
                     </div>
                     <hr class="my-2">
                     <p class="text-xs text-gray-500 text-center mb-1">Fortschritt pro Übungsmodus:</p>
@@ -171,12 +171,12 @@
                 <div id="test-stats-view" class="hidden">
                     <p class="text-sm text-gray-600 text-center">Gesamtfortschritt: <span id="test-progress-text">0 / 36</span></p>
                     <div class="bg-gray-200 rounded-lg overflow-hidden h-5">
-                        <div id="test-progress-bar" class="bg-green-500 h-full transition-all duration-500 ease-in-out" style="width: 0%;"></div>
+                        <div id="test-progress-bar" class="h-full transition-all duration-500 ease-in-out"></div>
                     </div>
                     <hr class="my-2">
                     <p class="text-sm text-gray-600 text-center">Genauigkeit: <span id="test-accuracy-text">0 / 0</span></p>
                     <div class="bg-gray-200 rounded-lg overflow-hidden h-5">
-                        <div id="test-accuracy-bar" class="bg-blue-500 h-full transition-all duration-500 ease-in-out" style="width: 0%;"></div>
+                        <div id="test-accuracy-bar" class="h-full transition-all duration-500 ease-in-out"></div>
                     </div>
                 </div>
             </div>
