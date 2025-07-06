@@ -420,11 +420,6 @@ export function setupSpellingMode(
                 
                 // Nächstes Wort laden
                 processAnswer(isFullyCorrect, correctAnswerText);
-
-                // Nach processAnswer(...), rufe explizit window.loadNextTask() auf, falls vorhanden.
-                if (typeof (window as any).loadNextTask === 'function') {
-                    (window as any).loadNextTask();
-                }
             };
             
             // Event-Handler für Weiter-Button setzen
@@ -504,11 +499,6 @@ export function setupSpellingMode(
                 
                 // Nächstes Wort laden
                 processAnswer(isCorrect, correctAnswer);
-
-                // Nach processAnswer(...), rufe explizit window.loadNextTask() auf, falls vorhanden.
-                if (typeof (window as any).loadNextTask === 'function') {
-                    (window as any).loadNextTask();
-                }
             };
             
             // Event-Handler für Weiter-Button setzen
