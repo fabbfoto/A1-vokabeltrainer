@@ -1,1 +1,16 @@
 /* Nur Deutschland-Wave Animation */
+
+input[type="text"] {
+  text-decoration: none !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  border: 1px solid #ccc !important;
+  border-radius: 0.5rem !important;
+  resize: none !important;
+  outline: none !important;
+}
+
+input[type="text"]:focus {
+  border-color: #3b82f6 !important; /* Tailwind blue-500 */
+  box-shadow: 0 0 0 2px #3b82f633 !important;
+}

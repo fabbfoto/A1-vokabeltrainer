@@ -302,16 +302,22 @@ export function setupSpellingMode(
     const isNounWithPlural = 'plural' in currentWord && currentWord.plural !== undefined;
     
     if (isNounWithPlural) {
-        // Nomen-Modus: Zwei Felder
+        // Nomen-Modus: Drei Felder (Artikel, Singular, Plural)
         dom.nounInputContainerEl.classList.remove('hidden');
         dom.singleInputContainerEl.classList.add('hidden');
         
+        // Reset alle Felder
+        dom.spellingInputArticleEl.value = '';
+        dom.spellingInputArticleEl.disabled = false;
         dom.spellingInputNoun1El.value = '';
         dom.spellingInputNoun1El.disabled = false;
         dom.spellingInputNoun2El.value = '';
         dom.spellingInputNoun2El.disabled = false;
         
-        // Focus Handler
+        // Focus Handler für alle drei Felder
+        dom.spellingInputArticleEl.addEventListener('focus', () => {
+            state.activeTextInput = dom.spellingInputArticleEl;
+        });
         dom.spellingInputNoun1El.addEventListener('focus', () => {
             state.activeTextInput = dom.spellingInputNoun1El;
         });
@@ -319,28 +325,34 @@ export function setupSpellingMode(
             state.activeTextInput = dom.spellingInputNoun2El;
         });
         
-        // Button Click Handler
+        // Button Click Handler mit separater Artikelprüfung
         dom.checkSpellingButton.onclick = () => {
-            const article = (currentWord as any).article || '';
-            const correctAnswerSingular = article ? `${article} ${currentWord.german}` : currentWord.german;
-            const correctAnswerPluralWord = (currentWord as any).plural!;
+            const correctArticle = (currentWord as any).article || '';
+            const correctSingular = currentWord.german;
+            const correctPlural = (currentWord as any).plural!;
             
+            const userInputArticle = dom.spellingInputArticleEl.value.trim();
             const userInputSingular = dom.spellingInputNoun1El.value.trim();
             const userInputPlural = dom.spellingInputNoun2El.value.trim();
             
-            const isSingularCorrect = vergleicheAntwort(userInputSingular, correctAnswerSingular);
-            const isPluralCorrect = vergleicheAntwort(userInputPlural, correctAnswerPluralWord);
+            // Separate Prüfung für jedes Feld
+            const isArticleCorrect = vergleicheAntwort(userInputArticle, correctArticle);
+            const isSingularCorrect = vergleicheAntwort(userInputSingular, correctSingular);
+            const isPluralCorrect = vergleicheAntwort(userInputPlural, correctPlural);
             
+            // Visuelles Feedback für jedes Feld
+            dom.spellingInputArticleEl.classList.add(isArticleCorrect ? 'correct-user-input' : 'incorrect-user-input');
             dom.spellingInputNoun1El.classList.add(isSingularCorrect ? 'correct-user-input' : 'incorrect-user-input');
             dom.spellingInputNoun2El.classList.add(isPluralCorrect ? 'correct-user-input' : 'incorrect-user-input');
             
-            const isFullyCorrect = isSingularCorrect && isPluralCorrect;
-            const correctAnswer = `${correctAnswerSingular} / ${correctAnswerPluralWord}`;
+            // Nur wenn alle drei Felder korrekt sind, ist die Antwort vollständig richtig
+            const isFullyCorrect = isArticleCorrect && isSingularCorrect && isPluralCorrect;
+            const correctAnswer = `${correctArticle} ${correctSingular} / ${correctPlural}`;
             
             processAnswer(isFullyCorrect, correctAnswer);
         };
-        // Automatisch erstes Feld fokussieren
-        setTimeout(() => { dom.spellingInputNoun1El.focus(); state.activeTextInput = dom.spellingInputNoun1El; }, 0);
+        // Automatisch Artikel-Feld fokussieren
+        setTimeout(() => { dom.spellingInputArticleEl.focus(); state.activeTextInput = dom.spellingInputArticleEl; }, 0);
     } else {
         // Single-Input-Modus
         dom.singleInputContainerEl.classList.remove('hidden');

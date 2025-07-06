@@ -481,21 +481,29 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     (window as any).initUmlautButtons = function() {
         let lastFocusedInput: HTMLInputElement | null = null;
         
-        // Focus-Listener für beide Noun-Inputs
+        // Focus-Listener für alle Noun-Inputs
+        const article = document.getElementById('spelling-input-article') as HTMLInputElement;
         const noun1 = document.getElementById('spelling-input-noun-1') as HTMLInputElement;
         const noun2 = document.getElementById('spelling-input-noun-2') as HTMLInputElement;
+        
+        if (article) {
+            article.addEventListener('focus', () => {
+                lastFocusedInput = article;
+                console.log('Focus auf Artikel-Feld');
+            });
+        }
         
         if (noun1) {
             noun1.addEventListener('focus', () => {
                 lastFocusedInput = noun1;
-                console.log('Focus auf linkes Feld');
+                console.log('Focus auf Singular-Feld');
             });
         }
         
         if (noun2) {
             noun2.addEventListener('focus', () => {
                 lastFocusedInput = noun2;
-                console.log('Focus auf rechtes Feld');
+                console.log('Focus auf Plural-Feld');
             });
         }
         
@@ -511,6 +519,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     
                     if (single && single.offsetParent !== null) {
                         targetInput = single;
+                    } else if (article && article.offsetParent !== null) {
+                        targetInput = lastFocusedInput || article;
                     } else if (noun1 && noun1.offsetParent !== null) {
                         targetInput = lastFocusedInput || noun1;
                     }

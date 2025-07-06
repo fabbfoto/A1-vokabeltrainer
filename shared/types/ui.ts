@@ -37,6 +37,7 @@ export interface DOMElements {
     singleInputContainerEl: HTMLElement;
     spellingInputSingleEl: HTMLInputElement;
     nounInputContainerEl: HTMLElement;
+    spellingInputArticleEl: HTMLInputElement;
     spellingInputNoun1El: HTMLInputElement;
     spellingInputNoun2El: HTMLInputElement;
     checkSpellingButton: HTMLButtonElement;

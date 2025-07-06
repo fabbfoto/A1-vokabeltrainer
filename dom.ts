@@ -56,6 +56,7 @@ export const dom: DOMElements = {
     singleInputContainerEl: getElement<HTMLElement>('single-input-container'),
     spellingInputSingleEl: getElement<HTMLInputElement>('spelling-input-single'),
     nounInputContainerEl: getElement<HTMLElement>('noun-input-container'),
+    spellingInputArticleEl: getElement<HTMLInputElement>('spelling-input-article'),
     spellingInputNoun1El: getElement<HTMLInputElement>('spelling-input-noun-1'),
     spellingInputNoun2El: getElement<HTMLInputElement>('spelling-input-noun-2'),
     checkSpellingButton: getElement<HTMLButtonElement>('check-spelling-button'),

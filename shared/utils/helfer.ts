@@ -46,6 +46,11 @@ export function vergleicheAntwort(userAnswer: string, correctAnswer: string, { i
   let processedUserAnswer = userAnswer.trim().toLowerCase();
   let processedCorrectAnswer = correctAnswer.trim().toLowerCase();
   
+  // Artikel am Anfang entfernen (der, die, das, ein, eine, einen, einem, einer, eines)
+  const artikelRegex = /^(der|die|das|ein|eine|einen|einem|einer|eines)\s+/i;
+  processedUserAnswer = processedUserAnswer.replace(artikelRegex, '');
+  processedCorrectAnswer = processedCorrectAnswer.replace(artikelRegex, '');
+  
   if (ignorePunctuation) {
     const punctuationRegex = /[.,;:!?'"„"»«]/g;
     processedUserAnswer = processedUserAnswer.replace(punctuationRegex, "");
