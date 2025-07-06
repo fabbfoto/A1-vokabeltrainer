@@ -31,23 +31,35 @@ export function insertTextAtCursor(input: HTMLInputElement, text: string): void 
 /**
  * Setzt die Umlaut-Buttons für die Text-Eingabe auf.
  */
-export function setupUmlautButtons(dom: DOMElements, state: TrainerState): void {
-    console.log('[UMLAUT] setupUmlautButtons aufgerufen', dom.umlautButtonsContainer);
+export function setupUmlautButtons(dom: any, state: any): void {
     if (!dom.umlautButtonsContainer) return;
     const umlautButtons = dom.umlautButtonsContainer.querySelectorAll('.umlaut-button');
-    console.log('[UMLAUT] Anzahl gefundener Buttons:', umlautButtons.length);
     umlautButtons.forEach((btn: HTMLButtonElement) => {
-        console.log('[UMLAUT] Button:', btn.textContent, 'data-umlaut-initialized:', btn.hasAttribute('data-umlaut-initialized'));
         if (!btn.hasAttribute('data-umlaut-initialized')) {
-            console.log('[UMLAUT] Initialisiere Umlaut-Button:', btn.textContent);
-            btn.addEventListener('click', (e: MouseEvent) => {
-                console.log('[UMLAUT] Button geklickt:', btn.textContent, 'activeTextInput:', state.activeTextInput);
+            btn.addEventListener('mousedown', function(e: MouseEvent) {
                 e.preventDefault();
-                if (!state.activeTextInput) return;
-                const isShiftPressed = e.shiftKey;
-                const buttonText = btn.textContent || '';
-                const charToInsert = isShiftPressed ? buttonText.toUpperCase() : buttonText;
-                insertTextAtCursor(state.activeTextInput, charToInsert);
+                // Ziel-Input bestimmen
+                let input: HTMLInputElement | null = state.activeTextInput;
+                if (!input || input.disabled || !(input as HTMLElement).offsetParent) {
+                    // Fallback: aktives oder sichtbares Input suchen
+                    if (document.activeElement && (document.activeElement as HTMLElement).tagName === 'INPUT') {
+                        input = document.activeElement as HTMLInputElement;
+                    } else {
+                        const visibleInputs = Array.from(document.querySelectorAll('input[type="text"]:not([disabled])'))
+                            .filter(inp => (inp as HTMLElement).offsetParent !== null) as HTMLInputElement[];
+                        if (visibleInputs.length === 1) input = visibleInputs[0];
+                    }
+                }
+                if (input) {
+                    const start = input.selectionStart || 0;
+                    const end = input.selectionEnd || 0;
+                    const value = input.value;
+                    const char = e.shiftKey && btn.textContent ? btn.textContent.toUpperCase() : btn.textContent || '';
+                    input.value = value.substring(0, start) + char + value.substring(end);
+                    input.selectionStart = input.selectionEnd = start + char.length;
+                    input.focus();
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                }
             });
             btn.setAttribute('data-umlaut-initialized', 'true');
         }

@@ -128,7 +128,7 @@ export function setupMultipleChoiceMode(
                 dom.exampleSentenceDisplayEl.innerHTML = exampleSentence.map(part => {
                     try {
                         console.log('[DEBUG][Kasus]', part.text, '→', part.case || part.kasus);
-                        return `<span class="${getTailwindCaseClass(part.case || part.kasus)}" style="font-family: 'Times New Roman', Times, serif; font-size: 2.5rem;">${part.text}</span>`;
+                        return `<span class="${getTailwindCaseClass(part.case || part.kasus)}" style="font-family: 'Times New Roman', Times, serif; font-size: 2.5rem; line-height: 1.5;">${part.text}</span>`;
                     } catch (e) {
                         console.error('[FEHLER][Kasus-Färbung]', part, e);
                         return `<span>${part.text}</span>`;
@@ -136,6 +136,7 @@ export function setupMultipleChoiceMode(
                 }).join('');
                 dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
                 dom.exampleSentenceDisplayEl.style.fontSize = '2.5rem';
+                dom.exampleSentenceDisplayEl.style.lineHeight = '1.5';
             } else {
                 dom.exampleSentenceDisplayEl.textContent = '';
             }
@@ -144,6 +145,7 @@ export function setupMultipleChoiceMode(
                 dom.exampleSentenceDisplayEl.textContent = exampleSentence;
                 dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
                 dom.exampleSentenceDisplayEl.style.fontSize = '2.5rem';
+                dom.exampleSentenceDisplayEl.style.lineHeight = '1.5';
             } else {
                 dom.exampleSentenceDisplayEl.textContent = '';
             }
