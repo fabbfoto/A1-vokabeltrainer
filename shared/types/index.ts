@@ -254,6 +254,8 @@ export interface TrainerState {
   
   // Correction Mode State (für didaktisches Feedback)
   isCorrectionMode: boolean;
+  // UI-Helper für globalen Enter-Handler im Korrekturmodus
+  _removeCorrectionEnterHandler?: (() => void);
 }
 
 export type TrainerAction = 

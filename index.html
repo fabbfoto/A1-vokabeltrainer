@@ -92,7 +92,7 @@
                 <button id="audio-word-button" class="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors" title="Wort vorspielen"></button>
             </div>
 
-            <div id="sentence-line-container" class="flex justify-center items-center gap-3 w-full mb-4">
+            <div id="sentence-line-container" class="flex justify-center items-center gap-3 w-full mb-1">
                 <div id="example-sentence-display" class="italic text-gray-600 text-center text-lg"></div>
                 <button id="audio-sentence-button" class="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors" title="Satz vorspielen"></button>
             </div>
@@ -106,13 +106,13 @@
             </div>
             
             <!-- SPELLING MODE (Tailwind-only) -->
-            <div id="spelling-mode-ui" class="ui-mode my-4 space-y-3 flex flex-col justify-center min-h-[150px]">
-                <div id="single-input-container" class="w-full flex">
+            <div id="spelling-mode-ui" class="ui-mode my-1 flex flex-col justify-center min-h-[150px]">
+                <div id="single-input-container" class="w-full flex mb-1">
                     <input type="text" id="spelling-input-single"
                         class="w-full max-w-md border border-gray-300 rounded-lg text-center p-3 text-xl transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none shadow-none"
                         autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Antwort hier eingeben">
                 </div>
-                <div id="noun-input-container" class="hidden flex flex-wrap items-center gap-1 max-w-full w-full mx-auto">
+                <div id="noun-input-container" class="hidden flex flex-wrap items-center gap-1 max-w-full w-full mx-auto mb-1">
                     <input type="text" id="spelling-input-article"
                         class="w-20 sm:w-24 border border-gray-300 rounded-lg text-center p-3 text-xl transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none shadow-none"
                         placeholder="Artikel" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
@@ -123,9 +123,9 @@
                         class="flex-1 min-w-[100px] border border-gray-300 rounded-lg text-center p-3 text-xl transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none shadow-none"
                         placeholder="Plural" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
                 </div>
-                <button id="check-spelling-button" class="w-full font-semibold py-2 px-4 rounded-lg shadow bg-blue-500 text-white transition-colors hover:bg-blue-600 disabled:opacity-60">Auswerten</button>
+                <button id="check-spelling-button" class="w-full font-semibold py-2 px-4 rounded-lg shadow bg-blue-500 text-white transition-colors hover:bg-blue-600 disabled:opacity-60 mb-1">Auswerten</button>
                 <!-- Umlaut-Buttons (Tailwind-only) -->
-                <div id="umlaut-buttons-container" class="mt-4 flex justify-center space-x-2">
+                <div id="umlaut-buttons-container" class="mt-1 flex justify-center space-x-2 mb-1">
                     <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ä</button>
                     <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ö</button>
                     <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ü</button>
@@ -147,12 +147,12 @@
             </div>
 
             <!-- Feedback Container -->
-            <div id="feedback-container" class="my-6 text-center min-h-[3rem] flex flex-col justify-center items-center"></div>
+            <div id="feedback-container" class="my-1 text-center min-h-[3rem] flex flex-col justify-center items-center"></div>
             
             <!-- Bereich für die richtige Lösung (nur für Nomen-Übung) -->
-            <div id="correction-solution" class="hidden text-2xl text-red-600 font-bold text-center mt-4 p-4 bg-red-50 border-2 border-red-200 rounded-lg"></div>
+            <div id="correction-solution" class="hidden text-2xl text-red-600 font-bold text-center mt-1 mb-1"></div>
             
-            <button id="continue-button" class="hidden w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg mt-4 transition-colors">Weiter</button>
+            <button id="continue-button" class="hidden w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg mt-2 transition-colors">Weiter</button>
 
             <!-- Statistiken -->
             <div id="stats-container" class="mt-6 space-y-3">

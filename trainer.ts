@@ -274,7 +274,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     function loadNextTask(): void {
         state.currentWordIndex++;
-        console.log('[DEBUG][loadNextTask] Nach Antwort: currentWordIndex:', state.currentWordIndex, 'shuffledWordsForMode.length:', state.shuffledWordsForMode.length);
+
         if (state.currentWordIndex >= state.shuffledWordsForMode.length) {
             const accuracy = state.attemptedInCurrentRound > 0 ? Math.round((state.correctInCurrentRound / state.attemptedInCurrentRound) * 100) : 0;
             ui.showMessage(dom, `Runde beendet! Genauigkeit: ${accuracy}%`, 'success');
@@ -282,15 +282,22 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             return;
         }
         state.currentWord = state.shuffledWordsForMode[state.currentWordIndex];
-        console.log('[DEBUG][loadNextTask] Neuer currentWord:', state.currentWord);
+
         const modeInfo = state.currentMode ? learningModes[state.currentMode] : null;
         if (modeInfo && typeof modeInfo.setupFunction === 'function') {
             modeInfo.setupFunction();
         } else {
             console.error(`Keine Setup-Funktion für Modus "${state.currentMode}" gefunden`);
         }
-        ui.updatePracticeStats(dom, state, learningModes);
-        console.log('[DEBUG][loadNextTask] currentWordIndex:', state.currentWordIndex, 'shuffledWordsForMode.length:', state.shuffledWordsForMode.length, 'currentWord:', state.currentWord);
+        
+        // Fortschrittsbalken bei jedem Aufgabenwechsel aktualisieren
+        if (state.isTestModeActive) {
+            ui.updateTestStats(dom, state);
+        } else {
+            ui.updatePracticeStats(dom, state, learningModes);
+        }
+        
+
     }
 
     function getTopicKey(main: TopicId|null, sub: SubTopicId|null) {
@@ -298,6 +305,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     function setMode(modeId: ModeId, isRepeat: boolean = false): void {
+        // Test Fortschrittsbalken
+
+        ui.testProgressBars(dom);
+        
         state.currentMode = modeId;
         state.isTestModeActive = false;
         state.isRepeatSessionActive = isRepeat;
@@ -319,6 +330,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         state.currentWordIndex = -1;
         state.correctInCurrentRound = 0;
         state.attemptedInCurrentRound = 0;
+
         document.querySelectorAll('#mode-button-grid .mode-button').forEach(btn => {
             if (!btn.id.includes('repeat')) {
                 btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
@@ -556,4 +568,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             loadNextTask();
         }
     });
+
+
 });

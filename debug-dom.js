@@ -1,0 +1,1 @@
+console.log('DOM Check:'); console.log('accuracy-bar:', document.getElementById('accuracy-bar')); console.log('test-progress-bar:', document.getElementById('test-progress-bar')); console.log('test-accuracy-bar:', document.getElementById('test-accuracy-bar'));

@@ -14,6 +14,7 @@ function getElement<T extends HTMLElement>(id: string): T {
         // Erstelle ein Dummy-Element, um Laufzeitfehler bei der Initialisierung zu vermeiden
         return document.createElement('div') as unknown as T;
     }
+    
     return element as T;
 }
 

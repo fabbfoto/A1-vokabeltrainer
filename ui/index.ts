@@ -20,7 +20,8 @@ export {
     updateErrorCounts,
     updateCategoryStats,
     updatePracticeStats,
-    updateTestStats
+    updateTestStats,
+    testProgressBars
 } from './statistics';
 
 // Test Modal exports

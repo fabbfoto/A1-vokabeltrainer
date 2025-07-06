@@ -1,3 +1,6 @@
+// HINWEIS: Alle Abstände (margin, padding, gap) werden ausschließlich über Tailwind-Klassen im HTML geregelt.
+// Keine programmatischen Styles für Layout/Abstand in diesem File!
+
 // ui-modes.ts - TypeScript Version mit globalen Types
 // Alle Lernmodus-Setup-Funktionen mit vollständiger Type-Safety
 
@@ -76,6 +79,11 @@ export function setupMultipleChoiceMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
+    state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
+    dom.feedbackContainerEl.innerHTML = '';
+    dom.correctionSolutionEl.textContent = '';
+    dom.correctionSolutionEl.classList.add('hidden');
     document.getElementById('umlaut-buttons-container')!.style.display = 'none';
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'block';
@@ -101,19 +109,7 @@ export function setupMultipleChoiceMode(
     // HIER: exampleSentence einmal holen und für die ganze Funktion verwenden
     const exampleSentence = getExampleSentence(currentWord);
     
-    // DEBUG: Zeige aktuelles Wort und seine Eigenschaften
-    console.log('[DEBUG][setupMultipleChoiceMode] Aktuelles Wort:', {
-        german: currentWord.german,
-        english: currentWord.english,
-        id: currentWord.id,
-        hasExampleGerman: 'exampleGerman' in currentWord,
-        hasExampleDe: 'example_de' in currentWord,
-        exampleGerman: (currentWord as any).exampleGerman,
-        example_de: (currentWord as any).example_de
-    });
-    
-    // DEBUG-Ausgabe für exampleSentence
-    console.log('[DEBUG][setupMultipleChoiceMode] exampleSentence:', exampleSentence);
+
     
     // Genus und Plural anzeigen
     let displayGermanWord = currentWord.german || "";
@@ -126,11 +122,10 @@ export function setupMultipleChoiceMode(
         // Beispielsatz anzeigen (mit Tailwind-Farben, Times New Roman, größer, SCHRIFTFARBE)
         if (Array.isArray(exampleSentence)) {
             const joined = exampleSentence.map(part => part.text).join('');
-            console.log('[DEBUG][setupMultipleChoiceMode] exampleSentence (joined):', joined);
             if (joined.trim() !== '') {
                 dom.exampleSentenceDisplayEl.innerHTML = exampleSentence.map(part => {
                     try {
-                        console.log('[DEBUG][Kasus]', part.text, '→', part.case || part.kasus);
+
                         return `<span class="${getTailwindCaseClass(part.case || part.kasus)}" style="font-family: 'Times New Roman', Times, serif; font-size: 2.5rem; line-height: 1.5;">${part.text}</span>`;
                     } catch (e) {
                         console.error('[FEHLER][Kasus-Färbung]', part, e);
@@ -185,15 +180,11 @@ export function setupMultipleChoiceMode(
     dom.wordLineContainerEl.style.flexDirection = 'row';
     dom.wordLineContainerEl.style.alignItems = 'center';
     dom.wordLineContainerEl.style.justifyContent = 'center';
-    dom.wordLineContainerEl.style.gap = '16px';
-    dom.wordLineContainerEl.style.marginBottom = '8px';
 
     dom.sentenceLineContainerEl.style.display = 'flex';
     dom.sentenceLineContainerEl.style.flexDirection = 'row';
     dom.sentenceLineContainerEl.style.alignItems = 'center';
     dom.sentenceLineContainerEl.style.justifyContent = 'center';
-    dom.sentenceLineContainerEl.style.gap = '16px';
-    dom.sentenceLineContainerEl.style.marginBottom = '16px';
 
     // Multiple Choice Antworten generieren
     generateMultipleChoiceAnswers(dom, state, processAnswer);
@@ -254,6 +245,15 @@ export function setupSpellingMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    if (dom.spellingInputSingleEl) dom.spellingInputSingleEl.disabled = false;
+    if (dom.spellingInputArticleEl) dom.spellingInputArticleEl.disabled = false;
+    if (dom.spellingInputNoun1El) dom.spellingInputNoun1El.disabled = false;
+    if (dom.spellingInputNoun2El) dom.spellingInputNoun2El.disabled = false;
+    if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
+    state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
+    dom.feedbackContainerEl.innerHTML = '';
+    dom.correctionSolutionEl.textContent = '';
+    dom.correctionSolutionEl.classList.add('hidden');
     document.getElementById('umlaut-buttons-container')!.style.display = 'flex';
     setTimeout(() => {
         if (typeof (window as any).initUmlautButtons === 'function') {
@@ -350,7 +350,6 @@ export function setupSpellingMode(
         
         // Button Click Handler mit didaktischem Feedback
         const handleCheckButtonClick = () => {
-            console.log('[DEBUG] Check button clicked');
             const correctArticle = (currentWord as any).article || '';
             const correctSingular = currentWord.german;
             const correctPlural = (currentWord as any).plural!;
@@ -359,25 +358,33 @@ export function setupSpellingMode(
             const userInputSingular = dom.spellingInputNoun1El.value.trim();
             const userInputPlural = dom.spellingInputNoun2El.value.trim();
             
-            console.log('[DEBUG] User inputs:', { userInputArticle, userInputSingular, userInputPlural });
-            console.log('[DEBUG] Correct answers:', { correctArticle, correctSingular, correctPlural });
+
             
             // Separate Prüfung für jedes Feld
             const isArticleCorrect = vergleicheAntwort(userInputArticle, correctArticle);
             const isSingularCorrect = vergleicheAntwort(userInputSingular, correctSingular);
             const isPluralCorrect = vergleicheAntwort(userInputPlural, correctPlural);
             
-            console.log('[DEBUG] Results:', { isArticleCorrect, isSingularCorrect, isPluralCorrect });
+
             
             // DIDAKTISCHES FEEDBACK: Jedes Feld bekommt sofort grün/rot (Tailwind)
-            dom.spellingInputArticleEl.classList.remove('border-gray-300');
-            dom.spellingInputArticleEl.classList.add(isArticleCorrect ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50');
+            if (isArticleCorrect) {
+                dom.spellingInputArticleEl.classList.add('border-green-400', 'bg-green-50');
+            } else {
+                dom.spellingInputArticleEl.classList.add('border-red-400', 'bg-red-50');
+            }
             
-            dom.spellingInputNoun1El.classList.remove('border-gray-300');
-            dom.spellingInputNoun1El.classList.add(isSingularCorrect ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50');
+            if (isSingularCorrect) {
+                dom.spellingInputNoun1El.classList.add('border-green-400', 'bg-green-50');
+            } else {
+                dom.spellingInputNoun1El.classList.add('border-red-400', 'bg-red-50');
+            }
             
-            dom.spellingInputNoun2El.classList.remove('border-gray-300');
-            dom.spellingInputNoun2El.classList.add(isPluralCorrect ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50');
+            if (isPluralCorrect) {
+                dom.spellingInputNoun2El.classList.add('border-green-400', 'bg-green-50');
+            } else {
+                dom.spellingInputNoun2El.classList.add('border-red-400', 'bg-red-50');
+            }
             
             // Felder sperren
             dom.spellingInputArticleEl.disabled = true;
@@ -386,22 +393,34 @@ export function setupSpellingMode(
             
             // Richtige Lösung anzeigen (groß und rot)
             const correctAnswerText = `${correctArticle} ${correctSingular} / ${correctPlural}`;
-            dom.correctionSolutionEl.textContent = correctAnswerText;
-            dom.correctionSolutionEl.classList.remove('hidden');
+            if (isArticleCorrect && isSingularCorrect && isPluralCorrect) {
+                // RICHTIGE ANTWORT: Keine Korrekturlösung, kein Weiter-Button, direkt nächste Aufgabe
+                dom.correctionSolutionEl.classList.add('hidden');
+                dom.correctionSolutionEl.textContent = '';
+                dom.continueButton.classList.add('hidden');
+                
+                // Kurze Verzögerung für grünes Feedback, dann nächste Aufgabe
+                setTimeout(() => {
+                    processAnswer(true, correctAnswerText);
+                }, 1200);
+            } else {
+                // FALSCHE ANTWORT: Korrekturlösung UND Weiter-Button anzeigen
+                dom.correctionSolutionEl.textContent = correctAnswerText;
+                dom.correctionSolutionEl.classList.remove('hidden');
+                dom.continueButton.classList.remove('hidden');
+            }
             
-            // Auswerten-Button deaktivieren, Weiter-Button anzeigen
+            // Auswerten-Button deaktivieren
             dom.checkSpellingButton.disabled = true;
-            dom.continueButton.classList.remove('hidden');
             
-            // Korrekturmodus aktivieren
-            state.isCorrectionMode = true;
+            // Korrekturmodus aktivieren (nur bei falscher Antwort relevant)
+            state.isCorrectionMode = !(isArticleCorrect && isSingularCorrect && isPluralCorrect);
             
             // Nur wenn alle drei Felder korrekt sind, ist die Antwort vollständig richtig
             const isFullyCorrect = isArticleCorrect && isSingularCorrect && isPluralCorrect;
             
-            // Weiter-Button Handler
+            // Weiter-Button Handler (nur bei falscher Antwort relevant)
             const handleContinueButtonClick = () => {
-                console.log('[DEBUG] Continue button clicked');
                 // Korrekturmodus beenden
                 state.isCorrectionMode = false;
                 
@@ -420,10 +439,15 @@ export function setupSpellingMode(
                 
                 // Nächstes Wort laden
                 processAnswer(isFullyCorrect, correctAnswerText);
+                dom.feedbackContainerEl.innerHTML = '';
+                dom.correctionSolutionEl.textContent = '';
+                dom.correctionSolutionEl.classList.add('hidden');
             };
             
-            // Event-Handler für Weiter-Button setzen
-            dom.continueButton.onclick = handleContinueButtonClick;
+            // Event-Handler für Weiter-Button setzen (nur bei falscher Antwort)
+            if (!isFullyCorrect) {
+                dom.continueButton.onclick = handleContinueButtonClick;
+            }
         };
         
         // Event-Handler für Auswerten-Button setzen
@@ -455,34 +479,48 @@ export function setupSpellingMode(
         
         // Button Click Handler mit didaktischem Feedback
         const handleSingleCheckButtonClick = () => {
-            console.log('[DEBUG] Single check button clicked');
             const userInput = dom.spellingInputSingleEl.value.trim();
             const correctAnswer = currentWord.german;
             const isCorrect = vergleicheAntwort(userInput, correctAnswer);
             
-            console.log('[DEBUG] Single input:', { userInput, correctAnswer, isCorrect });
+
             
             // DIDAKTISCHES FEEDBACK: Feld bekommt sofort grün/rot (Tailwind)
-            dom.spellingInputSingleEl.classList.remove('border-gray-300');
-            dom.spellingInputSingleEl.classList.add(isCorrect ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50');
+            if (isCorrect) {
+                dom.spellingInputSingleEl.classList.add('border-green-400', 'bg-green-50');
+            } else {
+                dom.spellingInputSingleEl.classList.add('border-red-400', 'bg-red-50');
+            }
             
             // Feld sperren
             dom.spellingInputSingleEl.disabled = true;
             
             // Richtige Lösung anzeigen (groß und rot)
-            dom.correctionSolutionEl.textContent = correctAnswer;
-            dom.correctionSolutionEl.classList.remove('hidden');
+            if (isCorrect) {
+                // RICHTIGE ANTWORT: Keine Korrekturlösung, kein Weiter-Button, direkt nächste Aufgabe
+                dom.correctionSolutionEl.classList.add('hidden');
+                dom.correctionSolutionEl.textContent = '';
+                dom.continueButton.classList.add('hidden');
+                
+                // Kurze Verzögerung für grünes Feedback, dann nächste Aufgabe
+                setTimeout(() => {
+                    processAnswer(true, correctAnswer);
+                }, 1200);
+            } else {
+                // FALSCHE ANTWORT: Korrekturlösung UND Weiter-Button anzeigen
+                dom.correctionSolutionEl.textContent = correctAnswer;
+                dom.correctionSolutionEl.classList.remove('hidden');
+                dom.continueButton.classList.remove('hidden');
+            }
             
-            // Auswerten-Button deaktivieren, Weiter-Button anzeigen
+            // Auswerten-Button deaktivieren
             dom.checkSpellingButton.disabled = true;
-            dom.continueButton.classList.remove('hidden');
             
-            // Korrekturmodus aktivieren
-            state.isCorrectionMode = true;
+            // Korrekturmodus aktivieren (nur bei falscher Antwort relevant)
+            state.isCorrectionMode = !isCorrect;
             
-            // Weiter-Button Handler
+            // Weiter-Button Handler (nur bei falscher Antwort relevant)
             const handleSingleContinueButtonClick = () => {
-                console.log('[DEBUG] Single continue button clicked');
                 // Korrekturmodus beenden
                 state.isCorrectionMode = false;
                 
@@ -499,10 +537,15 @@ export function setupSpellingMode(
                 
                 // Nächstes Wort laden
                 processAnswer(isCorrect, correctAnswer);
+                dom.feedbackContainerEl.innerHTML = '';
+                dom.correctionSolutionEl.textContent = '';
+                dom.correctionSolutionEl.classList.add('hidden');
             };
             
-            // Event-Handler für Weiter-Button setzen
-            dom.continueButton.onclick = handleSingleContinueButtonClick;
+            // Event-Handler für Weiter-Button setzen (nur bei falscher Antwort)
+            if (!isCorrect) {
+                dom.continueButton.onclick = handleSingleContinueButtonClick;
+            }
         };
         
         // Event-Handler für Auswerten-Button setzen
@@ -518,6 +561,11 @@ export function setupClozeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
+    state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
+    dom.feedbackContainerEl.innerHTML = '';
+    dom.correctionSolutionEl.textContent = '';
+    dom.correctionSolutionEl.classList.add('hidden');
     document.getElementById('umlaut-buttons-container')!.style.display = 'flex';
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'none';
@@ -611,6 +659,11 @@ export function setupSentenceTranslationEnDeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
+    state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
+    dom.feedbackContainerEl.innerHTML = '';
+    dom.correctionSolutionEl.textContent = '';
+    dom.correctionSolutionEl.classList.add('hidden');
     document.getElementById('umlaut-buttons-container')!.style.display = 'flex';
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'none';
@@ -710,4 +763,16 @@ function generateSentenceInputs(
         const firstInput = dom.sentenceWordInputContainerEl.querySelector('input[type="text"]') as HTMLInputElement;
         if (firstInput) { firstInput.focus(); state.activeTextInput = firstInput; }
     }, 0);
+}
+
+function addCorrectionEnterHandler(dom: DOMElements, state: TrainerState) {
+    function handler(e: KeyboardEvent) {
+        if (state.isCorrectionMode && e.key === 'Enter') {
+            e.preventDefault();
+            dom.continueButton?.click();
+        }
+    }
+    document.addEventListener('keydown', handler);
+    // Rückgabefunktion zum Entfernen
+    return () => document.removeEventListener('keydown', handler);
 }

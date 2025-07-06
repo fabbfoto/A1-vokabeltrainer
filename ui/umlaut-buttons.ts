@@ -119,7 +119,7 @@ export function initUmlautSupport(
 export function createUmlautButtonsUI(): HTMLElement {
     const container = document.createElement('div');
     container.id = 'umlaut-buttons-container';
-    container.className = 'mt-4 flex justify-center space-x-2';
+    container.className = 'mt-1 flex justify-center space-x-2';
     container.style.display = 'none';
     
     const umlauts = ['ä', 'ö', 'ü', 'ß'];

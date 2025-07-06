@@ -86,22 +86,27 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
  * Aktualisiert die Haupt-Statistiken in der Übungsrunde.
  */
 export function updatePracticeStats(dom: DOMElements, state: TrainerState, learningModes: LearningModes): void {
-    dom.correctInRoundPracticeEl.textContent = state.correctInCurrentRound.toString();
-    dom.attemptedInRoundPracticeEl.textContent = state.attemptedInCurrentRound.toString();
+    if (dom.correctInRoundPracticeEl) {
+        dom.correctInRoundPracticeEl.textContent = state.correctInCurrentRound.toString();
+    }
+    if (dom.attemptedInRoundPracticeEl) {
+        dom.attemptedInRoundPracticeEl.textContent = state.attemptedInCurrentRound.toString();
+    }
     
     const accuracy = state.attemptedInCurrentRound > 0 
         ? (state.correctInCurrentRound / state.attemptedInCurrentRound) * 100 
         : 0;
     
-    dom.accuracyInRoundPracticeEl.textContent = `${accuracy.toFixed(0)}%`;
-    
-    // Farbkodierung für Genauigkeit
-    if (accuracy >= 80) {
-        dom.accuracyInRoundPracticeEl.className = 'text-green-600 font-semibold';
-    } else if (accuracy >= 60) {
-        dom.accuracyInRoundPracticeEl.className = 'text-yellow-600 font-semibold';
-    } else {
-        dom.accuracyInRoundPracticeEl.className = 'text-red-600 font-semibold';
+    if (dom.accuracyInRoundPracticeEl) {
+        dom.accuracyInRoundPracticeEl.style.width = `${accuracy}%`;
+        dom.accuracyInRoundPracticeEl.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+        if (accuracy >= 80) {
+            dom.accuracyInRoundPracticeEl.classList.add('bg-green-500');
+        } else if (accuracy >= 60) {
+            dom.accuracyInRoundPracticeEl.classList.add('bg-yellow-500');
+        } else {
+            dom.accuracyInRoundPracticeEl.classList.add('bg-red-500');
+        }
     }
     
     updateCategoryStats(dom, state, learningModes);
@@ -119,7 +124,7 @@ export function updateTestStats(dom: DOMElements, state: TrainerState): void {
 
     // Fortschrittsbalken
     dom.testProgressEl.style.width = `${progress}%`;
-    dom.testProgressEl.classList.remove('color-black-sr', 'color-red-sr', 'color-gold-sr');
+    dom.testProgressEl.classList.remove('bg-de-black', 'bg-de-red', 'bg-de-gold');
     const colorClass = getProgressColorClass(attempted, total);
     dom.testProgressEl.classList.add(colorClass);
 
@@ -134,9 +139,8 @@ export function updateTestStats(dom: DOMElements, state: TrainerState): void {
         dom.testAccuracyEl.classList.add('bg-red-500');
     }
 
-    // Text-Updates
-    dom.correctInRoundTestEl.textContent = correct.toString();
-    dom.attemptedInRoundTestEl.textContent = `${attempted} / ${total}`;
+    // Text-Updates (beide Elemente zeigen auf test-progress-text)
+    dom.correctInRoundTestEl.textContent = `${attempted} / ${total}`;
     dom.accuracyInRoundTestEl.textContent = `${accuracy.toFixed(0)}%`;
     
     // Farbkodierung für Genauigkeit
@@ -146,5 +150,41 @@ export function updateTestStats(dom: DOMElements, state: TrainerState): void {
         dom.accuracyInRoundTestEl.className = 'text-yellow-600 font-bold';
     } else {
         dom.accuracyInRoundTestEl.className = 'text-red-600 font-bold';
+    }
+}
+
+/**
+ * Test-Funktion für Fortschrittsbalken
+ */
+export function testProgressBars(dom: DOMElements): void {
+    console.log('[TEST] Testing progress bars...');
+    
+    // Test Practice Stats
+    if (dom.accuracyInRoundPracticeEl) {
+        console.log('[TEST] Setting practice accuracy bar to 50%');
+        dom.accuracyInRoundPracticeEl.style.width = '50%';
+        dom.accuracyInRoundPracticeEl.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+        dom.accuracyInRoundPracticeEl.classList.add('bg-yellow-500');
+    } else {
+        console.error('[TEST] accuracyInRoundPracticeEl not found!');
+    }
+    
+    // Test Test Stats
+    if (dom.testProgressEl) {
+        console.log('[TEST] Setting test progress bar to 75%');
+        dom.testProgressEl.style.width = '75%';
+        dom.testProgressEl.classList.remove('bg-de-black', 'bg-de-red', 'bg-de-gold');
+        dom.testProgressEl.classList.add('bg-de-gold');
+    } else {
+        console.error('[TEST] testProgressEl not found!');
+    }
+    
+    if (dom.testAccuracyEl) {
+        console.log('[TEST] Setting test accuracy bar to 90%');
+        dom.testAccuracyEl.style.width = '90%';
+        dom.testAccuracyEl.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
+        dom.testAccuracyEl.classList.add('bg-green-500');
+    } else {
+        console.error('[TEST] testAccuracyEl not found!');
     }
 }
