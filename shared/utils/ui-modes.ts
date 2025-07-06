@@ -41,12 +41,12 @@ function getExampleSentence(currentWord: any): any {
 // Neue Hilfsfunktion: Tailwind-Klasse für Kasus als Schriftfarbe
 function getTailwindCaseClass(kasus: string): string {
   switch (kasus) {
-    case 'nominativ': return 'text-green-700 font-bold';
-    case 'genitiv':   return 'text-yellow-600 font-bold';
-    case 'dativ':     return 'text-blue-700 font-bold';
-    case 'akkusativ': return 'text-red-700 font-bold';
-    case 'verb':      return 'text-purple-700 italic';
-    default:          return 'text-gray-900';
+    case 'nominativ': return 'text-green-700 font-semibold';
+    case 'genitiv':   return 'text-yellow-600 font-semibold';
+    case 'dativ':     return 'text-red-700 font-semibold';
+    case 'akkusativ': return 'text-blue-700 font-semibold';
+    case 'verb':      return 'text-fuchsia-500 italic font-semibold';
+    default:          return 'text-gray-500';
   }
 }
 
