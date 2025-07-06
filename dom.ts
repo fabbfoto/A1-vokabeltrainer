@@ -74,6 +74,7 @@ export const dom: DOMElements = {
     
     // Feedback & Continue
     feedbackContainerEl: getElement<HTMLElement>('feedback-container'),
+    correctionSolutionEl: getElement<HTMLElement>('correction-solution'),
     continueButton: getElement<HTMLButtonElement>('continue-button'),
     messageBoxEl: getElement<HTMLElement>('message-box'),
     
@@ -96,7 +97,7 @@ export const dom: DOMElements = {
     testSelectionModalEl: getElement<HTMLElement>('test-selection-modal'),
     
     // Umlaut Buttons
-    umlautButtonsContainerEl: getElement<HTMLElement>('umlaut-buttons-container'),
+    umlautButtonsContainer: getElement<HTMLElement>('umlaut-buttons-container'),
     
     // SVG Icons
     SVG_SPEAKER_ICON: SVG_SPEAKER_ICON

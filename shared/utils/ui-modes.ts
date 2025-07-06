@@ -15,6 +15,9 @@ import type { DOMElements } from '../types/ui';
 import { vergleicheAntwort, shuffleArray, speak, parseNounString } from './helfer';
 import { registerInputForUmlauts } from '../../ui/umlaut-buttons';
 
+// Importiere loadNextTask aus trainer.ts oben einfügen:
+// import { loadNextTask } from '../../trainer';
+
 // ✅ KORREKTE PROCESS-ANSWER-FUNCTION TYPE
 type ProcessAnswerFunction = (isCorrect: boolean, correctAnswer?: string, timeSpent?: number) => void;
 
@@ -257,6 +260,7 @@ export function setupSpellingMode(
             (window as any).initUmlautButtons();
         }
     }, 100);
+    
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'none';
     dom.spellingModeUiEl.style.display = 'block';
@@ -265,7 +269,13 @@ export function setupSpellingMode(
     
     console.log('[setupSpellingMode] Starting - globale Types');
     
+    // Korrekturmodus zurücksetzen
+    state.isCorrectionMode = false;
+    
+    // UI zurücksetzen
     dom.checkSpellingButton.disabled = false;
+    dom.continueButton.classList.add('hidden');
+    dom.correctionSolutionEl.classList.add('hidden');
     
     const umlautContainer = dom.umlautButtonsContainer;
     if (umlautContainer) umlautContainer.style.display = 'flex';
@@ -293,9 +303,12 @@ export function setupSpellingMode(
     dom.wordLineContainerEl.style.display = 'flex';  // Zeigt das englische Wort
     dom.sentenceLineContainerEl.style.display = englishExample ? 'flex' : 'none'; // Zeigt den englischen Satz wenn vorhanden
     
-    // Reset styles
+    // Reset styles (Tailwind-Klassen)
     [dom.spellingInputSingleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El].forEach(input => {
-        if(input) input.classList.remove('correct-user-input', 'incorrect-user-input');
+        if(input) {
+            input.classList.remove('border-green-400', 'bg-green-50', 'border-red-400', 'bg-red-50');
+            input.classList.add('border-gray-300');
+        }
     });
     
     // Check if noun with plural
@@ -325,8 +338,19 @@ export function setupSpellingMode(
             state.activeTextInput = dom.spellingInputNoun2El;
         });
         
-        // Button Click Handler mit separater Artikelprüfung
-        dom.checkSpellingButton.onclick = () => {
+        // Enter-Key Handler NUR für das Pluralfeld
+        const handlePluralEnterKey = (event: KeyboardEvent) => {
+            if (event.key === 'Enter' && !state.isCorrectionMode) {
+                event.preventDefault();
+                handleCheckButtonClick();
+            }
+        };
+        dom.spellingInputNoun2El.addEventListener('keydown', handlePluralEnterKey);
+        // Entferne die Enter-Key-Handler von Artikel- und Singularfeld (lassen Standardverhalten zu)
+        
+        // Button Click Handler mit didaktischem Feedback
+        const handleCheckButtonClick = () => {
+            console.log('[DEBUG] Check button clicked');
             const correctArticle = (currentWord as any).article || '';
             const correctSingular = currentWord.german;
             const correctPlural = (currentWord as any).plural!;
@@ -335,22 +359,80 @@ export function setupSpellingMode(
             const userInputSingular = dom.spellingInputNoun1El.value.trim();
             const userInputPlural = dom.spellingInputNoun2El.value.trim();
             
+            console.log('[DEBUG] User inputs:', { userInputArticle, userInputSingular, userInputPlural });
+            console.log('[DEBUG] Correct answers:', { correctArticle, correctSingular, correctPlural });
+            
             // Separate Prüfung für jedes Feld
             const isArticleCorrect = vergleicheAntwort(userInputArticle, correctArticle);
             const isSingularCorrect = vergleicheAntwort(userInputSingular, correctSingular);
             const isPluralCorrect = vergleicheAntwort(userInputPlural, correctPlural);
             
-            // Visuelles Feedback für jedes Feld
-            dom.spellingInputArticleEl.classList.add(isArticleCorrect ? 'correct-user-input' : 'incorrect-user-input');
-            dom.spellingInputNoun1El.classList.add(isSingularCorrect ? 'correct-user-input' : 'incorrect-user-input');
-            dom.spellingInputNoun2El.classList.add(isPluralCorrect ? 'correct-user-input' : 'incorrect-user-input');
+            console.log('[DEBUG] Results:', { isArticleCorrect, isSingularCorrect, isPluralCorrect });
+            
+            // DIDAKTISCHES FEEDBACK: Jedes Feld bekommt sofort grün/rot (Tailwind)
+            dom.spellingInputArticleEl.classList.remove('border-gray-300');
+            dom.spellingInputArticleEl.classList.add(isArticleCorrect ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50');
+            
+            dom.spellingInputNoun1El.classList.remove('border-gray-300');
+            dom.spellingInputNoun1El.classList.add(isSingularCorrect ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50');
+            
+            dom.spellingInputNoun2El.classList.remove('border-gray-300');
+            dom.spellingInputNoun2El.classList.add(isPluralCorrect ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50');
+            
+            // Felder sperren
+            dom.spellingInputArticleEl.disabled = true;
+            dom.spellingInputNoun1El.disabled = true;
+            dom.spellingInputNoun2El.disabled = true;
+            
+            // Richtige Lösung anzeigen (groß und rot)
+            const correctAnswerText = `${correctArticle} ${correctSingular} / ${correctPlural}`;
+            dom.correctionSolutionEl.textContent = correctAnswerText;
+            dom.correctionSolutionEl.classList.remove('hidden');
+            
+            // Auswerten-Button deaktivieren, Weiter-Button anzeigen
+            dom.checkSpellingButton.disabled = true;
+            dom.continueButton.classList.remove('hidden');
+            
+            // Korrekturmodus aktivieren
+            state.isCorrectionMode = true;
             
             // Nur wenn alle drei Felder korrekt sind, ist die Antwort vollständig richtig
             const isFullyCorrect = isArticleCorrect && isSingularCorrect && isPluralCorrect;
-            const correctAnswer = `${correctArticle} ${correctSingular} / ${correctPlural}`;
             
-            processAnswer(isFullyCorrect, correctAnswer);
+            // Weiter-Button Handler
+            const handleContinueButtonClick = () => {
+                console.log('[DEBUG] Continue button clicked');
+                // Korrekturmodus beenden
+                state.isCorrectionMode = false;
+                
+                // UI zurücksetzen
+                dom.correctionSolutionEl.classList.add('hidden');
+                dom.continueButton.classList.add('hidden');
+                dom.checkSpellingButton.disabled = false;
+                
+                // Felder entsperren und zurücksetzen
+                [dom.spellingInputArticleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El].forEach(input => {
+                    input.disabled = false;
+                    input.value = '';
+                    input.classList.remove('border-green-400', 'bg-green-50', 'border-red-400', 'bg-red-50');
+                    input.classList.add('border-gray-300');
+                });
+                
+                // Nächstes Wort laden
+                processAnswer(isFullyCorrect, correctAnswerText);
+
+                // Nach processAnswer(...), rufe explizit window.loadNextTask() auf, falls vorhanden.
+                if (typeof (window as any).loadNextTask === 'function') {
+                    (window as any).loadNextTask();
+                }
+            };
+            
+            // Event-Handler für Weiter-Button setzen
+            dom.continueButton.onclick = handleContinueButtonClick;
         };
+        
+        // Event-Handler für Auswerten-Button setzen
+        dom.checkSpellingButton.onclick = handleCheckButtonClick;
         // Automatisch Artikel-Feld fokussieren
         setTimeout(() => { dom.spellingInputArticleEl.focus(); state.activeTextInput = dom.spellingInputArticleEl; }, 0);
     } else {
@@ -366,15 +448,75 @@ export function setupSpellingMode(
             state.activeTextInput = dom.spellingInputSingleEl;
         });
         
-        // Button Click Handler
-        dom.checkSpellingButton.onclick = () => {
+        // Enter-Key Handler für Single-Input
+        const handleSingleEnterKey = (event: KeyboardEvent) => {
+            if (event.key === 'Enter' && !state.isCorrectionMode) {
+                event.preventDefault();
+                handleSingleCheckButtonClick();
+            }
+        };
+        
+        dom.spellingInputSingleEl.addEventListener('keydown', handleSingleEnterKey);
+        
+        // Button Click Handler mit didaktischem Feedback
+        const handleSingleCheckButtonClick = () => {
+            console.log('[DEBUG] Single check button clicked');
             const userInput = dom.spellingInputSingleEl.value.trim();
             const correctAnswer = currentWord.german;
             const isCorrect = vergleicheAntwort(userInput, correctAnswer);
             
-            dom.spellingInputSingleEl.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
-            processAnswer(isCorrect, correctAnswer);
+            console.log('[DEBUG] Single input:', { userInput, correctAnswer, isCorrect });
+            
+            // DIDAKTISCHES FEEDBACK: Feld bekommt sofort grün/rot (Tailwind)
+            dom.spellingInputSingleEl.classList.remove('border-gray-300');
+            dom.spellingInputSingleEl.classList.add(isCorrect ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50');
+            
+            // Feld sperren
+            dom.spellingInputSingleEl.disabled = true;
+            
+            // Richtige Lösung anzeigen (groß und rot)
+            dom.correctionSolutionEl.textContent = correctAnswer;
+            dom.correctionSolutionEl.classList.remove('hidden');
+            
+            // Auswerten-Button deaktivieren, Weiter-Button anzeigen
+            dom.checkSpellingButton.disabled = true;
+            dom.continueButton.classList.remove('hidden');
+            
+            // Korrekturmodus aktivieren
+            state.isCorrectionMode = true;
+            
+            // Weiter-Button Handler
+            const handleSingleContinueButtonClick = () => {
+                console.log('[DEBUG] Single continue button clicked');
+                // Korrekturmodus beenden
+                state.isCorrectionMode = false;
+                
+                // UI zurücksetzen
+                dom.correctionSolutionEl.classList.add('hidden');
+                dom.continueButton.classList.add('hidden');
+                dom.checkSpellingButton.disabled = false;
+                
+                // Feld entsperren und zurücksetzen
+                dom.spellingInputSingleEl.disabled = false;
+                dom.spellingInputSingleEl.value = '';
+                dom.spellingInputSingleEl.classList.remove('border-green-400', 'bg-green-50', 'border-red-400', 'bg-red-50');
+                dom.spellingInputSingleEl.classList.add('border-gray-300');
+                
+                // Nächstes Wort laden
+                processAnswer(isCorrect, correctAnswer);
+
+                // Nach processAnswer(...), rufe explizit window.loadNextTask() auf, falls vorhanden.
+                if (typeof (window as any).loadNextTask === 'function') {
+                    (window as any).loadNextTask();
+                }
+            };
+            
+            // Event-Handler für Weiter-Button setzen
+            dom.continueButton.onclick = handleSingleContinueButtonClick;
         };
+        
+        // Event-Handler für Auswerten-Button setzen
+        dom.checkSpellingButton.onclick = handleSingleCheckButtonClick;
         // Automatisch erstes Feld fokussieren
         setTimeout(() => { dom.spellingInputSingleEl.focus(); state.activeTextInput = dom.spellingInputSingleEl; }, 0);
     }

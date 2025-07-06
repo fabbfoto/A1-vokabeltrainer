@@ -55,6 +55,7 @@ export interface DOMElements {
     
     // Feedback & Continue
     feedbackContainerEl: HTMLElement;
+    correctionSolutionEl: HTMLElement;
     continueButton: HTMLButtonElement;
     messageBoxEl: HTMLElement;
     

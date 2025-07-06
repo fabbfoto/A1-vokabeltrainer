@@ -251,6 +251,9 @@ export interface TrainerState {
   isLoading: boolean;
   currentError: string | null;
   lastUsedModeByTopic?: { [key: string]: ModeId };
+  
+  // Correction Mode State (für didaktisches Feedback)
+  isCorrectionMode: boolean;
 }
 
 export type TrainerAction = 

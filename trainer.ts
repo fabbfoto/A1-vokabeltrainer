@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         isLoading: false,
         currentError: null,
         lastUsedModeByTopic: {},
+        isCorrectionMode: false,
     };
 
     function loadProgress(): void {
@@ -539,4 +540,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     console.log('🎉 Trainer erfolgreich initialisiert!');
     console.log('📊 Verfügbare Themen:', Object.keys(vokabular));
     console.log('🎮 Verfügbare Modi:', Object.keys(learningModes));
+
+    // Am Ende von document.addEventListener('DOMContentLoaded', ...)
+    (window as any).loadNextTask = loadNextTask;
 });
