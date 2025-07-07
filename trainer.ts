@@ -469,9 +469,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                             `Perfekt! (${runText})`, 
                             'Übung wiederholen',
                             () => {
-                                console.log('Button-Click-Handler 1 (processAnswer) ausgeführt');
-                                state.perfectRunsByMode[state.currentMode] = runCount;
-                                savePerfectRuns();
+                                const progressKey = getTopicKey(state.currentMainTopic, state.currentSubTopic);
+                                if (progressKey && state.globalProgress[progressKey]) {
+                                    state.globalProgress[progressKey][state.currentMode] = new Set();
+                                    saveProgress();
+                                }
                                 setMode(state.currentMode, false);
                             }
                         );
@@ -549,9 +551,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                                 `Perfekt! (${runText})`, 
                                 'Übung wiederholen',
                                 () => {
-                                    console.log('Button-Click-Handler 2 (loadNextTask repeat) ausgeführt');
-                                    state.perfectRunsByMode[state.currentMode] = runCount;
-                                    savePerfectRuns();
+                                    const progressKey = getTopicKey(state.currentMainTopic, state.currentSubTopic);
+                                    if (progressKey && state.globalProgress[progressKey]) {
+                                        state.globalProgress[progressKey][state.currentMode] = new Set();
+                                        saveProgress();
+                                    }
                                     setMode(state.currentMode, false);
                                 }
                             );
@@ -604,9 +608,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                             `Perfekt! (${runText})`, 
                             'Übung wiederholen',
                             () => {
-                                console.log('Button-Click-Handler 3 (loadNextTask normal) ausgeführt');
-                                state.perfectRunsByMode[state.currentMode] = runCount;
-                                savePerfectRuns();
+                                const progressKey = getTopicKey(state.currentMainTopic, state.currentSubTopic);
+                                if (progressKey && state.globalProgress[progressKey]) {
+                                    state.globalProgress[progressKey][state.currentMode] = new Set();
+                                    saveProgress();
+                                }
                                 setMode(state.currentMode, false);
                             }
                         );
