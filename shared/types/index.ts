@@ -166,6 +166,18 @@ export interface SessionStats {
 
 export type TestType = 'subTopic' | 'mainTopic' | 'global' | 'custom';
 
+// Neue Test-Varianten
+export type TestVariant = 'chaos' | 'structured';
+export type TestCategory = 'bedeutung' | 'schreibweise' | 'luecke' | 'satz';
+
+// Mapping zwischen Kategorien und Modi
+export const CATEGORY_MODE_MAP: Record<TestCategory, ModeId> = {
+  'bedeutung': 'mc-de-en' as ModeId,
+  'schreibweise': 'type-de-adj' as ModeId,
+  'luecke': 'cloze-adj-de' as ModeId,
+  'satz': 'sentence-translation-en-de' as ModeId
+};
+
 export interface TestConfiguration {
   id: TestId;
   type: TestType;
@@ -178,6 +190,9 @@ export interface TestConfiguration {
   mode: ModeId; // The single mode selected for this specific test run
   minAccuracy: number;
   maxAttempts: number;
+  variant: TestVariant;
+  selectedCategory?: TestCategory;
+  taskDistribution?: Record<ModeId, number>;
 }
 
 export interface TestScore {
@@ -236,6 +251,8 @@ export interface TrainerState {
   isRepeatSessionActive: boolean;
   currentTest: TestConfiguration | null;
   testResults: TestResult[];
+  testModeRotation: ModeId[];
+  currentTestModeIndex: number;
   
   // Progress State
   correctInCurrentRound: number;

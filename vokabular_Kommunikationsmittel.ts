@@ -12,21 +12,21 @@ export const vokabularKommunikationsmittel: VocabularyStructure = createVocabula
             {
                 id: createWordId("kommunikation-schriftlich-001"),
                 wordType: "noun",
-                german: "Mail",
+                german: "E-Mail",
                 article: "die",
-                plural: "Mails",
+                plural: "E-Mails",
                 english: "email",
                 exampleGerman: [
                     { text: "Danke", case: "none" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
                     { text: "für", case: "none" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
-                    { text: "deine Mail", case: "akkusativ" } as CaseElement,
+                    { text: "deine E-Mail", case: "akkusativ" } as CaseElement,
                     { text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "Thank you for your email.",
                 clozeParts: ["Danke für deine ", "."],
-                clozeAnswers: ["Mail"]
+                clozeAnswers: ["E-Mail"]
             } as Noun,
             {
                 id: createWordId("kommunikation-schriftlich-002"),
@@ -37,7 +37,7 @@ export const vokabularKommunikationsmittel: VocabularyStructure = createVocabula
                 auxiliaryVerb: "haben",
                 pastParticiple: "gemailt",
                 presentConjugation: { ich: "maile", du: "mailst", er: "mailt", wir: "mailen", ihr: "mailt", sie: "mailen" },
-                imperative: { du: "Mail!", ihr: "Mailt!" },
+                imperative: { du: "Maile!", ihr: "Mailt!" },
                 exampleGerman: [
                     { text: "Ich", case: "nominativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,

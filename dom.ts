@@ -97,6 +97,9 @@ export const dom: DOMElements = {
     // Test Modal
     testSelectionModalEl: getElement<HTMLElement>('test-selection-modal'),
     
+    // Loading Indicator
+    loadingIndicatorEl: getElement<HTMLElement>('loading-indicator'),
+    
     // Umlaut Buttons
     umlautButtonsContainer: getElement<HTMLElement>('umlaut-buttons-container'),
     

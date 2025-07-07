@@ -25,6 +25,7 @@ import { initializeAuth } from './shared/auth/index';
 import { NavigationEvents } from './shared/events/navigation-events';
 import { setupUmlautButtons } from './ui/umlaut-buttons';
 import { updateErrorCounts } from './ui/statistics';
+import { generateTestQuestions, TestGenerationResult } from './utils/test-generator';
 
 console.log('📚 Vokabular importiert:', vokabular);
 console.log('📚 Anzahl Hauptthemen:', Object.keys(vokabular).length);
@@ -77,6 +78,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         lastUsedModeByTopic: {},
         isCorrectionMode: false,
         perfectRunsByMode: {}, // Zählt perfekte Durchläufe pro Modus
+        testModeRotation: [] as ModeId[],
+        currentTestModeIndex: 0,
     };
 
     function loadProgress(): void {
@@ -630,6 +633,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Hole nächstes Wort
         state.currentWord = state.shuffledWordsForMode[state.currentWordIndex];
         
+        // Mode-Rotation für Chaos-Test
+        if (state.isTestModeActive && state.currentTest?.variant === 'chaos' && state.testModeRotation.length > 0) {
+            // Nächster Modus aus der Rotation
+            state.currentMode = state.testModeRotation[state.currentTestModeIndex % state.testModeRotation.length];
+            state.currentTestModeIndex++;
+            console.log(`Chaos-Test: Aufgabe ${state.currentWordIndex + 1} mit Modus ${state.currentMode}`);
+        }
+        
         if (!state.currentWord) {
             console.error('Kein Wort gefunden!');
             return;
@@ -638,9 +649,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Setup für den aktuellen Modus
         const modeInfo = state.currentMode ? learningModes[state.currentMode] : null;
         if (modeInfo && typeof modeInfo.setupFunction === 'function') {
+            console.log('[loadNextTask] Setup-Funktion für Modus:', state.currentMode);
             modeInfo.setupFunction();
         } else {
-            console.error(`Keine Setup-Funktion für Modus "${state.currentMode}" gefunden`);
+            console.error(`[loadNextTask] Keine Setup-Funktion für Modus "${state.currentMode}" gefunden`);
         }
         
         // Statistiken aktualisieren
@@ -761,6 +773,15 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         };
         const testKey = `${state.currentMainTopic}-${state.currentSubTopic}-${state.currentMode}`;
         state.lastTestScores[testKey] = testScore;
+        // Erweiterte Test-Keys für neue Varianten
+        if (state.currentTest) {
+            const variantKey = `${testKey}-${state.currentTest.variant}`;
+            state.lastTestScores[variantKey] = testScore;
+            if (state.currentTest.selectedCategory) {
+                const categoryKey = `${testKey}-${state.currentTest.selectedCategory}`;
+                state.lastTestScores[categoryKey] = testScore;
+            }
+        }
         saveLastTestScores();
         ui.showMessage(dom, `Test beendet! Ergebnis: ${Math.round(accuracy * 100)}%`,
             accuracy >= 0.8 ? 'success' : 'info');
@@ -803,7 +824,32 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         speakWord: (word: string) => console.log('Spreche Wort:', word),
         speakSentence: (sentence: string) => console.log('Spreche Satz:', sentence),
         startTest: (testConfig: TestConfiguration) => {
-            console.log('Starte Test mit Konfiguration:', testConfig);
+            console.log('Starte Test:', testConfig.testTitle);
+            // Generiere Test-Aufgaben
+            const result = generateTestQuestions(vokabular, {
+                variant: testConfig.variant,
+                scope: testConfig.type as any,
+                topicId: testConfig.topicId,
+                category: testConfig.selectedCategory,
+                totalQuestions: 20
+            });
+            // State für Test vorbereiten
+            state.currentTest = testConfig;
+            state.isTestModeActive = true;
+            state.currentVocabularySet = result.words;
+            state.shuffledWordsForMode = result.words;
+            state.currentWordIndex = -1;
+            state.correctInCurrentRound = 0;
+            state.attemptedInCurrentRound = 0;
+            // Mode-Rotation für Chaos-Test
+            if (testConfig.variant === 'chaos' && result.modeRotation) {
+                state.testModeRotation = result.modeRotation;
+                state.currentTestModeIndex = 0;
+            } else {
+                state.currentMode = testConfig.mode;
+            }
+            // UI für Test starten
+            startTestUI(testConfig.testTitle, testConfig.mode);
         },
         submitTestAnswer: (isCorrect: boolean, timeSpent: number) => {
             console.log(`Testantwort: ${isCorrect}, Zeit: ${timeSpent}`);
@@ -840,6 +886,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const { mode } = (e as CustomEvent).detail;
         callbacks.startRepeatSession!(mode as ModeId);
     });
+    
+
 
     // Navigation Event Listeners initialisieren
     ui.initNavigationListeners(dom, state, callbacks, learningModes, vokabular);

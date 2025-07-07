@@ -79,6 +79,7 @@ export function setupMultipleChoiceMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    console.log('[setupMultipleChoiceMode] aktiviert');
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
     state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
     dom.feedbackContainerEl.innerHTML = '';
@@ -245,6 +246,8 @@ export function setupSpellingMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    console.log('[setupSpellingMode] aktiviert');
+    // Robustes Reset: Alle Felder aktivieren
     if (dom.spellingInputSingleEl) dom.spellingInputSingleEl.disabled = false;
     if (dom.spellingInputArticleEl) dom.spellingInputArticleEl.disabled = false;
     if (dom.spellingInputNoun1El) dom.spellingInputNoun1El.disabled = false;
@@ -561,6 +564,7 @@ export function setupClozeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    console.log('[setupClozeMode] aktiviert');
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
     state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
     dom.feedbackContainerEl.innerHTML = '';
@@ -659,6 +663,7 @@ export function setupSentenceTranslationEnDeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    console.log('[setupSentenceTranslationEnDeMode] aktiviert');
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
     state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
     dom.feedbackContainerEl.innerHTML = '';
