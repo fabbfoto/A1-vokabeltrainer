@@ -45,6 +45,50 @@ export function showMessage(
 }
 
 /**
+ * Zeigt eine Erfolgsmeldung mit "Übung wiederholen" Button an.
+ */
+export function showSuccessMessageWithButton(
+    dom: DOMElements,
+    message: string,
+    buttonText: string = 'Übung wiederholen',
+    onButtonClick: () => void
+): void {
+    if (!dom.messageBoxEl) {
+        console.error('Message box element not found');
+        return;
+    }
+    
+    // Erstelle HTML-Inhalt mit Nachricht und Button
+    dom.messageBoxEl.innerHTML = `
+        <div class="text-center">
+            <div class="mb-3">${message}</div>
+            <button class="px-4 py-2 bg-white text-green-500 rounded shadow hover:bg-gray-100 transition font-semibold">
+                ${buttonText}
+            </button>
+        </div>
+    `;
+    
+    // CSS-Klassen für Erfolgsmeldung
+    dom.messageBoxEl.className = 'fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-xl';
+    dom.messageBoxEl.classList.remove('hidden');
+    
+    // Event Listener für den Button
+    const button = dom.messageBoxEl.querySelector('button');
+    if (button) {
+        console.log('Button gefunden, Event Listener hinzugefügt');
+        button.addEventListener('click', (e) => {
+            console.log('Button geklickt!');
+            e.preventDefault();
+            e.stopPropagation();
+            onButtonClick();
+            dom.messageBoxEl.classList.add('hidden');
+        });
+    } else {
+        console.error('Button nicht gefunden!');
+    }
+}
+
+/**
  * Versteckt alle spezifischen Lernmodus-UIs und setzt Feedback-Container zurück.
  */
 export function hideAllUIs(dom: DOMElements): void {

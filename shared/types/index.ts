@@ -256,6 +256,9 @@ export interface TrainerState {
   isCorrectionMode: boolean;
   // UI-Helper für globalen Enter-Handler im Korrekturmodus
   _removeCorrectionEnterHandler?: (() => void);
+  
+  // Statistics State
+  perfectRunsByMode: Record<string, number>; // Zählt perfekte Durchläufe pro Modus
 }
 
 export type TrainerAction = 

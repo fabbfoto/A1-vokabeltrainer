@@ -35,6 +35,7 @@ export {
 // Feedback exports
 export {
     showMessage,
+    showSuccessMessageWithButton,
     hideAllUIs,
     showCorrectFeedback,
     showIncorrectFeedback,

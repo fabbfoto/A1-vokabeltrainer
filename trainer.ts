@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         currentError: null,
         lastUsedModeByTopic: {},
         isCorrectionMode: false,
+        perfectRunsByMode: {}, // Zählt perfekte Durchläufe pro Modus
     };
 
     function loadProgress(): void {
@@ -232,6 +233,27 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     }
 
+    function loadPerfectRuns(): void {
+        const saved = localStorage.getItem('trainer-perfect-runs');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                state.perfectRunsByMode = parsed;
+                console.log('✅ Perfect runs geladen');
+            } catch (e) {
+                console.warn('⚠️ Fehler beim Laden der perfect runs:', e);
+            }
+        }
+    }
+
+    function savePerfectRuns(): void {
+        try {
+            localStorage.setItem('trainer-perfect-runs', JSON.stringify(state.perfectRunsByMode));
+        } catch (e) {
+            console.warn('⚠️ Fehler beim Speichern perfect runs:', e);
+        }
+    }
+
     function updateRepeatButtons() {
         ui.updateErrorCounts(dom, state, learningModes);
     }
@@ -240,6 +262,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     loadMasteredWords();
     loadWordsToRepeat();
     loadLastTestScores();
+    loadPerfectRuns();
 
     function processAnswer(isCorrect: boolean, correctAnswer?: string): void {
         state.attemptedInCurrentRound++;
@@ -407,23 +430,56 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             const remainingErrors = state.wordsToRepeatByMode[state.currentMode]?.size || 0;
             
             if (remainingErrors === 0) {
-                // Keine Fehler mehr - wechsle zurück zum normalen Modus
-                console.log('✅ Alle Fehler behoben - wechsle zu normalem Modus');
+                // Keine Fehler mehr - wechsle zu "noch nicht richtig beantworteten" Vokabeln
+                console.log('✅ Alle Fehler behoben - wechsle zu noch nicht beantworteten Vokabeln');
                 state.isRepeatSessionActive = false;
                 
-                // Lade normale Wortliste
-                state.shuffledWordsForMode = shuffleArray([...state.currentVocabularySet]);
-                state.currentWordIndex = -1; // Wird in loadNextTask erhöht
+                // Filtere Vokabeln, die noch nicht richtig beantwortet wurden
+                const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+                const progressForMode = state.globalProgress[progressKey]?.[state.currentMode] || new Set();
                 
-                // Update UI
-                const repeatButton = document.getElementById(`mode-repeat-${state.currentMode}`);
-                if (repeatButton) {
-                    repeatButton.classList.remove('bg-red-600', 'text-white');
-                    repeatButton.classList.add('bg-red-100', 'text-red-500');
+                // Stelle sicher, dass es ein Set ist
+                const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
+                
+                const remainingWords = state.currentVocabularySet.filter(word => 
+                    !progressSet.has(word.id)
+                );
+                
+                if (remainingWords.length > 0) {
+                    // Es gibt noch Vokabeln, die nicht richtig beantwortet wurden
+                    state.shuffledWordsForMode = shuffleArray(remainingWords);
+                    state.currentWordIndex = -1; // Wird in loadNextTask erhöht
+                    
+                    // Update UI
+                    const repeatButton = document.getElementById(`mode-repeat-${state.currentMode}`);
+                    if (repeatButton) {
+                        repeatButton.classList.remove('bg-red-600', 'text-white');
+                        repeatButton.classList.add('bg-red-100', 'text-red-500');
+                    }
+                    
+                    // Zeige kurze Erfolgsmeldung
+                    ui.showMessage(dom, `Alle Fehler behoben! Weiter mit ${remainingWords.length} noch nicht beantworteten Vokabeln.`, 'success');
+                } else {
+                    // Alle Vokabeln wurden richtig beantwortet - Modus beenden
+                    if (state.currentMode) {
+                        const runCount = (state.perfectRunsByMode[state.currentMode] || 0) + 1;
+                        const runText = runCount === 1 ? '1. Durchlauf' : `${runCount}. Durchlauf`;
+                        ui.showSuccessMessageWithButton(
+                            dom, 
+                            `Perfekt! (${runText})`, 
+                            'Übung wiederholen',
+                            () => {
+                                console.log('Button-Click-Handler 1 (processAnswer) ausgeführt');
+                                state.perfectRunsByMode[state.currentMode] = runCount;
+                                savePerfectRuns();
+                                setMode(state.currentMode, false);
+                            }
+                        );
+                    } else {
+                        ui.showMessage(dom, 'Perfekt! Alle Vokabeln in diesem Modus wurden richtig beantwortet.', 'success');
+                    }
+                    return;
                 }
-                
-                // Zeige kurze Erfolgsmeldung
-                ui.showMessage(dom, 'Alle Fehler behoben! Weiter mit normalen Übungen.', 'success');
             }
             
             // IMMER zur nächsten Aufgabe
@@ -468,10 +524,49 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 // Im Wiederholungsmodus: Prüfe ob noch Fehler da sind
                 const remainingErrors = state.wordsToRepeatByMode[state.currentMode]?.size || 0;
                 if (remainingErrors === 0) {
-                    // Automatisch zu normalem Modus wechseln
+                    // Keine Fehler mehr - wechsle zu "noch nicht richtig beantworteten" Vokabeln
                     state.isRepeatSessionActive = false;
-                    state.shuffledWordsForMode = shuffleArray([...state.currentVocabularySet]);
-                    ui.showMessage(dom, 'Super! Alle Fehler behoben. Weiter geht\'s!', 'success');
+                    
+                    // Filtere Vokabeln, die noch nicht richtig beantwortet wurden
+                    const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+                    const progressForMode = state.globalProgress[progressKey]?.[state.currentMode] || new Set();
+                    const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
+                    
+                    const remainingWords = state.currentVocabularySet.filter(word => 
+                        !progressSet.has(word.id)
+                    );
+                    
+                    if (remainingWords.length > 0) {
+                        state.shuffledWordsForMode = shuffleArray(remainingWords);
+                        ui.showMessage(dom, `Weiter mit ${remainingWords.length} noch nicht beantworteten Vokabeln.`, 'info');
+                    } else {
+                        // Alle Vokabeln wurden richtig beantwortet - Modus beenden
+                        if (state.currentMode) {
+                            const runCount = (state.perfectRunsByMode[state.currentMode] || 0) + 1;
+                            const runText = runCount === 1 ? '1. Durchlauf' : `${runCount}. Durchlauf`;
+                            ui.showSuccessMessageWithButton(
+                                dom, 
+                                `Perfekt! (${runText})`, 
+                                'Übung wiederholen',
+                                () => {
+                                    console.log('Button-Click-Handler 2 (loadNextTask repeat) ausgeführt');
+                                    state.perfectRunsByMode[state.currentMode] = runCount;
+                                    savePerfectRuns();
+                                    setMode(state.currentMode, false);
+                                }
+                            );
+                        } else {
+                            ui.showMessage(dom, 'Perfekt! Alle Vokabeln in diesem Modus wurden richtig beantwortet.', 'success');
+                        }
+                        
+                        // Fortschritt für diesen Modus zurücksetzen
+                        const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+                        if (state.globalProgress[progressKey] && state.currentMode) {
+                            state.globalProgress[progressKey][state.currentMode] = new Set();
+                            saveProgress();
+                        }
+                        return;
+                    }
                 } else {
                     // Noch Fehler da - shuffle Fehlerliste
                     const errorWords = state.currentVocabularySet.filter(word => 
@@ -480,8 +575,47 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     state.shuffledWordsForMode = shuffleArray(errorWords);
                 }
             } else {
-                // Normaler Modus - shuffle alle Wörter
-                state.shuffledWordsForMode = shuffleArray([...state.currentVocabularySet]);
+                // Normaler Modus - nur noch nicht richtig beantwortete Wörter
+                const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+                const progressForMode = state.globalProgress[progressKey]?.[state.currentMode] || new Set();
+                const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
+                
+                const remainingWords = state.currentVocabularySet.filter(word => 
+                    !progressSet.has(word.id)
+                );
+                
+                if (remainingWords.length > 0) {
+                    state.shuffledWordsForMode = shuffleArray(remainingWords);
+                    console.log(`Normaler Modus: ${remainingWords.length} Wörter noch nicht beantwortet`);
+                } else {
+                    // Alle Wörter wurden richtig beantwortet
+                    // Erhöhe Perfect Run Counter
+                    if (state.currentMode) {
+                        if (!state.perfectRunsByMode[state.currentMode]) {
+                            state.perfectRunsByMode[state.currentMode] = 0;
+                        }
+                        state.perfectRunsByMode[state.currentMode]++;
+                        savePerfectRuns();
+                        
+                        const runCount = state.perfectRunsByMode[state.currentMode];
+                        const runText = runCount === 1 ? '1. Durchlauf' : `${runCount}. Durchlauf`;
+                        ui.showSuccessMessageWithButton(
+                            dom, 
+                            `Perfekt! (${runText})`, 
+                            'Übung wiederholen',
+                            () => {
+                                console.log('Button-Click-Handler 3 (loadNextTask normal) ausgeführt');
+                                state.perfectRunsByMode[state.currentMode] = runCount;
+                                savePerfectRuns();
+                                setMode(state.currentMode, false);
+                            }
+                        );
+                    } else {
+                        ui.showMessage(dom, 'Perfekt! Alle Vokabeln in diesem Modus wurden richtig beantwortet.', 'success');
+                    }
+                    
+                    return;
+                }
             }
             
             state.currentWordIndex = 0;
@@ -517,6 +651,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     function setMode(modeId: ModeId, isRepeat: boolean = false): void {
+        console.log(`setMode aufgerufen: ${modeId}, isRepeat: ${isRepeat}`);
         
         state.currentMode = modeId;
         state.isTestModeActive = false;
@@ -544,8 +679,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             
             console.log(`Starte Wiederholung mit ${wordsForSession.length} Wörtern`);
         } else {
-            // Normaler Modus
-            wordsForSession = [...state.currentVocabularySet];
+            // Normaler Modus - nur noch nicht richtig beantwortete Wörter
+            const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+            const progressForMode = state.globalProgress[progressKey]?.[modeId] || new Set();
+            const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
+            
+            wordsForSession = state.currentVocabularySet.filter(word => 
+                !progressSet.has(word.id)
+            );
+            
+            console.log(`Normaler Modus: ${wordsForSession.length} von ${state.currentVocabularySet.length} Wörtern noch nicht beantwortet`);
         }
         state.shuffledWordsForMode = shuffleArray(wordsForSession);
         state.currentWordIndex = -1;
