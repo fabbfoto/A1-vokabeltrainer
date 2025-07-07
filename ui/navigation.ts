@@ -139,6 +139,14 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
     syncButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2');
     dom.navigationContainerEl.appendChild(syncButton);
     
+    // NEU: Ranking-Button
+    const rankingButton = createActionButton('ranking', '🏆 Ranglisten');
+    rankingButton.className = '';
+    rankingButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2', 'mt-2');
+    rankingButton.style.backgroundColor = '#10b981';
+    rankingButton.style.color = 'white';
+    dom.navigationContainerEl.appendChild(rankingButton);
+    
     // Copyright Footer
     const existingFooter = dom.navigationViewEl.querySelector('.copyright-footer');
     if (!existingFooter) {
@@ -327,4 +335,16 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
         // KORREKTUR: Alle nötigen Argumente werden übergeben.
         showMainTopicNavigation(dom, state, vokabular, learningModes);
     });
+    
+    // NEU: Ranking-Button Event-Listener
+    const rankingButton = document.getElementById('ranking-btn');
+    if (rankingButton) {
+        rankingButton.addEventListener('click', () => {
+            if ((window as any).rankingUI) {
+                (window as any).rankingUI.showRankingNavigation();
+            } else {
+                console.warn('Ranking-UI nicht verfügbar');
+            }
+        });
+    }
 }

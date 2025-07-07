@@ -7,6 +7,8 @@ import { app } from './firebase-config';
 import { AuthService } from '../services/auth-service';
 import { SyncService } from '../services/sync-service';
 import { AuthUI } from '../ui/auth-ui';
+import { RankingService } from '../services/ranking-service';
+import { RankingUI } from '../ui/ranking-ui';
 
 export function initializeAuth(trainerId, uiConfig) {
     console.log('[initializeAuth] Starte die Initialisierung der Shared-Module...');
@@ -14,6 +16,16 @@ export function initializeAuth(trainerId, uiConfig) {
     const authService = new AuthService();
     const syncService = new SyncService(trainerId, authService);
     const authUI = new AuthUI(trainerId, uiConfig, authService);
+    
+    // NEU: Ranking-System initialisieren
+    const rankingService = new RankingService(authService);
+    const rankingUI = new RankingUI(rankingService, {
+        containerId: uiConfig.rankingContainerId || 'ranking-container',
+        showUserStats: true,
+        showGlobalRankings: true,
+        showTopicRankings: true,
+        showWeeklyRankings: true
+    });
 
     const auth = getAuth(app);
     onIdTokenChanged(auth, (user) => {
@@ -28,5 +40,10 @@ export function initializeAuth(trainerId, uiConfig) {
         }
     });
 
-    return { authService, authUI, syncService };
+    // NEU: Ranking-UI global verfügbar machen
+    if (typeof window !== 'undefined') {
+        window.rankingUI = rankingUI;
+    }
+
+    return { authService, authUI, syncService, rankingService, rankingUI };
 }

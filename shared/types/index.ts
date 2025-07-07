@@ -206,6 +206,12 @@ export interface TestScore {
   subTopicId?: SubTopicId;
   duration: number;
   modesUsed: ModeId[];
+  // Neue Zeitmessung-Felder
+  startTime: number; // Unix timestamp
+  endTime: number; // Unix timestamp
+  averageTimePerQuestion: number; // in seconds
+  timePenalty: number; // Punkteabzug für Zeit
+  finalScore: number; // Score nach Zeitabzug
 }
 
 export interface TestResult {
@@ -253,6 +259,11 @@ export interface TrainerState {
   testResults: TestResult[];
   testModeRotation: ModeId[];
   currentTestModeIndex: number;
+  
+  // Neue Zeitmessung-Felder für Tests
+  testStartTime: number | null; // Unix timestamp
+  currentQuestionStartTime: number | null; // Unix timestamp
+  questionTimes: number[]; // Array der Zeiten pro Frage in Sekunden
   
   // Progress State
   correctInCurrentRound: number;
@@ -483,6 +494,31 @@ export function createSessionToken(token: string): SessionToken {
 
 export function createDocumentId(id: string): DocumentId {
   return id as DocumentId;
+}
+
+// Neue Funktionen für Score-Berechnung mit Zeitfaktor
+export function calculateTestScore(
+  correct: number, 
+  total: number, 
+  timeInSeconds: number, 
+  timePenaltyPerSecond: number = 2
+): { baseScore: number; timePenalty: number; finalScore: number } {
+  const baseScore = correct * 100; // 100 Punkte pro richtige Antwort
+  const timePenalty = Math.floor(timeInSeconds * timePenaltyPerSecond);
+  const finalScore = Math.max(0, baseScore - timePenalty);
+  
+  return {
+    baseScore,
+    timePenalty,
+    finalScore
+  };
+}
+
+// Neue Funktion für durchschnittliche Zeit pro Frage
+export function calculateAverageTimePerQuestion(questionTimes: number[]): number {
+  if (questionTimes.length === 0) return 0;
+  const totalTime = questionTimes.reduce((sum, time) => sum + time, 0);
+  return totalTime / questionTimes.length;
 }
 
 // ========== LEGACY COMPATIBILITY ==========

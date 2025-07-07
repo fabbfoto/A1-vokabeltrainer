@@ -100,6 +100,11 @@ export interface TestScore {
   subTopicId?: SubTopicId;
   duration: number; // in seconds
   modesUsed: ModeId[];
+  startTime: number; // Unix timestamp
+  endTime: number; // Unix timestamp
+  averageTimePerQuestion: number; // in seconds
+  timePenalty: number; // Punkteabzug für Zeit
+  finalScore: number; // Score nach Zeitabzug
 }
 
 export interface TestResult {
@@ -108,6 +113,8 @@ export interface TestResult {
   score: TestScore;
   wordResults: WordTestResult[];
   recommendations: TestRecommendation[];
+  testVariant: TestVariant;
+  selectedCategory?: TestCategory;
 }
 
 export interface WordTestResult {
@@ -116,6 +123,8 @@ export interface WordTestResult {
   correct: boolean;
   attempts: number;
   timeSpent: number; // in seconds
+  startTime: number; // Unix timestamp
+  endTime: number; // Unix timestamp
 }
 
 export interface TestRecommendation {
@@ -148,6 +157,11 @@ export interface TrainerState {
   testResults: TestResult[];
   testModeRotation: ModeId[];
   currentTestModeIndex: number;
+  
+  // Neue Zeitmessung-Felder für Tests
+  testStartTime: number | null; // Unix timestamp
+  currentQuestionStartTime: number | null; // Unix timestamp
+  questionTimes: number[]; // Array der Zeiten pro Frage in Sekunden
   
   // Progress State
   correctInCurrentRound: number;
@@ -198,9 +212,34 @@ export function calculateAccuracy(correct: number, total: number): number {
 export function calculateMasteryLevel(attempts: number, correctAttempts: number): WordProgress['masteryLevel'] {
   if (attempts === 0) return 'learning';
   const accuracy = correctAttempts / attempts;
-  if (accuracy >= 0.9 && attempts >= 3) return 'mastered';
-  if (accuracy >= 0.7 && attempts >= 2) return 'practiced';
+  if (accuracy >= 0.9) return 'mastered';
+  if (accuracy >= 0.7) return 'practiced';
   return 'learning';
+}
+
+// Neue Funktion für Score-Berechnung mit Zeitfaktor
+export function calculateTestScore(
+  correct: number, 
+  total: number, 
+  timeInSeconds: number, 
+  timePenaltyPerSecond: number = 2
+): { baseScore: number; timePenalty: number; finalScore: number } {
+  const baseScore = correct * 100; // 100 Punkte pro richtige Antwort
+  const timePenalty = Math.floor(timeInSeconds * timePenaltyPerSecond);
+  const finalScore = Math.max(0, baseScore - timePenalty);
+  
+  return {
+    baseScore,
+    timePenalty,
+    finalScore
+  };
+}
+
+// Neue Funktion für durchschnittliche Zeit pro Frage
+export function calculateAverageTimePerQuestion(questionTimes: number[]): number {
+  if (questionTimes.length === 0) return 0;
+  const totalTime = questionTimes.reduce((sum, time) => sum + time, 0);
+  return totalTime / questionTimes.length;
 }
 
 export function shouldRepeatWord(wordProgress: WordProgress): boolean {

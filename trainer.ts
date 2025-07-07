@@ -26,6 +26,7 @@ import { NavigationEvents } from './shared/events/navigation-events';
 import { setupUmlautButtons } from './ui/umlaut-buttons';
 import { updateErrorCounts } from './ui/statistics';
 import { generateTestQuestions, TestGenerationResult } from './utils/test-generator';
+import { calculateTestScore, calculateAverageTimePerQuestion } from './shared/types/index';
 
 console.log('📚 Vokabular importiert:', vokabular);
 console.log('📚 Anzahl Hauptthemen:', Object.keys(vokabular).length);
@@ -46,6 +47,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         onSyncUpdate: () => { },
         saveProgress: async () => { }
     };
+    
+    // NEU: Ranking-Service Mock für Fallback
+    const rankingService = {
+        submitTestResult: async () => { console.log('Ranking-Service nicht verfügbar'); }
+    };
 
     NavigationEvents.dispatchRoot();
     globalAuthUI = authUI;
@@ -65,6 +71,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         isRepeatSessionActive: false,
         currentTest: null,
         testResults: [],
+        testModeRotation: [] as ModeId[],
+        currentTestModeIndex: 0,
+        
+        // Neue Zeitmessung-Felder für Tests
+        testStartTime: null,
+        currentQuestionStartTime: null,
+        questionTimes: [],
+        
         correctInCurrentRound: 0,
         attemptedInCurrentRound: 0,
         globalProgress: {},
@@ -78,8 +92,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         lastUsedModeByTopic: {},
         isCorrectionMode: false,
         perfectRunsByMode: {}, // Zählt perfekte Durchläufe pro Modus
-        testModeRotation: [] as ModeId[],
-        currentTestModeIndex: 0,
     };
 
     function loadProgress(): void {
@@ -269,6 +281,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     function processAnswer(isCorrect: boolean, correctAnswer?: string): void {
         state.attemptedInCurrentRound++;
+        
+        // Zeitmessung für Test-Modus
+        if (state.isTestModeActive && state.currentQuestionStartTime) {
+            const questionEndTime = Date.now();
+            const questionTime = (questionEndTime - state.currentQuestionStartTime) / 1000; // in Sekunden
+            state.questionTimes.push(questionTime);
+            console.log(`⏱️ Frage ${state.attemptedInCurrentRound} beantwortet in ${questionTime.toFixed(2)}s`);
+        }
 
         // Im Korrekturmodus wird das Feedback vom jeweiligen Modul selbst verwaltet
         if (state.isCorrectionMode) {
@@ -655,6 +675,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             console.error(`[loadNextTask] Keine Setup-Funktion für Modus "${state.currentMode}" gefunden`);
         }
         
+        // Zeitmessung für neue Frage starten (nur im Test-Modus)
+        if (state.isTestModeActive) {
+            state.currentQuestionStartTime = Date.now();
+        }
+        
         // Statistiken aktualisieren
         if (state.isTestModeActive) {
             ui.updateTestStats(dom, state);
@@ -756,8 +781,22 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         loadNextTask();
     }
 
-    function handleTestCompletion(): void {
+    async function handleTestCompletion(): Promise<void> {
         const accuracy = state.attemptedInCurrentRound > 0 ? (state.correctInCurrentRound / state.attemptedInCurrentRound) : 0;
+        
+        // Zeitmessung für Test-Abschluss
+        const testEndTime = Date.now();
+        const totalTestTime = state.testStartTime ? (testEndTime - state.testStartTime) / 1000 : 0; // in Sekunden
+        const averageTimePerQuestion = calculateAverageTimePerQuestion(state.questionTimes);
+        
+        // Score-Berechnung mit Zeitfaktor
+        const scoreCalculation = calculateTestScore(
+            state.correctInCurrentRound,
+            state.attemptedInCurrentRound,
+            totalTestTime,
+            2 // 2 Punkte Abzug pro Sekunde
+        );
+        
         if (!state.lastTestScores) state.lastTestScores = {};
         const testScore: TestScore = {
             testId: `test_${Date.now()}` as any,
@@ -768,11 +807,19 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             testType: 'subTopic',
             topicId: state.currentMainTopic!,
             subTopicId: state.currentSubTopic!,
-            duration: 0,
-            modesUsed: state.currentMode ? [state.currentMode] : []
+            duration: totalTestTime,
+            modesUsed: state.currentMode ? [state.currentMode] : [],
+            // Neue Zeitmessung-Felder
+            startTime: state.testStartTime || 0,
+            endTime: testEndTime,
+            averageTimePerQuestion: averageTimePerQuestion,
+            timePenalty: scoreCalculation.timePenalty,
+            finalScore: scoreCalculation.finalScore
         };
+        
         const testKey = `${state.currentMainTopic}-${state.currentSubTopic}-${state.currentMode}`;
         state.lastTestScores[testKey] = testScore;
+        
         // Erweiterte Test-Keys für neue Varianten
         if (state.currentTest) {
             const variantKey = `${testKey}-${state.currentTest.variant}`;
@@ -782,11 +829,42 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 state.lastTestScores[categoryKey] = testScore;
             }
         }
+        
         saveLastTestScores();
-        ui.showMessage(dom, `Test beendet! Ergebnis: ${Math.round(accuracy * 100)}%`,
+        
+        // Erweiterte Erfolgsmeldung mit Zeit und Score
+        const timeMessage = `⏱️ Zeit: ${Math.floor(totalTestTime)}s (Ø ${averageTimePerQuestion.toFixed(1)}s/Frage)`;
+        const scoreMessage = `🏆 Score: ${scoreCalculation.finalScore} (${scoreCalculation.baseScore} - ${scoreCalculation.timePenalty} Zeitstrafe)`;
+        const accuracyMessage = `📊 Genauigkeit: ${Math.round(accuracy * 100)}%`;
+        
+        ui.showMessage(dom, `Test beendet! ${accuracyMessage} | ${timeMessage} | ${scoreMessage}`,
             accuracy >= 0.8 ? 'success' : 'info');
+        
         state.isTestModeActive = false;
         ui.updateTestStats(dom, state);
+        
+        // Zeitmessung zurücksetzen
+        state.testStartTime = null;
+        state.currentQuestionStartTime = null;
+        state.questionTimes = [];
+        
+        // NEU: Test-Ergebnis an Firebase Ranking-System senden
+        if (state.currentTest) {
+            try {
+                if ((window as any).rankingService) {
+                    await (window as any).rankingService.submitTestResult(
+                        testScore,
+                        state.currentTest.variant,
+                        state.currentTest.selectedCategory
+                    );
+                    console.log('✅ Test-Ergebnis an Ranking-System gesendet');
+                } else {
+                    console.log('ℹ️ Ranking-Service nicht verfügbar - Test-Ergebnis nur lokal gespeichert');
+                }
+            } catch (error) {
+                console.warn('⚠️ Fehler beim Senden an Ranking-System:', error);
+            }
+        }
     }
 
     const callbacks: UICallbacks = {
@@ -841,6 +919,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             state.currentWordIndex = -1;
             state.correctInCurrentRound = 0;
             state.attemptedInCurrentRound = 0;
+            
+            // Zeitmessung für Test starten
+            state.testStartTime = Date.now();
+            state.currentQuestionStartTime = Date.now();
+            state.questionTimes = [];
+            
             // Mode-Rotation für Chaos-Test
             if (testConfig.variant === 'chaos' && result.modeRotation) {
                 state.testModeRotation = result.modeRotation;

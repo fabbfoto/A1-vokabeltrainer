@@ -32,7 +32,7 @@ export function createTopicButton(
     return button;
 }
 
-type ActionButtonType = 'global-test' | 'main-topic-test' | 'sync';
+type ActionButtonType = 'global-test' | 'main-topic-test' | 'sync' | 'ranking';
 
 /**
  * Creates a primary action button (e.g., for tests or device sync).
@@ -61,6 +61,11 @@ export function createActionButton(
             id: 'device-sync-btn',
             classes: 'bg-gradient-to-r from-de-black via-de-red to-de-gold hover:brightness-125',
             innerHTML: `<div class="flex items-center justify-center gap-2"><span>📱🇩🇪</span><span>${text}</span></div>`
+        },
+        'ranking': {
+            id: 'ranking-btn',
+            classes: 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 hover:-translate-y-0.5 hover:shadow-xl',
+            innerHTML: `<div class="flex items-center justify-center gap-2"><span>🏆</span><span>${text}</span></div>`
         }
     };
     
