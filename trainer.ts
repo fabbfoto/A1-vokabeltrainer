@@ -686,6 +686,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             state.currentMode = state.testModeRotation[state.currentTestModeIndex % state.testModeRotation.length];
             state.currentTestModeIndex++;
             console.log(`Chaos-Test: Aufgabe ${state.currentWordIndex + 1} mit Modus ${state.currentMode}`);
+            // BUGFIX: UI-Reset nach Mode-Wechsel im Chaos-Test
+            requestAnimationFrame(() => {
+                document.querySelectorAll('[disabled]').forEach(el => {
+                    el.removeAttribute('disabled');
+                });
+            });
         }
         
         if (!state.currentWord) {
@@ -714,6 +720,20 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             ui.updatePracticeStats(dom, state, learningModes);
             ui.updateCategoryStats(dom, state, learningModes);
         }
+        // BUGFIX: Chaos-Test Eingabefelder aktivieren
+        // Stelle sicher, dass alle UI-Elemente zurückgesetzt und aktivierbar sind
+        setTimeout(() => {
+            document.querySelectorAll('button, input').forEach(element => {
+                if (element instanceof HTMLButtonElement || element instanceof HTMLInputElement) {
+                    element.disabled = false;
+                    element.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            });
+            document.querySelectorAll('.choice-button').forEach(btn => {
+                btn.removeAttribute('disabled');
+                btn.classList.remove('opacity-50');
+            });
+        }, 50);
     }
 
     function getTopicKey(main: TopicId|null, sub: SubTopicId|null) {
@@ -1100,4 +1120,4 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     });
 
 
-});
+});// Test-Änderung

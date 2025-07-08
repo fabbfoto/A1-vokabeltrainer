@@ -73,12 +73,29 @@ function splitSentence(sentence: string): string[] {
     return words;
 }
 
+// BUGFIX: Hilfsfunktion zum Aktivieren aller Eingabefelder
+function ensureInputsEnabled() {
+    setTimeout(() => {
+        document.querySelectorAll('input[type="text"], input[type="password"], button.choice-button').forEach(el => {
+            (el as HTMLInputElement | HTMLButtonElement).disabled = false;
+            el.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+        });
+    }, 0);
+}
+
 // ✅ MULTIPLE CHOICE MODE - mit korrekten Property-Namen
 export function setupMultipleChoiceMode(
     dom: DOMElements, 
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
+    // BUGFIX: Explizit alle Choice-Buttons aktivieren
+    const choiceButtons = document.querySelectorAll('.choice-button');
+    choiceButtons.forEach(button => {
+        (button as HTMLButtonElement).disabled = false;
+        button.classList.remove('opacity-50', 'cursor-not-allowed');
+    });
     console.log('[setupMultipleChoiceMode] aktiviert');
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
     state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
@@ -246,6 +263,7 @@ export function setupSpellingMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
     console.log('[setupSpellingMode] aktiviert');
     // Robustes Reset: Alle Felder aktivieren
     if (dom.spellingInputSingleEl) dom.spellingInputSingleEl.disabled = false;
@@ -574,6 +592,7 @@ export function setupClozeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
     console.log('[setupClozeMode] aktiviert');
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
     state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
@@ -684,6 +703,7 @@ export function setupSentenceTranslationEnDeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
     console.log('[setupSentenceTranslationEnDeMode] aktiviert');
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
     state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);

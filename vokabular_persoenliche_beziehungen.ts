@@ -965,7 +965,7 @@ export const vokabularPersoenlicheBeziehungen: VocabularyStructure = createVocab
                 plural: "Tiere",
                 english: "animal",
                 exampleGerman: [
-                    { text: "Mein Lieblings-Tier", case: "nominativ" } as CaseElement,
+                    { text: "Mein Lieblingstier", case: "nominativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
                     { text: "ist", case: "verb" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
@@ -973,8 +973,8 @@ export const vokabularPersoenlicheBeziehungen: VocabularyStructure = createVocab
                     { text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "My favorite animal is the dog.",
-                clozeParts: ["Mein Lieblings-", " ist der Hund."],
-                clozeAnswers: ["Tier"]
+                clozeParts: ["Mein Lieblingstier ist der Hund."],
+                clozeAnswers: ["Lieblingstier"]
             } as Noun,
             {
                 id: createWordId("persoenliche-beziehungen-lieblingstiere-006"),
