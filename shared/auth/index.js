@@ -1,6 +1,6 @@
 // shared/auth/index.js - FINALE VERSION MIT ALLEN KORREKTEN PFADEN
 
-import { getAuth, onIdTokenChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth';
+import { getAuth, onIdTokenChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
 import { app } from './firebase-config';
 
 // KORRIGIERTE PFADE: Die Imports zeigen jetzt auf die Ordner 'services' und 'ui'.

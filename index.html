@@ -31,6 +31,33 @@
     <link rel="manifest" href="manifest.json"> 
     <meta name="theme-color" content="#3b82f6">
     <link rel="stylesheet" href="./shared/styles/minimal-legacy.css">
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDvbEE9u2-y1sB8COT3zw4dQ6nJAry2Z2g",
+            authDomain: "a1-vokabeltrainer.firebaseapp.com",
+            projectId: "a1-vokabeltrainer",
+            storageBucket: "a1-vokabeltrainer.firebasestorage.app",
+            messagingSenderId: "149333337863",
+            appId: "1:149333337863:web:71e5894cca5086024c47a2",
+            measurementId: "G-WZELR67WKZ"
+        };
+        
+        // Firebase initialisieren
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        // Global verfügbar machen
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firebaseDb = db;
+    </script>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 font-['Inter'] flex flex-col justify-start items-center min-h-screen p-4">
 
@@ -44,6 +71,7 @@
             <!-- Navigation Buttons werden hier dynamisch eingefügt -->
         </div>
         <div id="auth-button-container" class="mt-4 w-full"></div>
+        <div id="ranking-container" class="mt-4 w-full"></div>
     </div>
 
     <!-- TRAINER MAIN VIEW -->

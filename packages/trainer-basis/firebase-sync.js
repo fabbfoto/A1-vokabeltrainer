@@ -13,7 +13,7 @@ import {
   limit,
   orderBy,
   deleteDoc
-} from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore';
+} from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 import { db, auth, getCurrentDeviceInfo } from './firebase-config';
 
 class FirebaseSyncService {
@@ -151,7 +151,7 @@ class FirebaseSyncService {
           resolve(user);
         } else {
           // Versuche anonyme Anmeldung
-          import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth')
+          import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js')
             .then(({ signInAnonymously }) => {
               return signInAnonymously(auth);
             })

@@ -134,11 +134,6 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
     testContainer.appendChild(globalStructuredTest);
     dom.navigationContainerEl.appendChild(testContainer);
 
-    const syncButton = createActionButton('sync', 'Geräte verbinden');
-    syncButton.className = '';
-    syncButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2');
-    dom.navigationContainerEl.appendChild(syncButton);
-    
     // NEU: Ranking-Button
     const rankingButton = createActionButton('ranking', '🏆 Ranglisten');
     rankingButton.className = '';

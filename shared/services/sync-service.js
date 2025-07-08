@@ -1,6 +1,6 @@
 // shared/services/sync-service.js - VOLLSTÄNDIGE VERSION
 
-import { getFirestore, doc, onSnapshot, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore';
+import { getFirestore, doc, onSnapshot, setDoc } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 import { app } from '../auth/firebase-config';
 
 export class SyncService {

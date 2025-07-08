@@ -27,6 +27,7 @@ import { setupUmlautButtons } from './ui/umlaut-buttons';
 import { updateErrorCounts } from './ui/statistics';
 import { generateTestQuestions, TestGenerationResult } from './utils/test-generator';
 import { calculateTestScore, calculateAverageTimePerQuestion } from './shared/types/index';
+import { showTestResultModal } from './shared/ui/test-result-modal';
 
 console.log('📚 Vokabular importiert:', vokabular);
 console.log('📚 Anzahl Hauptthemen:', Object.keys(vokabular).length);
@@ -36,22 +37,48 @@ let globalAuthUI: AuthUI | null = null;
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     console.log('🚀 DOMContentLoaded Event gefeuert');
 
-    const authService = { isLoggedIn: () => false };
-    const authUI: AuthUI = {
-        show: () => { },
-        hide: () => { },
-        isVisible: false,
-        container: null
-    };
-    const syncService = {
-        onSyncUpdate: () => { },
-        saveProgress: async () => { }
-    };
-    
-    // NEU: Ranking-Service Mock für Fallback
-    const rankingService = {
-        submitTestResult: async () => { console.log('Ranking-Service nicht verfügbar'); }
-    };
+    // NEU: Firebase Auth initialisieren
+    let authService: any;
+    let authUI: AuthUI;
+    let syncService: any;
+    let rankingService: any;
+
+    try {
+        // Firebase Auth initialisieren
+        const { initializeAuth } = await import('./shared/auth/index.js');
+        const services = initializeAuth('a1-vokabeltrainer', {
+            buttonContainerId: 'auth-button-container',
+            rankingContainerId: 'ranking-container'
+        });
+        
+        authService = services.authService;
+        authUI = services.authUI;
+        syncService = services.syncService;
+        rankingService = services.rankingService;
+        
+        // Ranking-Service global verfügbar machen
+        (window as any).rankingService = rankingService;
+        
+        console.log('✅ Firebase Auth erfolgreich initialisiert');
+    } catch (error) {
+        console.warn('⚠️ Firebase Auth nicht verfügbar, verwende Fallback:', error);
+        
+        // Fallback-Services
+        authService = { isLoggedIn: () => false };
+        authUI = {
+            show: () => { },
+            hide: () => { },
+            isVisible: false,
+            container: null
+        };
+        syncService = {
+            onSyncUpdate: () => { },
+            saveProgress: async () => { }
+        };
+        rankingService = {
+            submitTestResult: async () => { console.log('Ranking-Service nicht verfügbar'); }
+        };
+    }
 
     NavigationEvents.dispatchRoot();
     globalAuthUI = authUI;
@@ -865,6 +892,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 console.warn('⚠️ Fehler beim Senden an Ranking-System:', error);
             }
         }
+        showTestResultModal(testScore, state.currentTest || undefined);
     }
 
     const callbacks: UICallbacks = {

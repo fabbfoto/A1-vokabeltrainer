@@ -415,7 +415,7 @@ export interface AuthUI {
   show: () => void;
   hide: () => void;
   isVisible: boolean;
-  container: HTMLElement | null;
+  container?: HTMLElement | null;
 }
 
 export interface AuthService {

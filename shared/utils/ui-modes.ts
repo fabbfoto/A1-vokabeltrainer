@@ -432,13 +432,19 @@ export function setupSpellingMode(
                 dom.continueButton.classList.add('hidden');
                 dom.checkSpellingButton.disabled = false;
                 
-                // Felder entsperren und zurücksetzen
+                // ✅ ROBUSTE AKTIVIERUNG: Alle Felder explizit aktivieren und zurücksetzen
                 [dom.spellingInputArticleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El].forEach(input => {
                     input.disabled = false;
                     input.value = '';
                     input.classList.remove('border-green-400', 'bg-green-50', 'border-red-400', 'bg-red-50');
                     input.classList.add('border-gray-300');
                 });
+                
+                // ✅ FOKUSSIERUNG: Mittleres Feld (Singular) fokussieren
+                if (dom.spellingInputNoun1El) {
+                    dom.spellingInputNoun1El.focus();
+                    state.activeTextInput = dom.spellingInputNoun1El;
+                }
                 
                 // Nächstes Wort laden
                 processAnswer(isFullyCorrect, correctAnswerText);
@@ -532,11 +538,15 @@ export function setupSpellingMode(
                 dom.continueButton.classList.add('hidden');
                 dom.checkSpellingButton.disabled = false;
                 
-                // Feld entsperren und zurücksetzen
+                // ✅ ROBUSTE AKTIVIERUNG: Einzelfeld explizit aktivieren und zurücksetzen
                 dom.spellingInputSingleEl.disabled = false;
                 dom.spellingInputSingleEl.value = '';
                 dom.spellingInputSingleEl.classList.remove('border-green-400', 'bg-green-50', 'border-red-400', 'bg-red-50');
                 dom.spellingInputSingleEl.classList.add('border-gray-300');
+                
+                // ✅ FOKUSSIERUNG: Einzelfeld fokussieren
+                dom.spellingInputSingleEl.focus();
+                state.activeTextInput = dom.spellingInputSingleEl;
                 
                 // Nächstes Wort laden
                 processAnswer(isCorrect, correctAnswer);
@@ -636,6 +646,14 @@ function generateClozeUI(
         }
     });
     
+    // ✅ ROBUSTE AKTIVIERUNG: Alle Cloze-Felder explizit aktivieren
+    const inputs = dom.clozeSentenceContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
+    inputs.forEach(input => {
+        input.disabled = false;
+        input.classList.remove('border-green-400', 'bg-green-50', 'border-red-400', 'bg-red-50');
+        input.classList.add('border-gray-300');
+    });
+    
     dom.checkClozeButton.onclick = () => {
         const inputs = dom.clozeSentenceContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
         let allCorrect = true;
@@ -653,7 +671,10 @@ function generateClozeUI(
     };
     setTimeout(() => {
         const firstInput = dom.clozeSentenceContainerEl.querySelector('input[type="text"]') as HTMLInputElement;
-        if (firstInput) { firstInput.focus(); state.activeTextInput = firstInput; }
+        if (firstInput) { 
+            firstInput.focus(); 
+            state.activeTextInput = firstInput; 
+        }
     }, 0);
 }
 
@@ -747,6 +768,14 @@ function generateSentenceInputs(
         input.addEventListener('focus', () => {
             state.activeTextInput = input;
         });
+    });
+    
+    // ✅ ROBUSTE AKTIVIERUNG: Alle Satzübersetzungs-Felder explizit aktivieren
+    const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
+    inputs.forEach(input => {
+        input.disabled = false;
+        input.classList.remove('border-green-400', 'bg-green-50', 'border-red-400', 'bg-red-50');
+        input.classList.add('border-gray-300');
     });
     
     dom.checkSentenceButton.onclick = () => {
