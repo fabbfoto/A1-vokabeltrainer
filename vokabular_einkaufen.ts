@@ -416,7 +416,7 @@ export const vokabularEinkaufen: VocabularyStructure = createVocabulary({
                 wordType: "noun",
                 german: "Euro",
                 article: "der",
-                plural: "Euros",
+                plural: "Euro",
                 english: "euro",
                 exampleGerman: [
                     { text: "Das", case: "nominativ" } as CaseElement,
