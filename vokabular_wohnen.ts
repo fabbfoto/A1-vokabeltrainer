@@ -465,14 +465,14 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Lichter",
                 english: "light",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Kannst", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "du", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "das Licht", case: "akkusativ" },
+                    { text: " ", case: "none" },
+                    { text: "anmachen", case: "verb" },
+                    { text: "?", case: "none" }
                 ],
                 exampleEnglish: "Can you turn on the light?",
                 clozeParts: ["Kannst du das ", " anmachen?"],
@@ -486,12 +486,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Bilder",
                 english: "picture / image",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "An der Wand", case: "dativ" },
+                    { text: " ", case: "none" },
+                    { text: "hängt", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "ein Bild", case: "nominativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "A picture hangs on the wall.",
                 clozeParts: ["An der Wand hängt ein ", "."],
@@ -505,12 +505,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Uhren",
                 english: "clock / watch",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Die Uhr", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "hängt", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "an der Wand", case: "dativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "The clock hangs on the wall.",
                 clozeParts: ["Die ", " hängt an der Wand."],
@@ -524,14 +524,14 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Schreibtische",
                 english: "desk",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Ich", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "mache", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "meine Hausaufgaben", case: "akkusativ" },
+                    { text: " ", case: "none" },
+                    { text: "am Schreibtisch", case: "dativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "I do my homework at the desk.",
                 clozeParts: ["Ich mache meine Hausaufgaben am ", "."],
@@ -545,12 +545,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Spiegel",
                 english: "mirror",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Der Spiegel", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "ist", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "im Bad", case: "dativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "The mirror is in the bathroom.",
                 clozeParts: ["Der ", " ist im Bad."],
@@ -564,12 +564,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Gardinen/Vorhänge",
                 english: "curtain",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Die Gardinen", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "sind", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "weiß", case: "none" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "The curtains are white.",
                 clozeParts: ["Die ", " sind weiß."],
@@ -587,12 +587,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Fernseher",
                 english: "television set",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Der Fernseher", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "ist", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "neu", case: "none" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "The television is new.",
                 clozeParts: ["Der ", " ist neu."],
@@ -606,12 +606,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Heizungen",
                 english: "heating",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Die Heizung", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "ist", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "aus", case: "none" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "The heating is off.",
                 clozeParts: ["Die ", " ist aus."],
@@ -625,12 +625,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Stockwerke",
                 english: "floor / storey",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Unsere Wohnung", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "ist", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "im ersten Stock", case: "dativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "Our apartment is on the first floor.",
                 clozeParts: ["Unsere Wohnung ist im ersten ", "."],
@@ -1263,12 +1263,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                     ihr: "Pflanzt!"
                 },
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Wir", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "pflanzen", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "einen Baum", case: "akkusativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "We are planting a tree.",
                 clozeParts: ["Wir ", " einen Baum."],
@@ -1295,12 +1295,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                     ihr: "Sitzt!"
                 },
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Wir", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "sitzen", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "im Garten", case: "dativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "We are sitting in the garden.",
                 clozeParts: ["Wir ", " im Garten."],
@@ -1327,14 +1327,14 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                     ihr: "Grillt!"
                 },
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Im Sommer", case: "dativ" },
+                    { text: " ", case: "none" },
+                    { text: "grillen", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "wir", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "im Garten", case: "dativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "In summer we grill in the garden.",
                 clozeParts: ["Im Sommer ", " wir im Garten."],
@@ -1348,12 +1348,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Sonnen",
                 english: "sun",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Die Sonne", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "scheint", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "im Garten", case: "dativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "The sun is shining in the garden.",
                 clozeParts: ["Die ", " scheint im Garten."],
@@ -1367,14 +1367,14 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Schatten",
                 english: "shade / shadow",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Im Schatten", case: "dativ" },
+                    { text: " ", case: "none" },
+                    { text: "ist", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "es", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "kühl", case: "none" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "It is cool in the shade.",
                 clozeParts: ["Im ", " ist es kühl."],
@@ -1388,12 +1388,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Werkzeuge",
                 english: "tool / tools",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Das Werkzeug", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "liegt", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "im Gartenhaus", case: "dativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "The tools are in the garden shed.",
                 clozeParts: ["Das ", " liegt im Gartenhaus."],
@@ -1407,12 +1407,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 plural: "Gartenhäuser",
                 english: "garden shed / summer house",
                 exampleGerman: [
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" },
-                    { text: "", case: "none" }
+                    { text: "Das Werkzeug", case: "nominativ" },
+                    { text: " ", case: "none" },
+                    { text: "liegt", case: "verb" },
+                    { text: " ", case: "none" },
+                    { text: "im Gartenhaus", case: "dativ" },
+                    { text: ".", case: "none" }
                 ],
                 exampleEnglish: "The tools are in the garden shed.",
                 clozeParts: ["Das Werkzeug liegt im ", "."],
