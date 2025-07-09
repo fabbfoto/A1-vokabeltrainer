@@ -1,22 +1,12 @@
-// Lokale Typen definieren (ohne komplexe Imports)
-interface Word {
-  german: string;
-  english: string;
-  id: string;
-  wordType?: string;
-}
-
-type TopicId = string;
-type SubTopicId = string;
-type ModeId = 'mc-de-en' | 'type-de-adj' | 'cloze-adj-de' | 'sentence-translation-en-de';
-type TestCategory = 'multiple-choice' | 'typing' | 'cloze' | 'translation';
+// Importiere Typen aus shared/types
+import type { Word, TopicId, SubTopicId, ModeId, TestCategory } from '../shared/types/index';
 
 // Konstante für Kategorie-Modus-Mapping
 const CATEGORY_MODE_MAP: Record<TestCategory, ModeId> = {
-  'multiple-choice': 'mc-de-en',
-  'typing': 'type-de-adj',
-  'cloze': 'cloze-adj-de',
-  'translation': 'sentence-translation-en-de'
+  'bedeutung': 'mc-de-en' as ModeId,
+  'schreibweise': 'type-de-adj' as ModeId,
+  'luecke': 'cloze-adj-de' as ModeId,
+  'satz': 'sentence-translation-en-de' as ModeId
 };
 
 // Hilfsfunktion
@@ -79,23 +69,12 @@ export function generateTestQuestions(
   const shuffledWords = shuffleArray(allWords);
   
   // 3. Erstelle Modus-Verteilung und Rotation
-  let modeDistribution: Record<ModeId, number> = {
-    'mc-de-en': 0,
-    'type-de-adj': 0,
-    'cloze-adj-de': 0,
-    'sentence-translation-en-de': 0
-  };
+  const modeKeys = ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as const;
+  let modeDistribution = Object.fromEntries(modeKeys.map(k => [k as ModeId, 0])) as Record<ModeId, number>;
   let modeRotation: ModeId[] = [];
   
   if (variant === 'chaos') {
-    // Gleichmäßige Verteilung für Chaos
-    modeDistribution = {
-      'mc-de-en': 5,
-      'type-de-adj': 5,
-      'cloze-adj-de': 5,
-      'sentence-translation-en-de': 5
-    };
-    
+    modeDistribution = Object.fromEntries(modeKeys.map(k => [k as ModeId, 5])) as Record<ModeId, number>;
     // Erstelle Rotation für Chaos-Modus
     Object.keys(modeDistribution).forEach(mode => {
       const count = modeDistribution[mode as ModeId];
@@ -104,12 +83,10 @@ export function generateTestQuestions(
       }
     });
     modeRotation = shuffleArray(modeRotation);
-    
   } else if (variant === 'structured' && category) {
     // Nur eine Kategorie für strukturiert
     const mode = CATEGORY_MODE_MAP[category];
     modeDistribution[mode] = totalQuestions;
-    
     // Keine Rotation bei strukturiert
     for (let i = 0; i < totalQuestions; i++) {
       modeRotation.push(mode);

@@ -2,12 +2,16 @@
 // Firebase-basierter Ranking-Service für Test-Ergebnisse
 
 // Firebase-Imports für Runtime
+// @ts-ignore
 import { collection, addDoc, query, orderBy, limit, getDocs, where } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 import { db } from '../auth/firebase-config.js';
 import type { TestScore, TestVariant, TestCategory, TopicId } from '../types/index.js';
 
-// TypeScript-Typen für Firebase
-type Timestamp = any;
+type TimestampType = { fromDate: (date: Date) => any };
+// Fallback für Timestamp.fromDate, falls nicht vorhanden
+const Timestamp: TimestampType = {
+  fromDate: (date: Date) => date
+};
 
 export interface TestResultSubmission {
   userId: string;

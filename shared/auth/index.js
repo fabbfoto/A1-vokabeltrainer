@@ -6,7 +6,7 @@ import { app } from './firebase-config';
 // KORRIGIERTE PFADE: Die Imports zeigen jetzt auf die Ordner 'services' und 'ui'.
 import { AuthService } from '../services/auth-service.ts';
 import { SyncService } from '../services/sync-service';
-import { AuthUI } from '../ui/auth-ui';
+import { AuthUI } from '../ui/auth-ui.ts';
 import { RankingService } from '../services/ranking-service';
 import { RankingUI } from '../ui/ranking-ui';
 

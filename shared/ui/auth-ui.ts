@@ -1,27 +1,48 @@
-// shared/ui/auth-ui.js - Perfekte Event-basierte Version
+// shared/ui/auth-ui.ts - Perfekte Event-basierte Version
+
+import type { AuthService } from '../services/auth-service';
+import type { User } from '../types/index';
+
+interface UIConfig {
+    buttonContainerId: string;
+    hideOnNavigation?: boolean;
+    buttonClasses?: {
+        loggedIn?: string;
+        loggedOut?: string;
+    };
+}
+
+interface NavigationEvent extends CustomEvent {
+    detail: {
+        isRoot: boolean;
+    };
+}
 
 export class AuthUI {
-    constructor(trainerId, uiConfig, authService) {
+    private options: UIConfig;
+    private authService: AuthService;
+    private syncButton: HTMLButtonElement | null = null;
+    private isVisible: boolean = true;
+    private boundNavigationHandler: ((event: NavigationEvent) => void) | null = null;
+    
+    constructor(trainerId: string, uiConfig: UIConfig, authService: AuthService) {
         this.options = uiConfig;
         this.authService = authService;
-        this.syncButton = null;
-        this.isVisible = true;
-        this.boundNavigationHandler = null;
         
         // Setup Event-Listener wenn konfiguriert
         this.setupNavigationListener();
     }
     
-    setupNavigationListener() {
+    private setupNavigationListener(): void {
         // Nur wenn hideOnNavigation aktiviert ist
         if (this.options.hideOnNavigation) {
             // Speichere gebundene Funktion für späteres removeEventListener
             this.boundNavigationHandler = this.handleNavigationChange.bind(this);
-            window.addEventListener('navigationChanged', this.boundNavigationHandler);
+            window.addEventListener('navigationChanged', this.boundNavigationHandler as EventListener);
         }
     }
     
-    handleNavigationChange(event) {
+    private handleNavigationChange(event: NavigationEvent): void {
         // Prüfe ob wir auf der Root-Seite sind
         const isRoot = event.detail && event.detail.isRoot;
         
@@ -32,21 +53,21 @@ export class AuthUI {
         }
     }
     
-    hide() {
+    public hide(): void {
         this.isVisible = false;
         if (this.syncButton) {
             this.syncButton.style.display = 'none';
         }
     }
     
-    show() {
+    public show(): void {
         this.isVisible = true;
         if (this.syncButton) {
             this.syncButton.style.display = '';
         }
     }
     
-    renderSyncButton(isLoggedIn, userEmail = null) {
+    public renderSyncButton(isLoggedIn: boolean, userEmail: string | null = null): void {
         const container = document.getElementById(this.options.buttonContainerId);
         if (!container) {
             console.error(`AuthUI: Container-Element mit der ID '${this.options.buttonContainerId}' nicht gefunden.`);
@@ -93,25 +114,25 @@ export class AuthUI {
         container.appendChild(this.syncButton);
     }
 
-    updateUIAfterLogin(user) {
+    public updateUIAfterLogin(user: User): void {
         console.log('[AuthUI] updateUIAfterLogin aufgerufen, zeichne Button neu.');
         this.renderSyncButton(true, user.email);
     }
 
-    updateUIAfterLogout() {
+    public updateUIAfterLogout(): void {
         console.log('[AuthUI] updateUIAfterLogout aufgerufen, zeichne Button neu.');
         this.renderSyncButton(false, null);
     }
 
-    showAuthModal() {
+    public showAuthModal(): void {
         console.log('[AuthUI] showAuthModal aufgerufen.');
         this.authService.loginWithGoogle();
     }
     
     // Cleanup-Methode für Event-Listener
-    destroy() {
+    public destroy(): void {
         if (this.boundNavigationHandler) {
-            window.removeEventListener('navigationChanged', this.boundNavigationHandler);
+            window.removeEventListener('navigationChanged', this.boundNavigationHandler as EventListener);
             this.boundNavigationHandler = null;
         }
         
@@ -120,4 +141,4 @@ export class AuthUI {
             this.syncButton = null;
         }
     }
-}
+} 

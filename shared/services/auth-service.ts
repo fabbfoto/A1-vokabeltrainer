@@ -1,4 +1,5 @@
 // Firebase-Imports für Runtime
+// @ts-ignore
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
 import { app } from '../auth/firebase-config';
 

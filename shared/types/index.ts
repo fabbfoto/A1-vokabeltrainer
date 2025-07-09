@@ -414,7 +414,6 @@ export interface AuthState {
 export interface AuthUI {
   show: () => void;
   hide: () => void;
-  isVisible: boolean;
   container?: HTMLElement | null;
 }
 

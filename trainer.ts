@@ -68,7 +68,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         authUI = {
             show: () => { },
             hide: () => { },
-            isVisible: false,
             container: null
         };
         syncService = {
@@ -995,14 +994,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 variant: testConfig.variant,
                 scope: testConfig.type as any,
                 topicId: testConfig.topicId,
-                category: testConfig.selectedCategory,
+                category: testConfig.selectedCategory as import('./shared/types/index').TestCategory,
                 totalQuestions: 20
             });
             // State für Test vorbereiten
             state.currentTest = testConfig;
             state.isTestModeActive = true;
-            state.currentVocabularySet = result.words;
-            state.shuffledWordsForMode = result.words;
+            state.currentVocabularySet = result.words as import('./shared/types/index').Word[];
+            state.shuffledWordsForMode = result.words as import('./shared/types/index').Word[];
             state.currentWordIndex = -1;
             state.correctInCurrentRound = 0;
             state.attemptedInCurrentRound = 0;
@@ -1014,7 +1013,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             
             // Mode-Rotation für Chaos-Test
             if (testConfig.variant === 'chaos' && result.modeRotation) {
-                state.testModeRotation = result.modeRotation;
+                state.testModeRotation = result.modeRotation as import('./shared/types/index').ModeId[];
                 state.currentTestModeIndex = 0;
             } else {
                 state.currentMode = testConfig.mode;
