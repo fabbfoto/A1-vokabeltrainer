@@ -503,9 +503,13 @@ export function calculateTestScore(
   timeInSeconds: number, 
   timePenaltyPerSecond: number = 2
 ): { baseScore: number; timePenalty: number; finalScore: number } {
-  const baseScore = correct * 100; // 100 Punkte pro richtige Antwort
-  const timePenalty = Math.floor(timeInSeconds * timePenaltyPerSecond);
-  const finalScore = Math.max(0, baseScore - timePenalty);
+  // Vereinfachte Berechnung: Nur Prozent der richtigen Antworten
+  const percentCorrect = total > 0 ? (correct / total) * 100 : 0;
+  const baseScore = Math.round(percentCorrect);
+  
+  // Kein Zeitabzug mehr - nur reiner Prozentsatz
+  const timePenalty = 0;
+  const finalScore = baseScore;
   
   return {
     baseScore,
