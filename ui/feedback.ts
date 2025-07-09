@@ -136,10 +136,10 @@ export function hideAllUIs(dom: DOMElements): void {
         }
     });
     
-    // Verstecke Umlaut Buttons
-    if (dom.umlautButtonsContainer) {
-        dom.umlautButtonsContainer.style.display = 'none';
-    }
+    // Umlaut Buttons NICHT verstecken - werden von den einzelnen Modi gesteuert
+    // if (dom.umlautButtonsContainer) {
+    //     dom.umlautButtonsContainer.style.display = 'none';
+    // }
 }
 
 /**

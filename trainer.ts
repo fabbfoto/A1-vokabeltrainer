@@ -296,6 +296,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     }
 
+
+
     function updateRepeatButtons() {
         ui.updateErrorCounts(dom, state, learningModes);
     }
@@ -743,6 +745,36 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     function setMode(modeId: ModeId, isRepeat: boolean = false): void {
         console.log(`setMode aufgerufen: ${modeId}, isRepeat: ${isRepeat}`);
         
+        // FEHLERZÄHLER ZURÜCKSETZEN nur für normale Übungen (nicht für Wiederholungen)
+        if (!isRepeat) {
+            console.log('🔄 Setze Fehlerzähler für neue Übung zurück...');
+            state.correctInCurrentRound = 0;
+            state.attemptedInCurrentRound = 0;
+            
+            // Fehlerzähler für diesen Modus zurücksetzen
+            if (state.wordsToRepeatByMode[modeId]) {
+                state.wordsToRepeatByMode[modeId] = new Set();
+                saveWordsToRepeat();
+                console.log(`🗑️ Fehlerzähler für Modus ${modeId} zurückgesetzt`);
+            }
+            
+            // localStorage direkt löschen (da Firebase-Services keine saveWordsToRepeat haben)
+            localStorage.removeItem('trainer-words-to-repeat');
+            console.log(`🗑️ localStorage 'trainer-words-to-repeat' gelöscht`);
+            
+            // Firebase Progress zurücksetzen (falls verfügbar)
+            if ((window as any).firebaseSyncService) {
+                try {
+                    // Leeren Progress an Firebase senden
+                    const emptyProgress = {};
+                    (window as any).firebaseSyncService.saveProgress(emptyProgress);
+                    console.log(`☁️ Firebase Progress zurückgesetzt`);
+                } catch (error) {
+                    console.warn('⚠️ Fehler beim Firebase-Reset:', error);
+                }
+            }
+        }
+        
         state.currentMode = modeId;
         state.isTestModeActive = false;
         state.isRepeatSessionActive = isRepeat;
@@ -805,12 +837,18 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
         loadNextTask();
         // Umlaut-Buttons nach jedem Moduswechsel initialisieren
-        const umlautModes = ['type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'];
-        if (umlautModes.includes(modeId)) {
-            if (ui.setupUmlautButtons) ui.setupUmlautButtons(dom, state);
-        } else {
-            if (ui.hideUmlautButtons) ui.hideUmlautButtons(dom);
-        }
+        // Verzögert ausführen, damit die Input-Felder im DOM sind
+        setTimeout(() => {
+            const umlautModes = ['type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'];
+            if (umlautModes.includes(modeId)) {
+                if (ui.setupUmlautButtons) {
+                    ui.setupUmlautButtons(dom, state);
+                    console.log(`✅ Umlaut-Buttons für Modus ${modeId} initialisiert`);
+                }
+            } else {
+                if (ui.hideUmlautButtons) ui.hideUmlautButtons(dom);
+            }
+        }, 200); // Längere Verzögerung für dynamisch erstellte Input-Felder
     }
 
     function startTestUI(testTitle: string, modus: ModeId): void {
@@ -951,6 +989,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         speakSentence: (sentence: string) => console.log('Spreche Satz:', sentence),
         startTest: (testConfig: TestConfiguration) => {
             console.log('Starte Test:', testConfig.testTitle);
+            
             // Generiere Test-Aufgaben
             const result = generateTestQuestions(vokabular, {
                 variant: testConfig.variant,
@@ -1037,63 +1076,13 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Initialen Fehlerzählerstand anzeigen
     updateRepeatButtons();
 
+
+    
     // Globale initUmlautButtons Funktion für die Browser-Lösung
+    // ENTFERNT: Doppelte Implementierung - wird jetzt durch ui/umlaut-buttons.ts gehandhabt
     (window as any).initUmlautButtons = function() {
-        let lastFocusedInput: HTMLInputElement | null = null;
-        
-        // Focus-Listener für alle Noun-Inputs
-        const article = document.getElementById('spelling-input-article') as HTMLInputElement;
-        const noun1 = document.getElementById('spelling-input-noun-1') as HTMLInputElement;
-        const noun2 = document.getElementById('spelling-input-noun-2') as HTMLInputElement;
-        
-        if (article) {
-            article.addEventListener('focus', () => {
-                lastFocusedInput = article;
-                console.log('Focus auf Artikel-Feld');
-            });
-        }
-        
-        if (noun1) {
-            noun1.addEventListener('focus', () => {
-                lastFocusedInput = noun1;
-                console.log('Focus auf Singular-Feld');
-            });
-        }
-        
-        if (noun2) {
-            noun2.addEventListener('focus', () => {
-                lastFocusedInput = noun2;
-                console.log('Focus auf Plural-Feld');
-            });
-        }
-        
-        // Umlaut-Buttons
-        const umlautBtns = document.getElementById('umlaut-buttons-container')?.getElementsByTagName('button');
-        
-        if (umlautBtns) {
-            Array.from(umlautBtns).forEach(btn => {
-                btn.onclick = function(event) {
-                    // Finde das richtige Input
-                    const single = document.getElementById('spelling-input-single') as HTMLInputElement;
-                    let targetInput: HTMLInputElement | null = null;
-                    
-                    if (single && single.offsetParent !== null) {
-                        targetInput = single;
-                    } else if (article && article.offsetParent !== null) {
-                        targetInput = lastFocusedInput || article;
-                    } else if (noun1 && noun1.offsetParent !== null) {
-                        targetInput = lastFocusedInput || noun1;
-                    }
-                    
-                    if (targetInput && !targetInput.disabled) {
-                        const charToInsert = (event as MouseEvent).shiftKey ? (this as HTMLButtonElement).textContent?.toUpperCase() : (this as HTMLButtonElement).textContent;
-                        targetInput.value += charToInsert;
-                        targetInput.focus();
-                        console.log('Umlaut eingefügt in:', targetInput.id);
-                    }
-                };
-            });
-        }
+        console.log('initUmlautButtons aufgerufen - wird durch TypeScript-Implementierung gehandhabt');
+        // Die TypeScript-Implementierung in ui/umlaut-buttons.ts übernimmt jetzt alles
     };
 
     console.log('🎉 Trainer erfolgreich initialisiert!');

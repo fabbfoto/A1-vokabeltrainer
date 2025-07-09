@@ -58,6 +58,8 @@ function getTailwindCaseClass(kasus: string): string {
 
 // Neue splitSentence Funktion
 function splitSentence(sentence: string): string[] {
+    console.log('🔍 splitSentence aufgerufen mit:', sentence);
+    
     const punctuationMatch = sentence.match(/[.,;:!?]+$/);
     const punctuation = punctuationMatch ? punctuationMatch[0] : '';
     
@@ -70,6 +72,7 @@ function splitSentence(sentence: string): string[] {
         words[words.length - 1] = words[words.length - 1] + punctuation;
     }
     
+    console.log('🔍 splitSentence Ergebnis:', words);
     return words;
 }
 
@@ -102,7 +105,9 @@ export function setupMultipleChoiceMode(
     dom.feedbackContainerEl.innerHTML = '';
     dom.correctionSolutionEl.textContent = '';
     dom.correctionSolutionEl.classList.add('hidden');
-    document.getElementById('umlaut-buttons-container')!.style.display = 'none';
+    // Umlaut-Buttons verstecken
+    const umlautContainer = document.getElementById('umlaut-buttons-container');
+    if (umlautContainer) umlautContainer.style.display = 'none';
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'block';
     dom.spellingModeUiEl.style.display = 'none';
@@ -275,12 +280,11 @@ export function setupSpellingMode(
     dom.feedbackContainerEl.innerHTML = '';
     dom.correctionSolutionEl.textContent = '';
     dom.correctionSolutionEl.classList.add('hidden');
-    document.getElementById('umlaut-buttons-container')!.style.display = 'flex';
-    setTimeout(() => {
-        if (typeof (window as any).initUmlautButtons === 'function') {
-            (window as any).initUmlautButtons();
-        }
-    }, 100);
+    // Umlaut-Buttons anzeigen
+    if (dom.umlautButtonsContainer) {
+        dom.umlautButtonsContainer.style.display = 'flex';
+        console.log('✅ Umlaut-Buttons in Schreibweise-Modus angezeigt');
+    }
     
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'none';
@@ -298,8 +302,10 @@ export function setupSpellingMode(
     dom.continueButton.classList.add('hidden');
     dom.correctionSolutionEl.classList.add('hidden');
     
-    const umlautContainer = dom.umlautButtonsContainer;
-    if (umlautContainer) umlautContainer.style.display = 'flex';
+    if (dom.umlautButtonsContainer) {
+        dom.umlautButtonsContainer.style.display = 'flex';
+        console.log('✅ Umlaut-Buttons in Schreibweise-Modus angezeigt');
+    }
     // Audio-Buttons verstecken
     if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
     if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'none';
@@ -599,7 +605,8 @@ export function setupClozeMode(
     dom.feedbackContainerEl.innerHTML = '';
     dom.correctionSolutionEl.textContent = '';
     dom.correctionSolutionEl.classList.add('hidden');
-    document.getElementById('umlaut-buttons-container')!.style.display = 'flex';
+    // Umlaut-Buttons anzeigen
+    if (dom.umlautButtonsContainer) dom.umlautButtonsContainer.style.display = 'flex';
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'none';
     dom.spellingModeUiEl.style.display = 'none';
@@ -610,8 +617,10 @@ export function setupClozeMode(
     
     dom.checkClozeButton.disabled = false;
     
-    const umlautContainer = dom.umlautButtonsContainer;
-    if (umlautContainer) umlautContainer.style.display = 'flex';
+    if (dom.umlautButtonsContainer) {
+        dom.umlautButtonsContainer.style.display = 'flex';
+        console.log('✅ Umlaut-Buttons in Cloze-Modus angezeigt');
+    }
     // Audio-Buttons verstecken
     if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
     if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'none';
@@ -694,6 +703,15 @@ function generateClozeUI(
             firstInput.focus(); 
             state.activeTextInput = firstInput; 
         }
+        
+        // Umlaut-Buttons für dynamisch erstellte Input-Felder initialisieren
+        const inputs = dom.clozeSentenceContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
+        if (inputs.length > 0) {
+            import('../../ui/umlaut-buttons').then(mod => {
+                mod.setupUmlautButtons(dom, state);
+                console.log('✅ Umlaut-Buttons für Cloze-Modus initialisiert');
+            });
+        }
     }, 0);
 }
 
@@ -710,7 +728,8 @@ export function setupSentenceTranslationEnDeMode(
     dom.feedbackContainerEl.innerHTML = '';
     dom.correctionSolutionEl.textContent = '';
     dom.correctionSolutionEl.classList.add('hidden');
-    document.getElementById('umlaut-buttons-container')!.style.display = 'flex';
+    // Umlaut-Buttons anzeigen
+    if (dom.umlautButtonsContainer) dom.umlautButtonsContainer.style.display = 'flex';
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'none';
     dom.spellingModeUiEl.style.display = 'none';
@@ -721,8 +740,10 @@ export function setupSentenceTranslationEnDeMode(
     
     dom.checkSentenceButton.disabled = false;
     
-    const umlautContainer = dom.umlautButtonsContainer;
-    if (umlautContainer) umlautContainer.style.display = 'flex';
+    if (dom.umlautButtonsContainer) {
+        dom.umlautButtonsContainer.style.display = 'flex';
+        console.log('✅ Umlaut-Buttons in Satzübersetzungs-Modus angezeigt');
+    }
     // Audio-Buttons verstecken
     if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
     if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'none';
@@ -758,6 +779,11 @@ export function setupSentenceTranslationEnDeMode(
 
     // Wörter für Layout extrahieren (jetzt inkl. Satzzeichen)
     const wordsForLayout = splitSentence(fullGermanSentence);
+    console.log('🔍 Satzübersetzung Debug:', {
+        fullGermanSentence,
+        wordsForLayout,
+        wordsCount: wordsForLayout.length
+    });
     
     // Sentence-Input-Container generieren
     generateSentenceInputs(dom, wordsForLayout, fullGermanSentence, processAnswer, state);
@@ -770,6 +796,11 @@ function generateSentenceInputs(
     processAnswer: ProcessAnswerFunction,
     state: TrainerState
 ): void {
+    console.log('🔍 generateSentenceInputs aufgerufen mit:', {
+        wordsForLayout,
+        containerExists: !!dom.sentenceWordInputContainerEl
+    });
+    
     dom.sentenceWordInputContainerEl.innerHTML = '';
     
     wordsForLayout.forEach((word, index) => {
@@ -816,6 +847,15 @@ function generateSentenceInputs(
     setTimeout(() => {
         const firstInput = dom.sentenceWordInputContainerEl.querySelector('input[type="text"]') as HTMLInputElement;
         if (firstInput) { firstInput.focus(); state.activeTextInput = firstInput; }
+        
+        // Umlaut-Buttons für dynamisch erstellte Input-Felder initialisieren
+        const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
+        if (inputs.length > 0) {
+            import('../../ui/umlaut-buttons').then(mod => {
+                mod.setupUmlautButtons(dom, state);
+                console.log('✅ Umlaut-Buttons für Satzübersetzung initialisiert');
+            });
+        }
     }, 0);
 }
 

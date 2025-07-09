@@ -23,6 +23,53 @@ function showMessage(message, type = 'info') {
     // Hier könnte eine UI-Meldung angezeigt werden
 }
 
+// ========== FEHLERZÄHLER-RESET FUNKTION ==========
+function resetAllErrorCounts() {
+    console.log('🔄 Setze alle Fehlerzähler zurück...');
+    
+    try {
+        // 1. State zurücksetzen
+        state.globalProgress = {};
+        state.currentMainTopic = null;
+        state.currentSubTopic = null;
+        
+        // 2. localStorage zurücksetzen
+        const localStorageKeys = [
+            'a1ThemenProgress',
+            'goetheA1LastTestScores', 
+            'trainer-words-to-repeat',
+            'goetheA1Progress'
+        ];
+        
+        localStorageKeys.forEach(key => {
+            localStorage.removeItem(key);
+            console.log(`🗑️ localStorage Key gelöscht: ${key}`);
+        });
+        
+        // 3. Firebase zurücksetzen (falls verfügbar)
+        if (window.firebaseSyncService) {
+            // Leere Objekte an Firebase senden
+            const emptyProgress = {};
+            const emptyTestScores = {};
+            
+            window.firebaseSyncService.saveProgress(emptyProgress);
+            window.firebaseSyncService.saveTestScores(emptyTestScores);
+            console.log('☁️ Firebase-Daten zurückgesetzt');
+        }
+        
+        // 4. Sync-Service zurücksetzen (falls verfügbar)
+        if (window.syncService) {
+            window.syncService.saveProgress({});
+            console.log('🔄 Sync-Service zurückgesetzt');
+        }
+        
+        console.log('✅ Alle Fehlerzähler erfolgreich zurückgesetzt');
+        
+    } catch (error) {
+        console.error('❌ Fehler beim Zurücksetzen der Fehlerzähler:', error);
+    }
+}
+
 function updateTestModeProgressBars() {
     console.log('[updateTestModeProgressBars] Aktualisiere Test-Fortschritt');
     // Implementierung für Test-Fortschritt
@@ -30,6 +77,10 @@ function updateTestModeProgressBars() {
 
 function startTraining(subTopic) {
     console.log('[startTraining] Starte Training für:', subTopic);
+    
+    // Fehlerzähler zurücksetzen vor dem Start
+    resetAllErrorCounts();
+    
     state.currentSubTopic = subTopic;
     // Hier würde das Training gestartet werden
 }
@@ -151,7 +202,8 @@ window.trainerJS = {
     displaySubTopics,
     handleNavigation,
     init,
-    setVokabular: (vocab) => { vokabular = vocab; }
+    setVokabular: (vocab) => { vokabular = vocab; },
+    resetAllErrorCounts // Neue Funktion exportieren
 };
 
 // Automatische Initialisierung wenn DOM bereit ist
@@ -159,4 +211,7 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
 } else {
     init();
-} 
+}
+
+// Globale Funktionen für externe Aufrufe
+window.resetAllErrorCounts = resetAllErrorCounts; 

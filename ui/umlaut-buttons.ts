@@ -32,12 +32,86 @@ export function insertTextAtCursor(input: HTMLInputElement, text: string): void 
  * Setzt die Umlaut-Buttons für die Text-Eingabe auf.
  */
 export function setupUmlautButtons(dom: any, state: any): void {
-    if (!dom.umlautButtonsContainer) return;
-    const umlautButtons = dom.umlautButtonsContainer.querySelectorAll('.umlaut-button');
-    umlautButtons.forEach((btn: HTMLButtonElement) => {
+    // Alle möglichen Umlaut-Button-Container finden
+    const umlautContainers = [
+        dom.umlautButtonsContainer, // Schreibweise-Modus
+        document.getElementById('umlaut-buttons-container-cloze'), // Cloze-Modus
+        document.getElementById('umlaut-buttons-container-sentence') // Satzübersetzungs-Modus
+    ].filter(Boolean);
+    
+    if (umlautContainers.length === 0) {
+        console.error('❌ Keine Umlaut-Buttons Container gefunden!');
+        return;
+    }
+    
+    // Alle sichtbaren Container anzeigen
+    umlautContainers.forEach(container => {
+        if (container) {
+            container.style.display = 'flex';
+            console.log(`✅ Umlaut-Buttons Container angezeigt: ${container.id}`);
+        }
+    });
+    
+    // Debug: Prüfe ob Container wirklich sichtbar ist
+    const computedStyle = window.getComputedStyle(dom.umlautButtonsContainer);
+    console.log('🔍 Umlaut-Container Debug:', {
+        display: computedStyle.display,
+        visibility: computedStyle.visibility,
+        opacity: computedStyle.opacity,
+        height: computedStyle.height,
+        width: computedStyle.width,
+        position: computedStyle.position,
+        zIndex: computedStyle.zIndex
+    });
+    
+    // Alle relevanten Input-Felder registrieren
+    const inputsToRegister = [
+        'spelling-input-single',
+        'spelling-input-article', 
+        'spelling-input-noun-1',
+        'spelling-input-noun-2'
+    ];
+    
+    inputsToRegister.forEach(inputId => {
+        const input = document.getElementById(inputId) as HTMLInputElement;
+        if (input) {
+            registerInputForUmlauts(input, state, dom);
+        }
+    });
+    
+    // Dynamisch erstellte Input-Felder registrieren (Cloze und Satzübersetzung)
+    const clozeInputs = document.querySelectorAll('#cloze-sentence-container input[type="text"]') as NodeListOf<HTMLInputElement>;
+    const sentenceInputs = document.querySelectorAll('#sentence-word-input-container input[type="text"]') as NodeListOf<HTMLInputElement>;
+    
+    [...clozeInputs, ...sentenceInputs].forEach(input => {
+        if (input && !input.hasAttribute('data-umlaut-registered')) {
+            registerInputForUmlauts(input, state, dom);
+            input.setAttribute('data-umlaut-registered', 'true');
+            console.log(`✅ Input-Feld registriert: ${input.className}`);
+        }
+    });
+    
+    // Fallback: Alle sichtbaren Text-Inputs registrieren
+    const allTextInputs = document.querySelectorAll('input[type="text"]:not([disabled])') as NodeListOf<HTMLInputElement>;
+    allTextInputs.forEach(input => {
+        if (input && !input.hasAttribute('data-umlaut-registered') && (input as HTMLElement).offsetParent !== null) {
+            registerInputForUmlauts(input, state, dom);
+            input.setAttribute('data-umlaut-registered', 'true');
+            console.log(`✅ Fallback Input-Feld registriert: ${input.className}`);
+        }
+    });
+    
+    console.log(`✅ Insgesamt ${allTextInputs.length} Input-Felder für Umlaut-Buttons gefunden`);
+    
+    // Event-Listener für alle Umlaut-Buttons in allen Containern setzen
+    umlautContainers.forEach(container => {
+        const umlautButtons = container.querySelectorAll('.umlaut-button');
+        umlautButtons.forEach((btn: HTMLButtonElement) => {
         if (!btn.hasAttribute('data-umlaut-initialized')) {
             btn.addEventListener('mousedown', function(e: MouseEvent) {
                 e.preventDefault();
+                e.stopPropagation();
+                
                 // Ziel-Input bestimmen
                 let input: HTMLInputElement | null = state.activeTextInput;
                 if (!input || input.disabled || !(input as HTMLElement).offsetParent) {
@@ -50,30 +124,37 @@ export function setupUmlautButtons(dom: any, state: any): void {
                         if (visibleInputs.length === 1) input = visibleInputs[0];
                     }
                 }
+                
                 if (input) {
-                    const start = input.selectionStart || 0;
-                    const end = input.selectionEnd || 0;
-                    const value = input.value;
                     const char = e.shiftKey && btn.textContent ? btn.textContent.toUpperCase() : btn.textContent || '';
-                    input.value = value.substring(0, start) + char + value.substring(end);
-                    input.selectionStart = input.selectionEnd = start + char.length;
-                    input.focus();
-                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    insertTextAtCursor(input, char);
                 }
             });
             btn.setAttribute('data-umlaut-initialized', 'true');
         }
         btn.title = 'Shift für Großbuchstaben';
+        });
     });
+    
+    console.log('✅ Umlaut-Buttons erfolgreich initialisiert');
 }
 
 /**
  * Versteckt die Umlaut-Buttons.
  */
 export function hideUmlautButtons(dom: DOMElements): void {
-    if (dom.umlautButtonsContainer) {
-        dom.umlautButtonsContainer.style.display = 'none';
-    }
+    const umlautContainers = [
+        dom.umlautButtonsContainer,
+        document.getElementById('umlaut-buttons-container-cloze'),
+        document.getElementById('umlaut-buttons-container-sentence')
+    ].filter(Boolean);
+    
+    umlautContainers.forEach(container => {
+        if (container) {
+            container.style.display = 'none';
+            console.log(`✅ Umlaut-Buttons versteckt: ${container.id}`);
+        }
+    });
 }
 
 /**
