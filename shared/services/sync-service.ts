@@ -1,8 +1,9 @@
 // shared/services/sync-service.ts - VOLLSTÄNDIGE VERSION
 
-// Firebase-Imports als any deklarieren für Kompatibilität
-const { getFirestore, doc, onSnapshot, setDoc } = (window as any).firebase?.firestore || {};
-import { app } from '../auth/firebase-config';
+// Firebase-Imports aus der Konfiguration
+import { app, db } from '../auth/firebase-config';
+// @ts-ignore
+import { doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import type { AuthService } from './auth-service';
 import type { UserData } from '../types/index';
 
@@ -22,7 +23,7 @@ export class SyncService {
     private authService: AuthService | null = null;
 
     constructor(trainerId?: string, authService?: AuthService) {
-        this.db = getFirestore(app);
+        this.db = db;
         this.trainerType = trainerId || 'basis';
         this.authService = authService || null;
     }

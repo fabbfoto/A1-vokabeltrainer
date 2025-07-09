@@ -4,7 +4,7 @@
 // Firebase-Imports für Runtime
 // @ts-ignore
 import { collection, addDoc, query, orderBy, limit, getDocs, where } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
-import { db } from '../auth/firebase-config.js';
+import { db } from '../auth/firebase-config';
 import type { TestScore, TestVariant, TestCategory, TopicId } from '../types/index.js';
 
 type TimestampType = { fromDate: (date: Date) => any };

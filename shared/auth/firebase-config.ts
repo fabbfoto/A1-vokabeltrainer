@@ -1,6 +1,10 @@
 // shared/auth/firebase-config.ts
-// Firebase-Imports als any deklarieren für Kompatibilität
-const { initializeApp, getAuth, getFirestore } = (window as any).firebase || {};
+// @ts-ignore
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+// @ts-ignore
+import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+// @ts-ignore
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 
 interface FirebaseConfig {
   apiKey: string;
@@ -30,9 +34,9 @@ const firebaseConfig: FirebaseConfig = {
   measurementId: "G-WZELR67WKZ"
 };
 
-export const app: any = initializeApp(firebaseConfig);
-const auth: any = getAuth(app);
-const db: any = getFirestore(app);
+export const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 function getCurrentDeviceInfo(): DeviceInfo {
     let browserName: string = 'Unknown';
