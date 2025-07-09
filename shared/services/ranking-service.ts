@@ -1,9 +1,13 @@
 // shared/services/ranking-service.ts
 // Firebase-basierter Ranking-Service für Test-Ergebnisse
 
-import { collection, addDoc, query, orderBy, limit, getDocs, where, Timestamp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+// Firebase-Imports für Runtime
+import { collection, addDoc, query, orderBy, limit, getDocs, where } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 import { db } from '../auth/firebase-config.js';
 import type { TestScore, TestVariant, TestCategory, TopicId } from '../types/index.js';
+
+// TypeScript-Typen für Firebase
+type Timestamp = any;
 
 export interface TestResultSubmission {
   userId: string;

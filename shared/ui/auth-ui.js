@@ -67,15 +67,16 @@ export class AuthUI {
         }
 
         if (isLoggedIn) {
-            let loggedInClasses = 'rounded-lg py-2 px-4 font-semibold text-white cursor-default';
+            let loggedInClasses = 'rounded-lg py-2 px-4 font-semibold text-white transition-colors duration-200';
             if (this.options.buttonClasses && this.options.buttonClasses.loggedIn) {
                 loggedInClasses = this.options.buttonClasses.loggedIn;
             }
             
             this.syncButton.className = loggedInClasses;
-            this.syncButton.innerHTML = `${userEmail || 'Angemeldet'}`;
+            this.syncButton.innerHTML = `${userEmail || 'Angemeldet'} (Klick zum Abmelden)`;
             this.syncButton.style.background = 'linear-gradient(to right, #000000, #DD0000, #FFCC00)';
-            this.syncButton.disabled = true;
+            this.syncButton.style.cursor = 'pointer';
+            this.syncButton.addEventListener('click', () => this.authService.logout());
         } else {
             let loggedOutClasses = 'rounded-lg py-2 px-4 font-semibold transition-colors duration-200';
             if (this.options.buttonClasses && this.options.buttonClasses.loggedOut) {

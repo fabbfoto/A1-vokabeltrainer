@@ -1,45 +1,49 @@
-// shared/services/auth-service.js - VOLLSTÄNDIGE VERSION
-
+// Firebase-Imports für Runtime
 import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
 import { app } from '../auth/firebase-config';
 
+// TypeScript-Typen für Firebase
+type User = any;
+type Auth = any;
+
 export class AuthService {
+    public auth: Auth;
+    public currentUser: User | null;
+
     constructor() {
         this.auth = getAuth(app);
         this.currentUser = this.auth.currentUser;
 
         // Richte einen internen Listener ein, um den currentUser immer aktuell zu halten
-        onAuthStateChanged(this.auth, (user) => {
+        onAuthStateChanged(this.auth, (user: User | null) => {
             this.currentUser = user;
         });
     }
 
     /**
      * Prüft synchron, ob ein Benutzer gerade angemeldet ist.
-     * @returns {boolean}
      */
-    isLoggedIn() {
+    isLoggedIn(): boolean {
         return !!this.currentUser;
     }
 
     /**
      * Gibt die E-Mail des aktuellen Benutzers zurück.
-     * @returns {string|null}
      */
-    getUserEmail() {
+    getUserEmail(): string | null {
         return this.currentUser ? this.currentUser.email : null;
     }
 
     /**
      * Startet den Google Login-Prozess mit einem Popup.
      */
-    async loginWithGoogle() {
+    async loginWithGoogle(): Promise<void> {
         const provider = new GoogleAuthProvider();
         try {
             await signInWithPopup(this.auth, provider);
             // Der onIdTokenChanged-Listener in index.js wird dies automatisch erkennen
             // und die notwendigen Aktionen auslösen.
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Fehler beim Google-Login:", error);
             alert("Login fehlgeschlagen. Bitte versuche es erneut.");
         }
@@ -48,12 +52,12 @@ export class AuthService {
     /**
      * Meldet den aktuellen Benutzer ab.
      */
-    async logout() {
+    async logout(): Promise<void> {
         try {
             await signOut(this.auth);
             // Der onIdTokenChanged-Listener in index.js wird dies ebenfalls erkennen.
-        } catch (error) {
+        } catch (error: unknown) {
             console.error("Fehler beim Logout:", error);
         }
     }
-}
+} 

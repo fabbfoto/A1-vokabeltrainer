@@ -106,8 +106,7 @@ export function setupMultipleChoiceMode(
     dom.correctionSolutionEl.textContent = '';
     dom.correctionSolutionEl.classList.add('hidden');
     // Umlaut-Buttons verstecken
-    const umlautContainer = document.getElementById('umlaut-buttons-container');
-    if (umlautContainer) umlautContainer.style.display = 'none';
+    if (dom.umlautButtonsContainer) dom.umlautButtonsContainer.style.display = 'none';
     // Sichtbarkeitsumschaltung
     dom.mcUiEl.style.display = 'block';
     dom.spellingModeUiEl.style.display = 'none';
