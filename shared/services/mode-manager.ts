@@ -1,5 +1,5 @@
 // shared/services/mode-manager.ts
-import type { TrainerState, WordId } from '../types/index';
+import type { ModeId, LearningMode } from '../types/trainer';
 
 // Definiere die verschiedenen App-Modi
 export type AppMode = 

@@ -13,7 +13,7 @@ import type {
     WordId,
     TestScore,
     TestConfiguration
-} from './shared/types/index';
+} from './shared/types/trainer';
 
 import { dom } from './dom';
 import type { DOMElements } from './shared/types/ui';
@@ -26,7 +26,7 @@ import { NavigationEvents } from './shared/events/navigation-events';
 import { setupUmlautButtons } from './ui/umlaut-buttons';
 import { updateErrorCounts } from './ui/statistics';
 import { generateTestQuestions, TestGenerationResult } from './utils/test-generator';
-import { calculateTestScore, calculateAverageTimePerQuestion } from './shared/types/index';
+import { calculateTestScore, calculateAverageTimePerQuestion } from './shared/types/trainer';
 import { showTestResultModal } from './shared/ui/test-result-modal';
 import { ModeManager } from './shared/services/mode-manager';
 
@@ -840,13 +840,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Verzögert ausführen, damit die Input-Felder im DOM sind
         setTimeout(() => {
             const umlautModes = ['type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'];
-            if (umlautModes.includes(modeId)) {
-                if (ui.setupUmlautButtons) {
-                    ui.setupUmlautButtons(dom, state);
-                    console.log(`✅ Umlaut-Buttons für Modus ${modeId} initialisiert`);
-                }
-            } else {
-                if (ui.hideUmlautButtons) ui.hideUmlautButtons(dom);
+            if (ui.setupUmlautButtons) {
+                ui.setupUmlautButtons(dom, state);
+                console.log(`✅ Umlaut-Buttons für Modus ${modeId} initialisiert`);
             }
         }, 200); // Längere Verzögerung für dynamisch erstellte Input-Felder
     }
@@ -998,20 +994,20 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 variant: testConfig.variant,
                 scope: testConfig.type as any,
                 topicId: testConfig.topicId,
-                category: testConfig.selectedCategory as import('./shared/types/index').TestCategory,
+                category: testConfig.selectedCategory as import('./shared/types/trainer').TestCategory,
                 totalQuestions: 20
             });
             // State für Test vorbereiten
             state.currentTest = testConfig;
-            state.currentVocabularySet = result.words as import('./shared/types/index').Word[];
-            state.shuffledWordsForMode = result.words as import('./shared/types/index').Word[];
+            state.currentVocabularySet = result.words as import('./shared/types/trainer').Word[];
+            state.shuffledWordsForMode = result.words as import('./shared/types/trainer').Word[];
             state.currentWordIndex = -1;
             state.correctInCurrentRound = 0;
             state.attemptedInCurrentRound = 0;
             
             // Mode-Rotation für Chaos-Test
             if (testConfig.variant === 'chaos' && result.modeRotation) {
-                state.testModeRotation = result.modeRotation as import('./shared/types/index').ModeId[];
+                state.testModeRotation = result.modeRotation as import('./shared/types/trainer').ModeId[];
                 state.currentTestModeIndex = 0;
             } else {
                 state.currentMode = testConfig.mode;

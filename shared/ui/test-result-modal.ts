@@ -1,7 +1,7 @@
 // shared/ui/test-result-modal.ts
-import type { TestScore, TestConfiguration } from '../types/index';
+import type { TestResult } from '../types/trainer';
 
-export function showTestResultModal(score: TestScore, testConfig?: TestConfiguration) {
+export function showTestResultModal(score: TestResult, testConfig?: any) {
   // Prüfe, ob schon ein Modal existiert
   if (document.getElementById('test-result-modal')) return;
 

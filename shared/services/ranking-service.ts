@@ -5,7 +5,7 @@
 // @ts-ignore
 import { collection, addDoc, query, orderBy, limit, getDocs, where } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
 import { db } from '../auth/firebase-config';
-import type { TestScore, TestVariant, TestCategory, TopicId } from '../types/index.js';
+import type { TrainerState, SessionStats, TestResult } from '../types/trainer';
 
 type TimestampType = { fromDate: (date: Date) => any };
 // Fallback für Timestamp.fromDate, falls nicht vorhanden
@@ -62,7 +62,7 @@ export interface UserStats {
 export class RankingService {
   constructor(private authService: any) {}
 
-  async submitTestResult(testScore: TestScore, testVariant: TestVariant, selectedCategory?: TestCategory): Promise<void> {
+  async submitTestResult(testScore: TestResult, testVariant: 'chaos' | 'structured', selectedCategory?: string): Promise<void> {
     const user = this.authService.currentUser;
     if (!user) {
       console.warn('User nicht angemeldet - Test-Ergebnis wird nicht gespeichert');
@@ -148,7 +148,7 @@ export class RankingService {
     }
   }
 
-  async getTestTypeRankings(testType: TestVariant, limitCount: number = 50): Promise<RankingEntry[]> {
+  async getTestTypeRankings(testType: 'chaos' | 'structured', limitCount: number = 50): Promise<RankingEntry[]> {
     try {
       const q = query(
         collection(db, 'testResults'),

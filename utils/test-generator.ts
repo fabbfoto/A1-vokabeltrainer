@@ -1,5 +1,5 @@
 // Importiere Typen aus shared/types
-import type { Word, TopicId, SubTopicId, ModeId, TestCategory } from '../shared/types/index';
+import type { Word, TopicId, SubTopicId, ModeId, TestCategory } from '../shared/types/trainer';
 
 // Konstante für Kategorie-Modus-Mapping
 const CATEGORY_MODE_MAP: Record<TestCategory, ModeId> = {

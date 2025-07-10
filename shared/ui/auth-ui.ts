@@ -1,7 +1,7 @@
 // shared/ui/auth-ui.ts - Perfekte Event-basierte Version
 
 import type { AuthService } from '../services/auth-service';
-import type { User } from '../types/index';
+import type { TrainerState } from '../types/trainer';
 
 interface UIConfig {
     buttonContainerId: string;
@@ -114,7 +114,7 @@ export class AuthUI {
         container.appendChild(this.syncButton);
     }
 
-    public updateUIAfterLogin(user: User): void {
+    public updateUIAfterLogin(user: TrainerState): void {
         console.log('[AuthUI] updateUIAfterLogin aufgerufen, zeichne Button neu.');
         this.renderSyncButton(true, user.email);
     }

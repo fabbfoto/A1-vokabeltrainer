@@ -9,6 +9,9 @@ export type ModeId = string & { __brand: 'ModeId' };
 export type TestId = string & { __brand: 'TestId' };
 export type SessionId = string & { __brand: 'SessionId' };
 
+// ========== RE-EXPORTS ==========
+export type { TopicId, SubTopicId, WordId } from './vocabulary';
+
 // ========== LEARNING MODES (WICHTIG - WERDEN NOCH VERWENDET) ==========
 export type LearningModeType = 
   | 'multipleChoice'

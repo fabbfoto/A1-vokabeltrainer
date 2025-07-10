@@ -2,7 +2,7 @@
 // Navigation und Themen-Anzeige Funktionen
 
 import type { DOMElements } from '../shared/types/ui';
-import type { TrainerState, VocabularyStructure, LearningModes, UICallbacks, TopicId, SubTopicId, ModeId } from '../shared/types/index';
+import type { TrainerState, VocabularyStructure, LearningModes, UICallbacks, TopicId, SubTopicId, ModeId } from '../shared/types/trainer';
 import type { TestCategory } from '../shared/types/trainer';
 
 import { NavigationEvents } from '../shared/events/navigation-events';

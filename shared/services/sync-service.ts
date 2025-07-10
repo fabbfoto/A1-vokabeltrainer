@@ -5,7 +5,7 @@ import { app, db } from '../auth/firebase-config';
 // @ts-ignore
 import { doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 import type { AuthService } from './auth-service';
-import type { UserData } from '../types/index';
+import type { TrainerState, Progress } from '../types/trainer';
 
 interface SyncListener {
     (type: 'remoteUpdate' | 'localUpdate' | 'error', data: any): void;

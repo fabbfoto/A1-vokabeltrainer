@@ -5,11 +5,7 @@
 // Alle Lernmodus-Setup-Funktionen mit vollständiger Type-Safety
 
 // ✅ IMPORT GLOBALE TYPES (statt lokale Definitionen)
-import type { 
-    Word, 
-    TrainerState, 
-    ModeId
-} from '../types/index';
+import type { ModeId, LearningMode, Word } from '../types/trainer';
 
 // Import DOMElements from the correct location to avoid conflicts
 import type { DOMElements } from '../types/ui';
