@@ -19,12 +19,12 @@ export function resetErrorCountsForNewExercise(
     console.log('🔄 Setze Fehlerzähler für neue Übung zurück...');
     
     // 1. Aktuelle Übungszähler zurücksetzen
-    state.correctInCurrentRound = 0;
-    state.attemptedInCurrentRound = 0;
+    state.training.correctInCurrentRound = 0;
+    state.training.attemptedInCurrentRound = 0;
     
     // 2. Fehlerzähler für diesen Modus zurücksetzen
-    if (state.wordsToRepeatByMode[modeId]) {
-        state.wordsToRepeatByMode[modeId] = new Set();
+    if (state.progress.wordsToRepeatByMode[modeId]) {
+        state.progress.wordsToRepeatByMode[modeId] = new Set();
         saveWordsToRepeat();
         console.log(`🗑️ Fehlerzähler für Modus ${modeId} zurückgesetzt`);
     }
@@ -60,9 +60,9 @@ export function resetAllErrorCounts(
     console.log('🔄 Setze ALLE Fehlerzähler zurück...');
     
     // 1. State zurücksetzen
-    state.correctInCurrentRound = 0;
-    state.attemptedInCurrentRound = 0;
-    state.wordsToRepeatByMode = {};
+    state.training.correctInCurrentRound = 0;
+    state.training.attemptedInCurrentRound = 0;
+    state.progress.wordsToRepeatByMode = {};
     
     // 2. localStorage löschen
     localStorage.removeItem('trainer-words-to-repeat');
@@ -93,7 +93,7 @@ export function resetAllErrorCounts(
  * @returns true wenn Fehler vorhanden sind, false sonst
  */
 export function hasErrorCounts(state: any, modeId: ModeId): boolean {
-    const errorSet = state.wordsToRepeatByMode[modeId];
+    const errorSet = state.progress.wordsToRepeatByMode[modeId];
     return errorSet && errorSet.size > 0;
 }
 
@@ -105,6 +105,6 @@ export function hasErrorCounts(state: any, modeId: ModeId): boolean {
  * @returns Anzahl der Fehler
  */
 export function getErrorCount(state: any, modeId: ModeId): number {
-    const errorSet = state.wordsToRepeatByMode[modeId];
+    const errorSet = state.progress.wordsToRepeatByMode[modeId];
     return errorSet ? errorSet.size : 0;
 } 

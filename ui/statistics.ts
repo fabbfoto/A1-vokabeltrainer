@@ -85,7 +85,7 @@ export function updateErrorCounts(dom: DOMElements, state: TrainerState, learnin
             return;
         }
         
-        const errorCount = state.wordsToRepeatByMode[mode]?.size || 0;
+        const errorCount = state.progress.wordsToRepeatByMode[mode]?.size || 0;
         
         // Immer die Zahl anzeigen
         countSpan.textContent = errorCount.toString();
@@ -128,7 +128,7 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
     }
     
     dom.categoryStatsContainerEl.innerHTML = '';
-    const totalItemsInSet = state.currentVocabularySet.length;
+    const totalItemsInSet = state.training.currentVocabularySet.length;
     if (totalItemsInSet === 0) return;
 
     const title = document.createElement('p');
@@ -183,14 +183,14 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
  */
 export function updatePracticeStats(dom: DOMElements, state: TrainerState, learningModes: LearningModes): void {
     if (dom.correctInRoundPracticeEl) {
-        dom.correctInRoundPracticeEl.textContent = state.correctInCurrentRound.toString();
+        dom.correctInRoundPracticeEl.textContent = state.training.correctInCurrentRound.toString();
     }
     if (dom.attemptedInRoundPracticeEl) {
-        dom.attemptedInRoundPracticeEl.textContent = state.attemptedInCurrentRound.toString();
+        dom.attemptedInRoundPracticeEl.textContent = state.training.attemptedInCurrentRound.toString();
     }
     
-    const accuracy = state.attemptedInCurrentRound > 0 
-        ? (state.correctInCurrentRound / state.attemptedInCurrentRound) * 100 
+    const accuracy = state.training.attemptedInCurrentRound > 0 
+        ? (state.training.correctInCurrentRound / state.training.attemptedInCurrentRound) * 100 
         : 0;
     
     if (dom.accuracyInRoundPracticeEl) {
@@ -208,9 +208,9 @@ export function updatePracticeStats(dom: DOMElements, state: TrainerState, learn
  * Aktualisiert die Test-Statistiken während eines Tests.
  */
 export function updateTestStats(dom: DOMElements, state: TrainerState): void {
-    const correct = state.correctInCurrentRound;
+    const correct = state.training.correctInCurrentRound;
     const total = state.shuffledWordsForMode.length;
-    const attempted = state.attemptedInCurrentRound;
+    const attempted = state.training.attemptedInCurrentRound;
     const progress = calculateProgressPercentage(attempted, total);
     const accuracy = attempted > 0 ? (correct / attempted) * 100 : 0;
 
