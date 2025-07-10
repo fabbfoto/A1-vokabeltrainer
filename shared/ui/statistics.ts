@@ -7,7 +7,7 @@ export function updateErrorCounts(dom: DOMElements, state: TrainerState, learnin
         if (!repeatButton) return;
         const countSpan = repeatButton.querySelector('.count-display');
         if (!countSpan) return;
-        const errorCount = state.wordsToRepeatByMode[mode]?.size || 0;
+        const errorCount = state.progress.wordsToRepeatByMode[mode as import('../types/trainer').ModeId]?.size || 0;
         countSpan.textContent = errorCount.toString();
     });
 } 
