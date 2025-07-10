@@ -146,7 +146,6 @@ export function setupMultipleChoiceMode(
             if (joined.trim() !== '') {
                 dom.exampleSentenceDisplayEl.innerHTML = exampleSentence.map(part => {
                     try {
-
                         return `<span class="${getTailwindCaseClass(part.case || part.kasus)}" style="font-family: 'Times New Roman', Times, serif; font-size: 2.5rem; line-height: 1.5;">${part.text}</span>`;
                     } catch (e) {
                         console.error('[FEHLER][Kasus-Färbung]', part, e);
@@ -597,7 +596,7 @@ export function setupSpellingMode(
                 
                 // ✅ FOKUSSIERUNG: Einzelfeld fokussieren
                 dom.spellingInputSingleEl.focus();
-                state.activeTextInput = dom.spellingInputSingleEl;
+                state.training.activeTextInput = dom.spellingInputSingleEl;
                 
                 // Nächstes Wort laden
                 processAnswer(isCorrect, correctAnswer);
@@ -615,7 +614,7 @@ export function setupSpellingMode(
         // Event-Handler für Auswerten-Button setzen
         dom.checkSpellingButton.onclick = handleSingleCheckButtonClick;
         // Automatisch erstes Feld fokussieren
-        setTimeout(() => { dom.spellingInputSingleEl.focus(); state.activeTextInput = dom.spellingInputSingleEl; }, 0);
+        setTimeout(() => { dom.spellingInputSingleEl.focus(); state.training.activeTextInput = dom.spellingInputSingleEl; }, 0);
     }
 }
 
@@ -653,7 +652,7 @@ export function setupClozeMode(
     if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'none';
     
     // ✅ KORREKT: currentWord statt currentWordData
-    const currentWord = state.currentWord;
+    const currentWord = state.training.currentWord;
     if (!currentWord) {
         console.error('[setupClozeMode] Kein currentWord gefunden!');
         return;
@@ -696,7 +695,7 @@ function generateClozeUI(
             dom.clozeSentenceContainerEl.appendChild(input);
             
             input.addEventListener('focus', () => {
-                state.activeTextInput = input;
+                state.training.activeTextInput = input;
             });
         }
     });
@@ -728,7 +727,7 @@ function generateClozeUI(
         const firstInput = dom.clozeSentenceContainerEl.querySelector('input[type="text"]') as HTMLInputElement;
         if (firstInput) { 
             firstInput.focus(); 
-            state.activeTextInput = firstInput; 
+            state.training.activeTextInput = firstInput; 
         }
         
         // Umlaut-Buttons für dynamisch erstellte Input-Felder initialisieren
@@ -779,7 +778,7 @@ export function setupSentenceTranslationEnDeMode(
     if (sentenceUi) sentenceUi.style.display = 'block';
     
     // ✅ KORREKT: currentWord statt currentWordData
-    const currentWord = state.currentWord;
+    const currentWord = state.training.currentWord;
     if (!currentWord) {
         console.error('[setupSentenceTranslationEnDeMode] Kein currentWord gefunden!');
         return;
@@ -844,7 +843,7 @@ function generateSentenceInputs(
         input.dataset.expectedWord = word;
         dom.sentenceWordInputContainerEl.appendChild(input);
         input.addEventListener('focus', () => {
-            state.activeTextInput = input;
+            state.training.activeTextInput = input;
         });
     });
     
@@ -873,7 +872,7 @@ function generateSentenceInputs(
     };
     setTimeout(() => {
         const firstInput = dom.sentenceWordInputContainerEl.querySelector('input[type="text"]') as HTMLInputElement;
-        if (firstInput) { firstInput.focus(); state.activeTextInput = firstInput; }
+        if (firstInput) { firstInput.focus(); state.training.activeTextInput = firstInput; }
         
         // Umlaut-Buttons für dynamisch erstellte Input-Felder initialisieren
         const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
@@ -888,7 +887,7 @@ function generateSentenceInputs(
 
 function addCorrectionEnterHandler(dom: DOMElements, state: TrainerState) {
     function handler(e: KeyboardEvent) {
-        if (state.isCorrectionMode && e.key === 'Enter') {
+        if (state.training.isCorrectionMode && e.key === 'Enter') {
             e.preventDefault();
             dom.continueButton?.click();
         }

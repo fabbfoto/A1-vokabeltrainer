@@ -100,8 +100,8 @@ export function updateErrorCounts(dom: DOMElements, state: TrainerState, learnin
             repeatButton.classList.add('bg-red-100', 'text-red-500');
             
             // Falls das der aktive Wiederholungsmodus war
-            if (state.isRepeatSessionActive && state.currentMode === mode) {
-                state.isRepeatSessionActive = false;
+            if (state.training.isRepeatSessionActive && state.training.currentMode === mode) {
+                state.training.isRepeatSessionActive = false;
                 console.log('[updateErrorCounts] Wiederholungs-Modus beendet');
             }
         } else {
@@ -110,7 +110,7 @@ export function updateErrorCounts(dom: DOMElements, state: TrainerState, learnin
             repeatButton.removeAttribute('disabled');
             
             // Standard-Styling wenn nicht aktiv
-            if (!state.isRepeatSessionActive || state.currentMode !== mode) {
+            if (!state.training.isRepeatSessionActive || state.training.currentMode !== mode) {
                 repeatButton.classList.remove('bg-red-600', 'text-white', 'hover:bg-red-700');
                 repeatButton.classList.add('bg-red-100', 'text-red-500', 'hover:enabled:bg-red-200');
             }
@@ -141,8 +141,8 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
     
     Object.keys(learningModes).forEach(modeId => {
         const modeInfo = learningModes[modeId];
-        const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
-        const progressData = state.globalProgress[progressKey]?.[modeId];
+        const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
+        const progressData = state.progress.globalProgress[progressKey]?.[modeId];
         const masteredCount = progressData?.size || 0;
         const percentage = calculateProgressPercentage(masteredCount, totalItemsInSet);
 

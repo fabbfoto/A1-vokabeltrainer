@@ -113,7 +113,7 @@ export function setupUmlautButtons(dom: any, state: any): void {
                 e.stopPropagation();
                 
                 // Ziel-Input bestimmen
-                let input: HTMLInputElement | null = state.activeTextInput;
+                let input: HTMLInputElement | null = state.training.activeTextInput;
                 if (!input || input.disabled || !(input as HTMLElement).offsetParent) {
                     // Fallback: aktives oder sichtbares Input suchen
                     if (document.activeElement && (document.activeElement as HTMLElement).tagName === 'INPUT') {
@@ -167,13 +167,13 @@ export function registerInputForUmlauts(
 ): void {
     if (!input) return;
     input.addEventListener('focus', () => {
-        state.activeTextInput = input;
+        state.training.activeTextInput = input;
         // Buttons werden nur einmalig initialisiert, kein erneutes setup nötig
     });
     input.addEventListener('blur', () => {
         setTimeout(() => {
-            if (state.activeTextInput === input) {
-                state.activeTextInput = null;
+            if (state.training.activeTextInput === input) {
+                state.training.activeTextInput = null;
             }
         }, 200);
     });
