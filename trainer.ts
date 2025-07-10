@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         activeTextInput: null,
         isLoading: false,
         currentError: null,
-        lastUsedModeByTopic: {},
+        lastUsedModeByTopic: {} as Record<string, ModeId>,
         isCorrectionMode: false,
         perfectRunsByMode: {}, // Zählt perfekte Durchläufe pro Modus
     };
@@ -697,6 +697,49 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     function getTopicKey(main: TopicId|null, sub: SubTopicId|null) {
         return main && sub ? `${main}|${sub}` : '';
+    }
+
+    // Hilfsfunktion für sichere Mode-Zugriffe
+    function getCurrentMode(): ModeId | null {
+        return state.currentMode;
+    }
+
+    function isCurrentModeValid(): boolean {
+        return state.currentMode !== null;
+    }
+
+    // Sichere Zugriffe auf State mit Null-Checks
+    function getProgressForMode(progressKey: string): Set<WordId> {
+        if (!state.currentMode) return new Set();
+        const progress = state.globalProgress[progressKey]?.[state.currentMode];
+        if (progress instanceof Set) {
+            return progress;
+        }
+        return new Set();
+    }
+
+    function setProgressForMode(progressKey: string, progress: Set<WordId>): void {
+        if (!state.currentMode) return;
+        if (!state.globalProgress[progressKey]) {
+            state.globalProgress[progressKey] = {};
+        }
+        state.globalProgress[progressKey][state.currentMode] = progress;
+    }
+
+    function getWordsToRepeatForMode(): Set<WordId> {
+        if (!state.currentMode) return new Set();
+        return state.wordsToRepeatByMode[state.currentMode] || new Set();
+    }
+
+    function setWordsToRepeatForMode(words: Set<WordId>): void {
+        if (!state.currentMode) return;
+        state.wordsToRepeatByMode[state.currentMode] = words;
+    }
+
+    function safeSetMode(modeId: ModeId | null, isRepeat: boolean = false): void {
+        if (modeId) {
+            setMode(modeId, isRepeat);
+        }
     }
 
     function setMode(modeId: ModeId, isRepeat: boolean = false): void {
