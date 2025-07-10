@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     removeFromErrorList();
                     
                     // Prüfe ob noch Fehler da sind
-                    const remainingErrors = state.currentMode ? state.wordsToRepeatByMode[state.currentMode]?.size || 0 : 0;
+                    const remainingErrors = state.wordsToRepeatByMode[state.currentMode]?.size || 0;
                     if (remainingErrors === 0) {
                         handleNoMoreErrors();
                         return;

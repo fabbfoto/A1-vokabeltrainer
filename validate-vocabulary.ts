@@ -43,9 +43,23 @@ export function validateAllVocabularies() {
     return issues;
 }
 
-// Nutze diese Funktion beim Start der App
-const validationIssues = validateAllVocabularies();
-if (validationIssues.length > 0) {
-    console.error('Vokabular-Validierung gefunden:', validationIssues.length, 'Probleme');
-    console.table(validationIssues);
+// Nur ausführen, wenn diese Datei direkt mit Node gestartet wird
+// (z.B. mit: npx ts-node validate-vocabulary.ts)
+// Für Browser/Frontend ist diese Datei nicht gedacht!
+declare const require: any;
+declare const module: any;
+declare const process: any;
+
+if (typeof require !== 'undefined' && typeof module !== 'undefined' && require.main === module) {
+    const validationIssues = validateAllVocabularies();
+    if (validationIssues.length > 0) {
+        // eslint-disable-next-line no-console
+        console.error('Vokabular-Validierung gefunden:', validationIssues.length, 'Probleme');
+        // eslint-disable-next-line no-console
+        console.table(validationIssues);
+        process.exit(1);
+    } else {
+        // eslint-disable-next-line no-console
+        console.log('✅ Alle Vokabularien sind valide!');
+    }
 } 

@@ -110,7 +110,7 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc, index) => ({
+      const rankings = snapshot.docs.map((doc: any, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
@@ -134,7 +134,7 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc, index) => ({
+      const rankings = snapshot.docs.map((doc: any, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
@@ -158,7 +158,7 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc, index) => ({
+      const rankings = snapshot.docs.map((doc: any, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
@@ -181,7 +181,7 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const results = snapshot.docs.map(doc => doc.data()) as TestResultSubmission[];
+      const results = snapshot.docs.map((doc: any) => doc.data()) as TestResultSubmission[];
       
       if (results.length === 0) return null;
       
@@ -263,7 +263,7 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc, index) => ({
+      const rankings = snapshot.docs.map((doc: any, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),

@@ -1,5 +1,7 @@
-// packages/trainer-themen/trainer.js
-// JavaScript-Version der Navigation-Funktionen
+// packages/trainer-themen/trainer.ts
+// TypeScript-Version der Navigation-Funktionen
+
+import type { VocabularyStructure } from '../../shared/types/vocabulary';
 
 // DOM-Elemente
 const navigationContainerEl = document.getElementById('navigation-container');
@@ -7,24 +9,31 @@ const navigationTitleEl = document.getElementById('navigation-title');
 const backToMainTopicsButton = document.getElementById('back-to-main-topics');
 const testSelectionModalEl = document.getElementById('test-selection-modal');
 
+// State-Interface
+interface TrainerState {
+    currentMainTopic: string | null;
+    currentSubTopic: string | null;
+    globalProgress: Record<string, any>;
+}
+
 // State-Objekt
-const state = {
+const state: TrainerState = {
     currentMainTopic: null,
     currentSubTopic: null,
     globalProgress: {}
 };
 
 // Vokabular importieren (wird von außen geladen)
-let vokabular = {};
+let vokabular: VocabularyStructure = {} as VocabularyStructure;
 
 // Hilfsfunktionen
-function showMessage(message, type = 'info') {
+function showMessage(message: string, type: 'info' | 'error' | 'warning' = 'info'): void {
     console.log(`[${type.toUpperCase()}] ${message}`);
     // Hier könnte eine UI-Meldung angezeigt werden
 }
 
 // ========== FEHLERZÄHLER-RESET FUNKTION ==========
-function resetAllErrorCounts() {
+function resetAllErrorCounts(): void {
     console.log('🔄 Setze alle Fehlerzähler zurück...');
     
     try {
@@ -47,19 +56,19 @@ function resetAllErrorCounts() {
         });
         
         // 3. Firebase zurücksetzen (falls verfügbar)
-        if (window.firebaseSyncService) {
+        if ((window as any).firebaseSyncService) {
             // Leere Objekte an Firebase senden
             const emptyProgress = {};
             const emptyTestScores = {};
             
-            window.firebaseSyncService.saveProgress(emptyProgress);
-            window.firebaseSyncService.saveTestScores(emptyTestScores);
+            (window as any).firebaseSyncService.saveProgress(emptyProgress);
+            (window as any).firebaseSyncService.saveTestScores(emptyTestScores);
             console.log('☁️ Firebase-Daten zurückgesetzt');
         }
         
         // 4. Sync-Service zurücksetzen (falls verfügbar)
-        if (window.syncService) {
-            window.syncService.saveProgress({});
+        if ((window as any).syncService) {
+            (window as any).syncService.saveProgress({});
             console.log('🔄 Sync-Service zurückgesetzt');
         }
         
@@ -70,12 +79,12 @@ function resetAllErrorCounts() {
     }
 }
 
-function updateTestModeProgressBars() {
+function updateTestModeProgressBars(): void {
     console.log('[updateTestModeProgressBars] Aktualisiere Test-Fortschritt');
     // Implementierung für Test-Fortschritt
 }
 
-function startTraining(subTopic) {
+function startTraining(subTopic: string): void {
     console.log('[startTraining] Starte Training für:', subTopic);
     
     // Fehlerzähler zurücksetzen vor dem Start
@@ -86,7 +95,7 @@ function startTraining(subTopic) {
 }
 
 // Navigation-Funktionen
-function displayMainTopics() {
+function displayMainTopics(): void {
     console.log('[displayMainTopics] Zeige Hauptthemen');
     
     if (!navigationTitleEl || !backToMainTopicsButton || !navigationContainerEl) {
@@ -114,7 +123,7 @@ function displayMainTopics() {
     navigationContainerEl.appendChild(testButton);
 }
 
-function displaySubTopics(mainTopicName) {
+function displaySubTopics(mainTopicName: string): void {
     console.log('[displaySubTopics] Zeige Unterthemen für:', mainTopicName);
     
     if (!vokabular[mainTopicName]) {
@@ -142,21 +151,26 @@ function displaySubTopics(mainTopicName) {
     });
 }
 
-function handleNavigation(event) {
-    console.log('[handleNavigation] Klick auf:', event.target);
+function handleNavigation(event: Event): void {
+    const target = event.target as HTMLElement;
+    console.log('[handleNavigation] Klick auf:', target);
     
-    const mainTopicButton = event.target.closest('[data-main-topic]');
-    const subTopicButton = event.target.closest('[data-sub-topic]');
-    const testButton = event.target.closest('#start-test-mode-btn');
+    const mainTopicButton = target.closest('[data-main-topic]') as HTMLElement;
+    const subTopicButton = target.closest('[data-sub-topic]') as HTMLElement;
+    const testButton = target.closest('#start-test-mode-btn') as HTMLElement;
 
     if (mainTopicButton) {
         const topic = mainTopicButton.dataset.mainTopic;
-        console.log('[handleNavigation] Hauptthema:', topic);
-        displaySubTopics(topic);
+        if (topic) {
+            console.log('[handleNavigation] Hauptthema:', topic);
+            displaySubTopics(topic);
+        }
     } else if (subTopicButton) {
         const subTopic = subTopicButton.dataset.subTopic;
-        console.log('[handleNavigation] Unterthema:', subTopic);
-        startTraining(subTopic);
+        if (subTopic) {
+            console.log('[handleNavigation] Unterthema:', subTopic);
+            startTraining(subTopic);
+        }
     } else if (testButton) {
         console.log('[handleNavigation] Test-Button');
         updateTestModeProgressBars();
@@ -167,7 +181,7 @@ function handleNavigation(event) {
 }
 
 // Initialisierung
-function init() {
+function init(): void {
     console.log('=== INIT START ===');
     console.log('vokabular vorhanden:', typeof vokabular, Object.keys(vokabular));
     console.log('displayMainTopics:', typeof displayMainTopics);
@@ -196,15 +210,25 @@ function init() {
     console.log('=== INIT ENDE ===');
 }
 
+// Interface für den globalen Export
+interface TrainerJS {
+    displayMainTopics: () => void;
+    displaySubTopics: (mainTopicName: string) => void;
+    handleNavigation: (event: Event) => void;
+    init: () => void;
+    setVokabular: (vocab: VocabularyStructure) => void;
+    resetAllErrorCounts: () => void;
+}
+
 // Export für externe Verwendung
-window.trainerJS = {
+(window as any).trainerJS = {
     displayMainTopics,
     displaySubTopics,
     handleNavigation,
     init,
-    setVokabular: (vocab) => { vokabular = vocab; },
+    setVokabular: (vocab: VocabularyStructure) => { vokabular = vocab; },
     resetAllErrorCounts // Neue Funktion exportieren
-};
+} as TrainerJS;
 
 // Automatische Initialisierung wenn DOM bereit ist
 if (document.readyState === 'loading') {
@@ -214,4 +238,4 @@ if (document.readyState === 'loading') {
 }
 
 // Globale Funktionen für externe Aufrufe
-window.resetAllErrorCounts = resetAllErrorCounts; 
+(window as any).resetAllErrorCounts = resetAllErrorCounts; 

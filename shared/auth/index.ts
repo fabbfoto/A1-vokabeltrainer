@@ -1,5 +1,6 @@
-// shared/auth/index.js - FINALE VERSION MIT ALLEN KORREKTEN PFADEN
+// shared/auth/index.ts - FINALE VERSION MIT ALLEN KORREKTEN PFADEN
 
+// @ts-ignore
 import { getAuth, onIdTokenChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
 import { app } from './firebase-config';
 
@@ -10,7 +11,20 @@ import { AuthUI } from '../ui/auth-ui';
 import { RankingService } from '../services/ranking-service';
 import { RankingUI } from '../ui/ranking-ui';
 
-export function initializeAuth(trainerId, uiConfig) {
+interface UIConfig {
+    buttonContainerId: string;
+    rankingContainerId?: string;
+}
+
+interface AuthServices {
+    authService: AuthService;
+    authUI: AuthUI;
+    syncService: SyncService;
+    rankingService: RankingService;
+    rankingUI: RankingUI;
+}
+
+export function initializeAuth(trainerId: string, uiConfig: UIConfig): AuthServices {
     console.log('[initializeAuth] Starte die Initialisierung der Shared-Module...');
 
     const authService = new AuthService();
@@ -28,7 +42,7 @@ export function initializeAuth(trainerId, uiConfig) {
     });
 
     const auth = getAuth(app);
-    onIdTokenChanged(auth, (user) => {
+    onIdTokenChanged(auth, (user: any) => {
         if (user) {
             console.log(`[Auth Listener] User ist eingeloggt: ${user.uid}. Starte Echtzeit-Synchronisation.`);
             syncService.startRealtimeSync(user.uid);
@@ -42,8 +56,8 @@ export function initializeAuth(trainerId, uiConfig) {
 
     // NEU: Ranking-UI global verfügbar machen
     if (typeof window !== 'undefined') {
-        window.rankingUI = rankingUI;
+        (window as any).rankingUI = rankingUI;
     }
 
     return { authService, authUI, syncService, rankingService, rankingUI };
-}
+} 

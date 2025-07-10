@@ -19,10 +19,7 @@ export class ModeManager {
     return 'learning';
   }
   
-  // Prüfe ob Test-Modus aktiv ist
-  static isInTestMode(state: TrainerState): boolean {
-    return state.isTestModeActive;
-  }
+
   
   // Zu neuem Modus wechseln
   static switchToMode(state: TrainerState, newMode: AppMode): void {

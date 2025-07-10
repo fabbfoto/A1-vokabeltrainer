@@ -76,7 +76,7 @@ export function showSuccessMessageWithButton(
     const button = dom.messageBoxEl.querySelector('button');
     if (button) {
         console.log('Button gefunden, Event Listener hinzugefügt');
-        button.addEventListener('click', (e) => {
+        button.addEventListener('click', (e: Event) => {
             console.log('Button geklickt!');
             e.preventDefault();
             e.stopPropagation();
