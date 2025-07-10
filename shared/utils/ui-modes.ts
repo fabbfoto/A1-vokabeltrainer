@@ -92,6 +92,9 @@ export function setupMultipleChoiceMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    // WICHTIG: Correction Mode explizit deaktivieren
+    state.isCorrectionMode = false;
+    
     ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
     // BUGFIX: Explizit alle Choice-Buttons aktivieren
     const choiceButtons = document.querySelectorAll('.choice-button');
@@ -254,7 +257,36 @@ function generateMultipleChoiceAnswers(
         button.className = 'mc-answer-button w-full p-4 text-left border-2 border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors';
         button.textContent = answer;
         button.onclick = () => {
+            // Alle Buttons deaktivieren
+            const allButtons = dom.mcAnswersContainerEl.querySelectorAll('.mc-answer-button');
+            allButtons.forEach(btn => {
+                (btn as HTMLButtonElement).disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            });
+            
+            // Visuelles Feedback
+            if (answer === correctAnswerEN) {
+                button.classList.remove('border-gray-300');
+                button.classList.add('border-green-500', 'bg-green-100');
+            } else {
+                button.classList.remove('border-gray-300');
+                button.classList.add('border-red-500', 'bg-red-100');
+                
+                // Richtige Antwort hervorheben
+                allButtons.forEach(btn => {
+                    if (btn.textContent === correctAnswerEN) {
+                        btn.classList.remove('border-gray-300');
+                        btn.classList.add('border-green-500', 'bg-green-100');
+                    }
+                });
+            }
+            
             const isCorrect = answer === correctAnswerEN;
+            
+            // Wichtig: Bei Multiple Choice NIE in Correction Mode gehen
+            // Das war das Problem!
+            state.isCorrectionMode = false;
+            
             processAnswer(isCorrect, correctAnswerEN);
         };
         dom.mcAnswersContainerEl.appendChild(button);
