@@ -74,20 +74,20 @@ export class RankingService {
       userName: user.displayName || 'Anonym',
       userEmail: user.email || 'unknown@email.com',
       testType: testVariant,
-      topic: testScore.topicId || 'global',
+      topic: testScore.score.topicId || 'global',
       category: selectedCategory,
-      score: testScore.finalScore,
-      correctAnswers: testScore.correct,
-      totalQuestions: testScore.total,
-      timeInSeconds: testScore.duration,
-      averageTimePerQuestion: testScore.averageTimePerQuestion,
-      timestamp: testScore.timestamp,
+      score: testScore.score.finalScore,
+      correctAnswers: testScore.score.correct,
+      totalQuestions: testScore.score.total,
+      timeInSeconds: testScore.score.duration,
+      averageTimePerQuestion: testScore.score.averageTimePerQuestion,
+      timestamp: testScore.score.timestamp,
       difficulty: 'A1',
-      baseScore: testScore.finalScore + testScore.timePenalty, // Rekonstruiere Basis-Score
-      timePenalty: testScore.timePenalty,
-      finalScore: testScore.finalScore,
-      accuracy: testScore.accuracy,
-      modesUsed: testScore.modesUsed
+      baseScore: testScore.score.finalScore + testScore.score.timePenalty, // Rekonstruiere Basis-Score
+      timePenalty: testScore.score.timePenalty,
+      finalScore: testScore.score.finalScore,
+      accuracy: testScore.score.accuracy,
+      modesUsed: testScore.score.modesUsed
     };
 
     try {

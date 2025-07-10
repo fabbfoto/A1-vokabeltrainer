@@ -92,7 +92,7 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
         Object.keys(vokabular[mainTopicName]).forEach(subTopicName => {
             const words = vokabular[mainTopicName][subTopicName];
             const progressKey = `${mainTopicName}|${subTopicName}`;
-            const progressForKey = state.globalProgress[progressKey] || {};
+            const progressForKey = state.progress.globalProgress[progressKey] || {};
             totalWords += words.length * numberOfModes;
             Object.keys(learningModes).forEach(modeId => {
                 const masteredSet = progressForKey[modeId];
@@ -166,7 +166,7 @@ export function displaySubTopics(dom: DOMElements, state: TrainerState, vokabula
         const words = vokabular[mainTopicName][subTopicName];
         const totalPossibleTasks = words.length * numberOfModes;
         const progressKey = `${mainTopicName}|${subTopicName}`;
-        const progressForKey = state.globalProgress[progressKey] || {};
+        const progressForKey = state.progress.globalProgress[progressKey] || {};
         let completedTasks = 0;
         Object.values(progressForKey).forEach((masteredSet: any) => {
             completedTasks += (masteredSet.size || masteredSet.length || 0);
@@ -213,8 +213,8 @@ export function displaySubTopics(dom: DOMElements, state: TrainerState, vokabula
  */
 export function showMainTopicNavigation(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, learningModes: LearningModes): void {
     NavigationEvents.dispatchRoot();
-    state.currentMainTopic = null;
-    state.currentSubTopic = null;
+    state.navigation.currentMainTopic = null;
+    state.navigation.currentSubTopic = null;
     dom.navigationViewEl.classList.remove('hidden');
     dom.trainerMainViewEl.classList.add('hidden');
     dom.navigationTitleEl.textContent = 'Themen';
@@ -228,7 +228,7 @@ export function showMainTopicNavigation(dom: DOMElements, state: TrainerState, v
  */
 export function showSubTopicNavigation(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, mainTopic: TopicId, learningModes: LearningModes): void {
     NavigationEvents.dispatchSub();
-    state.currentMainTopic = mainTopic;
+    state.navigation.currentMainTopic = mainTopic;
     dom.navigationViewEl.classList.remove('hidden');
     dom.trainerMainViewEl.classList.add('hidden');
     dom.navigationTitleEl.textContent = mainTopic;
@@ -243,7 +243,7 @@ export function showSubTopicNavigation(dom: DOMElements, state: TrainerState, vo
 export function showTrainingModes(dom: DOMElements, state: TrainerState): void {
     dom.navigationViewEl.classList.add('hidden');
     dom.trainerMainViewEl.classList.remove('hidden');
-    dom.currentTrainingTitleEl.textContent = `${state.currentMainTopic} > ${state.currentSubTopic}`;
+    dom.currentTrainingTitleEl.textContent = `${state.navigation.currentMainTopic} > ${state.navigation.currentSubTopic}`;
 }
 
 /**
@@ -289,7 +289,7 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
             const mainTopic = mainTopicButton.dataset.mainTopic! as TopicId;
             showSubTopicNavigation(dom, state, vokabular, mainTopic, learningModes);
         } else if (subTopicButton) {
-            callbacks.handleTopicSelection(state.currentMainTopic!, subTopicButton.dataset.subTopic! as SubTopicId);
+            callbacks.handleTopicSelection(state.navigation.currentMainTopic!, subTopicButton.dataset.subTopic! as SubTopicId);
         } else if (testButton) {
             const variant = testButton.dataset.testVariant as 'chaos' | 'structured';
             const scope = testButton.dataset.testScope as 'global' | 'mainTopic';

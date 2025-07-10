@@ -2,7 +2,26 @@
 // Neue State-Types für das Refactoring
 
 import type { Word, TopicId, SubTopicId, WordId } from './vocabulary';
-import type { TestConfiguration, TestResult } from './index';
+
+// TestConfiguration und TestResult direkt hier definieren
+export interface TestConfiguration {
+  testId: TestId;
+  testType: TestType;
+  topicId?: TopicId;
+  subTopicId?: SubTopicId;
+  modeIds: ModeId[];
+  questionCount: number;
+  timeLimit?: number;
+  variant: TestVariant;
+  categories: TestCategory[];
+}
+
+export interface TestResult {
+  testId: TestId;
+  score: TestScore;
+  wordResults: WordTestResult[];
+  recommendations: TestRecommendation[];
+}
 
 // ========== BRANDED TYPES (WICHTIG - WERDEN NOCH VERWENDET) ==========
 export type ModeId = string & { __brand: 'ModeId' };
@@ -10,7 +29,7 @@ export type TestId = string & { __brand: 'TestId' };
 export type SessionId = string & { __brand: 'SessionId' };
 
 // ========== RE-EXPORTS ==========
-export type { TopicId, SubTopicId, WordId } from './vocabulary';
+export type { TopicId, SubTopicId, WordId, Word } from './vocabulary';
 
 // ========== LEARNING MODES (WICHTIG - WERDEN NOCH VERWENDET) ==========
 export type LearningModeType = 
@@ -286,6 +305,35 @@ export interface TestStateManager extends StateManager<TestState> {
     getAverageTimePerQuestion(): number;
 }
 
+// ========== FEHLENDE TYPES FÜR KOMPATIBILITÄT ==========
+export interface VocabularyStructure {
+    [mainTopic: string]: {
+        [subTopic: string]: Word[];
+    };
+}
+
+export interface UICallbacks {
+    handleTopicSelection: (mainTopic: TopicId, subTopic: SubTopicId) => void;
+    handleModeSelection: (modeId: ModeId) => void;
+    handleAnswer: (isCorrect: boolean, correctAnswer?: string) => void;
+    handleTestCompletion: () => void;
+}
+
+export interface AuthUI {
+    show: () => void;
+    hide: () => void;
+    container: HTMLElement | null;
+}
+
+export interface UserData {
+    email: string;
+    progress: Record<string, Record<string, string[]>>;
+    masteredWords: Record<string, string[]>;
+    wordsToRepeat: Record<string, string[]>;
+    lastTestScores: Record<string, any>;
+    perfectRuns: Record<string, number>;
+}
+
 // ========== STATE INITIALIZATION ==========
 export function createInitialNavigationState(): NavigationState {
     return {
@@ -347,6 +395,3 @@ export function createInitialTrainerState(): TrainerState {
         test: createInitialTestState(),
     };
 }
-
-// ========== RE-EXPORTS ==========
-export type { TestConfiguration, TestResult } from './index';

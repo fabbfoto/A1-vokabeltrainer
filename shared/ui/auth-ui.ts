@@ -114,7 +114,7 @@ export class AuthUI {
         container.appendChild(this.syncButton);
     }
 
-    public updateUIAfterLogin(user: TrainerState): void {
+    public updateUIAfterLogin(user: any): void {
         console.log('[AuthUI] updateUIAfterLogin aufgerufen, zeichne Button neu.');
         this.renderSyncButton(true, user.email);
     }

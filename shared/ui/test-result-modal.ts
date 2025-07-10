@@ -1,7 +1,7 @@
 // shared/ui/test-result-modal.ts
 import type { TestResult } from '../types/trainer';
 
-export function showTestResultModal(score: TestResult, testConfig?: any) {
+export function showTestResultModal(testResult: TestResult, testConfig?: any) {
   // Prüfe, ob schon ein Modal existiert
   if (document.getElementById('test-result-modal')) return;
 
@@ -9,6 +9,7 @@ export function showTestResultModal(score: TestResult, testConfig?: any) {
   modal.id = 'test-result-modal';
   modal.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50';
 
+  const score = testResult.score;
   const date = new Date(score.timestamp);
   const dateString = date.toLocaleDateString('de-DE') + ' ' + date.toLocaleTimeString('de-DE');
 

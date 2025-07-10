@@ -84,41 +84,53 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     globalAuthUI = authUI;
 
     const state: TrainerState = {
-        currentMainTopic: null,
-        currentSubTopic: null,
-        previousMainTopic: null,
-        previousSubTopic: null,
-        currentVocabularySet: [],
-        shuffledWordsForMode: [],
-        currentWordIndex: -1,
-        currentWord: null,
-        currentMode: null,
-        sessionId: null,
-        isTestModeActive: false,
-        isRepeatSessionActive: false,
-        currentTest: null,
-        testResults: [],
-        testModeRotation: [] as ModeId[],
-        currentTestModeIndex: 0,
+        // Navigation State
+        navigation: {
+            currentMainTopic: null,
+            currentSubTopic: null,
+            previousMainTopic: null,
+            previousSubTopic: null,
+            lastUsedModeByTopic: {} as Record<string, ModeId>,
+        },
         
-        // Neue Zeitmessung-Felder für Tests
-        testStartTime: null,
-        currentQuestionStartTime: null,
-        questionTimes: [],
+        // Training State
+        training: {
+            currentVocabularySet: [],
+            shuffledWordsForMode: [],
+            currentWordIndex: -1,
+            currentWord: null,
+            currentMode: null,
+            sessionId: null,
+            isRepeatSessionActive: false,
+            isCorrectionMode: false,
+            correctInCurrentRound: 0,
+            attemptedInCurrentRound: 0,
+            sessionStats: [],
+            activeTextInput: null,
+            isLoading: false,
+            currentError: null,
+        },
         
-        correctInCurrentRound: 0,
-        attemptedInCurrentRound: 0,
-        globalProgress: {},
-        masteredWordsByMode: {},
-        wordsToRepeatByMode: {},
-        lastTestScores: {},
-        sessionStats: [],
-        activeTextInput: null,
-        isLoading: false,
-        currentError: null,
-        lastUsedModeByTopic: {} as Record<string, ModeId>,
-        isCorrectionMode: false,
-        perfectRunsByMode: {}, // Zählt perfekte Durchläufe pro Modus
+        // Progress State
+        progress: {
+            globalProgress: {},
+            masteredWordsByMode: {},
+            wordsToRepeatByMode: {},
+            perfectRunsByMode: {}, // Zählt perfekte Durchläufe pro Modus
+            lastTestScores: {},
+        },
+        
+        // Test State
+        test: {
+            isTestModeActive: false,
+            currentTest: null,
+            testResults: [],
+            testModeRotation: [] as ModeId[],
+            currentTestModeIndex: 0,
+            testStartTime: null,
+            currentQuestionStartTime: null,
+            questionTimes: [],
+        }
     };
 
     function loadProgress(): void {
@@ -154,11 +166,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                state.globalProgress = {};
+                state.progress.globalProgress = {};
                 
                 // WICHTIG: Konvertiere IMMER zu Sets
                 Object.keys(parsed).forEach(topicKey => {
-                    state.globalProgress[topicKey] = {};
+                    state.progress.globalProgress[topicKey] = {};
                     
                     if (typeof parsed[topicKey] === 'object' && parsed[topicKey] !== null) {
                         Object.keys(parsed[topicKey]).forEach(mode => {
@@ -166,12 +178,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                             
                             // Stelle sicher, dass es ein Set wird
                             if (Array.isArray(data)) {
-                                state.globalProgress[topicKey][mode] = new Set(data);
+                                state.progress.globalProgress[topicKey][mode] = new Set(data);
                             } else if (data instanceof Set) {
-                                state.globalProgress[topicKey][mode] = data;
+                                state.progress.globalProgress[topicKey][mode] = data;
                             } else {
                                 console.warn(`⚠️ Unerwarteter Datentyp für ${topicKey}/${mode}:`, typeof data);
-                                state.globalProgress[topicKey][mode] = new Set();
+                                state.progress.globalProgress[topicKey][mode] = new Set();
                             }
                         });
                     } else {
@@ -179,20 +191,20 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     }
                 });
                 
-                console.log('✅ Progress geladen mit', Object.keys(state.globalProgress).length, 'Themen');
+                console.log('✅ Progress geladen mit', Object.keys(state.progress.globalProgress).length, 'Themen');
             } catch (e) {
                 console.error('❌ Fehler beim Laden des Progress:', e);
-                state.globalProgress = {};
+                state.progress.globalProgress = {};
             }
         } else {
             console.log('ℹ️ Kein gespeicherter Progress gefunden');
-            state.globalProgress = {};
+            state.progress.globalProgress = {};
         }
     }
 
     function saveProgress(): void {
         try {
-            localStorage.setItem('trainer-progress', JSON.stringify(state.globalProgress));
+            localStorage.setItem('trainer-progress', JSON.stringify(state.progress.globalProgress));
             console.log('✅ Progress gespeichert');
         } catch (e) {
             console.warn('⚠️ Fehler beim Speichern:', e);
@@ -205,7 +217,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             try {
                 const parsed = JSON.parse(saved);
                 Object.keys(parsed).forEach(mode => {
-                    state.masteredWordsByMode[mode as ModeId] = new Set(parsed[mode] as WordId[]);
+                    state.progress.masteredWordsByMode[mode as ModeId] = new Set(parsed[mode] as WordId[]);
                 });
                 console.log('✅ Mastered Words geladen');
             } catch (e) {
@@ -217,9 +229,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     function saveMasteredWords(): void {
         try {
             const toSave: Record<string, WordId[]> = {};
-            Object.keys(state.masteredWordsByMode).forEach(key => {
+            Object.keys(state.progress.masteredWordsByMode).forEach(key => {
                 const mode = key as ModeId;
-                toSave[mode] = Array.from(state.masteredWordsByMode[mode]!);
+                toSave[mode] = Array.from(state.progress.masteredWordsByMode[mode]!);
             });
             localStorage.setItem('trainer-mastered-words', JSON.stringify(toSave));
         } catch (e) {
@@ -233,7 +245,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             try {
                 const parsed = JSON.parse(saved);
                 Object.keys(parsed).forEach(mode => {
-                    state.wordsToRepeatByMode[mode as ModeId] = new Set(parsed[mode] as WordId[]);
+                    state.progress.wordsToRepeatByMode[mode as ModeId] = new Set(parsed[mode] as WordId[]);
                 });
                 console.log('✅ Words to repeat geladen');
             } catch (e) {
@@ -245,9 +257,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     function saveWordsToRepeat(): void {
         try {
             const toSave: Record<string, WordId[]> = {};
-            Object.keys(state.wordsToRepeatByMode).forEach(key => {
+            Object.keys(state.progress.wordsToRepeatByMode).forEach(key => {
                 const mode = key as ModeId;
-                toSave[mode] = Array.from(state.wordsToRepeatByMode[mode]!);
+                toSave[mode] = Array.from(state.progress.wordsToRepeatByMode[mode]!);
             });
             localStorage.setItem('trainer-words-to-repeat', JSON.stringify(toSave));
         } catch (e) {
@@ -259,7 +271,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const saved = localStorage.getItem('trainer-last-test-scores');
         if (saved) {
             try {
-                state.lastTestScores = JSON.parse(saved);
+                state.test.lastTestScores = JSON.parse(saved);
                 console.log('✅ Test scores geladen');
             } catch (e) {
                 console.warn('⚠️ Fehler beim Laden test scores:', e);
@@ -269,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     function saveLastTestScores(): void {
         try {
-            localStorage.setItem('trainer-last-test-scores', JSON.stringify(state.lastTestScores));
+            localStorage.setItem('trainer-last-test-scores', JSON.stringify(state.test.lastTestScores));
         } catch (e) {
             console.warn('⚠️ Fehler beim Speichern test scores:', e);
         }
@@ -313,17 +325,17 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             isCorrect,
             correctAnswer,
             currentMode: ModeManager.getCurrentMode(state),
-            isCorrectionMode: state.isCorrectionMode,
-            isTestMode: state.isTestModeActive,
-            currentWord: state.currentWord?.german
+            isCorrectionMode: state.training.isCorrectionMode,
+            isTestMode: state.test.isTestModeActive,
+            currentWord: state.training.currentWord?.german
         });
         
-        state.attemptedInCurrentRound++;
+        state.training.attemptedInCurrentRound++;
         
         // Spezialbehandlung für Multiple Choice im normalen Modus
-        if (state.currentMode === 'mc-de-en' && !state.isTestModeActive) {
+        if (state.training.currentMode === 'mc-de-en' && !state.test.isTestModeActive) {
             if (isCorrect) {
-                state.correctInCurrentRound++;
+                state.training.correctInCurrentRound++;
                 updateProgress(true);
                 ui.showMessage(dom, 'Richtig!', 'success');
             } else {
@@ -338,9 +350,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
         
         // Zeitmessung für Test-Modus
-        if (ModeManager.isInTestMode(state) && state.currentQuestionStartTime) {
-            const questionTime = (Date.now() - state.currentQuestionStartTime) / 1000;
-            state.questionTimes.push(questionTime);
+        if (ModeManager.isInTestMode(state) && state.test.currentQuestionStartTime) {
+            const questionTime = (Date.now() - state.test.currentQuestionStartTime) / 1000;
+            state.test.questionTimes.push(questionTime);
         }
         
         // Aktueller Modus bestimmt das Verhalten
@@ -351,7 +363,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             case 'correcting':
                 // Im Korrekturmodus nur Statistiken aktualisieren
                 if (isCorrect) {
-                    state.correctInCurrentRound++;
+                    state.training.correctInCurrentRound++;
                 } else {
                     addToErrorList();
                 }
@@ -362,7 +374,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             case 'testing':
                 // Im Test-Modus immer direkt weiter
                 if (isCorrect) {
-                    state.correctInCurrentRound++;
+                    state.training.correctInCurrentRound++;
                     ui.showMessage(dom, '✓', 'success', 1000);
                 } else {
                     ui.showMessage(dom, '✗', 'error', 1000);
@@ -373,12 +385,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             case 'repeating':
                 // Im Wiederholungs-Modus
                 if (isCorrect) {
-                    state.correctInCurrentRound++;
+                    state.training.correctInCurrentRound++;
                     updateProgress(true);
                     removeFromErrorList();
                     
                     // Prüfe ob noch Fehler da sind
-                    const remainingErrors = state.currentMode ? state.wordsToRepeatByMode[state.currentMode]?.size || 0 : 0;
+                    const remainingErrors = state.training.currentMode ? state.wordsToRepeatByMode[state.training.currentMode]?.size || 0 : 0;
                     if (remainingErrors === 0) {
                         handleNoMoreErrors();
                         return;
@@ -396,7 +408,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             default:
                 // Normaler Lernmodus
                 if (isCorrect) {
-                    state.correctInCurrentRound++;
+                    state.training.correctInCurrentRound++;
                     updateProgress(true);
                     ui.showMessage(dom, 'Richtig!', 'success');
                     setTimeout(() => loadNextTask(), 1500);
@@ -411,18 +423,18 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // Hilfsfunktionen
     function addToErrorList(): void {
-        if (state.currentWord && state.currentMode) {
-            if (!state.wordsToRepeatByMode[state.currentMode]) {
-                state.wordsToRepeatByMode[state.currentMode] = new Set();
+        if (state.training.currentWord && state.training.currentMode) {
+            if (!state.wordsToRepeatByMode[state.training.currentMode]) {
+                state.wordsToRepeatByMode[state.training.currentMode] = new Set();
             }
-            state.wordsToRepeatByMode[state.currentMode].add(state.currentWord.id);
+            state.wordsToRepeatByMode[state.training.currentMode].add(state.training.currentWord.id);
             saveWordsToRepeat();
         }
     }
 
     function removeFromErrorList(): void {
-        if (state.currentWord && state.currentMode) {
-            state.wordsToRepeatByMode[state.currentMode]?.delete(state.currentWord.id);
+        if (state.training.currentWord && state.training.currentMode) {
+            state.wordsToRepeatByMode[state.training.currentMode]?.delete(state.training.currentWord.id);
             saveWordsToRepeat();
         }
     }
@@ -443,67 +455,67 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     function updateProgress(isCorrect: boolean): void {
-        if (isCorrect && state.currentWord && state.currentMode) {
-            const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+        if (isCorrect && state.training.currentWord && state.training.currentMode) {
+            const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
             
-            if (!state.globalProgress[progressKey]) {
-                state.globalProgress[progressKey] = {};
+            if (!state.progress.globalProgress[progressKey]) {
+                state.progress.globalProgress[progressKey] = {};
             }
-            if (!state.globalProgress[progressKey][state.currentMode]) {
-                state.globalProgress[progressKey][state.currentMode] = new Set();
+            if (!state.progress.globalProgress[progressKey][state.training.currentMode]) {
+                state.progress.globalProgress[progressKey][state.training.currentMode] = new Set();
             }
             
             // Stelle sicher, dass es ein Set ist
-            let progressSet = state.globalProgress[progressKey][state.currentMode];
+            let progressSet = state.progress.globalProgress[progressKey][state.training.currentMode];
             if (!(progressSet instanceof Set)) {
                 if (Array.isArray(progressSet)) {
                     progressSet = new Set(progressSet);
-                    state.globalProgress[progressKey][state.currentMode] = progressSet;
+                    state.globalProgress[progressKey][state.training.currentMode] = progressSet;
                 } else {
                     progressSet = new Set();
-                    state.globalProgress[progressKey][state.currentMode] = progressSet;
+                    state.globalProgress[progressKey][state.training.currentMode] = progressSet;
                 }
             }
             
-            progressSet.add(state.currentWord.id);
+            progressSet.add(state.training.currentWord.id);
             saveProgress();
         }
     }
 
     function handleNoMoreErrors(): void {
         console.log('✅ Alle Fehler behoben - wechsle zu noch nicht beantworteten Vokabeln');
-        state.isRepeatSessionActive = false;
+        state.test.isRepeatSessionActive = false;
         
         // Filtere Vokabeln, die noch nicht richtig beantwortet wurden
-        const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
-        const progressForMode = state.globalProgress[progressKey]?.[state.currentMode] || new Set();
+        const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
+        const progressForMode = state.globalProgress[progressKey]?.[state.training.currentMode] || new Set();
         const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
         
-        const remainingWords = state.currentVocabularySet.filter(word => 
+        const remainingWords = state.training.currentVocabularySet.filter(word => 
             !progressSet.has(word.id)
         );
         
         if (remainingWords.length > 0) {
-            state.shuffledWordsForMode = shuffleArray(remainingWords);
-            state.currentWordIndex = -1;
+            state.training.shuffledWordsForMode = shuffleArray(remainingWords);
+            state.training.currentWordIndex = -1;
             ui.showMessage(dom, `Weiter mit ${remainingWords.length} noch nicht beantworteten Vokabeln.`, 'info');
             setTimeout(() => loadNextTask(), 1000);
         } else {
             // Alle Vokabeln wurden richtig beantwortet
-            if (state.currentMode) {
-                const runCount = (state.perfectRunsByMode[state.currentMode] || 0) + 1;
+            if (state.training.currentMode) {
+                const runCount = (state.perfectRunsByMode[state.training.currentMode] || 0) + 1;
                 const runText = runCount === 1 ? '1. Durchlauf' : `${runCount}. Durchlauf`;
                 ui.showSuccessMessageWithButton(
                     dom, 
                     `Perfekt! (${runText})`, 
                     'Übung wiederholen',
                     () => {
-                        const progressKey = getTopicKey(state.currentMainTopic, state.currentSubTopic);
+                        const progressKey = getTopicKey(state.navigation.currentMainTopic, state.navigation.currentSubTopic);
                         if (progressKey && state.globalProgress[progressKey]) {
-                            state.globalProgress[progressKey][state.currentMode] = new Set();
+                            state.globalProgress[progressKey][state.training.currentMode] = new Set();
                             saveProgress();
                         }
-                        setMode(state.currentMode, false);
+                        setMode(state.training.currentMode, false);
                     }
                 );
             }
@@ -521,51 +533,51 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         ui.hideAllUIs(dom);
         
         // Erhöhe Index
-        state.currentWordIndex++;
+        state.training.currentWordIndex++;
         
         // Prüfe ob wir am Ende der Liste sind
-        if (state.currentWordIndex >= state.shuffledWordsForMode.length) {
-            if (state.isTestModeActive) {
+        if (state.training.currentWordIndex >= state.training.shuffledWordsForMode.length) {
+            if (state.test.isTestModeActive) {
                 handleTestCompletion();
                 return;
             }
             
             // Shuffle und von vorne beginnen
-            if (state.isRepeatSessionActive) {
+            if (state.test.isRepeatSessionActive) {
                 // Im Wiederholungsmodus: Prüfe ob noch Fehler da sind
-                const remainingErrors = state.wordsToRepeatByMode[state.currentMode]?.size || 0;
+                const remainingErrors = state.wordsToRepeatByMode[state.training.currentMode]?.size || 0;
                 if (remainingErrors === 0) {
                     // Keine Fehler mehr - wechsle zu "noch nicht richtig beantworteten" Vokabeln
-                    state.isRepeatSessionActive = false;
+                    state.test.isRepeatSessionActive = false;
                     
                     // Filtere Vokabeln, die noch nicht richtig beantwortet wurden
-                    const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
-                    const progressForMode = state.globalProgress[progressKey]?.[state.currentMode] || new Set();
+                    const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
+                    const progressForMode = state.globalProgress[progressKey]?.[state.training.currentMode] || new Set();
                     const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
                     
-                    const remainingWords = state.currentVocabularySet.filter(word => 
+                    const remainingWords = state.training.currentVocabularySet.filter(word => 
                         !progressSet.has(word.id)
                     );
                     
                     if (remainingWords.length > 0) {
-                        state.shuffledWordsForMode = shuffleArray(remainingWords);
+                        state.training.shuffledWordsForMode = shuffleArray(remainingWords);
                         ui.showMessage(dom, `Weiter mit ${remainingWords.length} noch nicht beantworteten Vokabeln.`, 'info');
                     } else {
                         // Alle Vokabeln wurden richtig beantwortet - Modus beenden
-                        if (state.currentMode) {
-                            const runCount = (state.perfectRunsByMode[state.currentMode] || 0) + 1;
+                        if (state.training.currentMode) {
+                            const runCount = (state.perfectRunsByMode[state.training.currentMode] || 0) + 1;
                             const runText = runCount === 1 ? '1. Durchlauf' : `${runCount}. Durchlauf`;
                             ui.showSuccessMessageWithButton(
                                 dom, 
                                 `Perfekt! (${runText})`, 
                                 'Übung wiederholen',
                                 () => {
-                                    const progressKey = getTopicKey(state.currentMainTopic, state.currentSubTopic);
+                                    const progressKey = getTopicKey(state.navigation.currentMainTopic, state.navigation.currentSubTopic);
                                     if (progressKey && state.globalProgress[progressKey]) {
-                                        state.globalProgress[progressKey][state.currentMode] = new Set();
+                                        state.globalProgress[progressKey][state.training.currentMode] = new Set();
                                         saveProgress();
                                     }
-                                    setMode(state.currentMode, false);
+                                    setMode(state.training.currentMode, false);
                                 }
                             );
                         } else {
@@ -573,56 +585,56 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         }
                         
                         // Fortschritt für diesen Modus zurücksetzen
-                        const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
-                        if (state.globalProgress[progressKey] && state.currentMode) {
-                            state.globalProgress[progressKey][state.currentMode] = new Set();
+                        const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
+                        if (state.globalProgress[progressKey] && state.training.currentMode) {
+                            state.globalProgress[progressKey][state.training.currentMode] = new Set();
                             saveProgress();
                         }
                         return;
                     }
                 } else {
                     // Noch Fehler da - shuffle Fehlerliste
-                    const errorWords = state.currentVocabularySet.filter(word => 
-                        state.wordsToRepeatByMode[state.currentMode]?.has(word.id)
+                    const errorWords = state.training.currentVocabularySet.filter(word => 
+                        state.wordsToRepeatByMode[state.training.currentMode]?.has(word.id)
                     );
-                    state.shuffledWordsForMode = shuffleArray(errorWords);
+                    state.training.shuffledWordsForMode = shuffleArray(errorWords);
                 }
             } else {
                 // Normaler Modus - nur noch nicht richtig beantwortete Wörter
-                const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
-                const progressForMode = state.globalProgress[progressKey]?.[state.currentMode] || new Set();
+                const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
+                const progressForMode = state.globalProgress[progressKey]?.[state.training.currentMode] || new Set();
                 const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
                 
-                const remainingWords = state.currentVocabularySet.filter(word => 
+                const remainingWords = state.training.currentVocabularySet.filter(word => 
                     !progressSet.has(word.id)
                 );
                 
                 if (remainingWords.length > 0) {
-                    state.shuffledWordsForMode = shuffleArray(remainingWords);
+                    state.training.shuffledWordsForMode = shuffleArray(remainingWords);
                     console.log(`Normaler Modus: ${remainingWords.length} Wörter noch nicht beantwortet`);
                 } else {
                     // Alle Wörter wurden richtig beantwortet
                     // Erhöhe Perfect Run Counter
-                    if (state.currentMode) {
-                        if (!state.perfectRunsByMode[state.currentMode]) {
-                            state.perfectRunsByMode[state.currentMode] = 0;
+                    if (state.training.currentMode) {
+                        if (!state.perfectRunsByMode[state.training.currentMode]) {
+                            state.perfectRunsByMode[state.training.currentMode] = 0;
                         }
-                        state.perfectRunsByMode[state.currentMode]++;
+                        state.perfectRunsByMode[state.training.currentMode]++;
                         savePerfectRuns();
                         
-                        const runCount = state.perfectRunsByMode[state.currentMode];
+                        const runCount = state.perfectRunsByMode[state.training.currentMode];
                         const runText = runCount === 1 ? '1. Durchlauf' : `${runCount}. Durchlauf`;
                         ui.showSuccessMessageWithButton(
                             dom, 
                             `Perfekt! (${runText})`, 
                             'Übung wiederholen',
                             () => {
-                                const progressKey = getTopicKey(state.currentMainTopic, state.currentSubTopic);
+                                const progressKey = getTopicKey(state.navigation.currentMainTopic, state.navigation.currentSubTopic);
                                 if (progressKey && state.globalProgress[progressKey]) {
-                                    state.globalProgress[progressKey][state.currentMode] = new Set();
+                                    state.globalProgress[progressKey][state.training.currentMode] = new Set();
                                     saveProgress();
                                 }
-                                setMode(state.currentMode, false);
+                                setMode(state.training.currentMode, false);
                             }
                         );
                     } else {
@@ -633,18 +645,18 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 }
             }
             
-            state.currentWordIndex = 0;
+            state.training.currentWordIndex = 0;
         }
         
         // Hole nächstes Wort
-        state.currentWord = state.shuffledWordsForMode[state.currentWordIndex];
+        state.training.currentWord = state.training.shuffledWordsForMode[state.training.currentWordIndex];
         
         // Mode-Rotation für Chaos-Test
-        if (state.isTestModeActive && state.currentTest?.variant === 'chaos' && state.testModeRotation.length > 0) {
+        if (state.test.isTestModeActive && state.test.currentTest?.variant === 'chaos' && state.test.testModeRotation.length > 0) {
             // Nächster Modus aus der Rotation
-            state.currentMode = state.testModeRotation[state.currentTestModeIndex % state.testModeRotation.length];
-            state.currentTestModeIndex++;
-            console.log(`Chaos-Test: Aufgabe ${state.currentWordIndex + 1} mit Modus ${state.currentMode}`);
+            state.training.currentMode = state.test.testModeRotation[state.test.currentTestModeIndex % state.test.testModeRotation.length];
+            state.test.currentTestModeIndex++;
+            console.log(`Chaos-Test: Aufgabe ${state.training.currentWordIndex + 1} mit Modus ${state.training.currentMode}`);
             // BUGFIX: UI-Reset nach Mode-Wechsel im Chaos-Test
             requestAnimationFrame(() => {
                 document.querySelectorAll('[disabled]').forEach(el => {
@@ -653,27 +665,27 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             });
         }
         
-        if (!state.currentWord) {
+        if (!state.training.currentWord) {
             console.error('Kein Wort gefunden!');
             return;
         }
         
         // Setup für den aktuellen Modus
-        const modeInfo = state.currentMode ? learningModes[state.currentMode] : null;
+        const modeInfo = state.training.currentMode ? learningModes[state.training.currentMode] : null;
         if (modeInfo && typeof modeInfo.setupFunction === 'function') {
-            console.log('[loadNextTask] Setup-Funktion für Modus:', state.currentMode);
+            console.log('[loadNextTask] Setup-Funktion für Modus:', state.training.currentMode);
             modeInfo.setupFunction();
         } else {
-            console.error(`[loadNextTask] Keine Setup-Funktion für Modus "${state.currentMode}" gefunden`);
+            console.error(`[loadNextTask] Keine Setup-Funktion für Modus "${state.training.currentMode}" gefunden`);
         }
         
         // Zeitmessung für neue Frage starten (nur im Test-Modus)
-        if (state.isTestModeActive) {
-            state.currentQuestionStartTime = Date.now();
+        if (state.test.isTestModeActive) {
+            state.test.currentQuestionStartTime = Date.now();
         }
         
         // Statistiken aktualisieren
-        if (state.isTestModeActive) {
+        if (state.test.isTestModeActive) {
             ui.updateTestStats(dom, state);
         } else {
             ui.updatePracticeStats(dom, state, learningModes);
@@ -701,17 +713,17 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // Hilfsfunktion für sichere Mode-Zugriffe
     function getCurrentMode(): ModeId | null {
-        return state.currentMode;
+        return state.training.currentMode;
     }
 
     function isCurrentModeValid(): boolean {
-        return state.currentMode !== null;
+        return state.training.currentMode !== null;
     }
 
     // Sichere Zugriffe auf State mit Null-Checks
     function getProgressForMode(progressKey: string): Set<WordId> {
-        if (!state.currentMode) return new Set();
-        const progress = state.globalProgress[progressKey]?.[state.currentMode];
+        if (!state.training.currentMode) return new Set();
+        const progress = state.globalProgress[progressKey]?.[state.training.currentMode];
         if (progress instanceof Set) {
             return progress;
         }
@@ -719,21 +731,21 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     function setProgressForMode(progressKey: string, progress: Set<WordId>): void {
-        if (!state.currentMode) return;
+        if (!state.training.currentMode) return;
         if (!state.globalProgress[progressKey]) {
             state.globalProgress[progressKey] = {};
         }
-        state.globalProgress[progressKey][state.currentMode] = progress;
+        state.globalProgress[progressKey][state.training.currentMode] = progress;
     }
 
     function getWordsToRepeatForMode(): Set<WordId> {
-        if (!state.currentMode) return new Set();
-        return state.wordsToRepeatByMode[state.currentMode] || new Set();
+        if (!state.training.currentMode) return new Set();
+        return state.wordsToRepeatByMode[state.training.currentMode] || new Set();
     }
 
     function setWordsToRepeatForMode(words: Set<WordId>): void {
-        if (!state.currentMode) return;
-        state.wordsToRepeatByMode[state.currentMode] = words;
+        if (!state.training.currentMode) return;
+        state.wordsToRepeatByMode[state.training.currentMode] = words;
     }
 
     function safeSetMode(modeId: ModeId | null, isRepeat: boolean = false): void {
@@ -748,8 +760,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // FEHLERZÄHLER ZURÜCKSETZEN nur für normale Übungen (nicht für Wiederholungen)
         if (!isRepeat) {
             console.log('🔄 Setze Fehlerzähler für neue Übung zurück...');
-            state.correctInCurrentRound = 0;
-            state.attemptedInCurrentRound = 0;
+            state.training.correctInCurrentRound = 0;
+            state.training.attemptedInCurrentRound = 0;
             
             // Fehlerzähler für diesen Modus zurücksetzen
             if (state.wordsToRepeatByMode[modeId]) {
@@ -775,22 +787,22 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             }
         }
         
-        state.currentMode = modeId;
-        state.isTestModeActive = false;
-        state.isRepeatSessionActive = isRepeat;
-        const key = getTopicKey(state.currentMainTopic, state.currentSubTopic);
-        if (key) state.lastUsedModeByTopic[key] = modeId;
+        state.training.currentMode = modeId;
+        state.test.isTestModeActive = false;
+        state.test.isRepeatSessionActive = isRepeat;
+        const key = getTopicKey(state.navigation.currentMainTopic, state.navigation.currentSubTopic);
+        if (key) state.navigation.lastUsedModeByTopic[key] = modeId;
         let wordsForSession: Word[] = [];
         if (isRepeat) {
             const wordIdsToRepeat = state.wordsToRepeatByMode[modeId] || new Set<WordId>();
             if (wordIdsToRepeat.size === 0) {
                 ui.showMessage(dom, 'Keine Fehler zum Wiederholen in diesem Modus.', 'info');
-                state.isRepeatSessionActive = false;
+                state.test.isRepeatSessionActive = false;
                 return;
             }
             
             // Filtere Wörter die wiederholt werden müssen
-            wordsForSession = state.currentVocabularySet.filter(word => 
+            wordsForSession = state.training.currentVocabularySet.filter(word => 
                 wordIdsToRepeat.has(word.id as WordId)
             );
             
@@ -802,20 +814,20 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             console.log(`Starte Wiederholung mit ${wordsForSession.length} Wörtern`);
         } else {
             // Normaler Modus - nur noch nicht richtig beantwortete Wörter
-            const progressKey = `${state.currentMainTopic}|${state.currentSubTopic}`;
+            const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
             const progressForMode = state.globalProgress[progressKey]?.[modeId] || new Set();
             const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
             
-            wordsForSession = state.currentVocabularySet.filter(word => 
+            wordsForSession = state.training.currentVocabularySet.filter(word => 
                 !progressSet.has(word.id)
             );
             
-            console.log(`Normaler Modus: ${wordsForSession.length} von ${state.currentVocabularySet.length} Wörtern noch nicht beantwortet`);
+            console.log(`Normaler Modus: ${wordsForSession.length} von ${state.training.currentVocabularySet.length} Wörtern noch nicht beantwortet`);
         }
-        state.shuffledWordsForMode = shuffleArray(wordsForSession);
-        state.currentWordIndex = -1;
-        state.correctInCurrentRound = 0;
-        state.attemptedInCurrentRound = 0;
+        state.training.shuffledWordsForMode = shuffleArray(wordsForSession);
+        state.training.currentWordIndex = -1;
+        state.training.correctInCurrentRound = 0;
+        state.training.attemptedInCurrentRound = 0;
 
         document.querySelectorAll('#mode-button-grid .mode-button').forEach(btn => {
             if (!btn.id.includes('repeat')) {
@@ -863,51 +875,51 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     async function handleTestCompletion(): Promise<void> {
-        const accuracy = state.attemptedInCurrentRound > 0 ? (state.correctInCurrentRound / state.attemptedInCurrentRound) : 0;
+        const accuracy = state.training.attemptedInCurrentRound > 0 ? (state.training.correctInCurrentRound / state.training.attemptedInCurrentRound) : 0;
         
         // Zeitmessung für Test-Abschluss
         const testEndTime = Date.now();
-        const totalTestTime = state.testStartTime ? (testEndTime - state.testStartTime) / 1000 : 0; // in Sekunden
-        const averageTimePerQuestion = calculateAverageTimePerQuestion(state.questionTimes);
+        const totalTestTime = state.test.testStartTime ? (testEndTime - state.test.testStartTime) / 1000 : 0; // in Sekunden
+        const averageTimePerQuestion = calculateAverageTimePerQuestion(state.test.questionTimes);
         
         // Score-Berechnung mit Zeitfaktor
         const scoreCalculation = calculateTestScore(
-            state.correctInCurrentRound,
-            state.attemptedInCurrentRound,
+            state.training.correctInCurrentRound,
+            state.training.attemptedInCurrentRound,
             totalTestTime,
             2 // 2 Punkte Abzug pro Sekunde
         );
         
-        if (!state.lastTestScores) state.lastTestScores = {};
+        if (!state.test.lastTestScores) state.test.lastTestScores = {};
         const testScore: TestScore = {
             testId: `test_${Date.now()}` as any,
-            correct: state.correctInCurrentRound,
-            total: state.attemptedInCurrentRound,
+            correct: state.training.correctInCurrentRound,
+            total: state.training.attemptedInCurrentRound,
             accuracy: accuracy,
             timestamp: new Date(),
             testType: 'subTopic',
-            topicId: state.currentMainTopic!,
-            subTopicId: state.currentSubTopic!,
+            topicId: state.navigation.currentMainTopic!,
+            subTopicId: state.navigation.currentSubTopic!,
             duration: totalTestTime,
-            modesUsed: state.currentMode ? [state.currentMode] : [],
+            modesUsed: state.training.currentMode ? [state.training.currentMode] : [],
             // Neue Zeitmessung-Felder
-            startTime: state.testStartTime || 0,
+            startTime: state.test.testStartTime || 0,
             endTime: testEndTime,
             averageTimePerQuestion: averageTimePerQuestion,
             timePenalty: scoreCalculation.timePenalty,
             finalScore: scoreCalculation.finalScore
         };
         
-        const testKey = `${state.currentMainTopic}-${state.currentSubTopic}-${state.currentMode}`;
-        state.lastTestScores[testKey] = testScore;
+        const testKey = `${state.navigation.currentMainTopic}-${state.navigation.currentSubTopic}-${state.training.currentMode}`;
+        state.test.lastTestScores[testKey] = testScore;
         
         // Erweiterte Test-Keys für neue Varianten
-        if (state.currentTest) {
-            const variantKey = `${testKey}-${state.currentTest.variant}`;
-            state.lastTestScores[variantKey] = testScore;
-            if (state.currentTest.selectedCategory) {
-                const categoryKey = `${testKey}-${state.currentTest.selectedCategory}`;
-                state.lastTestScores[categoryKey] = testScore;
+        if (state.test.currentTest) {
+            const variantKey = `${testKey}-${state.test.currentTest.variant}`;
+            state.test.lastTestScores[variantKey] = testScore;
+            if (state.test.currentTest.selectedCategory) {
+                const categoryKey = `${testKey}-${state.test.currentTest.selectedCategory}`;
+                state.test.lastTestScores[categoryKey] = testScore;
             }
         }
         
@@ -921,22 +933,22 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         ui.showMessage(dom, `Test beendet! ${accuracyMessage} | ${timeMessage} | ${scoreMessage}`,
             accuracy >= 0.8 ? 'success' : 'info');
         
-        state.isTestModeActive = false;
+        state.test.isTestModeActive = false;
         ui.updateTestStats(dom, state);
         
         // Zeitmessung zurücksetzen
-        state.testStartTime = null;
-        state.currentQuestionStartTime = null;
-        state.questionTimes = [];
+        state.test.testStartTime = null;
+        state.test.currentQuestionStartTime = null;
+        state.test.questionTimes = [];
         
         // NEU: Test-Ergebnis an Firebase Ranking-System senden
-        if (state.currentTest) {
+        if (state.test.currentTest) {
             try {
                 if ((window as any).rankingService) {
                     await (window as any).rankingService.submitTestResult(
                         testScore,
-                        state.currentTest.variant,
-                        state.currentTest.selectedCategory
+                        state.test.currentTest.variant,
+                        state.test.currentTest.selectedCategory
                     );
                     console.log('✅ Test-Ergebnis an Ranking-System gesendet');
                 } else {
@@ -946,33 +958,33 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 console.warn('⚠️ Fehler beim Senden an Ranking-System:', error);
             }
         }
-        showTestResultModal(testScore, state.currentTest || undefined);
+        showTestResultModal(testScore, state.test.currentTest || undefined);
     }
 
     const callbacks: UICallbacks = {
         handleTopicSelection: (mainTopic: TopicId, subTopic: SubTopicId) => {
-            state.currentMainTopic = mainTopic;
-            state.currentSubTopic = subTopic;
+            state.navigation.currentMainTopic = mainTopic;
+            state.navigation.currentSubTopic = subTopic;
             
             const topicVokabular = vokabular[mainTopic]?.[subTopic] || [];
             if (!topicVokabular) {
                 console.error(`Kein Vokabular für ${mainTopic} > ${subTopic} gefunden.`);
                 return;
             }
-            state.currentVocabularySet = topicVokabular;
+            state.training.currentVocabularySet = topicVokabular;
             
             ui.showTrainingModes(dom, state);
             updateRepeatButtons();
 
             // KORREKTUR: Letzten Modus laden oder Standardmodus starten
             const topicKey = getTopicKey(mainTopic, subTopic);
-            const lastMode = state.lastUsedModeByTopic[topicKey];
+            const lastMode = state.navigation.lastUsedModeByTopic[topicKey];
             const startMode = lastMode || ('mc-de-en' as ModeId);
             setMode(startMode, false);
         },
         handleBackNavigation: () => {
-            if (state.currentSubTopic && state.currentMainTopic) {
-                ui.showSubTopicNavigation(dom, state, vokabular, state.currentMainTopic, learningModes);
+            if (state.navigation.currentSubTopic && state.navigation.currentMainTopic) {
+                ui.showSubTopicNavigation(dom, state, vokabular, state.navigation.currentMainTopic, learningModes);
             } else {
                 ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
             }
@@ -998,19 +1010,19 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 totalQuestions: 20
             });
             // State für Test vorbereiten
-            state.currentTest = testConfig;
-            state.currentVocabularySet = result.words as import('./shared/types/trainer').Word[];
-            state.shuffledWordsForMode = result.words as import('./shared/types/trainer').Word[];
-            state.currentWordIndex = -1;
-            state.correctInCurrentRound = 0;
-            state.attemptedInCurrentRound = 0;
+            state.test.currentTest = testConfig;
+            state.training.currentVocabularySet = result.words as import('./shared/types/trainer').Word[];
+            state.training.shuffledWordsForMode = result.words as import('./shared/types/trainer').Word[];
+            state.training.currentWordIndex = -1;
+            state.training.correctInCurrentRound = 0;
+            state.training.attemptedInCurrentRound = 0;
             
             // Mode-Rotation für Chaos-Test
             if (testConfig.variant === 'chaos' && result.modeRotation) {
-                state.testModeRotation = result.modeRotation as import('./shared/types/trainer').ModeId[];
-                state.currentTestModeIndex = 0;
+                state.test.testModeRotation = result.modeRotation as import('./shared/types/trainer').ModeId[];
+                state.test.currentTestModeIndex = 0;
             } else {
-                state.currentMode = testConfig.mode;
+                state.training.currentMode = testConfig.mode;
             }
             // UI für Test starten
             startTestUI(testConfig.testTitle, testConfig.mode);
@@ -1098,7 +1110,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         
         if (previousMode === 'correcting') {
             // Zurück zum vorherigen Modus (learning oder repeating)
-            if (state.wordsToRepeatByMode[state.currentMode]?.size > 0) {
+            if (state.wordsToRepeatByMode[state.training.currentMode]?.size > 0) {
                 ModeManager.switchToMode(state, 'repeating');
             } else {
                 ModeManager.switchToMode(state, 'learning');

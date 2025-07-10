@@ -1,5 +1,5 @@
 // shared/services/mode-manager.ts
-import type { ModeId, LearningMode } from '../types/trainer';
+import type { ModeId, LearningMode, TrainerState } from '../types/trainer';
 
 // Definiere die verschiedenen App-Modi
 export type AppMode = 
@@ -13,9 +13,9 @@ export class ModeManager {
   // Aktuellen Modus abrufen (Kompatibilität mit alten Flags)
   static getCurrentMode(state: TrainerState): AppMode {
     // Priorisierte Reihenfolge wichtig!
-    if (state.isCorrectionMode) return 'correcting';
-    if (state.isTestModeActive) return 'testing';
-    if (state.isRepeatSessionActive) return 'repeating';
+    if (state.training.isCorrectionMode) return 'correcting';
+    if (state.test.isTestModeActive) return 'testing';
+    if (state.training.isRepeatSessionActive) return 'repeating';
     return 'learning';
   }
   
@@ -40,38 +40,34 @@ export class ModeManager {
     
     switch (currentMode) {
       case 'correcting':
-        // Korrektur-Handler entfernen
-        if (state._removeCorrectionEnterHandler) {
-          state._removeCorrectionEnterHandler();
-          state._removeCorrectionEnterHandler = undefined;
-        }
+        // Korrektur-Handler entfernen - wird in trainer.ts gehandhabt
         break;
         
       case 'testing':
         // Test-spezifische Aufräumarbeiten
-        state.testStartTime = null;
-        state.currentQuestionStartTime = null;
-        state.questionTimes = [];
+        state.test.testStartTime = null;
+        state.test.currentQuestionStartTime = null;
+        state.test.questionTimes = [];
         break;
     }
   }
   
   private static updateLegacyFlags(state: TrainerState, newMode: AppMode): void {
     // Alle Flags zurücksetzen
-    state.isTestModeActive = false;
-    state.isCorrectionMode = false;
-    state.isRepeatSessionActive = false;
+    state.test.isTestModeActive = false;
+    state.training.isCorrectionMode = false;
+    state.training.isRepeatSessionActive = false;
     
     // Neuen Modus setzen
     switch (newMode) {
       case 'testing':
-        state.isTestModeActive = true;
+        state.test.isTestModeActive = true;
         break;
       case 'correcting':
-        state.isCorrectionMode = true;
+        state.training.isCorrectionMode = true;
         break;
       case 'repeating':
-        state.isRepeatSessionActive = true;
+        state.training.isRepeatSessionActive = true;
         break;
       // 'learning' braucht keine speziellen Flags
     }
@@ -81,9 +77,9 @@ export class ModeManager {
     switch (newMode) {
       case 'testing':
         // Test-Zeitmessung starten
-        state.testStartTime = Date.now();
-        state.currentQuestionStartTime = Date.now();
-        state.questionTimes = [];
+        state.test.testStartTime = Date.now();
+        state.test.currentQuestionStartTime = Date.now();
+        state.test.questionTimes = [];
         console.log('📝 Test-Modus aktiviert');
         break;
         

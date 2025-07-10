@@ -5,7 +5,7 @@
 // Alle Lernmodus-Setup-Funktionen mit vollständiger Type-Safety
 
 // ✅ IMPORT GLOBALE TYPES (statt lokale Definitionen)
-import type { ModeId, LearningMode, Word } from '../types/trainer';
+import type { ModeId, LearningMode, Word, TrainerState } from '../types/trainer';
 
 // Import DOMElements from the correct location to avoid conflicts
 import type { DOMElements } from '../types/ui';
@@ -89,7 +89,7 @@ export function setupMultipleChoiceMode(
     processAnswer: ProcessAnswerFunction
 ): void {
     // WICHTIG: Correction Mode explizit deaktivieren
-    state.isCorrectionMode = false;
+    state.training.isCorrectionMode = false;
     
     ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
     // BUGFIX: Explizit alle Choice-Buttons aktivieren
@@ -121,7 +121,7 @@ export function setupMultipleChoiceMode(
     if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'inline-flex';
     
     // KORREKT: currentWord statt currentWordData
-    const currentWord = state.currentWord;
+    const currentWord = state.training.currentWord;
     if (!currentWord) {
         console.error('[setupMultipleChoiceMode] Kein currentWord gefunden!');
         return;
@@ -218,7 +218,7 @@ function generateMultipleChoiceAnswers(
 ): void {
     dom.mcAnswersContainerEl.innerHTML = '';
     
-    const currentWord = state.currentWord;
+    const currentWord = state.training.currentWord;
     if (!currentWord) return;
     
     const correctAnswerEN = currentWord.english;
@@ -226,7 +226,7 @@ function generateMultipleChoiceAnswers(
     
     // Sammle alle englischen Bedeutungen aus dem gesamten Vokabular
     let allEnglish: string[] = [];
-    if (state.currentVocabularySet && state.currentVocabularySet.length > 0) {
+    if (state.training.currentVocabularySet && state.training.currentVocabularySet.length > 0) {
         // Hole alle Vokabeln aus dem gesamten Vokabular (flach)
         if ((window as any).vokabular) {
             const vokabular = (window as any).vokabular;
@@ -237,7 +237,7 @@ function generateMultipleChoiceAnswers(
                 .filter((en: string) => en && en !== correctAnswerEN);
         } else {
             // Fallback: alle aus currentVocabularySet
-            allEnglish = state.currentVocabularySet
+            allEnglish = state.training.currentVocabularySet
                 .filter(word => word.english && word.english !== correctAnswerEN)
                 .map(word => word.english);
         }
@@ -281,7 +281,7 @@ function generateMultipleChoiceAnswers(
             
             // Wichtig: Bei Multiple Choice NIE in Correction Mode gehen
             // Das war das Problem!
-            state.isCorrectionMode = false;
+            state.training.isCorrectionMode = false;
             
             processAnswer(isCorrect, correctAnswerEN);
         };
@@ -340,7 +340,7 @@ export function setupSpellingMode(
     import('../../ui/umlaut-buttons').then(mod => mod.setupUmlautButtons(dom, state));
     
     // ✅ KORREKT: currentWord statt currentWordData
-    const currentWord = state.currentWord;
+    const currentWord = state.training.currentWord;
     if (!currentWord) {
         console.error('[setupSpellingMode] Kein currentWord gefunden!');
         return;
@@ -383,18 +383,18 @@ export function setupSpellingMode(
         
         // Focus Handler für alle drei Felder
         dom.spellingInputArticleEl.addEventListener('focus', () => {
-            state.activeTextInput = dom.spellingInputArticleEl;
+            state.training.activeTextInput = dom.spellingInputArticleEl;
         });
         dom.spellingInputNoun1El.addEventListener('focus', () => {
-            state.activeTextInput = dom.spellingInputNoun1El;
+            state.training.activeTextInput = dom.spellingInputNoun1El;
         });
         dom.spellingInputNoun2El.addEventListener('focus', () => {
-            state.activeTextInput = dom.spellingInputNoun2El;
+            state.training.activeTextInput = dom.spellingInputNoun2El;
         });
         
         // Enter-Key Handler NUR für das Pluralfeld
         const handlePluralEnterKey = (event: KeyboardEvent) => {
-            if (event.key === 'Enter' && !state.isCorrectionMode) {
+            if (event.key === 'Enter' && !state.training.isCorrectionMode) {
                 event.preventDefault();
                 handleCheckButtonClick();
             }
@@ -468,7 +468,7 @@ export function setupSpellingMode(
             dom.checkSpellingButton.disabled = true;
             
             // Korrekturmodus aktivieren (nur bei falscher Antwort relevant)
-            state.isCorrectionMode = !(isArticleCorrect && isSingularCorrect && isPluralCorrect);
+            state.training.isCorrectionMode = !(isArticleCorrect && isSingularCorrect && isPluralCorrect);
             
             // Nur wenn alle drei Felder korrekt sind, ist die Antwort vollständig richtig
             const isFullyCorrect = isArticleCorrect && isSingularCorrect && isPluralCorrect;
@@ -476,7 +476,7 @@ export function setupSpellingMode(
             // Weiter-Button Handler (nur bei falscher Antwort relevant)
             const handleContinueButtonClick = () => {
                 // Korrekturmodus beenden
-                state.isCorrectionMode = false;
+                state.training.isCorrectionMode = false;
                 
                 // UI zurücksetzen
                 dom.correctionSolutionEl.classList.add('hidden');
@@ -494,7 +494,7 @@ export function setupSpellingMode(
                 // ✅ FOKUSSIERUNG: Mittleres Feld (Singular) fokussieren
                 if (dom.spellingInputNoun1El) {
                     dom.spellingInputNoun1El.focus();
-                    state.activeTextInput = dom.spellingInputNoun1El;
+                    state.training.activeTextInput = dom.spellingInputNoun1El;
                 }
                 
                 // Nächstes Wort laden
@@ -513,7 +513,7 @@ export function setupSpellingMode(
         // Event-Handler für Auswerten-Button setzen
         dom.checkSpellingButton.onclick = handleCheckButtonClick;
         // Automatisch Artikel-Feld fokussieren
-        setTimeout(() => { dom.spellingInputArticleEl.focus(); state.activeTextInput = dom.spellingInputArticleEl; }, 0);
+        setTimeout(() => { dom.spellingInputArticleEl.focus(); state.training.activeTextInput = dom.spellingInputArticleEl; }, 0);
     } else {
         // Single-Input-Modus
         dom.singleInputContainerEl.classList.remove('hidden');
@@ -524,12 +524,12 @@ export function setupSpellingMode(
         
         // Focus Handler
         dom.spellingInputSingleEl.addEventListener('focus', () => {
-            state.activeTextInput = dom.spellingInputSingleEl;
+            state.training.activeTextInput = dom.spellingInputSingleEl;
         });
         
         // Enter-Key Handler für Single-Input
         const handleSingleEnterKey = (event: KeyboardEvent) => {
-            if (event.key === 'Enter' && !state.isCorrectionMode) {
+            if (event.key === 'Enter' && !state.training.isCorrectionMode) {
                 event.preventDefault();
                 handleSingleCheckButtonClick();
             }
