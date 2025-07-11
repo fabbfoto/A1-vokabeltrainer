@@ -13,7 +13,7 @@ import {vokabularEinkaufen } from './vokabular_einkaufen';
 import {vokabularLernen } from './vokabular_lernen';
 import {vokabularFreizeitUnterhaltung } from './vokabular_freizeit_unterhaltung';
 
-import type {VocabularyStructure } from './shared/types/vocabulary.ts';
+import type { VocabularyStructure } from './shared/types/vocabulary';
 
 // Alle Vokabulare zusammenführen
 export const vokabular: VocabularyStructure = {...vokabularPerson,

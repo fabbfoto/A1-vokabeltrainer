@@ -1,7 +1,7 @@
 // packages/trainer-themen/vokabular_wohnen.ts
 
-import type {VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary.ts';
-import {createWordId, createVocabulary } from './shared/types/vocabulary.ts';
+import type {VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary';
+import {createWordId, createVocabulary } from './shared/types/vocabulary';
 
 export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": {
 

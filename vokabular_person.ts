@@ -8,8 +8,8 @@ import type {VocabularyStructure,
     Adjective,
     WordId,
     CaseElement 
-} from './shared/types/vocabulary.ts';
-import {createWordId, createVocabulary } from './shared/types/vocabulary.ts';
+} from './shared/types/vocabulary';
+import {createWordId, createVocabulary } from './shared/types/vocabulary';
 
 export const vokabularPerson: VocabularyStructure = createVocabulary({"Person": {
         // --- SUB-TOPIC: Name ---

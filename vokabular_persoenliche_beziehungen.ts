@@ -1,8 +1,8 @@
 // packages/trainer-themen/vokabular_persoenliche_beziehungen.ts
 // VOLLSTÄNDIGE TypeScript Migration von vokabular_persoenliche_beziehungen.js
 
-import type {VocabularyStructure, Noun, Verb, Adjective, Adverb, WordId, CaseElement } from './shared/types/vocabulary.ts';
-import {createWordId, createVocabulary } from './shared/types/vocabulary.ts';
+import type {VocabularyStructure, Noun, Verb, Adjective, Adverb, WordId, CaseElement } from './shared/types/vocabulary';
+import {createWordId, createVocabulary } from './shared/types/vocabulary';
 
 export const vokabularPersoenlicheBeziehungen: VocabularyStructure = createVocabulary({"Persönliche Beziehungen": {
 
