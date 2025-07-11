@@ -1,15 +1,13 @@
 // packages/trainer-themen/vokabular_freizeit_unterhaltung.ts
 
-import type {
-    Word,
-    Noun,
-    Verb,
+import type { 
+    VocabularyStructure, 
+    Word, 
+    Noun, 
+    Verb, 
     Adjective,
-    Conjugation,
-    Imperative,
     WordId,
-    CaseElement,
-    VocabularyStructure
+    CaseElement 
 } from './shared/types/vocabulary';
 import { createWordId, createVocabulary } from './shared/types/vocabulary';
 

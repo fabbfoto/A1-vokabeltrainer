@@ -1,9 +1,8 @@
 // ui/umlaut-buttons.ts
 // Umlaut-Button Funktionalität für Text-Eingabe
 
-// Type imports (temporär any, später aus shared/types)
-type DOMElements = any;
-type TrainerState = any;
+import type { DOMElements } from '../shared/types/ui';
+import type { TrainerState } from '../shared/types/trainer';
 
 /**
  * Fügt Text an der aktuellen Cursor-Position ein.
@@ -31,7 +30,7 @@ export function insertTextAtCursor(input: HTMLInputElement, text: string): void 
 /**
  * Setzt die Umlaut-Buttons für die Text-Eingabe auf.
  */
-export function setupUmlautButtons(dom: any, state: any): void {
+export function setupUmlautButtons(dom: DOMElements, state: TrainerState): void {
     // Alle möglichen Umlaut-Button-Container finden
     const umlautContainers = [
         dom.umlautButtonsContainer, // Schreibweise-Modus
@@ -83,7 +82,7 @@ export function setupUmlautButtons(dom: any, state: any): void {
     const clozeInputs = document.querySelectorAll('#cloze-sentence-container input[type="text"]') as NodeListOf<HTMLInputElement>;
     const sentenceInputs = document.querySelectorAll('#sentence-word-input-container input[type="text"]') as NodeListOf<HTMLInputElement>;
     
-    [...clozeInputs, ...sentenceInputs].forEach(input => {
+    Array.from(clozeInputs).concat(Array.from(sentenceInputs)).forEach(input => {
         if (input && !input.hasAttribute('data-umlaut-registered')) {
             registerInputForUmlauts(input, state, dom);
             input.setAttribute('data-umlaut-registered', 'true');
@@ -105,8 +104,10 @@ export function setupUmlautButtons(dom: any, state: any): void {
     
     // Event-Listener für alle Umlaut-Buttons in allen Containern setzen
     umlautContainers.forEach(container => {
+        if (!container) return;
         const umlautButtons = container.querySelectorAll('.umlaut-button');
-        umlautButtons.forEach((btn: HTMLButtonElement) => {
+        umlautButtons.forEach((btn: Element) => {
+            if (!(btn instanceof HTMLButtonElement)) return;
         if (!btn.hasAttribute('data-umlaut-initialized')) {
             btn.addEventListener('mousedown', function(e: MouseEvent) {
                 e.preventDefault();

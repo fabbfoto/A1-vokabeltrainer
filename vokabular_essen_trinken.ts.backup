@@ -867,14 +867,14 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "gegessen",
                 presentConjugation: { 
-                    I: "esse", 
-                    you_informal: "isst", 
-                    he: "isst", 
-                    we: "essen", 
-                    you_pl: "esst", 
-                    they: "essen" 
+                    ich: "esse", 
+                    du: "isst", 
+                    er: "isst", 
+                    wir: "essen", 
+                    ihr: "esst", 
+                    sie: "essen" 
                 },
-                imperative: { you_informal: "Iss!", you_pl: "Esst!" },
+                imperative: { du: "Iss!", ihr: "Esst!" },
                 exampleGerman: [
                     { text: "Was", case: "akkusativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
@@ -898,14 +898,14 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "getrunken",
                 presentConjugation: { 
-                    I: "trinke", 
-                    you_informal: "trinkst", 
-                    he: "trinkt", 
-                    we: "trinken", 
-                    you_pl: "trinkt", 
-                    they: "trinken" 
+                    ich: "trinke", 
+                    du: "trinkst", 
+                    er: "trinkt", 
+                    wir: "trinken", 
+                    ihr: "trinkt", 
+                    sie: "trinken" 
                 },
-                imperative: { you_informal: "Trink!", you_pl: "Trinkt!" },
+                imperative: { du: "Trink!", ihr: "Trinkt!" },
                 exampleGerman: [
                     { text: "Was", case: "akkusativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
@@ -967,14 +967,14 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "gekocht",
                 presentConjugation: { 
-                    I: "koche", 
-                    you_informal: "kochst", 
-                    he: "kocht", 
-                    we: "kochen", 
-                    you_pl: "kocht", 
-                    they: "kochen" 
+                    ich: "koche", 
+                    du: "kochst", 
+                    er: "kocht", 
+                    wir: "kochen", 
+                    ihr: "kocht", 
+                    sie: "kochen" 
                 },
-                imperative: { you_informal: "Koch!", you_pl: "Kocht!" },
+                imperative: { du: "Koch!", ihr: "Kocht!" },
                 exampleGerman: [
                     { text: "In der Küche", case: "dativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
@@ -996,14 +996,14 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "geschmeckt",
                 presentConjugation: { 
-                    I: "schmecke", 
-                    you_informal: "schmeckst", 
-                    he: "schmeckt", 
-                    we: "schmecken", 
-                    you_pl: "schmeckt", 
-                    they: "schmecken" 
+                    ich: "schmecke", 
+                    du: "schmeckst", 
+                    er: "schmeckt", 
+                    wir: "schmecken", 
+                    ihr: "schmeckt", 
+                    sie: "schmecken" 
                 },
-                imperative: { you_informal: "Schmeck!", you_pl: "Schmeckt!" },
+                imperative: { du: "Schmeck!", ihr: "Schmeckt!" },
                 exampleGerman: [
                     { text: "Der Kuchen", case: "nominativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
@@ -1025,14 +1025,14 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "probiert",
                 presentConjugation: { 
-                    I: "probiere", 
-                    you_informal: "probierst", 
-                    he: "probiert", 
-                    we: "probieren", 
-                    you_pl: "probiert", 
-                    they: "probieren" 
+                    ich: "probiere", 
+                    du: "probierst", 
+                    er: "probiert", 
+                    wir: "probieren", 
+                    ihr: "probiert", 
+                    sie: "probieren" 
                 },
-                imperative: { you_informal: "Probier!", you_pl: "Probiert!" },
+                imperative: { du: "Probier!", ihr: "Probiert!" },
                 exampleGerman: [
                     { text: "Probier", case: "verb" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
@@ -1054,14 +1054,14 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "bestellt",
                 presentConjugation: { 
-                    I: "bestelle", 
-                    you_informal: "bestellst", 
-                    he: "bestellt", 
-                    we: "bestellen", 
-                    you_pl: "bestellt", 
-                    they: "bestellen" 
+                    ich: "bestelle", 
+                    du: "bestellst", 
+                    er: "bestellt", 
+                    wir: "bestellen", 
+                    ihr: "bestellt", 
+                    sie: "bestellen" 
                 },
-                imperative: { you_informal: "Bestell!", you_pl: "Bestellt!" },
+                imperative: { du: "Bestell!", ihr: "Bestellt!" },
                 exampleGerman: [
                     { text: "Ich", case: "nominativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
@@ -1085,14 +1085,14 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "bezahlt",
                 presentConjugation: { 
-                    I: "bezahle", 
-                    you_informal: "bezahlst", 
-                    he: "bezahlt", 
-                    we: "bezahlen", 
-                    you_pl: "bezahlt", 
-                    they: "bezahlen" 
+                    ich: "bezahle", 
+                    du: "bezahlst", 
+                    er: "bezahlt", 
+                    wir: "bezahlen", 
+                    ihr: "bezahlt", 
+                    sie: "bezahlen" 
                 },
-                imperative: { you_informal: "Bezahl!", you_pl: "Bezahlt!" },
+                imperative: { du: "Bezahl!", ihr: "Bezahlt!" },
                 exampleGerman: [
                     { text: "Wo", case: "none" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
@@ -1352,14 +1352,14 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "reserviert",
                 presentConjugation: { 
-                    I: "reserviere", 
-                    you_informal: "reservierst", 
-                    he: "reserviert", 
-                    we: "reservieren", 
-                    you_pl: "reserviert", 
-                    they: "reservieren" 
+                    ich: "reserviere", 
+                    du: "reservierst", 
+                    er: "reserviert", 
+                    wir: "reservieren", 
+                    ihr: "reserviert", 
+                    sie: "reservieren" 
                 },
-                imperative: { you_informal: "Reservier!", you_pl: "Reserviert!" },
+                imperative: { du: "Reservier!", ihr: "Reserviert!" },
                 exampleGerman: [
                     { text: "Ich", case: "nominativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,

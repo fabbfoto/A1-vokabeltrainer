@@ -9,8 +9,8 @@ import type {
   DocumentSnapshot
 } from 'firebase/firestore';
 
-import type { WordId, TopicId, SubTopicId } from './vocabulary.js';
-import type { Progress, TestScore, SessionStats, ModeId } from './trainer.js';
+import type { WordId, TopicId, SubTopicId } from './vocabulary';
+import type { Progress, TestScore, SessionStats, ModeId } from './trainer';
 
 // ========== BRANDED TYPES ==========
 export type UserId = string & { __brand: 'UserId' };

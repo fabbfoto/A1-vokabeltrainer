@@ -1187,16 +1187,16 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "gespielt",
                 presentConjugation: {
-                    I: "spiele",
-                    you_informal: "spielst",
-                    he: "spielt",
-                    we: "spielen",
-                    you_pl: "spielt",
-                    they_you_formal: "spielen"
+                    ich: "spiele",
+                    du: "spielst",
+                    er: "spielt",
+                    wir: "spielen",
+                    ihr: "spielt",
+                    sie_Sie: "spielen"
                 },
                 imperative: {
-                    you_informal: "Spiel!",
-                    you_pl: "Spielt!"
+                    du: "Spiel!",
+                    ihr: "Spielt!"
                 },
                 exampleGerman: [
                     { text: "", case: "none" },
@@ -1219,16 +1219,16 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "gegossen",
                 presentConjugation: {
-                    I: "gieße",
-                    you_informal: "gießt",
-                    he: "gießt",
-                    we: "gießen",
-                    you_pl: "gießt",
-                    they_you_formal: "gießen"
+                    ich: "gieße",
+                    du: "gießt",
+                    er: "gießt",
+                    wir: "gießen",
+                    ihr: "gießt",
+                    sie_Sie: "gießen"
                 },
                 imperative: {
-                    you_informal: "Gieß!",
-                    you_pl: "Gießt!"
+                    du: "Gieß!",
+                    ihr: "Gießt!"
                 },
                 exampleGerman: [
                     { text: "", case: "none" },
@@ -1251,16 +1251,16 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "gepflanzt",
                 presentConjugation: {
-                    I: "pflanze",
-                    you_informal: "pflanzt",
-                    he: "pflanzt",
-                    we: "pflanzen",
-                    you_pl: "pflanzt",
-                    they_you_formal: "pflanzen"
+                    ich: "pflanze",
+                    du: "pflanzt",
+                    er: "pflanzt",
+                    wir: "pflanzen",
+                    ihr: "pflanzt",
+                    sie_Sie: "pflanzen"
                 },
                 imperative: {
-                    you_informal: "Pflanz!",
-                    you_pl: "Pflanzt!"
+                    du: "Pflanz!",
+                    ihr: "Pflanzt!"
                 },
                 exampleGerman: [
                     { text: "Wir", case: "nominativ" },
@@ -1283,16 +1283,16 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "gesessen",
                 presentConjugation: {
-                    I: "sitze",
-                    you_informal: "sitzt",
-                    he: "sitzt",
-                    we: "sitzen",
-                    you_pl: "sitzt",
-                    they_you_formal: "sitzen"
+                    ich: "sitze",
+                    du: "sitzt",
+                    er: "sitzt",
+                    wir: "sitzen",
+                    ihr: "sitzt",
+                    sie_Sie: "sitzen"
                 },
                 imperative: {
-                    you_informal: "Sitz!",
-                    you_pl: "Sitzt!"
+                    du: "Sitz!",
+                    ihr: "Sitzt!"
                 },
                 exampleGerman: [
                     { text: "Wir", case: "nominativ" },
@@ -1315,16 +1315,16 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                 auxiliaryVerb: "haben",
                 pastParticiple: "gegrillt",
                 presentConjugation: {
-                    I: "grille",
-                    you_informal: "grillst",
-                    he: "grillt",
-                    we: "grillen",
-                    you_pl: "grillt",
-                    they_you_formal: "grillen"
+                    ich: "grille",
+                    du: "grillst",
+                    er: "grillt",
+                    wir: "grillen",
+                    ihr: "grillt",
+                    sie_Sie: "grillen"
                 },
                 imperative: {
-                    you_informal: "Grill!",
-                    you_pl: "Grillt!"
+                    du: "Grill!",
+                    ihr: "Grillt!"
                 },
                 exampleGerman: [
                     { text: "Im Sommer", case: "dativ" },

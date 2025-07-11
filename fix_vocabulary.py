@@ -2,23 +2,35 @@
 import os
 import re
 from pathlib import Path
-import json
+import sys
 
-# Definiere alle erwarteten Feldnamen (Englisch)
-EXPECTED_FIELDS = {
-    'artikel': 'article',
-    'plural': 'plural',
-    'partizip_ii': 'pastParticiple',
-    'hilfsverb_perfekt': 'auxiliaryVerb',
-    'trennbar': 'separable',
-    'example_de': 'exampleGerman',
-    'example_en': 'exampleEnglish',
-    'cloze_parts': 'clozeParts',
-    'cloze_answers': 'clozeAnswers',
-    'konjugation_praesens': 'presentConjugation',
-    'imperativ': 'imperative',
-    'wortart': 'wordType',
-    'kasus': 'case'
+FIELD_MAPPING = {
+    "wortart": "wordType",
+    "kasus": "case",
+    "genus": "gender",
+    "plural": "plural",
+    "beispiel": "example",
+    "bedeutung": "meaning",
+    "artikel": "article",
+    "adjektiv": "adjective",
+    "verbform": "verbForm",
+    "praeposition": "preposition",
+    "kommentar": "comment",
+    "thema": "topic",
+    "unterthema": "subTopic",
+    "schwierigkeitsgrad": "difficulty",
+    "satz": "sentence",
+    "synonym": "synonym",
+    "antonym": "antonym",
+    "ich": "I",
+    "du": "you_informal",
+    "er": "he",
+    "sie": "they",
+    "Sie": "you_formal",
+    "sie_Sie": "they_you_formal",
+    "wir": "we",
+    "ihr": "you_pl",
+    "text": "text"
 }
 
 # Mapping für Wortarten
@@ -33,133 +45,49 @@ WORD_TYPE_MAP = {
     'Interjektion': 'interjection'
 }
 
-def analyze_vocabulary_files():
-    """Analysiere alle vokabular_*.ts Dateien auf Inkonsistenzen"""
-    
-    issues = {
-        'field_inconsistencies': {},
-        'word_type_inconsistencies': {},
-        'case_inconsistencies': {},
-        'missing_fields': {},
-        'duplicate_ids': []
-    }
-    
-    vocab_files = list(Path('.').glob('vokabular_*.ts'))
-    all_ids = []
-    
-    for file_path in vocab_files:
-        print(f"\nAnalysiere: {file_path}")
-        
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-        
-        # Finde alle IDs für Duplikat-Check
-        ids = re.findall(r'id:\s*createWordId\("([^"]+)"\)', content)
-        all_ids.extend(ids)
-        
-        # Prüfe auf deutsche Feldnamen
-        for german, english in EXPECTED_FIELDS.items():
-            pattern = rf'\b{german}:'
-            matches = re.findall(pattern, content)
-            if matches:
-                if file_path.name not in issues['field_inconsistencies']:
-                    issues['field_inconsistencies'][file_path.name] = []
-                issues['field_inconsistencies'][file_path.name].append(f"{german} -> {english} ({len(matches)} Vorkommen)")
-        
-        # Prüfe auf deutsche Wortarten
-        for german, english in WORD_TYPE_MAP.items():
-            pattern = rf'wortart:\s*["\']?{german}["\']?'
-            matches = re.findall(pattern, content)
-            if matches:
-                if file_path.name not in issues['word_type_inconsistencies']:
-                    issues['word_type_inconsistencies'][file_path.name] = []
-                issues['word_type_inconsistencies'][file_path.name].append(f"{german} -> {english} ({len(matches)} Vorkommen)")
-        
-        # Prüfe auf inkonsistente Kasus-Schreibweise
-        kasus_variants = re.findall(r'(kasus|case):\s*["\'](\w+)["\']', content)
-        for field, value in kasus_variants:
-            if field == 'kasus':
-                if file_path.name not in issues['case_inconsistencies']:
-                    issues['case_inconsistencies'][file_path.name] = []
-                issues['case_inconsistencies'][file_path.name].append(f"'kasus' sollte 'case' sein")
-                break
-    
-    # Finde Duplikate
-    id_counts = {}
-    for id in all_ids:
-        id_counts[id] = id_counts.get(id, 0) + 1
-    
-    for id, count in id_counts.items():
-        if count > 1:
-            issues['duplicate_ids'].append(f"{id} ({count} mal)")
-    
-    return issues
-
 def fix_vocabulary_files():
-    """Korrigiere alle gefundenen Inkonsistenzen"""
-    
     vocab_files = list(Path('.').glob('vokabular_*.ts'))
-    
+    total_vocab_count = 0
+    unmapped_fields = set()
     for file_path in vocab_files:
-        print(f"\nKorrigiere: {file_path}")
-        
+        print(f"\nBearbeite: {file_path}")
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        
         original_content = content
-        
-        # Ersetze deutsche Feldnamen
-        for german, english in EXPECTED_FIELDS.items():
-            content = re.sub(rf'\b{german}:', f'{english}:', content)
-        
-        # Ersetze deutsche Wortarten
-        for german, english in WORD_TYPE_MAP.items():
-            content = re.sub(rf'(wordType|wortart):\s*["\']?{german}["\']?', f'wordType: "{english}"', content)
-        
-        # Erstelle Backup wenn Änderungen vorgenommen wurden
+        # Finde alle Vokabel-Objekte (vereinfachte Annahme: { ... },)
+        vocab_matches = list(re.finditer(r'\{([^{}]*)\}', content, re.DOTALL))
+        file_vocab_count = 0
+        for match in vocab_matches:
+            obj = match.group(0)
+            # Finde alle Felder im Objekt
+            fields = re.findall(r'([a-zA-ZäöüßÄÖÜ_]+)\s*:', obj)
+            for field in fields:
+                if field in FIELD_MAPPING:
+                    # Ersetze Feldnamen
+                    content = re.sub(rf'\b{field}\s*:', f'{FIELD_MAPPING[field]}:', content)
+                elif field == 'wortart':
+                    # handled above
+                    continue
+                elif field not in FIELD_MAPPING.values():
+                    unmapped_fields.add(field)
+        total_vocab_count += len(vocab_matches)
+        file_vocab_count += len(vocab_matches)
+        if unmapped_fields:
+            print(f"  ❌ Nicht gemappte Felder gefunden: {', '.join(sorted(unmapped_fields))}")
+            print("  Skript bricht ab. Bitte Mapping ergänzen!")
+            sys.exit(1)
         if content != original_content:
             backup_path = file_path.with_suffix('.ts.backup')
             with open(backup_path, 'w', encoding='utf-8') as f:
                 f.write(original_content)
-            print(f"  Backup erstellt: {backup_path}")
-            
-            # Schreibe korrigierte Datei
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(content)
-            print(f"  ✓ Datei korrigiert")
+            print(f"  ✓ {file_vocab_count} Vokabeln bearbeitet, Backup erstellt: {backup_path}")
         else:
             print(f"  - Keine Änderungen notwendig")
+    print(f"\n✓ Alle Dateien geprüft. Gesamt bearbeitete Vokabeln: {total_vocab_count}")
+    if not unmapped_fields:
+        print("✓ Mapping zu 100% angewendet!")
 
 if __name__ == "__main__":
-    print("=== Vokabular-Dateien Analyse ===")
-    
-    # Analysiere zuerst
-    issues = analyze_vocabulary_files()
-    
-    print("\n=== Gefundene Probleme ===")
-    
-    if issues['field_inconsistencies']:
-        print("\n1. Feldnamen-Inkonsistenzen (Deutsch statt Englisch):")
-        for file, problems in issues['field_inconsistencies'].items():
-            print(f"  {file}:")
-            for problem in problems:
-                print(f"    - {problem}")
-    
-    if issues['word_type_inconsistencies']:
-        print("\n2. Wortart-Inkonsistenzen (Deutsch statt Englisch):")
-        for file, problems in issues['word_type_inconsistencies'].items():
-            print(f"  {file}:")
-            for problem in problems:
-                print(f"    - {problem}")
-    
-    if issues['duplicate_ids']:
-        print("\n3. Duplizierte IDs:")
-        for dup in issues['duplicate_ids']:
-            print(f"  - {dup}")
-    
-    if any(issues.values()):
-        print("\nStarte automatische Korrektur...")
-        fix_vocabulary_files()
-        print("\n✓ Alle Korrekturen abgeschlossen!")
-    else:
-        print("\n✓ Keine Probleme gefunden!") 
+    fix_vocabulary_files() 

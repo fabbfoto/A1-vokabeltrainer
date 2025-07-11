@@ -1,4 +1,4 @@
-// shared/services/sync-service.ts - VOLLSTÄNDIGE VERSION
+// shared/services/sync-service.ts - VOLLSTÄNDIGE VERSION MIT VOLLER TYPSICHERHEIT
 
 // Firebase-Imports aus der Konfiguration
 import { app, db } from '../auth/firebase-config';
@@ -7,20 +7,61 @@ import type { Firestore, Unsubscribe, DocumentSnapshot, FirestoreError } from 'f
 import type { AuthService } from './auth-service';
 import type { TrainerState, Progress, UserData } from '../types/trainer';
 
-interface SyncListener {
-    (type: 'remoteUpdate' | 'localUpdate' | 'error', data: unknown): void;
+// ========== TYPED INTERFACES ==========
+export type SyncEventType = 'remoteUpdate' | 'localUpdate' | 'error';
+
+export interface SyncEvent {
+    type: SyncEventType;
+    data: RemoteUpdateData | LocalUpdateData | ErrorData;
+    timestamp: Date;
 }
 
-interface ProgressData {
-    [key: string]: unknown;
+export interface RemoteUpdateData {
+    progress: UserData;
+    lastModified: Date;
+    userId: string;
 }
 
+export interface LocalUpdateData {
+    progress: Partial<UserData>;
+    userId: string;
+}
+
+export interface ErrorData {
+    error: string;
+    code?: string;
+    details?: unknown;
+}
+
+export interface SyncListener {
+    (event: SyncEvent): void;
+}
+
+export interface ProgressData extends Partial<UserData> {
+    lastSync?: Date;
+    version?: string;
+}
+
+export interface SyncStatus {
+    isConnected: boolean;
+    lastSync: Date | null;
+    pendingChanges: number;
+    errors: ErrorData[];
+}
+
+// ========== SYNC SERVICE MIT VOLLER TYPSICHERHEIT ==========
 export class SyncService {
     private db: Firestore;
     private unsubscribe: Unsubscribe | null = null;
-    private trainerType: string = 'basis'; // Standardwert, kann später angepasst werden
-    private listeners: SyncListener[] = []; // Für Benachrichtigungen über Updates
+    private trainerType: string = 'basis';
+    private listeners: SyncListener[] = [];
     private authService: AuthService | null = null;
+    private syncStatus: SyncStatus = {
+        isConnected: false,
+        lastSync: null,
+        pendingChanges: 0,
+        errors: []
+    };
 
     constructor(trainerId?: string, authService?: AuthService) {
         this.db = db;
@@ -39,15 +80,47 @@ export class SyncService {
         const docPath = `users/${userId}/progress/${this.trainerType}`;
         const docRef = doc(this.db, docPath);
 
-        this.unsubscribe = onSnapshot(docRef, (doc: DocumentSnapshot) => {
-            console.log("Firestore: Daten-Update erhalten.");
-            if (doc.exists()) {
-                this.notifyListeners('remoteUpdate', doc.data());
+        this.unsubscribe = onSnapshot(docRef, 
+            (doc: DocumentSnapshot) => {
+                console.log("✅ Firestore: Daten-Update erhalten.");
+                this.syncStatus.isConnected = true;
+                this.syncStatus.lastSync = new Date();
+                
+                if (doc.exists()) {
+                    const data = doc.data() as ProgressData;
+                    const remoteUpdate: RemoteUpdateData = {
+                        progress: data as UserData,
+                        lastModified: data.lastSync ? new Date(data.lastSync) : new Date(),
+                        userId: userId
+                    };
+                    
+                    this.notifyListeners({
+                        type: 'remoteUpdate',
+                        data: remoteUpdate,
+                        timestamp: new Date()
+                    });
+                }
+            }, 
+            (error: FirestoreError) => {
+                console.error("❌ Fehler in startRealtimeSync:", error);
+                this.syncStatus.isConnected = false;
+                this.syncStatus.errors.push({
+                    error: error.message,
+                    code: error.code,
+                    details: error
+                });
+                
+                this.notifyListeners({
+                    type: 'error',
+                    data: {
+                        error: error.message,
+                        code: error.code,
+                        details: error
+                    },
+                    timestamp: new Date()
+                });
             }
-        }, (error: FirestoreError) => {
-            console.error("Fehler in startRealtimeSync:", error);
-            this.notifyListeners('error', error);
-        });
+        );
     }
 
     /**
@@ -57,7 +130,8 @@ export class SyncService {
         if (this.unsubscribe) {
             this.unsubscribe();
             this.unsubscribe = null;
-            console.log("Firestore: Synchronisation gestoppt.");
+            this.syncStatus.isConnected = false;
+            console.log("🛑 Firestore: Synchronisation gestoppt.");
         }
     }
 
@@ -65,21 +139,48 @@ export class SyncService {
      * Speichert den gesamten Lernfortschritt in Firestore.
      * @param progressData - Das Fortschritts-Objekt.
      */
-    public async saveProgress(progressData: Partial<UserData>): Promise<void> {
-        const userId = this.authService?.currentUser?.uid;
+    public async saveProgress(progressData: ProgressData): Promise<void> {
+        const userId = this.authService?.getUserId();
         if (!userId) {
-            console.warn('Nicht speichern, da kein User angemeldet ist');
+            console.warn('⚠️ Nicht speichern, da kein User angemeldet ist');
             return;
         }
 
         const docPath = `users/${userId}/progress/${this.trainerType}`;
         const docRef = doc(this.db, docPath);
+        
+        const dataToSave: ProgressData = {
+            ...progressData,
+            lastSync: new Date(),
+            version: '1.0'
+        };
+        
         try {
-            await setDoc(docRef, progressData, { merge: true });
-            console.log('Fortschritt erfolgreich in Firestore gespeichert');
-        } catch (error) {
-            console.error("Fehler beim Speichern des Fortschritts:", error);
-            this.notifyListeners('error', error);
+            await setDoc(docRef, dataToSave, { merge: true });
+            console.log('✅ Fortschritt erfolgreich in Firestore gespeichert');
+            
+            this.notifyListeners({
+                type: 'localUpdate',
+                data: {
+                    progress: progressData,
+                    userId: userId
+                },
+                timestamp: new Date()
+            });
+        } catch (error: unknown) {
+            const errorData: ErrorData = {
+                error: error instanceof Error ? error.message : 'Unbekannter Fehler',
+                details: error
+            };
+            
+            console.error("❌ Fehler beim Speichern des Fortschritts:", error);
+            this.syncStatus.errors.push(errorData);
+            
+            this.notifyListeners({
+                type: 'error',
+                data: errorData,
+                timestamp: new Date()
+            });
         }
     }
 
@@ -93,11 +194,10 @@ export class SyncService {
     
     /**
      * Benachrichtigt alle registrierten Listener über ein Update.
-     * @param type - Die Art des Updates (z.B. 'remoteUpdate').
-     * @param data - Die Daten des Updates.
+     * @param event - Das Sync-Event mit Typ und Daten.
      */
-    private notifyListeners(type: 'remoteUpdate' | 'localUpdate' | 'error', data: unknown): void {
-        this.listeners.forEach(listener => listener(type, data));
+    private notifyListeners(event: SyncEvent): void {
+        this.listeners.forEach(listener => listener(event));
     }
 
     /**
@@ -120,5 +220,19 @@ export class SyncService {
      */
     public setTrainerType(trainerType: string): void {
         this.trainerType = trainerType;
+    }
+
+    /**
+     * Gibt den aktuellen Sync-Status zurück.
+     */
+    public getSyncStatus(): SyncStatus {
+        return { ...this.syncStatus };
+    }
+
+    /**
+     * Löscht alle gespeicherten Fehler.
+     */
+    public clearErrors(): void {
+        this.syncStatus.errors = [];
     }
 } 

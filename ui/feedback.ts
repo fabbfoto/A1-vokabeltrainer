@@ -1,8 +1,7 @@
 // ui/feedback.ts
-// Feedback, Nachrichten und UI-Reset Funktionen
+// Feedback und Message-System
 
-// Type imports (temporär any, später aus shared/types)
-type DOMElements = any;
+import type { DOMElements } from '../shared/types/ui';
 
 // SVG Icons als Konstanten
 const SVG_SPEAKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">

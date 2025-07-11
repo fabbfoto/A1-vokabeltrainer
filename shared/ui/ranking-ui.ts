@@ -1,8 +1,8 @@
 // shared/ui/ranking-ui.ts
 // UI-Komponenten für Ranking-System
 
-import type { RankingEntry, UserStats } from '../services/ranking-service.js';
-import type { RankingService } from '../services/ranking-service.js';
+import type { RankingEntry, UserStats } from '../services/ranking-service';
+import type { RankingService } from '../services/ranking-service';
 
 export interface RankingUIConfig {
   containerId: string;
@@ -27,16 +27,24 @@ export class RankingUI {
     if (!this.container) return;
     
     this.showLoading('Lade globale Rangliste...');
-    const rankings = await this.rankingService.getGlobalRankings(20);
-    this.renderRankings(rankings, '🌍 Globale Rangliste', 'Alle Themen');
+    try {
+      const response = await this.rankingService.getGlobalRankings(20);
+      this.renderRankings(response.entries, '🌍 Globale Rangliste', 'Alle Themen');
+    } catch (error) {
+      this.showError('Fehler beim Laden der globalen Rangliste');
+    }
   }
 
   async showTopicRankings(topic: string): Promise<void> {
     if (!this.container) return;
     
     this.showLoading(`Lade Rangliste für ${topic}...`);
-    const rankings = await this.rankingService.getTopicRankings(topic, 20);
-    this.renderRankings(rankings, `📚 Rangliste: ${topic}`, topic);
+    try {
+      const response = await this.rankingService.getTopicRankings(topic, 20);
+      this.renderRankings(response.entries, `📚 Rangliste: ${topic}`, topic);
+    } catch (error) {
+      this.showError(`Fehler beim Laden der Rangliste für ${topic}`);
+    }
   }
 
   async showTestTypeRankings(testType: 'chaos' | 'structured'): Promise<void> {
@@ -44,16 +52,24 @@ export class RankingUI {
     
     const typeName = testType === 'chaos' ? 'Chaos-Test' : 'Strukturierter Test';
     this.showLoading(`Lade Rangliste für ${typeName}...`);
-    const rankings = await this.rankingService.getTestTypeRankings(testType, 20);
-    this.renderRankings(rankings, `🎯 Rangliste: ${typeName}`, testType);
+    try {
+      const response = await this.rankingService.getTestTypeRankings(testType, 20);
+      this.renderRankings(response.entries, `🎯 Rangliste: ${typeName}`, testType);
+    } catch (error) {
+      this.showError(`Fehler beim Laden der Rangliste für ${typeName}`);
+    }
   }
 
   async showWeeklyRankings(): Promise<void> {
     if (!this.container) return;
     
     this.showLoading('Lade wöchentliche Rangliste...');
-    const rankings = await this.rankingService.getWeeklyRankings();
-    this.renderRankings(rankings, '📅 Wöchentliche Rangliste', 'Diese Woche');
+    try {
+      const response = await this.rankingService.getWeeklyRankings();
+      this.renderRankings(response.entries, '📅 Wöchentliche Rangliste', 'Diese Woche');
+    } catch (error) {
+      this.showError('Fehler beim Laden der wöchentlichen Rangliste');
+    }
   }
 
   async showUserStats(): Promise<void> {

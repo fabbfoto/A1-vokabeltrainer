@@ -1,5 +1,5 @@
 // shared/services/ranking-service.ts
-// Firebase-basierter Ranking-Service für Test-Ergebnisse
+// Firebase-basierter Ranking-Service für Test-Ergebnisse mit voller Typsicherheit
 
 // Firebase-Imports für Runtime
 import { collection, addDoc, query, orderBy, limit, getDocs, where, Timestamp } from 'firebase/firestore';
@@ -8,11 +8,15 @@ import { db } from '../auth/firebase-config';
 import type { AuthService } from './auth-service';
 import type { TrainerState, SessionStats, TestResult } from '../types/trainer';
 
+// ========== ENHANCED TYPED INTERFACES ==========
+export type TestType = 'chaos' | 'structured';
+export type DifficultyLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
+
 export interface TestResultSubmission {
   userId: string;
   userName: string;
   userEmail: string;
-  testType: 'chaos' | 'structured';
+  testType: TestType;
   topic: string;
   category?: string;
   score: number;
@@ -21,7 +25,7 @@ export interface TestResultSubmission {
   timeInSeconds: number;
   averageTimePerQuestion: number;
   timestamp: Date;
-  difficulty: 'A1';
+  difficulty: DifficultyLevel;
   // Erweiterte Felder für detaillierte Analyse
   baseScore: number;
   timePenalty: number;
@@ -39,9 +43,10 @@ export interface RankingEntry {
   timeInSeconds: number;
   accuracy: number;
   topic: string;
-  testType: string;
+  testType: TestType;
   timestamp: Date;
   rank?: number;
+  difficulty: DifficultyLevel;
 }
 
 export interface UserStats {
@@ -51,17 +56,42 @@ export interface UserStats {
   totalTime: number;
   averageAccuracy: number;
   favoriteTopic: string;
-  testCountByType: Record<string, number>;
+  testCountByType: Record<TestType, number>;
+  recentTests: TestResultSubmission[];
+  improvementTrend: 'improving' | 'declining' | 'stable';
 }
 
+export interface RankingFilters {
+  topic?: string;
+  testType?: TestType;
+  difficulty?: DifficultyLevel;
+  timeRange?: 'day' | 'week' | 'month' | 'all';
+  limit?: number;
+}
+
+export interface RankingResponse {
+  entries: RankingEntry[];
+  totalCount: number;
+  userRank?: number;
+  filters: RankingFilters;
+}
+
+// ========== RANKING SERVICE MIT VOLLER TYPSICHERHEIT ==========
 export class RankingService {
   constructor(private authService: AuthService) {}
 
-  async submitTestResult(testScore: TestResult, testVariant: 'chaos' | 'structured', selectedCategory?: string): Promise<void> {
+  /**
+   * Sendet ein Test-Ergebnis an Firebase
+   */
+  async submitTestResult(
+    testScore: TestResult, 
+    testVariant: TestType, 
+    selectedCategory?: string
+  ): Promise<string> {
     const user = this.authService.currentUser;
     if (!user) {
-      console.warn('User nicht angemeldet - Test-Ergebnis wird nicht gespeichert');
-      return;
+      console.warn('⚠️ User nicht angemeldet - Test-Ergebnis wird nicht gespeichert');
+      throw new Error('User nicht angemeldet');
     }
 
     const testResult: TestResultSubmission = {
@@ -78,7 +108,7 @@ export class RankingService {
       averageTimePerQuestion: testScore.score.averageTimePerQuestion,
       timestamp: testScore.score.timestamp,
       difficulty: 'A1',
-      baseScore: testScore.score.finalScore + testScore.score.timePenalty, // Rekonstruiere Basis-Score
+      baseScore: testScore.score.finalScore + testScore.score.timePenalty,
       timePenalty: testScore.score.timePenalty,
       finalScore: testScore.score.finalScore,
       accuracy: testScore.score.accuracy,
@@ -86,17 +116,22 @@ export class RankingService {
     };
 
     try {
-      await addDoc(collection(db, 'testResults'), {
+      const docRef = await addDoc(collection(db, 'testResults'), {
         ...testResult,
         timestamp: Timestamp.fromDate(testResult.timestamp)
       });
-      console.log('✅ Test-Ergebnis erfolgreich an Firebase gesendet');
-    } catch (error) {
+      console.log('✅ Test-Ergebnis erfolgreich an Firebase gesendet:', docRef.id);
+      return docRef.id;
+    } catch (error: unknown) {
       console.error('❌ Fehler beim Speichern des Test-Ergebnisses:', error);
+      throw new Error(`Fehler beim Speichern: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
   }
 
-  async getGlobalRankings(limitCount: number = 100): Promise<RankingEntry[]> {
+  /**
+   * Lädt globale Ranglisten
+   */
+  async getGlobalRankings(limitCount: number = 100): Promise<RankingResponse> {
     try {
       const q = query(
         collection(db, 'testResults'),
@@ -105,21 +140,28 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
+      const entries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
         rank: index + 1
       })) as RankingEntry[];
       
-      return rankings;
-    } catch (error) {
+      return {
+        entries,
+        totalCount: entries.length,
+        filters: { limit: limitCount }
+      };
+    } catch (error: unknown) {
       console.error('❌ Fehler beim Laden der globalen Rangliste:', error);
-      return [];
+      throw new Error(`Fehler beim Laden der Rangliste: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
   }
 
-  async getTopicRankings(topic: string, limitCount: number = 50): Promise<RankingEntry[]> {
+  /**
+   * Lädt Ranglisten für ein spezifisches Thema
+   */
+  async getTopicRankings(topic: string, limitCount: number = 50): Promise<RankingResponse> {
     try {
       const q = query(
         collection(db, 'testResults'),
@@ -129,21 +171,28 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
+      const entries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
         rank: index + 1
       })) as RankingEntry[];
       
-      return rankings;
-    } catch (error) {
+      return {
+        entries,
+        totalCount: entries.length,
+        filters: { topic, limit: limitCount }
+      };
+    } catch (error: unknown) {
       console.error(`❌ Fehler beim Laden der Rangliste für ${topic}:`, error);
-      return [];
+      throw new Error(`Fehler beim Laden der Rangliste für ${topic}: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
   }
 
-  async getTestTypeRankings(testType: 'chaos' | 'structured', limitCount: number = 50): Promise<RankingEntry[]> {
+  /**
+   * Lädt Ranglisten für einen spezifischen Test-Typ
+   */
+  async getTestTypeRankings(testType: TestType, limitCount: number = 50): Promise<RankingResponse> {
     try {
       const q = query(
         collection(db, 'testResults'),
@@ -153,20 +202,27 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
+      const entries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
         rank: index + 1
       })) as RankingEntry[];
       
-      return rankings;
-    } catch (error) {
+      return {
+        entries,
+        totalCount: entries.length,
+        filters: { testType, limit: limitCount }
+      };
+    } catch (error: unknown) {
       console.error(`❌ Fehler beim Laden der Rangliste für ${testType}:`, error);
-      return [];
+      throw new Error(`Fehler beim Laden der Rangliste für ${testType}: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
   }
 
+  /**
+   * Lädt detaillierte Statistiken für einen Benutzer
+   */
   async getUserStats(userId: string): Promise<UserStats | null> {
     try {
       const q = query(
@@ -197,10 +253,17 @@ export class RankingService {
         .sort(([,a], [,b]) => b - a)[0]?.[0] || 'Unbekannt';
       
       // Test-Typen zählen
-      const testCountByType: Record<string, number> = {};
+      const testCountByType: Record<TestType, number> = {
+        chaos: 0,
+        structured: 0
+      };
       results.forEach(r => {
-        testCountByType[r.testType] = (testCountByType[r.testType] || 0) + 1;
+        testCountByType[r.testType]++;
       });
+      
+      // Verbesserungstrend berechnen
+      const recentTests = results.slice(0, 5);
+      const improvementTrend = this.calculateImprovementTrend(results);
       
       return {
         totalTests,
@@ -209,20 +272,24 @@ export class RankingService {
         totalTime: Math.round(totalTime),
         averageAccuracy: Math.round(averageAccuracy),
         favoriteTopic,
-        testCountByType
+        testCountByType,
+        recentTests,
+        improvementTrend
       };
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Fehler beim Laden der User-Statistiken:', error);
-      return null;
+      throw new Error(`Fehler beim Laden der Statistiken: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
   }
 
+  /**
+   * Lädt das beste Ranking des aktuellen Benutzers
+   */
   async getCurrentUserRanking(): Promise<RankingEntry | null> {
     const user = this.authService.currentUser;
     if (!user) return null;
 
     try {
-      // Hole alle Ergebnisse des Users
       const q = query(
         collection(db, 'testResults'),
         where('userId', '==', user.uid),
@@ -239,13 +306,16 @@ export class RankingService {
         ...bestResult,
         timestamp: bestResult.timestamp?.toDate() || new Date()
       } as RankingEntry;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('❌ Fehler beim Laden des User-Rankings:', error);
-      return null;
+      throw new Error(`Fehler beim Laden des Rankings: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
   }
 
-  async getWeeklyRankings(): Promise<RankingEntry[]> {
+  /**
+   * Lädt wöchentliche Ranglisten
+   */
+  async getWeeklyRankings(): Promise<RankingResponse> {
     try {
       const oneWeekAgo = new Date();
       oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
@@ -258,17 +328,105 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
+      const entries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
         rank: index + 1
       })) as RankingEntry[];
       
-      return rankings;
-    } catch (error) {
+      return {
+        entries,
+        totalCount: entries.length,
+        filters: { timeRange: 'week', limit: 50 }
+      };
+    } catch (error: unknown) {
       console.error('❌ Fehler beim Laden der wöchentlichen Rangliste:', error);
-      return [];
+      throw new Error(`Fehler beim Laden der wöchentlichen Rangliste: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
     }
+  }
+
+  /**
+   * Lädt Ranglisten mit benutzerdefinierten Filtern
+   */
+  async getFilteredRankings(filters: RankingFilters): Promise<RankingResponse> {
+    try {
+      let q = query(collection(db, 'testResults'));
+      
+      // Filter anwenden
+      if (filters.topic) {
+        q = query(q, where('topic', '==', filters.topic));
+      }
+      if (filters.testType) {
+        q = query(q, where('testType', '==', filters.testType));
+      }
+      if (filters.difficulty) {
+        q = query(q, where('difficulty', '==', filters.difficulty));
+      }
+      if (filters.timeRange && filters.timeRange !== 'all') {
+        const startDate = this.getStartDateForTimeRange(filters.timeRange);
+        q = query(q, where('timestamp', '>=', Timestamp.fromDate(startDate)));
+      }
+      
+      // Sortierung und Limit
+      q = query(q, orderBy('finalScore', 'desc'), limit(filters.limit || 50));
+      
+      const snapshot = await getDocs(q);
+      const entries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate() || new Date(),
+        rank: index + 1
+      })) as RankingEntry[];
+      
+      return {
+        entries,
+        totalCount: entries.length,
+        filters
+      };
+    } catch (error: unknown) {
+      console.error('❌ Fehler beim Laden der gefilterten Rangliste:', error);
+      throw new Error(`Fehler beim Laden der gefilterten Rangliste: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+    }
+  }
+
+  /**
+   * Berechnet den Verbesserungstrend basierend auf den letzten Tests
+   */
+  private calculateImprovementTrend(results: TestResultSubmission[]): 'improving' | 'declining' | 'stable' {
+    if (results.length < 3) return 'stable';
+    
+    const recentScores = results.slice(0, 3).map(r => r.finalScore);
+    const olderScores = results.slice(3, 6).map(r => r.finalScore);
+    
+    if (olderScores.length === 0) return 'stable';
+    
+    const recentAvg = recentScores.reduce((a, b) => a + b, 0) / recentScores.length;
+    const olderAvg = olderScores.reduce((a, b) => a + b, 0) / olderScores.length;
+    
+    const difference = recentAvg - olderAvg;
+    
+    if (difference > 5) return 'improving';
+    if (difference < -5) return 'declining';
+    return 'stable';
+  }
+
+  /**
+   * Hilfsfunktion für Zeitbereich-Filter
+   */
+  private getStartDateForTimeRange(timeRange: 'day' | 'week' | 'month'): Date {
+    const now = new Date();
+    switch (timeRange) {
+      case 'day':
+        now.setDate(now.getDate() - 1);
+        break;
+      case 'week':
+        now.setDate(now.getDate() - 7);
+        break;
+      case 'month':
+        now.setMonth(now.getMonth() - 1);
+        break;
+    }
+    return now;
   }
 } 

@@ -2,7 +2,7 @@
 // Navigation und Themen-Anzeige Funktionen
 
 import type { DOMElements } from '../shared/types/ui';
-import type { TrainerState, VocabularyStructure, LearningModes, UICallbacks, TopicId, SubTopicId, ModeId } from '../shared/types/trainer';
+import type { TrainerState, VocabularyStructure, LearningModes, UICallbacks, TopicId, SubTopicId, ModeId, TestConfiguration, TestId } from '../shared/types/trainer';
 import type { TestCategory } from '../shared/types/trainer';
 
 import { NavigationEvents } from '../shared/events/navigation-events';
@@ -168,8 +168,8 @@ export function displaySubTopics(dom: DOMElements, state: TrainerState, vokabula
         const progressKey = `${mainTopicName}|${subTopicName}`;
         const progressForKey = state.progress.globalProgress[progressKey] || {};
         let completedTasks = 0;
-        Object.values(progressForKey).forEach((masteredSet: any) => {
-            completedTasks += (masteredSet.size || masteredSet.length || 0);
+        Object.values(progressForKey).forEach((masteredSet: Set<string> | string[]) => {
+            completedTasks += (masteredSet instanceof Set ? masteredSet.size : masteredSet.length);
         });
         const percentage = calculateProgressPercentage(completedTasks, totalPossibleTasks);
         const progressColorClass = getProgressColorClass(completedTasks, totalPossibleTasks);
@@ -296,31 +296,24 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
             const topicId = testButton.dataset.topicId;
             if (variant === 'chaos') {
                 // Chaos-Test direkt starten
-                const testConfig = {
-                    id: `test_${Date.now()}` as any,
-                    type: (scope === 'global' ? 'global' : 'mainTopic') as any,
-                    variant: 'chaos' as any,
-                    topicId: topicId as any,
-                    name: scope === 'global' ? 'Globaler Chaos-Test' : `${topicId} Chaos-Test`,
+                const testConfig: TestConfiguration = {
+                    testId: `test_${Date.now()}` as TestId,
+                    testType: scope === 'global' ? 'global' : 'mainTopic',
+                    variant: 'chaos',
+                    topicId: topicId as TopicId,
                     testTitle: scope === 'global' ? 'Globaler Chaos-Test' : `${topicId} Chaos-Test`,
-                    modes: ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as any,
-                    mode: 'mc-de-en' as any,
-                    minAccuracy: 0.8,
-                    maxAttempts: 1,
-                    taskDistribution: {
-                        'mc-de-en': 5,
-                        'type-de-adj': 5,
-                        'cloze-adj-de': 5,
-                        'sentence-translation-en-de': 5
-                    } as any
+                    modeIds: ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as ModeId[],
+                    mode: 'mc-de-en' as ModeId,
+                    questionCount: 20,
+                    categories: ['bedeutung', 'schreibweise', 'luecke', 'satz']
                 };
-                callbacks.startTest?.(testConfig as any);
+                callbacks.startTest?.(testConfig);
             } else {
                 // Struktur-Test - Modal für Kategorie-Auswahl
                 import('./test-modal').then(module => {
                     module.showCategoryModal(scope, topicId, 
                         scope === 'global' ? 'Globaler Struktur-Test' : `${topicId} Struktur-Test`, 
-                        callbacks as any);
+                        callbacks);
                 });
             }
         }

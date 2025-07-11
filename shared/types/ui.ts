@@ -1,7 +1,7 @@
 // shared/types/ui.ts
 // Professional UI and DOM element types
 
-import type { Word, TopicId, SubTopicId } from './vocabulary.js';
+import type { Word, TopicId, SubTopicId } from './vocabulary';
 import type { TrainerState, ModeId, TestConfiguration } from './trainer';
 // ========== DOM ELEMENTS INTERFACE - HINZUGEFÜGT ==========
 export interface DOMElements {

@@ -1,9 +1,8 @@
 // ui/test-modal.ts
-// Kategorie-Auswahl-Modal für Struktur-Tests
+// Test-Modal und Kategorie-Auswahl
 
 import type { DOMElements } from '../shared/types/ui';
-import type { TrainerState, TestCategory, TestConfiguration, ModeId, TestId, TopicId } from '../shared/types/trainer';
-import type { UICallbacks } from '../shared/types/ui';
+import type { TrainerState, UICallbacks, LearningModes, TestConfiguration, TestId, TopicId, ModeId, TestCategory } from '../shared/types/trainer';
 import { CATEGORY_MODE_MAP } from '../shared/types/trainer';
 
 // Modal instance
@@ -169,7 +168,7 @@ export function showCategoryModal(
                 categories: [category]
             };
             
-            callbacks.startTest(testConfig);
+            callbacks.startTest?.(testConfig);
         };
     });
     
@@ -220,7 +219,7 @@ export function initTestModalListeners(
     dom: DOMElements,
     state: TrainerState,
     callbacks: UICallbacks,
-    learningModes: any
+    learningModes: LearningModes
 ): void {
     // Chaos-Test Event
     window.addEventListener('startChaosTest', ((e: CustomEvent) => {
@@ -239,7 +238,7 @@ export function initTestModalListeners(
             categories: ['bedeutung', 'schreibweise', 'luecke', 'satz']
         };
         
-        callbacks.startTest(testConfig);
+        callbacks.startTest?.(testConfig);
     }) as EventListener);
     
     // Kategorie-Modal Event

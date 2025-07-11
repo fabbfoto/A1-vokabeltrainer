@@ -1,10 +1,8 @@
 // ui/statistics.ts
-// Statistik und Fortschritts-Anzeige Funktionen
+// Statistik-Berechnungen und UI-Updates
 
-// Type imports (temporär any, später aus shared/types)
-type DOMElements = any;
-type TrainerState = any;
-type LearningModes = any;
+import type { DOMElements } from '../shared/types/ui';
+import type { TrainerState, LearningModes } from '../shared/types/trainer';
 
 /**
  * Entfernt alle Farbklassen von einem Element
@@ -85,7 +83,7 @@ export function updateErrorCounts(dom: DOMElements, state: TrainerState, learnin
             return;
         }
         
-        const errorCount = state.progress.wordsToRepeatByMode[mode]?.size || 0;
+        const errorCount = state.progress.wordsToRepeatByMode[mode as import('../shared/types/trainer').ModeId]?.size || 0;
         
         // Immer die Zahl anzeigen
         countSpan.textContent = errorCount.toString();
@@ -142,7 +140,7 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
     Object.keys(learningModes).forEach(modeId => {
         const modeInfo = learningModes[modeId];
         const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
-        const progressData = state.progress.globalProgress[progressKey]?.[modeId];
+        const progressData = state.progress.globalProgress[progressKey]?.[modeId as import('../shared/types/trainer').ModeId];
         const masteredCount = progressData?.size || 0;
         const percentage = calculateProgressPercentage(masteredCount, totalItemsInSet);
 
@@ -209,7 +207,7 @@ export function updatePracticeStats(dom: DOMElements, state: TrainerState, learn
  */
 export function updateTestStats(dom: DOMElements, state: TrainerState): void {
     const correct = state.training.correctInCurrentRound;
-    const total = state.shuffledWordsForMode.length;
+    const total = state.training.shuffledWordsForMode.length;
     const attempted = state.training.attemptedInCurrentRound;
     const progress = calculateProgressPercentage(attempted, total);
     const accuracy = attempted > 0 ? (correct / attempted) * 100 : 0;
