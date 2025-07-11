@@ -802,12 +802,28 @@ export function setupSentenceTranslationEnDeMode(
     let fullGermanSentence = "";
     if ('exampleGerman' in currentWord) {
         const exampleGerman = currentWord.exampleGerman;
+        console.log('[DEBUG] exampleGerman raw:', exampleGerman);
         fullGermanSentence = getExampleSentenceText(exampleGerman);
+        console.log('[DEBUG] fullGermanSentence after getExampleSentenceText:', fullGermanSentence);
+        
+        // Fallback: Wenn kein Satz gefunden wurde, verwende das deutsche Wort
+        if (!fullGermanSentence || fullGermanSentence.trim() === '') {
+            console.log('[DEBUG] Using fallback - german word:', currentWord.german);
+            fullGermanSentence = currentWord.german;
+        }
+    } else {
+        // Fallback: Verwende das deutsche Wort als Satz
+        console.log('[DEBUG] No exampleGerman found, using german word:', currentWord.german);
+        fullGermanSentence = currentWord.german;
     }
 
     // Wörter für Layout extrahieren (jetzt inkl. Satzzeichen)
     const wordsForLayout = splitSentence(fullGermanSentence);
-
+    
+    // Fallback: Wenn keine Wörter gefunden wurden, verwende das deutsche Wort
+    if (wordsForLayout.length === 0) {
+        wordsForLayout.push(fullGermanSentence);
+    }
     
     // Sentence-Input-Container generieren
     generateSentenceInputs(dom, wordsForLayout, fullGermanSentence, processAnswer, state);
@@ -821,8 +837,12 @@ function generateSentenceInputs(
     state: TrainerState
 ): void {
 
-    
     dom.sentenceWordInputContainerEl.innerHTML = '';
+    
+    if (wordsForLayout.length === 0) {
+        console.error('[generateSentenceInputs] Keine Wörter für Layout gefunden!');
+        return;
+    }
     
     wordsForLayout.forEach((word, index) => {
         const input = document.createElement('input');

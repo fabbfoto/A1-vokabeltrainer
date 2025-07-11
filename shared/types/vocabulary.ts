@@ -31,6 +31,7 @@ export interface CaseElement {
 
 // ========== EXAMPLE SENTENCE INTERFACES ==========
 export interface ExampleSentencePart {
+  id?: WordId; // Optional ID for vocabulary files that include it
   text: string;
   case?: CaseType;
   kasus?: CaseType; // Legacy-Kompatibilität
@@ -45,9 +46,20 @@ export interface ExampleSentenceData {
 
 // ========== TYPE GUARDS FOR EXAMPLE SENTENCES ==========
 export function isExampleSentencePartArray(value: unknown): value is ExampleSentencePart[] {
-  return Array.isArray(value) && value.every(item => 
-    typeof item === 'object' && item !== null && 'text' in item && typeof item.text === 'string'
-  );
+  console.log('[DEBUG] isExampleSentencePartArray checking:', value);
+  const isArray = Array.isArray(value);
+  console.log('[DEBUG] isArray:', isArray);
+  
+  if (!isArray) return false;
+  
+  const everyItemValid = value.every(item => {
+    const isValid = typeof item === 'object' && item !== null && 'text' in item && typeof item.text === 'string';
+    console.log('[DEBUG] item:', item, 'isValid:', isValid);
+    return isValid;
+  });
+  
+  console.log('[DEBUG] everyItemValid:', everyItemValid);
+  return everyItemValid;
 }
 
 export function isExampleSentenceString(value: unknown): value is string {
@@ -55,16 +67,25 @@ export function isExampleSentenceString(value: unknown): value is string {
 }
 
 export function getExampleSentenceText(exampleSentence: ExampleSentencePart[] | string | undefined | null): string {
-  if (!exampleSentence) return '';
+  console.log('[DEBUG] getExampleSentenceText input:', exampleSentence);
+  
+  if (!exampleSentence) {
+    console.log('[DEBUG] exampleSentence is null/undefined, returning empty string');
+    return '';
+  }
   
   if (isExampleSentencePartArray(exampleSentence)) {
-    return exampleSentence.map(part => part.text).join('');
+    const result = exampleSentence.map(part => part.text).join('');
+    console.log('[DEBUG] isExampleSentencePartArray true, result:', result);
+    return result;
   }
   
   if (isExampleSentenceString(exampleSentence)) {
+    console.log('[DEBUG] isExampleSentenceString true, result:', exampleSentence);
     return exampleSentence;
   }
   
+  console.log('[DEBUG] No matching type found, returning empty string');
   return '';
 }
 
@@ -89,7 +110,7 @@ interface BaseWord {
   id: WordId;
   german: string;
   english: string;
-  exampleGerman?: CaseElement[];
+  exampleGerman?: ExampleSentencePart[];
   exampleEnglish?: string;
   clozeParts?: string[];
   clozeAnswers?: string[];

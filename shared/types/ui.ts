@@ -91,7 +91,7 @@ export interface DOMElements {
 export interface NavigationCallbacks {
   handleTopicSelection: (mainTopic: TopicId, subTopic?: SubTopicId) => void;
   handleBackNavigation: () => void;
-  handleModeSelection: (mode: ModeId) => void;
+  handleModeSelection: (mode: ModeId, isRepeat?: boolean) => void;
 }
 
 export interface LearningCallbacks {

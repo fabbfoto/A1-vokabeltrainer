@@ -15,8 +15,7 @@ export type Article = 'der' | 'die' | 'das' | 'der/die' | 'der/das' | 'die/das';
 
 export type Hilfsverb = 'haben' | 'sein';
 
-export interface BaseWord {
-  id: string;
+export interface BaseWord {id: string;
   wordType: string;
   german: string;
   english: string;
@@ -26,14 +25,12 @@ export interface BaseWord {
   clozeAnswers?: string[];
 }
 
-export interface Nomen extends BaseWord {
-  wordType: 'noun';
+export interface Nomen extends BaseWord {wordType: 'noun';
   article: Article;
   plural: string | null;
 }
 
-export interface Verb extends BaseWord {
-  wordType: 'verb';
+export interface Verb extends BaseWord {wordType: 'verb';
   separable: boolean;
   auxiliaryVerb?: Hilfsverb;
   pastParticiple?: string;
@@ -41,32 +38,25 @@ export interface Verb extends BaseWord {
   imperative?: Imperativ;
 }
 
-export interface Adjektiv extends BaseWord {
-  wordType: 'adjective';
+export interface Adjektiv extends BaseWord {wordType: 'adjective';
 }
 
-export interface Adverb extends BaseWord {
-  wordType: 'adverb';
+export interface Adverb extends BaseWord {wordType: 'adverb';
 }
 
-export interface Präposition extends BaseWord {
-  wordType: 'preposition';
+export interface Präposition extends BaseWord {wordType: 'preposition';
 }
 
-export interface Pronomen extends BaseWord {
-  wordType: 'pronoun';
+export interface Pronomen extends BaseWord {wordType: 'pronoun';
 }
 
-export interface Konjunktion extends BaseWord {
-  wordType: 'conjunction';
+export interface Konjunktion extends BaseWord {wordType: 'conjunction';
 }
 
-export interface Interjektion extends BaseWord {
-  wordType: 'interjection';
+export interface Interjektion extends BaseWord {wordType: 'interjection';
 }
 
-export interface Konjugation {
-  ich: string;
+export interface Konjugation {ich: string;
   du: string;
   er: string;
   sie: string;
@@ -76,8 +66,7 @@ export interface Konjugation {
   Sie: string;
 }
 
-export interface Imperativ {
-  du: string;
+export interface Imperativ {du: string;
   ihr: string;
   Sie: string;
 }
@@ -92,8 +81,7 @@ export type Word =
   | Konjunktion
   | Interjektion;
 
-export type CaseElement = {
-  text: string;
+export type CaseElement = {text: string;
   case: string;
 };
 
@@ -101,29 +89,23 @@ export type CaseElement = {
 export type Unterthema = Word[];
 
 // Type für ein Hauptthema (z.B. "Person")
-export interface Hauptthema {
-  [unterthema: string]: Unterthema;
+export interface Hauptthema {[unterthema: string]: Unterthema;
 }
 
 // Type für die gesamte Vokabular-Struktur
-export interface VokabularStruktur {
-  [hauptthema: string]: Hauptthema;
+export interface VokabularStruktur {[hauptthema: string]: Hauptthema;
 }
 
 // Type Guards für Type-Safety
-export function isNomen(word: Word): word is Nomen {
-  return word.wordType === 'noun';
+export function isNomen(word: Word): word is Nomen {return word.wordType === 'noun';
 }
 
-export function isVerb(word: Word): word is Verb {
-  return word.wordType === 'verb';
+export function isVerb(word: Word): word is Verb {return word.wordType === 'verb';
 }
 
-export function isAdjektiv(word: Word): word is Adjektiv {
-  return word.wordType === 'adjective';
+export function isAdjektiv(word: Word): word is Adjektiv {return word.wordType === 'adjective';
 }
 
 // Helper function für Type-sichere Vokabular-Erstellung
-export function createVokabular<T extends VokabularStruktur>(vokabular: T): T {
-  return vokabular;
+export function createVokabular<T extends VokabularStruktur>(vokabular: T): T {return vokabular;
 }

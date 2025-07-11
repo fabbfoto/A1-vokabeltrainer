@@ -331,7 +331,7 @@ export interface VocabularyStructure {
 
 export interface UICallbacks {
     handleTopicSelection: (mainTopic: TopicId, subTopic: SubTopicId) => void;
-    handleModeSelection: (modeId: ModeId) => void;
+    handleModeSelection: (modeId: ModeId, isRepeat?: boolean) => void;
     handleAnswer: (isCorrect: boolean, correctAnswer?: string) => void;
     handleTestCompletion: () => void;
     

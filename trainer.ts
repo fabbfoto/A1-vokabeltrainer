@@ -32,6 +32,7 @@ import { generateTestQuestions, TestGenerationResult } from './utils/test-genera
 import { calculateTestScore, calculateAverageTimePerQuestion } from './shared/types/trainer';
 import { showTestResultModal } from './shared/ui/test-result-modal';
 import { ModeManager } from './shared/services/mode-manager';
+import { validateVocabulary } from './validate-vocabulary';
 import type { AuthService } from './shared/services/auth-service';
 import type { SyncService } from './shared/services/sync-service';
 import type { RankingService } from './shared/services/ranking-service';
@@ -1136,6 +1137,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     console.log('🎉 Trainer erfolgreich initialisiert!');
     console.log('📊 Verfügbare Themen:', Object.keys(vokabular));
     console.log('🎮 Verfügbare Modi:', Object.keys(learningModes));
+    
+    // Vokabular-Validierung
+    console.log('🔍 Starte Vokabular-Validierung...');
+    const validationResult = validateVocabulary();
+    if (!validationResult.isValid) {
+        console.error('❌ Vokabular-Validierung fehlgeschlagen!');
+        console.error('Fehler:', validationResult.errors);
+    } else {
+        console.log('✅ Vokabular-Validierung erfolgreich!');
+    }
 
     // Am Ende von document.addEventListener('DOMContentLoaded', ...)
     (window as unknown as { loadNextTask: typeof loadNextTask }).loadNextTask = loadNextTask;

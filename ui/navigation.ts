@@ -253,7 +253,7 @@ export function initializeModeButtons(callbacks: UICallbacks, learningModes: Lea
     Object.keys(learningModes).forEach(modeId => {
         const button = document.getElementById(`mode-${modeId}`);
         if (button) {
-            button.addEventListener('click', () => callbacks.setMode?.(modeId as ModeId, false));
+            button.addEventListener('click', () => callbacks.handleModeSelection?.(modeId as ModeId, false));
         }
     });
 }
@@ -268,7 +268,7 @@ export function initializeRepeatButtons(callbacks: UICallbacks, learningModes: L
             repeatButton.addEventListener('click', () => {
                 // Nur ausführen, wenn der Button nicht deaktiviert ist
                 if (!(repeatButton as HTMLButtonElement).disabled) {
-                    callbacks.setMode?.(modeId as ModeId, true);
+                    callbacks.handleModeSelection?.(modeId as ModeId, true);
                 }
             });
         }
