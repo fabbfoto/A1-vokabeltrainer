@@ -24,6 +24,7 @@ export class AuthUI {
     private syncButton: HTMLButtonElement | null = null;
     private isVisible: boolean = true;
     private boundNavigationHandler: ((event: NavigationEvent) => void) | null = null;
+    public container: HTMLElement | null = null;
     
     constructor(trainerId: string, uiConfig: UIConfig, authService: AuthService) {
         this.options = uiConfig;
@@ -73,6 +74,7 @@ export class AuthUI {
             console.error(`AuthUI: Container-Element mit der ID '${this.options.buttonContainerId}' nicht gefunden.`);
             return;
         }
+        this.container = container;
 
         if (this.syncButton) {
             this.syncButton.remove();
@@ -114,7 +116,7 @@ export class AuthUI {
         container.appendChild(this.syncButton);
     }
 
-    public updateUIAfterLogin(user: any): void {
+    public updateUIAfterLogin(user: { uid: string; email: string | null; displayName: string | null }): void {
         console.log('[AuthUI] updateUIAfterLogin aufgerufen, zeichne Button neu.');
         this.renderSyncButton(true, user.email);
     }

@@ -243,7 +243,7 @@ export interface ProgressState {
     lastTestScores: Record<string, TestResult>;
     
     // Index-Signaturen für dynamische Zugriffe
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 // ========== TEST STATE ==========
@@ -353,7 +353,7 @@ export interface UserData {
     progress: Record<string, Record<string, string[]>>;
     masteredWords: Record<string, string[]>;
     wordsToRepeat: Record<string, string[]>;
-    lastTestScores: Record<string, any>;
+    lastTestScores: Record<string, TestResult>;
     perfectRuns: Record<string, number>;
 }
 

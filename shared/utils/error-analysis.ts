@@ -138,8 +138,8 @@ export function showErrorSummary(): void {
 // Automatische Ausführung wenn die Datei direkt geladen wird
 if (typeof window !== 'undefined') {
     // Globale Funktionen für Browser-Konsole verfügbar machen
-    (window as any).analyzeErrorCounts = analyzeErrorCounts;
-    (window as any).hasErrorsForMode = hasErrorsForMode;
-    (window as any).getErrorCountForMode = getErrorCountForMode;
-    (window as any).showErrorSummary = showErrorSummary;
+    window.analyzeErrorCounts = analyzeErrorCounts;
+    window.hasErrorsForMode = hasErrorsForMode;
+    window.getErrorCountForMode = getErrorCountForMode;
+    window.showErrorSummary = showErrorSummary;
 } 

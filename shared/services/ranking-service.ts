@@ -2,16 +2,11 @@
 // Firebase-basierter Ranking-Service für Test-Ergebnisse
 
 // Firebase-Imports für Runtime
-// @ts-ignore
-import { collection, addDoc, query, orderBy, limit, getDocs, where } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js';
+import { collection, addDoc, query, orderBy, limit, getDocs, where, Timestamp } from 'firebase/firestore';
+import type { QueryDocumentSnapshot, QuerySnapshot } from 'firebase/firestore';
 import { db } from '../auth/firebase-config';
+import type { AuthService } from './auth-service';
 import type { TrainerState, SessionStats, TestResult } from '../types/trainer';
-
-type TimestampType = { fromDate: (date: Date) => any };
-// Fallback für Timestamp.fromDate, falls nicht vorhanden
-const Timestamp: TimestampType = {
-  fromDate: (date: Date) => date
-};
 
 export interface TestResultSubmission {
   userId: string;
@@ -60,7 +55,7 @@ export interface UserStats {
 }
 
 export class RankingService {
-  constructor(private authService: any) {}
+  constructor(private authService: AuthService) {}
 
   async submitTestResult(testScore: TestResult, testVariant: 'chaos' | 'structured', selectedCategory?: string): Promise<void> {
     const user = this.authService.currentUser;
@@ -110,7 +105,7 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc: any, index: number) => ({
+      const rankings = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
@@ -134,7 +129,7 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc: any, index: number) => ({
+      const rankings = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
@@ -158,7 +153,7 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc: any, index: number) => ({
+      const rankings = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
@@ -181,7 +176,7 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const results = snapshot.docs.map((doc: any) => doc.data()) as TestResultSubmission[];
+      const results = snapshot.docs.map((doc: QueryDocumentSnapshot) => doc.data()) as TestResultSubmission[];
       
       if (results.length === 0) return null;
       
@@ -263,7 +258,7 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const rankings = snapshot.docs.map((doc: any, index: number) => ({
+      const rankings = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),

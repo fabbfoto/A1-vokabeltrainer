@@ -34,7 +34,7 @@ function insertTextAtCursor(inputElement: HTMLInputElement | null, text: string)
 }
 
 // Hilfsfunktion: Hole das Beispielsatzfeld (exampleGerman oder example_de)
-function getExampleSentence(currentWord: any): any {
+function getExampleSentence(currentWord: { exampleGerman?: unknown; example_de?: unknown }): unknown {
   if ('exampleGerman' in currentWord) return currentWord.exampleGerman;
   if ('example_de' in currentWord) return currentWord.example_de;
   return null;
@@ -191,9 +191,9 @@ export function setupMultipleChoiceMode(
 
     dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
     const sentenceForSpeech = Array.isArray(exampleSentence) 
-        ? exampleSentence.map((part: any) => part.text).join('') 
+        ? exampleSentence.map((part: { text: string }) => part.text).join('') 
         : exampleSentence || '';
-    dom.audioSentenceButtonEl.onclick = () => speak(sentenceForSpeech, 'de-DE');
+    dom.audioSentenceButtonEl.onclick = () => speak(sentenceForSpeech as string, 'de-DE');
 
     // Container Layout verbessern
     dom.wordLineContainerEl.style.display = 'flex';
@@ -227,12 +227,12 @@ function generateMultipleChoiceAnswers(
     let allEnglish: string[] = [];
     if (state.training.currentVocabularySet && state.training.currentVocabularySet.length > 0) {
         // Hole alle Vokabeln aus dem gesamten Vokabular (flach)
-        if ((window as any).vokabular) {
-            const vokabular = (window as any).vokabular;
+        if (window.vokabular) {
+            const vokabular = window.vokabular;
             allEnglish = Object.values(vokabular)
-                .flatMap((mainTopic: any) => Object.values(mainTopic))
-                .flatMap((subTopic: any) => Array.isArray(subTopic) ? subTopic : [])
-                .map((word: any) => word.english)
+                .flatMap((mainTopic: Record<string, unknown[]>) => Object.values(mainTopic))
+                .flatMap((subTopic: unknown[]) => Array.isArray(subTopic) ? subTopic : [])
+                .map((word: unknown) => (word as { english: string }).english)
                 .filter((en: string) => en && en !== correctAnswerEN);
         } else {
             // Fallback: alle aus currentVocabularySet
@@ -349,7 +349,7 @@ export function setupSpellingMode(
     dom.questionDisplayEl.textContent = currentWord.english.split(',')[0].trim();
 
     // Zeige den englischen Beispielsatz darunter
-    const englishExample = (currentWord as any).exampleEnglish || (currentWord as any).example_en || "";
+    const englishExample = (currentWord as { exampleEnglish?: string; example_en?: string }).exampleEnglish || (currentWord as { exampleEnglish?: string; example_en?: string }).example_en || "";
     dom.exampleSentenceDisplayEl.textContent = englishExample;
 
     // Zeige beide Container
@@ -403,9 +403,9 @@ export function setupSpellingMode(
         
         // Button Click Handler mit didaktischem Feedback
         const handleCheckButtonClick = () => {
-            const correctArticle = (currentWord as any).article || '';
+            const correctArticle = (currentWord as { article?: string }).article || '';
             const correctSingular = currentWord.german;
-            const correctPlural = (currentWord as any).plural!;
+            const correctPlural = (currentWord as { plural?: string }).plural || '';
             
             const userInputArticle = dom.spellingInputArticleEl.value.trim();
             const userInputSingular = dom.spellingInputNoun1El.value.trim();
@@ -664,8 +664,8 @@ export function setupClozeMode(
 
     // Cloze-spezifische Logik
     if ('clozeParts' in currentWord && 'clozeAnswers' in currentWord) {
-        const clozeParts = (currentWord as any).clozeParts;
-        const clozeAnswers = (currentWord as any).clozeAnswers;
+        const clozeParts = (currentWord as { clozeParts: string[] }).clozeParts;
+        const clozeAnswers = (currentWord as { clozeAnswers: string[] }).clozeAnswers;
         
         if (Array.isArray(clozeParts) && Array.isArray(clozeAnswers)) {
             generateClozeUI(dom, clozeParts, clozeAnswers, processAnswer, state);
@@ -785,7 +785,7 @@ export function setupSentenceTranslationEnDeMode(
     }
     
     if ('exampleEnglish' in currentWord) {
-        dom.questionDisplayEl.textContent = (currentWord as any).exampleEnglish;
+        dom.questionDisplayEl.textContent = (currentWord as { exampleEnglish: string }).exampleEnglish;
         dom.questionDisplayEl.className = 'text-center text-3xl font-semibold text-gray-900 mb-6';
     }
     
@@ -795,9 +795,9 @@ export function setupSentenceTranslationEnDeMode(
     // Deutschen Satz für Vergleich vorbereiten
     let fullGermanSentence = "";
     if ('exampleGerman' in currentWord) {
-        const exampleGerman = (currentWord as any).exampleGerman;
+        const exampleGerman = (currentWord as { exampleGerman: unknown }).exampleGerman;
         if (Array.isArray(exampleGerman)) {
-            fullGermanSentence = exampleGerman.map((part: any) => part.text).join("");
+            fullGermanSentence = exampleGerman.map((part: { text: string }) => part.text).join("");
         } else if (typeof exampleGerman === 'string') {
             fullGermanSentence = exampleGerman;
         }

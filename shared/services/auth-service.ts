@@ -1,11 +1,7 @@
 // Firebase-Imports für Runtime
-// @ts-ignore
-import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import type { User, Auth } from 'firebase/auth';
 import { app } from '../auth/firebase-config';
-
-// TypeScript-Typen für Firebase
-type User = any;
-type Auth = any;
 
 export class AuthService {
     public auth: Auth;

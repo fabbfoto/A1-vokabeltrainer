@@ -12,7 +12,8 @@ import type {
     SubTopicId,
     WordId,
     TestScore,
-    TestConfiguration
+    TestConfiguration,
+    TestResult
 } from './shared/types/trainer';
 
 import { dom } from './dom';
@@ -511,7 +512,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     'Übung wiederholen',
                     () => {
                         const progressKey = getTopicKey(state.navigation.currentMainTopic, state.navigation.currentSubTopic);
-                        if (progressKey && state.progress.globalProgress[progressKey]) {
+                        if (progressKey && state.progress.globalProgress[progressKey] && state.training.currentMode) {
                             state.progress.globalProgress[progressKey][state.training.currentMode] = new Set();
                             saveProgress();
                         }
@@ -575,7 +576,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                                 'Übung wiederholen',
                                 () => {
                                     const progressKey = getTopicKey(state.navigation.currentMainTopic, state.navigation.currentSubTopic);
-                                    if (progressKey && state.progress.globalProgress[progressKey]) {
+                                    if (progressKey && state.progress.globalProgress[progressKey] && state.training.currentMode) {
                                         state.progress.globalProgress[progressKey][state.training.currentMode] = new Set();
                                         saveProgress();
                                     }
@@ -599,7 +600,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 } else {
                     // Noch Fehler da - shuffle Fehlerliste
                     const errorWords = state.training.currentVocabularySet.filter(word => 
-                        state.progress.wordsToRepeatByMode[state.training.currentMode]?.has(word.id)
+                        state.training.currentMode && state.progress.wordsToRepeatByMode[state.training.currentMode]?.has(word.id)
                     );
                     state.training.shuffledWordsForMode = shuffleArray(errorWords);
                 }
@@ -634,7 +635,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                             'Übung wiederholen',
                             () => {
                                 const progressKey = getTopicKey(state.navigation.currentMainTopic, state.navigation.currentSubTopic);
-                                if (progressKey && state.progress.globalProgress[progressKey]) {
+                                if (progressKey && state.progress.globalProgress[progressKey] && state.training.currentMode) {
                                     state.progress.globalProgress[progressKey][state.training.currentMode] = new Set();
                                     saveProgress();
                                 }
@@ -990,7 +991,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 console.warn('⚠️ Fehler beim Senden an Ranking-System:', error);
             }
         }
-        showTestResultModal(testScore, state.test.currentTest || undefined);
+        // Konvertiere TestScore zu TestResult für die Modal-Anzeige
+        const testResult: TestResult = {
+            testId: testScore.testId,
+            score: testScore,
+            wordResults: [], // Leere Array da wir keine einzelnen Wort-Ergebnisse haben
+            recommendations: [] // Leere Array da wir keine Empfehlungen haben
+        };
+        showTestResultModal(testResult, state.test.currentTest as unknown as Record<string, unknown> || undefined);
     }
 
     const callbacks: UICallbacks = {
@@ -1022,11 +1030,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             }
         },
         handleModeSelection: setMode,
-        setMode: setMode,
-        processAnswer: processAnswer,
-        loadNextWord: loadNextTask,
-        speakWord: (word: string) => console.log('Spreche Wort:', word),
-        speakSentence: (sentence: string) => console.log('Spreche Satz:', sentence),
+        handleAnswer: (isCorrect: boolean, correctAnswer?: string) => {
+            processAnswer(isCorrect, correctAnswer);
+        },
+        handleTestCompletion: () => {
+            console.log('Test abgeschlossen');
+        },
         startTest: (testConfig: TestConfiguration) => {
             console.log('Starte Test:', testConfig.testTitle);
             
@@ -1054,30 +1063,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 state.test.testModeRotation = result.modeRotation as import('./shared/types/trainer').ModeId[];
                 state.test.currentTestModeIndex = 0;
             } else {
-                state.training.currentMode = testConfig.mode;
+                state.training.currentMode = testConfig.mode as ModeId || null; // Stelle sicher, dass es nicht undefined ist
             }
             // UI für Test starten
-            startTestUI(testConfig.testTitle, testConfig.mode);
-        },
-        submitTestAnswer: (isCorrect: boolean, timeSpent: number) => {
-            console.log(`Testantwort: ${isCorrect}, Zeit: ${timeSpent}`);
-        },
-        completeTest: (result: any) => {
-            console.log('Test abgeschlossen:', result);
-        },
-        showLoading: () => dom.loadingIndicatorEl.classList.remove('hidden'),
-        hideLoading: () => dom.loadingIndicatorEl.classList.add('hidden'),
-        showError: (error: string) => alert(error),
-        clearError: () => { /* Nichts zu tun */ },
-        updateProgress: (wordId: WordId, mode: ModeId, correct: boolean) => {
-            console.log(`Update Progress: ${wordId} in ${mode} war ${correct}`);
-        },
-        startRepeatSession: (mode: string) => {
-            // Wechsle zu Wiederholungs-Modus
-            ModeManager.switchToMode(state, 'repeating');
-            
-            // Rest der Initialisierung...
-            setMode(mode as ModeId, true);
+            startTestUI(testConfig.testTitle || 'Test', testConfig.mode as ModeId || 'mc-de-en' as ModeId); // Stelle sicher, dass es nicht undefined ist
         },
     };
 
@@ -1086,7 +1075,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         callbacks.handleTopicSelection(mainTopic as TopicId, subTopic as SubTopicId);
     });
     document.addEventListener('back-navigation', () => {
-        callbacks.handleBackNavigation();
+        callbacks.handleBackNavigation?.();
     });
     document.addEventListener('mode-selected', (e: Event) => {
         const { mode } = (e as CustomEvent).detail;
@@ -1110,7 +1099,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // KORREKTUR: Event Listener für den "Zurück"-Button im Trainer explizit hinzufügen
     dom.backToSubtopicsButton.addEventListener('click', () => {
-        callbacks.handleBackNavigation();
+        callbacks.handleBackNavigation?.();
     });
     
     // Initialansicht
@@ -1142,7 +1131,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         
         if (previousMode === 'correcting') {
             // Zurück zum vorherigen Modus (learning oder repeating)
-            if (state.progress.wordsToRepeatByMode[state.training.currentMode]?.size > 0) {
+            if (state.training.currentMode && state.progress.wordsToRepeatByMode[state.training.currentMode]?.size > 0) {
                 ModeManager.switchToMode(state, 'repeating');
             } else {
                 ModeManager.switchToMode(state, 'learning');

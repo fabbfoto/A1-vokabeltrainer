@@ -2,22 +2,22 @@
 
 // Firebase-Imports aus der Konfiguration
 import { app, db } from '../auth/firebase-config';
-// @ts-ignore
-import { doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import type { Firestore, Unsubscribe, DocumentSnapshot, FirestoreError } from 'firebase/firestore';
 import type { AuthService } from './auth-service';
 import type { TrainerState, Progress, UserData } from '../types/trainer';
 
 interface SyncListener {
-    (type: 'remoteUpdate' | 'localUpdate' | 'error', data: any): void;
+    (type: 'remoteUpdate' | 'localUpdate' | 'error', data: unknown): void;
 }
 
 interface ProgressData {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 export class SyncService {
-    private db: any; // Firebase Firestore instance
-    private unsubscribe: any = null;
+    private db: Firestore;
+    private unsubscribe: Unsubscribe | null = null;
     private trainerType: string = 'basis'; // Standardwert, kann später angepasst werden
     private listeners: SyncListener[] = []; // Für Benachrichtigungen über Updates
     private authService: AuthService | null = null;
@@ -39,12 +39,12 @@ export class SyncService {
         const docPath = `users/${userId}/progress/${this.trainerType}`;
         const docRef = doc(this.db, docPath);
 
-        this.unsubscribe = onSnapshot(docRef, (doc: any) => {
+        this.unsubscribe = onSnapshot(docRef, (doc: DocumentSnapshot) => {
             console.log("Firestore: Daten-Update erhalten.");
             if (doc.exists()) {
                 this.notifyListeners('remoteUpdate', doc.data());
             }
-        }, (error: any) => {
+        }, (error: FirestoreError) => {
             console.error("Fehler in startRealtimeSync:", error);
             this.notifyListeners('error', error);
         });
@@ -66,7 +66,7 @@ export class SyncService {
      * @param progressData - Das Fortschritts-Objekt.
      */
     public async saveProgress(progressData: Partial<UserData>): Promise<void> {
-        const userId = this.authService?.currentUser?.id;
+        const userId = this.authService?.currentUser?.uid;
         if (!userId) {
             console.warn('Nicht speichern, da kein User angemeldet ist');
             return;
@@ -96,7 +96,7 @@ export class SyncService {
      * @param type - Die Art des Updates (z.B. 'remoteUpdate').
      * @param data - Die Daten des Updates.
      */
-    private notifyListeners(type: 'remoteUpdate' | 'localUpdate' | 'error', data: any): void {
+    private notifyListeners(type: 'remoteUpdate' | 'localUpdate' | 'error', data: unknown): void {
         this.listeners.forEach(listener => listener(type, data));
     }
 

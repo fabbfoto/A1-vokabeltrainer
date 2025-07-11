@@ -1,7 +1,7 @@
 // shared/auth/index.ts - FINALE VERSION MIT ALLEN KORREKTEN PFADEN
 
-// @ts-ignore
-import { getAuth, onIdTokenChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+import { getAuth, onIdTokenChanged } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { app } from './firebase-config';
 
 // KORRIGIERTE PFADE: Die Imports zeigen jetzt auf die Ordner 'services' und 'ui'.
@@ -42,11 +42,11 @@ export function initializeAuth(trainerId: string, uiConfig: UIConfig): AuthServi
     });
 
     const auth = getAuth(app);
-    onIdTokenChanged(auth, (user: any) => {
+    onIdTokenChanged(auth, (user: User | null) => {
         if (user) {
             console.log(`[Auth Listener] User ist eingeloggt: ${user.uid}. Starte Echtzeit-Synchronisation.`);
             syncService.startRealtimeSync(user.uid);
-            authUI.updateUIAfterLogin(user);
+            authUI.updateUIAfterLogin({ uid: user.uid, email: user.email, displayName: user.displayName });
         } else {
             console.log('[Auth Listener] User ist ausgeloggt. Stoppe Synchronisation.');
             syncService.stopRealtimeSync();
@@ -56,7 +56,7 @@ export function initializeAuth(trainerId: string, uiConfig: UIConfig): AuthServi
 
     // NEU: Ranking-UI global verfügbar machen
     if (typeof window !== 'undefined') {
-        (window as any).rankingUI = rankingUI;
+        window.rankingUI = rankingUI;
     }
 
     return { authService, authUI, syncService, rankingService, rankingUI };

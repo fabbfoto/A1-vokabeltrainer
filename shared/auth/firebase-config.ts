@@ -1,10 +1,10 @@
 // shared/auth/firebase-config.ts
-// @ts-ignore
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-// @ts-ignore
-import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-// @ts-ignore
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
+import { initializeApp } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import type { FirebaseApp } from 'firebase/app';
+import type { Auth } from 'firebase/auth';
+import type { Firestore } from 'firebase/firestore';
 
 interface FirebaseConfig {
   apiKey: string;
@@ -34,9 +34,9 @@ const firebaseConfig: FirebaseConfig = {
   measurementId: "G-WZELR67WKZ"
 };
 
-export const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+export const app: FirebaseApp = initializeApp(firebaseConfig);
+export const auth: Auth = getAuth(app);
+export const db: Firestore = getFirestore(app);
 
 function getCurrentDeviceInfo(): DeviceInfo {
     let browserName: string = 'Unknown';
@@ -67,4 +67,4 @@ function getCurrentDeviceInfo(): DeviceInfo {
     };
 }
 
-export { auth, db, getCurrentDeviceInfo }; 
+export { getCurrentDeviceInfo }; 

@@ -255,7 +255,7 @@ export interface SentenceTranslationSetup extends LearningModeSetup {
 export interface CustomUIEvent extends Event {
   detail: {
     type: string;
-    data?: any;
+    data?: unknown;
   };
 }
 

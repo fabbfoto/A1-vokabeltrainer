@@ -12,7 +12,7 @@ import type { ModeId } from '../types/trainer';
  * @param saveWordsToRepeat - Funktion zum Speichern der Words-to-Repeat
  */
 export function resetErrorCountsForNewExercise(
-    state: any, 
+    state: { training: { correctInCurrentRound: number; attemptedInCurrentRound: number }; progress: { wordsToRepeatByMode: Record<string, Set<string>> } }, 
     modeId: ModeId, 
     saveWordsToRepeat: () => void
 ): void {
@@ -34,11 +34,11 @@ export function resetErrorCountsForNewExercise(
     console.log(`🗑️ localStorage 'trainer-words-to-repeat' gelöscht`);
     
     // 4. Firebase Progress zurücksetzen (falls verfügbar)
-    if ((window as any).firebaseSyncService) {
+    if (window.firebaseSyncService) {
         try {
             // Leeren Progress an Firebase senden
             const emptyProgress = {};
-            (window as any).firebaseSyncService.saveProgress(emptyProgress);
+            window.firebaseSyncService.saveProgress(emptyProgress);
             console.log(`☁️ Firebase Progress zurückgesetzt`);
         } catch (error) {
             console.warn('⚠️ Fehler beim Firebase-Reset:', error);
@@ -54,7 +54,7 @@ export function resetErrorCountsForNewExercise(
  * @param saveWordsToRepeat - Funktion zum Speichern der Words-to-Repeat
  */
 export function resetAllErrorCounts(
-    state: any, 
+    state: { training: { correctInCurrentRound: number; attemptedInCurrentRound: number }; progress: { wordsToRepeatByMode: Record<string, Set<string>> } }, 
     saveWordsToRepeat: () => void
 ): void {
     console.log('🔄 Setze ALLE Fehlerzähler zurück...');
@@ -72,10 +72,10 @@ export function resetAllErrorCounts(
     saveWordsToRepeat();
     
     // 4. Firebase zurücksetzen (falls verfügbar)
-    if ((window as any).firebaseSyncService) {
+    if (window.firebaseSyncService) {
         try {
             const emptyProgress = {};
-            (window as any).firebaseSyncService.saveProgress(emptyProgress);
+            window.firebaseSyncService.saveProgress(emptyProgress);
             console.log('☁️ Firebase Progress zurückgesetzt');
         } catch (error) {
             console.warn('⚠️ Fehler beim Firebase-Reset:', error);
@@ -92,7 +92,7 @@ export function resetAllErrorCounts(
  * @param modeId - Der zu prüfende Modus
  * @returns true wenn Fehler vorhanden sind, false sonst
  */
-export function hasErrorCounts(state: any, modeId: ModeId): boolean {
+export function hasErrorCounts(state: { progress: { wordsToRepeatByMode: Record<string, Set<string>> } }, modeId: ModeId): boolean {
     const errorSet = state.progress.wordsToRepeatByMode[modeId];
     return errorSet && errorSet.size > 0;
 }
@@ -104,7 +104,7 @@ export function hasErrorCounts(state: any, modeId: ModeId): boolean {
  * @param modeId - Der zu prüfende Modus
  * @returns Anzahl der Fehler
  */
-export function getErrorCount(state: any, modeId: ModeId): number {
+export function getErrorCount(state: { progress: { wordsToRepeatByMode: Record<string, Set<string>> } }, modeId: ModeId): number {
     const errorSet = state.progress.wordsToRepeatByMode[modeId];
     return errorSet ? errorSet.size : 0;
 } 

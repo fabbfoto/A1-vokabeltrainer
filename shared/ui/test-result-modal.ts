@@ -1,7 +1,7 @@
 // shared/ui/test-result-modal.ts
 import type { TestResult } from '../types/trainer';
 
-export function showTestResultModal(testResult: TestResult, testConfig?: any) {
+export function showTestResultModal(testResult: TestResult, testConfig?: Record<string, unknown>) {
   // Prüfe, ob schon ein Modal existiert
   if (document.getElementById('test-result-modal')) return;
 
@@ -69,8 +69,8 @@ export function showTestResultModal(testResult: TestResult, testConfig?: any) {
   // Statistiken-Button
   document.getElementById('show-my-stats')?.addEventListener('click', () => {
     modal.remove();
-    if ((window as any).rankingUI) {
-      (window as any).rankingUI.showUserStats();
+    if (window.rankingUI) {
+      window.rankingUI.showUserStats();
     }
   });
 } 

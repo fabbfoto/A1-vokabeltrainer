@@ -5,18 +5,18 @@
 export interface NavigationEventDetail {
     isRoot: boolean;
     timestamp: number;
-    [key: string]: any; // Für zusätzliche Daten
+    [key: string]: unknown; // Für zusätzliche Daten
 }
 
 export interface SubNavigationInfo {
-    [key: string]: any; // Flexible Struktur für Sub-Navigation-Daten
+    [key: string]: unknown; // Flexible Struktur für Sub-Navigation-Daten
 }
 
 export const NavigationEvents = {
     CHANGED: 'navigationChanged' as const,
     
     // Helper-Funktion zum Dispatchen
-    dispatch(isRoot: boolean, additionalData: Record<string, any> = {}): void {
+    dispatch(isRoot: boolean, additionalData: Record<string, unknown> = {}): void {
         const event = new CustomEvent<NavigationEventDetail>(this.CHANGED, {
             detail: {
                 isRoot: isRoot,

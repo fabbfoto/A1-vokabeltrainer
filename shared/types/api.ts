@@ -1,42 +1,13 @@
 // shared/types/api.ts
 // Professional API and Firebase integration types
 
-// ========== FIREBASE MOCK FÜR MIGRATION ==========
-// Da Firebase temporär deaktiviert ist, mocken wir die Types
-declare namespace FirebaseFirestore {
-  interface Timestamp {
-    toDate(): Date;
-    toMillis(): number;
-  }
-  
-  interface DocumentReference {
-    id: string;
-    path: string;
-  }
-  
-  interface CollectionReference {
-    id: string;
-    path: string;
-  }
-  
-  interface QuerySnapshot {
-    docs: DocumentSnapshot[];
-    size: number;
-    empty: boolean;
-  }
-  
-  interface DocumentSnapshot {
-    id: string;
-    exists: boolean;
-    data(): any;
-  }
-  
-  function Timestamp(): Timestamp;
-  namespace Timestamp {
-    function fromDate(date: Date): Timestamp;
-    function now(): Timestamp;
-  }
-}
+import { Timestamp } from 'firebase/firestore';
+import type { 
+  DocumentReference,
+  CollectionReference,
+  QuerySnapshot,
+  DocumentSnapshot
+} from 'firebase/firestore';
 
 import type { WordId, TopicId, SubTopicId } from './vocabulary.js';
 import type { Progress, TestScore, SessionStats, ModeId } from './trainer.js';
@@ -150,8 +121,8 @@ export interface SyncService {
 
 export interface SyncConflict {
   field: keyof UserData;
-  localValue: any;
-  remoteValue: any;
+  localValue: unknown;
+  remoteValue: unknown;
   lastModified: {
     local: Date;
     remote: Date;
@@ -171,8 +142,8 @@ export interface FirestoreUser {
   email: string;
   displayName?: string;
   photoURL?: string;
-  createdAt: FirebaseFirestore.Timestamp;
-  lastLogin: FirebaseFirestore.Timestamp;
+  createdAt: Timestamp;
+  lastLogin: Timestamp;
   preferences: UserPreferences;
   subscription: UserSubscription;
 }
@@ -184,7 +155,7 @@ export interface FirestoreProgress {
       [modeId: string]: string[]; // WordId arrays for Firestore
     };
   };
-  lastUpdated: FirebaseFirestore.Timestamp;
+  lastUpdated: Timestamp;
 }
 
 export interface FirestoreTestScore {
@@ -193,7 +164,7 @@ export interface FirestoreTestScore {
   correct: number;
   total: number;
   accuracy: number;
-  timestamp: FirebaseFirestore.Timestamp;
+  timestamp: Timestamp;
   testType: string;
   topicId?: string;
   subTopicId?: string;
@@ -204,8 +175,8 @@ export interface FirestoreTestScore {
 export interface FirestoreSessionStats {
   userId: string;
   sessionId: string;
-  startTime: FirebaseFirestore.Timestamp;
-  endTime?: FirebaseFirestore.Timestamp;
+  startTime: Timestamp;
+  endTime?: Timestamp;
   mode: string;
   topicId?: string;
   subTopicId?: string;
@@ -234,7 +205,7 @@ export interface StreakData {
 }
 
 // ========== API RESPONSE TYPES ==========
-export interface APIResponse<T = any> {
+export interface APIResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: APIError;
@@ -248,7 +219,7 @@ export interface APIResponse<T = any> {
 export interface APIError {
   code: string;
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   timestamp: Date;
 }
 
@@ -296,7 +267,7 @@ export interface VoiceOption {
 // ========== ANALYTICS TYPES ==========
 export interface AnalyticsEvent {
   event: string;
-  properties: Record<string, any>;
+  properties: Record<string, unknown>;
   userId?: UserId;
   sessionId?: string;
   timestamp: Date;
@@ -341,37 +312,36 @@ export function createDocumentId(id: string): DocumentId {
   return id as DocumentId;
 }
 
-// ========== FIREBASE CONVERSION UTILITIES ==========
-export function toFirestoreTimestamp(date: Date): FirebaseFirestore.Timestamp {
-  return FirebaseFirestore.Timestamp.fromDate(date);
+export function toFirestoreTimestamp(date: Date): Timestamp {
+  return Timestamp.fromDate(date);
 }
 
-export function fromFirestoreTimestamp(timestamp: FirebaseFirestore.Timestamp): Date {
+export function fromFirestoreTimestamp(timestamp: Timestamp): Date {
   return timestamp.toDate();
 }
 
 export function convertProgressToFirestore(progress: Progress): FirestoreProgress['topicProgress'] {
-  const result: FirestoreProgress['topicProgress'] = {};
+  const firestoreProgress: FirestoreProgress['topicProgress'] = {};
   
-  for (const [topicKey, modes] of Object.entries(progress)) {
-    result[topicKey] = {};
-    for (const [modeId, wordIds] of Object.entries(modes)) {
-      result[topicKey][modeId] = Array.from(wordIds as Set<WordId>);
+  for (const [topicId, topicData] of Object.entries(progress)) {
+    firestoreProgress[topicId] = {};
+    for (const [modeId, wordIds] of Object.entries(topicData)) {
+      firestoreProgress[topicId][modeId] = Array.from(wordIds);
     }
   }
   
-  return result;
+  return firestoreProgress;
 }
 
 export function convertProgressFromFirestore(firestoreProgress: FirestoreProgress['topicProgress']): Progress {
-  const result: Progress = {};
+  const progress: Progress = {};
   
-  for (const [topicKey, modes] of Object.entries(firestoreProgress)) {
-    result[topicKey] = {};
-    for (const [modeId, wordIds] of Object.entries(modes)) {
-      result[topicKey][modeId] = new Set(wordIds as WordId[]);
+  for (const [topicId, topicData] of Object.entries(firestoreProgress)) {
+    progress[topicId] = {};
+    for (const [modeId, wordIdArray] of Object.entries(topicData)) {
+      progress[topicId][modeId] = new Set(wordIdArray.map(id => id as WordId));
     }
   }
   
-  return result;
+  return progress;
 }

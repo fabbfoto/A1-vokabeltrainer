@@ -2,7 +2,7 @@
 // Kategorie-Auswahl-Modal für Struktur-Tests
 
 import type { DOMElements } from '../shared/types/ui';
-import type { TrainerState, TestCategory, TestConfiguration, ModeId } from '../shared/types/trainer';
+import type { TrainerState, TestCategory, TestConfiguration, ModeId, TestId, TopicId } from '../shared/types/trainer';
 import type { UICallbacks } from '../shared/types/ui';
 import { CATEGORY_MODE_MAP } from '../shared/types/trainer';
 
@@ -157,15 +157,16 @@ export function showCategoryModal(
             // Test-Konfiguration erstellen
             const mode = CATEGORY_MODE_MAP[category];
             const testConfig: TestConfiguration = {
-                id: `test_${Date.now()}` as any,
-                type: scope === 'global' ? 'global' : 'mainTopic',
+                testId: `test_${Date.now()}` as TestId,
+                testType: scope === 'global' ? 'global' : 'mainTopic',
                 variant: 'structured',
                 selectedCategory: category,
-                topicId: mainTopic as any,
+                topicId: mainTopic as TopicId,
                 testTitle: `${title} - ${getCategoryDisplayName(category)}`,
                 modeIds: [mode],
                 mode: mode,
-                questionCount: 10
+                questionCount: 10,
+                categories: [category]
             };
             
             callbacks.startTest(testConfig);
@@ -227,20 +228,15 @@ export function initTestModalListeners(
         
         // Test-Konfiguration für Chaos
         const testConfig: TestConfiguration = {
-            id: `test_${Date.now()}` as any,
-            type: scope === 'global' ? 'global' : 'mainTopic',
+            testId: `test_${Date.now()}` as TestId,
+            testType: scope === 'global' ? 'global' : 'mainTopic',
             variant: 'chaos',
-            topicId: mainTopic as any,
+            topicId: mainTopic as TopicId,
             testTitle: title,
             modeIds: ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as ModeId[],
-            mode: 'mixed' as any, // Spezieller Modus
+            mode: 'mixed' as ModeId, // Spezieller Modus
             questionCount: 20,
-            taskDistribution: {
-                'mc-de-en': 5,
-                'type-de-adj': 5,
-                'cloze-adj-de': 5,
-                'sentence-translation-en-de': 5
-            } as any
+            categories: ['bedeutung', 'schreibweise', 'luecke', 'satz']
         };
         
         callbacks.startTest(testConfig);
