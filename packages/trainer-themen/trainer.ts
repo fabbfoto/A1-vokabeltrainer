@@ -13,7 +13,7 @@ const testSelectionModalEl = document.getElementById('test-selection-modal');
 interface TrainerState {
     currentMainTopic: string | null;
     currentSubTopic: string | null;
-    globalProgress: Record<string, any>;
+    globalProgress: Record<string, Record<string, string[]>>;
 }
 
 // State-Objekt
@@ -56,19 +56,30 @@ function resetAllErrorCounts(): void {
         });
         
         // 3. Firebase zurücksetzen (falls verfügbar)
-        if ((window as any).firebaseSyncService) {
+        const windowWithFirebase = window as unknown as { 
+            firebaseSyncService?: { 
+                saveProgress: (data: Record<string, unknown>) => void;
+                saveTestScores: (data: Record<string, unknown>) => void;
+            } 
+        };
+        if (windowWithFirebase.firebaseSyncService) {
             // Leere Objekte an Firebase senden
-            const emptyProgress = {};
-            const emptyTestScores = {};
+            const emptyProgress: Record<string, unknown> = {};
+            const emptyTestScores: Record<string, unknown> = {};
             
-            (window as any).firebaseSyncService.saveProgress(emptyProgress);
-            (window as any).firebaseSyncService.saveTestScores(emptyTestScores);
+            windowWithFirebase.firebaseSyncService.saveProgress(emptyProgress);
+            windowWithFirebase.firebaseSyncService.saveTestScores(emptyTestScores);
             console.log('☁️ Firebase-Daten zurückgesetzt');
         }
         
         // 4. Sync-Service zurücksetzen (falls verfügbar)
-        if ((window as any).syncService) {
-            (window as any).syncService.saveProgress({});
+        const windowWithSync = window as unknown as { 
+            syncService?: { 
+                saveProgress: (data: Record<string, unknown>) => void;
+            } 
+        };
+        if (windowWithSync.syncService) {
+            windowWithSync.syncService.saveProgress({});
             console.log('🔄 Sync-Service zurückgesetzt');
         }
         
@@ -221,7 +232,7 @@ interface TrainerJS {
 }
 
 // Export für externe Verwendung
-(window as any).trainerJS = {
+(window as unknown as { trainerJS: TrainerJS }).trainerJS = {
     displayMainTopics,
     displaySubTopics,
     handleNavigation,
@@ -238,4 +249,4 @@ if (document.readyState === 'loading') {
 }
 
 // Globale Funktionen für externe Aufrufe
-(window as any).resetAllErrorCounts = resetAllErrorCounts; 
+(window as unknown as { resetAllErrorCounts: typeof resetAllErrorCounts }).resetAllErrorCounts = resetAllErrorCounts; 

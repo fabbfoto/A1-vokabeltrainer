@@ -99,7 +99,7 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
                 if (masteredSet instanceof Set) {
                     totalMastered += masteredSet.size;
                 } else if (Array.isArray(masteredSet)) {
-                    totalMastered += (masteredSet as any[]).length;
+                    totalMastered += (masteredSet as string[]).length;
                 }
             });
         });
@@ -328,8 +328,9 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
     const rankingButton = document.getElementById('ranking-btn');
     if (rankingButton) {
         rankingButton.addEventListener('click', () => {
-            if ((window as any).rankingUI) {
-                (window as any).rankingUI.showRankingNavigation();
+            const windowWithRanking = window as unknown as { rankingUI?: { showRankingNavigation: () => void } };
+            if (windowWithRanking.rankingUI) {
+                windowWithRanking.rankingUI.showRankingNavigation();
             } else {
                 console.warn('Ranking-UI nicht verfügbar');
             }

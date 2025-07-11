@@ -13,7 +13,9 @@ import type {
     WordId,
     TestScore,
     TestConfiguration,
-    TestResult
+    TestResult,
+    TestId,
+    TestType
 } from './shared/types/trainer';
 
 import { dom } from './dom';
@@ -30,6 +32,9 @@ import { generateTestQuestions, TestGenerationResult } from './utils/test-genera
 import { calculateTestScore, calculateAverageTimePerQuestion } from './shared/types/trainer';
 import { showTestResultModal } from './shared/ui/test-result-modal';
 import { ModeManager } from './shared/services/mode-manager';
+import type { AuthService } from './shared/services/auth-service';
+import type { SyncService } from './shared/services/sync-service';
+import type { RankingService } from './shared/services/ranking-service';
 
 console.log('📚 Vokabular importiert:', vokabular);
 console.log('📚 Anzahl Hauptthemen:', Object.keys(vokabular).length);
@@ -40,10 +45,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     console.log('🚀 DOMContentLoaded Event gefeuert');
 
     // NEU: Firebase Auth initialisieren
-    let authService: any;
+    let authService: AuthService;
     let authUI: AuthUI;
-    let syncService: any;
-    let rankingService: any;
+    let syncService: SyncService;
+    let rankingService: RankingService;
 
     try {
         // Firebase Auth initialisieren
@@ -65,20 +70,70 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     } catch (error) {
         console.warn('⚠️ Firebase Auth nicht verfügbar, verwende Fallback:', error);
         
-        // Fallback-Services
-        authService = { isLoggedIn: () => false };
+        // Fallback-Services mit Mock-Implementierungen
+        authService = {
+            auth: null,
+            currentUser: null,
+            firebaseUser: null,
+            convertFirebaseUser: () => null,
+            isLoggedIn: () => false,
+            login: async () => { throw new Error('Auth not available'); },
+            logout: async () => { throw new Error('Auth not available'); },
+            onAuthStateChanged: () => () => {},
+            getCurrentUser: () => null,
+            getUserId: () => null,
+            getUserEmail: () => null,
+            getDisplayName: () => null,
+            isEmailVerified: () => false,
+            loginWithGoogle: async () => { throw new Error('Auth not available'); },
+            getFirebaseUser: () => null
+        } as unknown as AuthService;
+        
         authUI = {
             show: () => { },
             hide: () => { },
             container: null
         };
+        
         syncService = {
+            db: null,
+            unsubscribe: null,
+            trainerType: 'a1-vokabeltrainer',
+            listeners: new Map(),
+            authService: null,
+            syncStatus: 'disconnected',
             onSyncUpdate: () => { },
-            saveProgress: async () => { }
-        };
+            saveProgress: async () => { },
+            saveTestScores: async () => { },
+            loadProgress: async () => ({}),
+            loadTestScores: async () => ({}),
+            startRealtimeSync: () => { },
+            stopRealtimeSync: () => { },
+            syncProgress: async () => { },
+            syncTestScores: async () => { },
+            notifyListeners: () => { },
+            clearListeners: () => { },
+            getSyncStatus: () => 'disconnected',
+            isConnected: () => false,
+            getLastSyncTime: () => null
+        } as unknown as SyncService;
+        
         rankingService = {
-            submitTestResult: async () => { console.log('Ranking-Service nicht verfügbar'); }
-        };
+            authService: null,
+            submitTestResult: async () => { 
+                console.log('Ranking-Service nicht verfügbar'); 
+                return 'mock-result-id';
+            },
+            getRankings: async () => [],
+            getUserStats: async () => null,
+            getTopicRankings: async () => [],
+            getWeeklyRankings: async () => [],
+            getGlobalRankings: async () => [],
+            getTestTypeRankings: async () => [],
+            getCurrentUserRanking: async () => null,
+            getTopUsers: async () => [],
+            getWeeklyTopUsers: async () => []
+        } as unknown as RankingService;
     }
 
     NavigationEvents.dispatchRoot();
@@ -808,11 +863,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             console.log(`🗑️ localStorage 'trainer-words-to-repeat' gelöscht`);
             
             // Firebase Progress zurücksetzen (falls verfügbar)
-            if ((window as any).firebaseSyncService) {
+            if ((window as unknown as { firebaseSyncService?: { saveProgress: (data: Record<string, unknown>) => void } }).firebaseSyncService) {
                 try {
                     // Leeren Progress an Firebase senden
-                    const emptyProgress = {};
-                    (window as any).firebaseSyncService.saveProgress(emptyProgress);
+                    const emptyProgress: Record<string, unknown> = {};
+                    (window as unknown as { firebaseSyncService: { saveProgress: (data: Record<string, unknown>) => void } }).firebaseSyncService.saveProgress(emptyProgress);
                     console.log(`☁️ Firebase Progress zurückgesetzt`);
                 } catch (error) {
                     console.warn('⚠️ Fehler beim Firebase-Reset:', error);
@@ -925,7 +980,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         
         if (!state.test.lastTestScores) state.test.lastTestScores = {};
         const testScore: TestScore = {
-            testId: `test_${Date.now()}` as any,
+            testId: `test_${Date.now()}` as TestId,
             correct: state.training.correctInCurrentRound,
             total: state.training.attemptedInCurrentRound,
             accuracy: accuracy,
@@ -977,8 +1032,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // NEU: Test-Ergebnis an Firebase Ranking-System senden
         if (state.test.currentTest) {
             try {
-                if ((window as any).rankingService) {
-                    await (window as any).rankingService.submitTestResult(
+                const windowWithRanking = window as unknown as { rankingService?: { submitTestResult: (testScore: TestScore, variant: string, category?: string) => Promise<string> } };
+                if (windowWithRanking.rankingService) {
+                    await windowWithRanking.rankingService.submitTestResult(
                         testScore,
                         state.test.currentTest.variant,
                         state.test.currentTest.selectedCategory
@@ -1045,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             // Generiere Test-Aufgaben
             const result = generateTestQuestions(vokabular, {
                 variant: testConfig.variant,
-                scope: testConfig.type as any,
+                scope: testConfig.type as 'subTopic' | 'mainTopic' | 'global',
                 topicId: testConfig.topicId,
                 category: testConfig.selectedCategory as import('./shared/types/trainer').TestCategory,
                 totalQuestions: 20
@@ -1112,7 +1168,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     
     // Globale initUmlautButtons Funktion für die Browser-Lösung
     // ENTFERNT: Doppelte Implementierung - wird jetzt durch ui/umlaut-buttons.ts gehandhabt
-    (window as any).initUmlautButtons = function() {
+    (window as unknown as { initUmlautButtons: () => void }).initUmlautButtons = function() {
         console.log('initUmlautButtons aufgerufen - wird durch TypeScript-Implementierung gehandhabt');
         // Die TypeScript-Implementierung in ui/umlaut-buttons.ts übernimmt jetzt alles
     };
@@ -1122,7 +1178,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     console.log('🎮 Verfügbare Modi:', Object.keys(learningModes));
 
     // Am Ende von document.addEventListener('DOMContentLoaded', ...)
-    (window as any).loadNextTask = loadNextTask;
+    (window as unknown as { loadNextTask: typeof loadNextTask }).loadNextTask = loadNextTask;
 
     // Event-Listener für Weiter-Button (nur einmalig registrieren)
     dom.continueButton.addEventListener('click', () => {

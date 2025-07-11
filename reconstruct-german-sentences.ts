@@ -16,10 +16,15 @@ export function reconstructFromCloze(clozeParts: string[], clozeAnswers: string[
 // );
 // Ergebnis: "Kannst du das Licht anmachen?"
 
-export function createExampleGermanFromCloze(clozeParts: string[], clozeAnswers: string[]): any[] {
+interface SentencePart {
+    text: string;
+    case: string;
+}
+
+export function createExampleGermanFromCloze(clozeParts: string[], clozeAnswers: string[]): SentencePart[] {
     if (!clozeParts || !clozeAnswers) return [];
     
-    const result: any[] = [];
+    const result: SentencePart[] = [];
     
     // Erste Cloze-Part
     if (clozeParts[0]) {

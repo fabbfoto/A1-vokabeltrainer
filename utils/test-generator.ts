@@ -1,5 +1,6 @@
 // Importiere Typen aus shared/types
 import type { Word, TopicId, SubTopicId, ModeId, TestCategory } from '../shared/types/trainer';
+import type { VocabularyStructure } from '../shared/types/vocabulary';
 
 // Konstante für Kategorie-Modus-Mapping
 const CATEGORY_MODE_MAP: Record<TestCategory, ModeId> = {
@@ -35,7 +36,7 @@ export interface TestGenerationResult {
 }
 
 export function generateTestQuestions(
-  vokabular: any,
+  vokabular: VocabularyStructure,
   config: TestGeneratorConfig
 ): TestGenerationResult {
   const { variant, scope, topicId, category, totalQuestions = 20 } = config;
