@@ -24,7 +24,9 @@
       "@shared/*": ["shared/*"],
       "@utils/*": ["shared/utils/*"],
       "@services/*": ["shared/services/*"]
-    }
+    },
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   },
   "include": [
     "*.ts",

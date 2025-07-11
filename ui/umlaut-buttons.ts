@@ -47,21 +47,11 @@ export function setupUmlautButtons(dom: DOMElements, state: TrainerState): void 
     umlautContainers.forEach(container => {
         if (container) {
             container.style.display = 'flex';
-            console.log(`✅ Umlaut-Buttons Container angezeigt: ${container.id}`);
+
         }
     });
     
-    // Debug: Prüfe ob Container wirklich sichtbar ist
-    const computedStyle = window.getComputedStyle(dom.umlautButtonsContainer);
-    console.log('🔍 Umlaut-Container Debug:', {
-        display: computedStyle.display,
-        visibility: computedStyle.visibility,
-        opacity: computedStyle.opacity,
-        height: computedStyle.height,
-        width: computedStyle.width,
-        position: computedStyle.position,
-        zIndex: computedStyle.zIndex
-    });
+
     
     // Alle relevanten Input-Felder registrieren
     const inputsToRegister = [
@@ -86,7 +76,7 @@ export function setupUmlautButtons(dom: DOMElements, state: TrainerState): void 
         if (input && !input.hasAttribute('data-umlaut-registered')) {
             registerInputForUmlauts(input, state, dom);
             input.setAttribute('data-umlaut-registered', 'true');
-            console.log(`✅ Input-Feld registriert: ${input.className}`);
+
         }
     });
     
@@ -96,11 +86,11 @@ export function setupUmlautButtons(dom: DOMElements, state: TrainerState): void 
         if (input && !input.hasAttribute('data-umlaut-registered') && (input as HTMLElement).offsetParent !== null) {
             registerInputForUmlauts(input, state, dom);
             input.setAttribute('data-umlaut-registered', 'true');
-            console.log(`✅ Fallback Input-Feld registriert: ${input.className}`);
+
         }
     });
     
-    console.log(`✅ Insgesamt ${allTextInputs.length} Input-Felder für Umlaut-Buttons gefunden`);
+
     
     // Event-Listener für alle Umlaut-Buttons in allen Containern setzen
     umlautContainers.forEach(container => {
@@ -137,7 +127,7 @@ export function setupUmlautButtons(dom: DOMElements, state: TrainerState): void 
         });
     });
     
-    console.log('✅ Umlaut-Buttons erfolgreich initialisiert');
+
 }
 
 /**
@@ -153,7 +143,7 @@ export function hideUmlautButtons(dom: DOMElements): void {
     umlautContainers.forEach(container => {
         if (container) {
             container.style.display = 'none';
-            console.log(`✅ Umlaut-Buttons versteckt: ${container.id}`);
+
         }
     });
 }

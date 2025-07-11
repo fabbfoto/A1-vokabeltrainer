@@ -28,13 +28,13 @@ let vokabular: VocabularyStructure = {} as VocabularyStructure;
 
 // Hilfsfunktionen
 function showMessage(message: string, type: 'info' | 'error' | 'warning' = 'info'): void {
-    console.log(`[${type.toUpperCase()}] ${message}`);
+
     // Hier könnte eine UI-Meldung angezeigt werden
 }
 
 // ========== FEHLERZÄHLER-RESET FUNKTION ==========
 function resetAllErrorCounts(): void {
-    console.log('🔄 Setze alle Fehlerzähler zurück...');
+
     
     try {
         // 1. State zurücksetzen
@@ -52,7 +52,7 @@ function resetAllErrorCounts(): void {
         
         localStorageKeys.forEach(key => {
             localStorage.removeItem(key);
-            console.log(`🗑️ localStorage Key gelöscht: ${key}`);
+    
         });
         
         // 3. Firebase zurücksetzen (falls verfügbar)
@@ -69,7 +69,7 @@ function resetAllErrorCounts(): void {
             
             windowWithFirebase.firebaseSyncService.saveProgress(emptyProgress);
             windowWithFirebase.firebaseSyncService.saveTestScores(emptyTestScores);
-            console.log('☁️ Firebase-Daten zurückgesetzt');
+    
         }
         
         // 4. Sync-Service zurücksetzen (falls verfügbar)
@@ -80,10 +80,10 @@ function resetAllErrorCounts(): void {
         };
         if (windowWithSync.syncService) {
             windowWithSync.syncService.saveProgress({});
-            console.log('🔄 Sync-Service zurückgesetzt');
+        
         }
         
-        console.log('✅ Alle Fehlerzähler erfolgreich zurückgesetzt');
+    
         
     } catch (error) {
         console.error('❌ Fehler beim Zurücksetzen der Fehlerzähler:', error);
@@ -91,12 +91,12 @@ function resetAllErrorCounts(): void {
 }
 
 function updateTestModeProgressBars(): void {
-    console.log('[updateTestModeProgressBars] Aktualisiere Test-Fortschritt');
+
     // Implementierung für Test-Fortschritt
 }
 
 function startTraining(subTopic: string): void {
-    console.log('[startTraining] Starte Training für:', subTopic);
+
     
     // Fehlerzähler zurücksetzen vor dem Start
     resetAllErrorCounts();
@@ -107,7 +107,7 @@ function startTraining(subTopic: string): void {
 
 // Navigation-Funktionen
 function displayMainTopics(): void {
-    console.log('[displayMainTopics] Zeige Hauptthemen');
+
     
     if (!navigationTitleEl || !backToMainTopicsButton || !navigationContainerEl) {
         console.error('[displayMainTopics] DOM-Elemente nicht gefunden');
@@ -135,7 +135,7 @@ function displayMainTopics(): void {
 }
 
 function displaySubTopics(mainTopicName: string): void {
-    console.log('[displaySubTopics] Zeige Unterthemen für:', mainTopicName);
+
     
     if (!vokabular[mainTopicName]) {
         console.error('Hauptthema nicht gefunden:', mainTopicName);
@@ -164,7 +164,7 @@ function displaySubTopics(mainTopicName: string): void {
 
 function handleNavigation(event: Event): void {
     const target = event.target as HTMLElement;
-    console.log('[handleNavigation] Klick auf:', target);
+
     
     const mainTopicButton = target.closest('[data-main-topic]') as HTMLElement;
     const subTopicButton = target.closest('[data-sub-topic]') as HTMLElement;
@@ -173,17 +173,17 @@ function handleNavigation(event: Event): void {
     if (mainTopicButton) {
         const topic = mainTopicButton.dataset.mainTopic;
         if (topic) {
-            console.log('[handleNavigation] Hauptthema:', topic);
+    
             displaySubTopics(topic);
         }
     } else if (subTopicButton) {
         const subTopic = subTopicButton.dataset.subTopic;
         if (subTopic) {
-            console.log('[handleNavigation] Unterthema:', subTopic);
+    
             startTraining(subTopic);
         }
     } else if (testButton) {
-        console.log('[handleNavigation] Test-Button');
+
         updateTestModeProgressBars();
         if (testSelectionModalEl) {
             testSelectionModalEl.classList.remove('hidden');
@@ -193,16 +193,12 @@ function handleNavigation(event: Event): void {
 
 // Initialisierung
 function init(): void {
-    console.log('=== INIT START ===');
-    console.log('vokabular vorhanden:', typeof vokabular, Object.keys(vokabular));
-    console.log('displayMainTopics:', typeof displayMainTopics);
-    console.log('displaySubTopics:', typeof displaySubTopics);
-    console.log('handleNavigation:', typeof handleNavigation);
+
     
     // Event-Listener hinzufügen
     if (navigationContainerEl) {
         navigationContainerEl.addEventListener('click', handleNavigation);
-        console.log('[init] Navigation Event-Listener hinzugefügt');
+    
     } else {
         console.error('[init] navigationContainerEl nicht gefunden');
     }
@@ -210,7 +206,7 @@ function init(): void {
     // Back-Button Event-Listener
     if (backToMainTopicsButton) {
         backToMainTopicsButton.addEventListener('click', () => {
-            console.log('[init] Back-Button geklickt');
+    
             displayMainTopics();
         });
     }
@@ -218,7 +214,7 @@ function init(): void {
     // Initiale Anzeige der Hauptthemen
     displayMainTopics();
     
-    console.log('=== INIT ENDE ===');
+
 }
 
 // Interface für den globalen Export

@@ -5,10 +5,16 @@
 // Alle Lernmodus-Setup-Funktionen mit vollständiger Type-Safety
 
 // ✅ IMPORT GLOBALE TYPES (statt lokale Definitionen)
-import type { ModeId, LearningMode, Word, TrainerState } from '../types/trainer';
-
-// Import DOMElements from the correct location to avoid conflicts
+import type { ModeId, LearningMode } from '../types/trainer';
+import type { Word, TrainerState } from '../types/trainer';
 import type { DOMElements } from '../types/ui';
+import { 
+    ExampleSentencePart,
+    ExampleSentenceData,
+    isExampleSentencePartArray,
+    isExampleSentenceString,
+    getExampleSentenceText
+} from '../types/vocabulary';
 
 // Import der Helfer-Funktionen
 import { vergleicheAntwort, shuffleArray, speak, parseNounString } from './helfer';
@@ -34,9 +40,13 @@ function insertTextAtCursor(inputElement: HTMLInputElement | null, text: string)
 }
 
 // Hilfsfunktion: Hole das Beispielsatzfeld (exampleGerman oder example_de)
-function getExampleSentence(currentWord: { exampleGerman?: unknown; example_de?: unknown }): unknown {
-  if ('exampleGerman' in currentWord) return currentWord.exampleGerman;
-  if ('example_de' in currentWord) return currentWord.example_de;
+function getExampleSentence(currentWord: ExampleSentenceData): ExampleSentencePart[] | string | null {
+  if ('exampleGerman' in currentWord && currentWord.exampleGerman !== undefined) {
+    return currentWord.exampleGerman;
+  }
+  if ('example_de' in currentWord && currentWord.example_de !== undefined) {
+    return currentWord.example_de;
+  }
   return null;
 }
 
@@ -54,7 +64,7 @@ function getTailwindCaseClass(kasus: string): string {
 
 // Neue splitSentence Funktion
 function splitSentence(sentence: string): string[] {
-    console.log('🔍 splitSentence aufgerufen mit:', sentence);
+
     
     const punctuationMatch = sentence.match(/[.,;:!?]+$/);
     const punctuation = punctuationMatch ? punctuationMatch[0] : '';
@@ -68,7 +78,7 @@ function splitSentence(sentence: string): string[] {
         words[words.length - 1] = words[words.length - 1] + punctuation;
     }
     
-    console.log('🔍 splitSentence Ergebnis:', words);
+
     return words;
 }
 
@@ -98,7 +108,7 @@ export function setupMultipleChoiceMode(
         (button as HTMLButtonElement).disabled = false;
         button.classList.remove('opacity-50', 'cursor-not-allowed');
     });
-    console.log('[setupMultipleChoiceMode] aktiviert');
+
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
     state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
     dom.feedbackContainerEl.innerHTML = '';
@@ -112,7 +122,7 @@ export function setupMultipleChoiceMode(
     dom.clozeUiEl.style.display = 'none';
     dom.sentenceUiEl.style.display = 'none';
     
-    console.log('[setupMultipleChoiceMode] Starting - korrekte globale Types');
+
     
     // UI Setup
     if (dom.umlautButtonsContainer) dom.umlautButtonsContainer.style.display = 'none';
@@ -123,7 +133,7 @@ export function setupMultipleChoiceMode(
     // KORREKT: currentWord statt currentWordData
     const currentWord = state.training.currentWord;
     if (!currentWord) {
-        console.error('[setupMultipleChoiceMode] Kein currentWord gefunden!');
+
         return;
     }
     
@@ -141,14 +151,14 @@ export function setupMultipleChoiceMode(
 
     try {
         // Beispielsatz anzeigen (mit Tailwind-Farben, Times New Roman, größer, SCHRIFTFARBE)
-        if (Array.isArray(exampleSentence)) {
+        if (exampleSentence && isExampleSentencePartArray(exampleSentence)) {
             const joined = exampleSentence.map(part => part.text).join('');
             if (joined.trim() !== '') {
                 dom.exampleSentenceDisplayEl.innerHTML = exampleSentence.map(part => {
                     try {
-                        return `<span class="${getTailwindCaseClass(part.case || part.kasus)}" style="font-family: 'Times New Roman', Times, serif; font-size: 2.5rem; line-height: 1.5;">${part.text}</span>`;
+                        return `<span class="${getTailwindCaseClass(part.case || part.kasus || 'none')}" style="font-family: 'Times New Roman', Times, serif; font-size: 2.5rem; line-height: 1.5;">${part.text}</span>`;
                     } catch (e) {
-                        console.error('[FEHLER][Kasus-Färbung]', part, e);
+    
                         return `<span>${part.text}</span>`;
                     }
                 }).join('');
@@ -158,7 +168,7 @@ export function setupMultipleChoiceMode(
             } else {
                 dom.exampleSentenceDisplayEl.textContent = '';
             }
-        } else if (typeof exampleSentence === 'string') {
+        } else if (exampleSentence && isExampleSentenceString(exampleSentence)) {
             if (exampleSentence.trim() !== '') {
                 dom.exampleSentenceDisplayEl.textContent = exampleSentence;
                 dom.exampleSentenceDisplayEl.style.fontFamily = "'Times New Roman', Times, serif";
@@ -171,14 +181,14 @@ export function setupMultipleChoiceMode(
             dom.exampleSentenceDisplayEl.textContent = '';
         }
     } catch (e) {
-        console.error('[FEHLER][setupMultipleChoiceMode] Fehler bei der Beispielsatz-Anzeige:', e, exampleSentence);
+
         dom.exampleSentenceDisplayEl.textContent = '[Fehler beim Anzeigen des Beispielsatzes]';
     }
 
     // Sichtbarkeit des gesamten Wort+Satz-Blocks abhängig vom Beispielsatz
     if (
-        (Array.isArray(exampleSentence) && exampleSentence.length > 0 && exampleSentence.some(part => part.text && part.text.trim() !== '')) ||
-        (typeof exampleSentence === 'string' && exampleSentence.trim() !== '')
+        (exampleSentence && isExampleSentencePartArray(exampleSentence) && exampleSentence.length > 0 && exampleSentence.some(part => part.text && part.text.trim() !== '')) ||
+        (exampleSentence && isExampleSentenceString(exampleSentence) && exampleSentence.trim() !== '')
     ) {
         dom.wordSentenceBlockEl.style.display = 'block';
     } else {
@@ -190,10 +200,8 @@ export function setupMultipleChoiceMode(
     dom.audioWordButtonEl.onclick = () => speak(currentWord.german);
 
     dom.audioSentenceButtonEl.innerHTML = dom.SVG_SPEAKER_ICON;
-    const sentenceForSpeech = Array.isArray(exampleSentence) 
-        ? exampleSentence.map((part: { text: string }) => part.text).join('') 
-        : exampleSentence || '';
-    dom.audioSentenceButtonEl.onclick = () => speak(sentenceForSpeech as string, 'de-DE');
+    const sentenceForSpeech = getExampleSentenceText(exampleSentence);
+    dom.audioSentenceButtonEl.onclick = () => speak(sentenceForSpeech, 'de-DE');
 
     // Container Layout verbessern
     dom.wordLineContainerEl.style.display = 'flex';
@@ -254,7 +262,7 @@ function generateMultipleChoiceAnswers(
         button.onclick = () => {
             // Alle Buttons deaktivieren
             const allButtons = dom.mcAnswersContainerEl.querySelectorAll('.mc-answer-button');
-            allButtons.forEach(btn => {
+            allButtons.forEach((btn: Element) => {
                 (btn as HTMLButtonElement).disabled = true;
                 btn.classList.add('opacity-50', 'cursor-not-allowed');
             });
@@ -268,7 +276,7 @@ function generateMultipleChoiceAnswers(
                 button.classList.add('border-red-500', 'bg-red-100');
                 
                 // Richtige Antwort hervorheben
-                allButtons.forEach(btn => {
+                allButtons.forEach((btn: Element) => {
                     if (btn.textContent === correctAnswerEN) {
                         btn.classList.remove('border-gray-300');
                         btn.classList.add('border-green-500', 'bg-green-100');
@@ -295,7 +303,7 @@ export function setupSpellingMode(
     processAnswer: ProcessAnswerFunction
 ): void {
     ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
-    console.log('[setupSpellingMode] aktiviert');
+
     // Robustes Reset: Alle Felder aktivieren
     if (dom.spellingInputSingleEl) dom.spellingInputSingleEl.disabled = false;
     if (dom.spellingInputArticleEl) dom.spellingInputArticleEl.disabled = false;
@@ -309,7 +317,6 @@ export function setupSpellingMode(
     // Umlaut-Buttons anzeigen
     if (dom.umlautButtonsContainer) {
         dom.umlautButtonsContainer.style.display = 'flex';
-        console.log('✅ Umlaut-Buttons in Schreibweise-Modus angezeigt');
     }
     
     // Sichtbarkeitsumschaltung
@@ -318,7 +325,7 @@ export function setupSpellingMode(
     dom.clozeUiEl.style.display = 'none';
     dom.sentenceUiEl.style.display = 'none';
     
-    console.log('[setupSpellingMode] Starting - globale Types');
+
     
     // Korrekturmodus zurücksetzen
     state.isCorrectionMode = false;
@@ -330,7 +337,6 @@ export function setupSpellingMode(
     
     if (dom.umlautButtonsContainer) {
         dom.umlautButtonsContainer.style.display = 'flex';
-        console.log('✅ Umlaut-Buttons in Schreibweise-Modus angezeigt');
     }
     // Audio-Buttons verstecken
     if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
@@ -341,7 +347,7 @@ export function setupSpellingMode(
     // ✅ KORREKT: currentWord statt currentWordData
     const currentWord = state.training.currentWord;
     if (!currentWord) {
-        console.error('[setupSpellingMode] Kein currentWord gefunden!');
+
         return;
     }
 
@@ -625,7 +631,7 @@ export function setupClozeMode(
     processAnswer: ProcessAnswerFunction
 ): void {
     ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
-    console.log('[setupClozeMode] aktiviert');
+
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
     state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
     dom.feedbackContainerEl.innerHTML = '';
@@ -639,13 +645,13 @@ export function setupClozeMode(
     dom.clozeUiEl.style.display = 'block';
     dom.sentenceUiEl.style.display = 'none';
     
-    console.log('[setupClozeMode] Starting - globale Types');
+
     
     dom.checkClozeButton.disabled = false;
     
     if (dom.umlautButtonsContainer) {
         dom.umlautButtonsContainer.style.display = 'flex';
-        console.log('✅ Umlaut-Buttons in Cloze-Modus angezeigt');
+
     }
     // Audio-Buttons verstecken
     if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
@@ -735,7 +741,7 @@ function generateClozeUI(
         if (inputs.length > 0) {
             import('../../ui/umlaut-buttons').then(mod => {
                 mod.setupUmlautButtons(dom, state);
-                console.log('✅ Umlaut-Buttons für Cloze-Modus initialisiert');
+
             });
         }
     }, 0);
@@ -748,7 +754,7 @@ export function setupSentenceTranslationEnDeMode(
     processAnswer: ProcessAnswerFunction
 ): void {
     ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
-    console.log('[setupSentenceTranslationEnDeMode] aktiviert');
+
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
     state._removeCorrectionEnterHandler = addCorrectionEnterHandler(dom, state);
     dom.feedbackContainerEl.innerHTML = '';
@@ -762,13 +768,13 @@ export function setupSentenceTranslationEnDeMode(
     dom.clozeUiEl.style.display = 'none';
     dom.sentenceUiEl.style.display = 'block';
     
-    console.log('[setupSentenceTranslationEnDeMode] Starting - globale Types');
+
     
     dom.checkSentenceButton.disabled = false;
     
     if (dom.umlautButtonsContainer) {
         dom.umlautButtonsContainer.style.display = 'flex';
-        console.log('✅ Umlaut-Buttons in Satzübersetzungs-Modus angezeigt');
+
     }
     // Audio-Buttons verstecken
     if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
@@ -795,21 +801,13 @@ export function setupSentenceTranslationEnDeMode(
     // Deutschen Satz für Vergleich vorbereiten
     let fullGermanSentence = "";
     if ('exampleGerman' in currentWord) {
-        const exampleGerman = (currentWord as { exampleGerman: unknown }).exampleGerman;
-        if (Array.isArray(exampleGerman)) {
-            fullGermanSentence = exampleGerman.map((part: { text: string }) => part.text).join("");
-        } else if (typeof exampleGerman === 'string') {
-            fullGermanSentence = exampleGerman;
-        }
+        const exampleGerman = currentWord.exampleGerman;
+        fullGermanSentence = getExampleSentenceText(exampleGerman);
     }
 
     // Wörter für Layout extrahieren (jetzt inkl. Satzzeichen)
     const wordsForLayout = splitSentence(fullGermanSentence);
-    console.log('🔍 Satzübersetzung Debug:', {
-        fullGermanSentence,
-        wordsForLayout,
-        wordsCount: wordsForLayout.length
-    });
+
     
     // Sentence-Input-Container generieren
     generateSentenceInputs(dom, wordsForLayout, fullGermanSentence, processAnswer, state);
@@ -822,10 +820,7 @@ function generateSentenceInputs(
     processAnswer: ProcessAnswerFunction,
     state: TrainerState
 ): void {
-    console.log('🔍 generateSentenceInputs aufgerufen mit:', {
-        wordsForLayout,
-        containerExists: !!dom.sentenceWordInputContainerEl
-    });
+
     
     dom.sentenceWordInputContainerEl.innerHTML = '';
     
@@ -879,7 +874,7 @@ function generateSentenceInputs(
         if (inputs.length > 0) {
             import('../../ui/umlaut-buttons').then(mod => {
                 mod.setupUmlautButtons(dom, state);
-                console.log('✅ Umlaut-Buttons für Satzübersetzung initialisiert');
+
             });
         }
     }, 0);

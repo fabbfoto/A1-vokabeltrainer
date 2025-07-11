@@ -10,8 +10,8 @@ import type {
     WordId,
     CaseElement,
     VocabularyStructure
-} from './shared/types/vocabulary';
-import { createWordId, createVocabulary } from './shared/types/vocabulary';
+} from './shared/types/vocabulary.ts';
+import { createWordId, createVocabulary } from './shared/types/vocabulary.ts';
 
 export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabulary({
     "Freizeit und Unterhaltung": {

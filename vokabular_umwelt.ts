@@ -1,8 +1,8 @@
 // packages/trainer-themen/vokabular_umwelt.ts
 // VOLLSTÄNDIGE TypeScript Migration von vokabular_umwelt.js
 
-import type { VocabularyStructure, Noun, WordId, CaseElement } from './shared/types/vocabulary';
-import { createWordId, createVocabulary } from './shared/types/vocabulary';
+import type { VocabularyStructure, Noun, WordId, CaseElement } from './shared/types/vocabulary.ts';
+import { createWordId, createVocabulary } from './shared/types/vocabulary.ts';
 
 export const vokabularUmwelt: VocabularyStructure = createVocabulary({
     "Umwelt": {

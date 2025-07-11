@@ -70,38 +70,32 @@ export function shuffleArray<T>(array: T[]): T[] {
 }
 
 export function setUIMode(modeId: string): void {
-  console.log(`[setUIMode] Aufgerufen mit modeId: ${modeId}`);
+  
   const uiModes = document.querySelectorAll<HTMLElement>('.ui-mode');
-  console.log(`[setUIMode] ${uiModes.length} Elemente mit Klasse .ui-mode gefunden.`);
+
   
   if (uiModes.length === 0) {
     console.warn("[setUIMode] Keine Elemente mit der Klasse '.ui-mode' gefunden. UI-Umschaltung funktioniert nicht.");
   }
 
   uiModes.forEach(modeEl => {
-    console.log(`[setUIMode] Verarbeite Element: #${modeEl.id}`);
+    
     if (modeEl.id === modeId) {
-      console.log(`[setUIMode] Zeige Element #${modeEl.id}`);
+      
       modeEl.classList.remove('hidden');
       if (modeEl.id === 'trainer-main-view' || modeEl.id === 'navigation-view') {
         modeEl.style.display = 'flex';
       } else {
         modeEl.style.display = 'block';
       }
-      console.log(`[setUIMode] Style für #${modeEl.id}: display=${modeEl.style.display}, Klassen=${modeEl.className}`);
+
     } else {
-      console.log(`[setUIMode] Verstecke Element #${modeEl.id}`);
       modeEl.style.display = 'none';
-      console.log(`[setUIMode] Style für #${modeEl.id}: display=${modeEl.style.display}, Klassen=${modeEl.className}`);
     }
   });
   
   const activeElement = document.getElementById(modeId);
-  if (activeElement && activeElement.style.display !== 'none') {
-    console.log(`[setUIMode] Element #${modeId} sollte jetzt sichtbar sein.`);
-  } else if (activeElement) {
-    console.error(`[setUIMode] FEHLER: Element #${modeId} ist nach dem Anzeigen immer noch versteckt! display: ${activeElement.style.display}`);
-  } else {
+  if (!activeElement) {
     console.error(`[setUIMode] FEHLER: Element mit ID #${modeId} wurde nicht im DOM gefunden!`);
   }
 }

@@ -25,7 +25,7 @@ interface AuthServices {
 }
 
 export function initializeAuth(trainerId: string, uiConfig: UIConfig): AuthServices {
-    console.log('[initializeAuth] Starte die Initialisierung der Shared-Module...');
+
 
     const authService = new AuthService();
     const syncService = new SyncService(trainerId, authService);
@@ -44,11 +44,11 @@ export function initializeAuth(trainerId: string, uiConfig: UIConfig): AuthServi
     const auth = getAuth(app);
     onIdTokenChanged(auth, (user: User | null) => {
         if (user) {
-            console.log(`[Auth Listener] User ist eingeloggt: ${user.uid}. Starte Echtzeit-Synchronisation.`);
+    
             syncService.startRealtimeSync(user.uid);
             authUI.updateUIAfterLogin({ uid: user.uid, email: user.email, displayName: user.displayName });
         } else {
-            console.log('[Auth Listener] User ist ausgeloggt. Stoppe Synchronisation.');
+    
             syncService.stopRealtimeSync();
             authUI.updateUIAfterLogout();
         }

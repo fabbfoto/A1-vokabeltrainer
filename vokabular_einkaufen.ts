@@ -1,8 +1,8 @@
 // packages/trainer-themen/vokabular_einkaufen.ts
 // VOLLSTÄNDIGE TypeScript Migration von vokabular_einkaufen.js
 
-import type { VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary';
-import { createWordId, createVocabulary } from './shared/types/vocabulary';
+import type { VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary.ts';
+import { createWordId, createVocabulary } from './shared/types/vocabulary.ts';
 
 export const vokabularEinkaufen: VocabularyStructure = createVocabulary({
     "Einkaufen": {

@@ -100,7 +100,7 @@ export function updateErrorCounts(dom: DOMElements, state: TrainerState, learnin
             // Falls das der aktive Wiederholungsmodus war
             if (state.training.isRepeatSessionActive && state.training.currentMode === mode) {
                 state.training.isRepeatSessionActive = false;
-                console.log('[updateErrorCounts] Wiederholungs-Modus beendet');
+            
             }
         } else {
             // Button aktivieren
@@ -173,7 +173,7 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
     });
     
     dom.categoryStatsContainerEl.appendChild(itemsContainer);
-    console.log('[updateCategoryStats] Aktualisierung abgeschlossen');
+
 }
 
 /**
@@ -248,38 +248,3 @@ export function updateTestStats(dom: DOMElements, state: TrainerState): void {
     }
 }
 
-/**
- * Test-Funktion für Fortschrittsbalken
- */
-export function testProgressBars(dom: DOMElements): void {
-    console.log('[TEST] Testing progress bars...');
-    
-    // Test Practice Stats
-    if (dom.accuracyInRoundPracticeEl) {
-        console.log('[TEST] Setting practice accuracy bar to 50%');
-        dom.accuracyInRoundPracticeEl.style.width = '50%';
-        dom.accuracyInRoundPracticeEl.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
-        dom.accuracyInRoundPracticeEl.classList.add('bg-yellow-500');
-    } else {
-        console.error('[TEST] accuracyInRoundPracticeEl not found!');
-    }
-    
-    // Test Test Stats
-    if (dom.testProgressEl) {
-        console.log('[TEST] Setting test progress bar to 75%');
-        dom.testProgressEl.style.width = '75%';
-        dom.testProgressEl.classList.remove('bg-de-black', 'bg-de-red', 'bg-de-gold');
-        dom.testProgressEl.classList.add('bg-de-gold');
-    } else {
-        console.error('[TEST] testProgressEl not found!');
-    }
-    
-    if (dom.testAccuracyEl) {
-        console.log('[TEST] Setting test accuracy bar to 90%');
-        dom.testAccuracyEl.style.width = '90%';
-        dom.testAccuracyEl.classList.remove('bg-red-500', 'bg-yellow-500', 'bg-green-500');
-        dom.testAccuracyEl.classList.add('bg-green-500');
-    } else {
-        console.error('[TEST] testAccuracyEl not found!');
-    }
-}

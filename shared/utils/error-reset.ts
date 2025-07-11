@@ -16,7 +16,7 @@ export function resetErrorCountsForNewExercise(
     modeId: ModeId, 
     saveWordsToRepeat: () => void
 ): void {
-    console.log('🔄 Setze Fehlerzähler für neue Übung zurück...');
+
     
     // 1. Aktuelle Übungszähler zurücksetzen
     state.training.correctInCurrentRound = 0;
@@ -26,12 +26,12 @@ export function resetErrorCountsForNewExercise(
     if (state.progress.wordsToRepeatByMode[modeId]) {
         state.progress.wordsToRepeatByMode[modeId] = new Set();
         saveWordsToRepeat();
-        console.log(`🗑️ Fehlerzähler für Modus ${modeId} zurückgesetzt`);
+
     }
     
     // 3. localStorage direkt löschen (da Firebase-Services keine saveWordsToRepeat haben)
     localStorage.removeItem('trainer-words-to-repeat');
-    console.log(`🗑️ localStorage 'trainer-words-to-repeat' gelöscht`);
+
     
     // 4. Firebase Progress zurücksetzen (falls verfügbar)
     if (window.firebaseSyncService) {
@@ -39,7 +39,7 @@ export function resetErrorCountsForNewExercise(
             // Leeren Progress an Firebase senden
             const emptyProgress = {};
             window.firebaseSyncService.saveProgress(emptyProgress);
-            console.log(`☁️ Firebase Progress zurückgesetzt`);
+    
         } catch (error) {
             console.warn('⚠️ Fehler beim Firebase-Reset:', error);
         }
@@ -57,7 +57,7 @@ export function resetAllErrorCounts(
     state: { training: { correctInCurrentRound: number; attemptedInCurrentRound: number }; progress: { wordsToRepeatByMode: Record<string, Set<string>> } }, 
     saveWordsToRepeat: () => void
 ): void {
-    console.log('🔄 Setze ALLE Fehlerzähler zurück...');
+
     
     // 1. State zurücksetzen
     state.training.correctInCurrentRound = 0;
@@ -66,7 +66,7 @@ export function resetAllErrorCounts(
     
     // 2. localStorage löschen
     localStorage.removeItem('trainer-words-to-repeat');
-    console.log('🗑️ localStorage "trainer-words-to-repeat" gelöscht');
+    
     
     // 3. Speichern
     saveWordsToRepeat();
@@ -76,13 +76,13 @@ export function resetAllErrorCounts(
         try {
             const emptyProgress = {};
             window.firebaseSyncService.saveProgress(emptyProgress);
-            console.log('☁️ Firebase Progress zurückgesetzt');
+    
         } catch (error) {
             console.warn('⚠️ Fehler beim Firebase-Reset:', error);
         }
     }
     
-    console.log('✅ Alle Fehlerzähler erfolgreich zurückgesetzt');
+
 }
 
 /**

@@ -219,6 +219,6 @@ function initializeDOM(): DOMElements {
 // Initialisiere das DOM-Objekt
 export const dom: DOMElements = initializeDOM();
 
-// Exportiere Validierungsfunktionen für Tests und Debugging
+// Exportiere Validierungsfunktionen
 export { validateDOMElements, getElement };
 export type { DOMValidationResult };

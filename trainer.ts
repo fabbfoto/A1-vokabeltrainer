@@ -36,13 +36,9 @@ import type { AuthService } from './shared/services/auth-service';
 import type { SyncService } from './shared/services/sync-service';
 import type { RankingService } from './shared/services/ranking-service';
 
-console.log('📚 Vokabular importiert:', vokabular);
-console.log('📚 Anzahl Hauptthemen:', Object.keys(vokabular).length);
-
 let globalAuthUI: AuthUI | null = null;
 
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
-    console.log('🚀 DOMContentLoaded Event gefeuert');
 
     // NEU: Firebase Auth initialisieren
     let authService: AuthService;
@@ -66,7 +62,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Ranking-Service global verfügbar machen
         (window as any).rankingService = rankingService;
         
-        console.log('✅ Firebase Auth erfolgreich initialisiert');
     } catch (error) {
         console.warn('⚠️ Firebase Auth nicht verfügbar, verwende Fallback:', error);
         
@@ -121,7 +116,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         rankingService = {
             authService: null,
             submitTestResult: async () => { 
-                console.log('Ranking-Service nicht verfügbar'); 
                 return 'mock-result-id';
             },
             getRankings: async () => [],
@@ -197,7 +191,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (!saved) {
             const firebaseSaved = localStorage.getItem('a1ThemenProgress');
             if (firebaseSaved) {
-                console.log('📦 Konvertiere Firebase-Progress zu lokalem Format...');
                 try {
                     const firebaseData = JSON.parse(firebaseSaved);
                     const converted: Record<string, Record<string, string[]>> = {};
@@ -211,7 +204,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     }
                     
                     saved = JSON.stringify(converted);
-                    console.log('✅ Firebase-Progress konvertiert');
                 } catch (e) {
                     console.error('❌ Fehler bei Firebase-Konvertierung:', e);
                 }
@@ -247,13 +239,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     }
                 });
                 
-                console.log('✅ Progress geladen mit', Object.keys(state.progress.globalProgress).length, 'Themen');
             } catch (e) {
                 console.error('❌ Fehler beim Laden des Progress:', e);
                 state.progress.globalProgress = {};
             }
         } else {
-            console.log('ℹ️ Kein gespeicherter Progress gefunden');
             state.progress.globalProgress = {};
         }
     }
@@ -261,7 +251,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     function saveProgress(): void {
         try {
             localStorage.setItem('trainer-progress', JSON.stringify(state.progress.globalProgress));
-            console.log('✅ Progress gespeichert');
         } catch (e) {
             console.warn('⚠️ Fehler beim Speichern:', e);
         }
@@ -275,7 +264,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 Object.keys(parsed).forEach(mode => {
                     state.progress.masteredWordsByMode[mode as ModeId] = new Set(parsed[mode] as WordId[]);
                 });
-                console.log('✅ Mastered Words geladen');
             } catch (e) {
                 console.warn('⚠️ Fehler beim Laden der mastered words:', e);
             }
@@ -303,7 +291,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 Object.keys(parsed).forEach(mode => {
                     state.progress.wordsToRepeatByMode[mode as ModeId] = new Set(parsed[mode] as WordId[]);
                 });
-                console.log('✅ Words to repeat geladen');
             } catch (e) {
                 console.warn('⚠️ Fehler beim Laden words to repeat:', e);
             }
@@ -328,7 +315,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (saved) {
             try {
                 state.test.lastTestScores = JSON.parse(saved);
-                console.log('✅ Test scores geladen');
             } catch (e) {
                 console.warn('⚠️ Fehler beim Laden test scores:', e);
             }
@@ -349,7 +335,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             try {
                 const parsed = JSON.parse(saved);
                 state.progress.perfectRunsByMode = parsed;
-                console.log('✅ Perfect runs geladen');
             } catch (e) {
                 console.warn('⚠️ Fehler beim Laden der perfect runs:', e);
             }
@@ -377,14 +362,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     loadPerfectRuns();
 
     function processAnswer(isCorrect: boolean, correctAnswer?: string): void {
-        console.log('[processAnswer] Start:', {
-            isCorrect,
-            correctAnswer,
-            currentMode: ModeManager.getCurrentMode(state),
-            isCorrectionMode: state.training.isCorrectionMode,
-            isTestMode: state.test.isTestModeActive,
-            currentWord: state.training.currentWord?.german
-        });
         
         state.training.attemptedInCurrentRound++;
         
@@ -413,7 +390,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         
         // Aktueller Modus bestimmt das Verhalten
         const currentMode = ModeManager.getCurrentMode(state);
-        console.log(`[processAnswer] Modus: ${currentMode}, Korrekt: ${isCorrect}`);
         
         switch (currentMode) {
             case 'correcting':
@@ -539,7 +515,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     function handleNoMoreErrors(): void {
-        console.log('✅ Alle Fehler behoben - wechsle zu noch nicht beantworteten Vokabeln');
         state.test.isRepeatSessionActive = false;
         
         // Filtere Vokabeln, die noch nicht richtig beantwortet wurden
@@ -671,7 +646,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 
                 if (remainingWords.length > 0) {
                     state.training.shuffledWordsForMode = shuffleArray(remainingWords);
-                    console.log(`Normaler Modus: ${remainingWords.length} Wörter noch nicht beantwortet`);
                 } else {
                     // Alle Wörter wurden richtig beantwortet
                     // Erhöhe Perfect Run Counter
@@ -718,7 +692,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             // Nächster Modus aus der Rotation
             state.training.currentMode = state.test.testModeRotation[state.test.currentTestModeIndex % state.test.testModeRotation.length];
             state.test.currentTestModeIndex++;
-            console.log(`Chaos-Test: Aufgabe ${state.training.currentWordIndex + 1} mit Modus ${state.training.currentMode}`);
             // BUGFIX: UI-Reset nach Mode-Wechsel im Chaos-Test
             requestAnimationFrame(() => {
                 document.querySelectorAll('[disabled]').forEach(el => {
@@ -735,7 +708,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Setup für den aktuellen Modus
         const modeInfo = state.training.currentMode ? learningModes[state.training.currentMode] : null;
         if (modeInfo && typeof modeInfo.setupFunction === 'function') {
-            console.log('[loadNextTask] Setup-Funktion für Modus:', state.training.currentMode);
             modeInfo.setupFunction();
         } else {
             console.error(`[loadNextTask] Keine Setup-Funktion für Modus "${state.training.currentMode}" gefunden`);
@@ -843,11 +815,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (state.test.isTestModeActive) {
             exitTestMode();
         }
-        console.log(`setMode aufgerufen: ${modeId}, isRepeat: ${isRepeat}`);
         
         // FEHLERZÄHLER ZURÜCKSETZEN nur für normale Übungen (nicht für Wiederholungen)
         if (!isRepeat) {
-            console.log('🔄 Setze Fehlerzähler für neue Übung zurück...');
             state.training.correctInCurrentRound = 0;
             state.training.attemptedInCurrentRound = 0;
             
@@ -855,12 +825,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             if (state.progress.wordsToRepeatByMode[modeId]) {
                 state.progress.wordsToRepeatByMode[modeId] = new Set();
                 saveWordsToRepeat();
-                console.log(`🗑️ Fehlerzähler für Modus ${modeId} zurückgesetzt`);
             }
             
             // localStorage direkt löschen (da Firebase-Services keine saveWordsToRepeat haben)
             localStorage.removeItem('trainer-words-to-repeat');
-            console.log(`🗑️ localStorage 'trainer-words-to-repeat' gelöscht`);
             
             // Firebase Progress zurücksetzen (falls verfügbar)
             if ((window as unknown as { firebaseSyncService?: { saveProgress: (data: Record<string, unknown>) => void } }).firebaseSyncService) {
@@ -868,7 +836,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     // Leeren Progress an Firebase senden
                     const emptyProgress: Record<string, unknown> = {};
                     (window as unknown as { firebaseSyncService: { saveProgress: (data: Record<string, unknown>) => void } }).firebaseSyncService.saveProgress(emptyProgress);
-                    console.log(`☁️ Firebase Progress zurückgesetzt`);
                 } catch (error) {
                     console.warn('⚠️ Fehler beim Firebase-Reset:', error);
                 }
@@ -899,7 +866,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 return;
             }
             
-            console.log(`Starte Wiederholung mit ${wordsForSession.length} Wörtern`);
         } else {
             // Normaler Modus - nur noch nicht richtig beantwortete Wörter
             const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
@@ -910,7 +876,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 !progressSet.has(word.id)
             );
             
-            console.log(`Normaler Modus: ${wordsForSession.length} von ${state.training.currentVocabularySet.length} Wörtern noch nicht beantwortet`);
         }
         state.training.shuffledWordsForMode = shuffleArray(wordsForSession);
         state.training.currentWordIndex = -1;
@@ -942,7 +907,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             const umlautModes = ['type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'];
             if (ui.setupUmlautButtons) {
                 ui.setupUmlautButtons(dom, state);
-                console.log(`✅ Umlaut-Buttons für Modus ${modeId} initialisiert`);
             }
         }, 200); // Längere Verzögerung für dynamisch erstellte Input-Felder
     }
@@ -1039,9 +1003,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         state.test.currentTest.variant,
                         state.test.currentTest.selectedCategory
                     );
-                    console.log('✅ Test-Ergebnis an Ranking-System gesendet');
-                } else {
-                    console.log('ℹ️ Ranking-Service nicht verfügbar - Test-Ergebnis nur lokal gespeichert');
                 }
             } catch (error) {
                 console.warn('⚠️ Fehler beim Senden an Ranking-System:', error);
@@ -1169,7 +1130,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Globale initUmlautButtons Funktion für die Browser-Lösung
     // ENTFERNT: Doppelte Implementierung - wird jetzt durch ui/umlaut-buttons.ts gehandhabt
     (window as unknown as { initUmlautButtons: () => void }).initUmlautButtons = function() {
-        console.log('initUmlautButtons aufgerufen - wird durch TypeScript-Implementierung gehandhabt');
         // Die TypeScript-Implementierung in ui/umlaut-buttons.ts übernimmt jetzt alles
     };
 

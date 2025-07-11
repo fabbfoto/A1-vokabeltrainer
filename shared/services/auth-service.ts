@@ -96,7 +96,7 @@ export class AuthService {
         try {
             const result = await signInWithPopup(this.auth, provider);
             const user = this.convertFirebaseUser(result.user);
-            console.log('✅ Google Login erfolgreich:', user.email);
+    
             return user;
         } catch (error: unknown) {
             console.error("❌ Fehler beim Google-Login:", error);
@@ -110,7 +110,7 @@ export class AuthService {
     async logout(): Promise<void> {
         try {
             await signOut(this.auth);
-            console.log('✅ Logout erfolgreich');
+    
         } catch (error: unknown) {
             console.error("❌ Fehler beim Logout:", error);
             throw new Error(`Logout fehlgeschlagen: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);

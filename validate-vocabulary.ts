@@ -1,6 +1,6 @@
-import { vokabularWohnen } from './vokabular_wohnen';
-import { vokabularLernen } from './vokabular_lernen';
-import { vokabularFreizeitUnterhaltung } from './vokabular_freizeit_unterhaltung';
+import { vokabularWohnen } from './vokabular_wohnen.ts';
+import { vokabularLernen } from './vokabular_lernen.ts';
+import { vokabularFreizeitUnterhaltung } from './vokabular_freizeit_unterhaltung.ts';
 import type { Word } from './shared/types/vocabulary';
 // ... weitere imports
 

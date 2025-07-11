@@ -29,6 +29,46 @@ export interface CaseElement {
   case: CaseType;
 }
 
+// ========== EXAMPLE SENTENCE INTERFACES ==========
+export interface ExampleSentencePart {
+  text: string;
+  case?: CaseType;
+  kasus?: CaseType; // Legacy-Kompatibilität
+}
+
+export interface ExampleSentenceData {
+  exampleGerman?: ExampleSentencePart[] | string;
+  exampleEnglish?: string;
+  example_de?: ExampleSentencePart[] | string; // Legacy-Kompatibilität
+  example_en?: string; // Legacy-Kompatibilität
+}
+
+// ========== TYPE GUARDS FOR EXAMPLE SENTENCES ==========
+export function isExampleSentencePartArray(value: unknown): value is ExampleSentencePart[] {
+  return Array.isArray(value) && value.every(item => 
+    typeof item === 'object' && item !== null && 'text' in item && typeof item.text === 'string'
+  );
+}
+
+export function isExampleSentenceString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+
+export function getExampleSentenceText(exampleSentence: ExampleSentencePart[] | string | undefined | null): string {
+  if (!exampleSentence) return '';
+  
+  if (isExampleSentencePartArray(exampleSentence)) {
+    return exampleSentence.map(part => part.text).join('');
+  }
+  
+  if (isExampleSentenceString(exampleSentence)) {
+    return exampleSentence;
+  }
+  
+  return '';
+}
+
+// ========== CONJUGATION INTERFACES ==========
 export interface Conjugation {
   ich?: string;
   du?: string;

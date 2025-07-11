@@ -23,7 +23,7 @@ export class ModeManager {
   
   // Zu neuem Modus wechseln
   static switchToMode(state: TrainerState, newMode: AppMode): void {
-    console.log(`[ModeManager] Wechsle von ${this.getCurrentMode(state)} zu ${newMode}`);
+    
     
     // Alten Modus beenden
     this.cleanupCurrentMode(state);
@@ -80,19 +80,19 @@ export class ModeManager {
         state.test.testStartTime = Date.now();
         state.test.currentQuestionStartTime = Date.now();
         state.test.questionTimes = [];
-        console.log('📝 Test-Modus aktiviert');
+
         break;
         
       case 'repeating':
-        console.log('🔄 Wiederholungs-Modus aktiviert');
+
         break;
         
       case 'correcting':
-        console.log('✏️ Korrektur-Modus aktiviert');
+
         break;
         
       case 'learning':
-        console.log('📚 Lern-Modus aktiviert');
+
         break;
     }
   }

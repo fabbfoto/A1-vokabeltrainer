@@ -24,7 +24,7 @@ export {
     updateCategoryStats,
     updatePracticeStats,
     updateTestStats,
-    testProgressBars
+
 } from './statistics';
 
 // Test Modal exports

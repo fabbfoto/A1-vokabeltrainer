@@ -82,7 +82,7 @@ export class SyncService {
 
         this.unsubscribe = onSnapshot(docRef, 
             (doc: DocumentSnapshot) => {
-                console.log("✅ Firestore: Daten-Update erhalten.");
+        
                 this.syncStatus.isConnected = true;
                 this.syncStatus.lastSync = new Date();
                 
@@ -131,7 +131,7 @@ export class SyncService {
             this.unsubscribe();
             this.unsubscribe = null;
             this.syncStatus.isConnected = false;
-            console.log("🛑 Firestore: Synchronisation gestoppt.");
+    
         }
     }
 
@@ -157,7 +157,7 @@ export class SyncService {
         
         try {
             await setDoc(docRef, dataToSave, { merge: true });
-            console.log('✅ Fortschritt erfolgreich in Firestore gespeichert');
+    
             
             this.notifyListeners({
                 type: 'localUpdate',

@@ -1,8 +1,8 @@
 // packages/trainer-themen/vokabular_lernen.ts
 // VOLLSTÄNDIGE TypeScript Migration von vokabular_lernen.js
 
-import type { VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary';
-import { createWordId, createVocabulary } from './shared/types/vocabulary';
+import type { VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary.ts';
+import { createWordId, createVocabulary } from './shared/types/vocabulary.ts';
 
 export const vokabularLernen: VocabularyStructure = createVocabulary({
     "Lernen": {

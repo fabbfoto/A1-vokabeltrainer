@@ -117,17 +117,17 @@ export class AuthUI {
     }
 
     public updateUIAfterLogin(user: { uid: string; email: string | null; displayName: string | null }): void {
-        console.log('[AuthUI] updateUIAfterLogin aufgerufen, zeichne Button neu.');
+
         this.renderSyncButton(true, user.email);
     }
 
     public updateUIAfterLogout(): void {
-        console.log('[AuthUI] updateUIAfterLogout aufgerufen, zeichne Button neu.');
+
         this.renderSyncButton(false, null);
     }
 
     public showAuthModal(): void {
-        console.log('[AuthUI] showAuthModal aufgerufen.');
+
         this.authService.loginWithGoogle();
     }
     

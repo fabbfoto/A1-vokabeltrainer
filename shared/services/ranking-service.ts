@@ -120,7 +120,7 @@ export class RankingService {
         ...testResult,
         timestamp: Timestamp.fromDate(testResult.timestamp)
       });
-      console.log('✅ Test-Ergebnis erfolgreich an Firebase gesendet:', docRef.id);
+      
       return docRef.id;
     } catch (error: unknown) {
       console.error('❌ Fehler beim Speichern des Test-Ergebnisses:', error);
