@@ -754,7 +754,33 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     }
 
+    // --- NEU: Testmodus sauber verlassen ---
+    function exitTestMode(): void {
+        // Test-spezifische States zurücksetzen
+        state.test.isTestModeActive = false;
+        state.test.currentTest = null;
+        state.test.testModeRotation = [];
+        state.test.currentTestModeIndex = 0;
+        state.test.testStartTime = null;
+        state.test.currentQuestionStartTime = null;
+        state.test.questionTimes = [];
+        // Test-Statistiken und UI zurücksetzen
+        dom.testStatsViewEl.classList.add('hidden');
+        dom.practiceStatsViewEl.classList.remove('hidden');
+        dom.modeButtonGridEl.classList.remove('hidden');
+        // Haupt-View wiederherstellen
+        dom.trainerMainViewEl.classList.remove('hidden');
+        dom.navigationViewEl.classList.add('hidden');
+        // Felder und Aufgaben-UI wieder anzeigen
+        ui.showTrainingModes(dom, state);
+        updateRepeatButtons();
+    }
+
     function setMode(modeId: ModeId, isRepeat: boolean = false): void {
+        // Wenn Testmodus aktiv war, alles zurücksetzen
+        if (state.test.isTestModeActive) {
+            exitTestMode();
+        }
         console.log(`setMode aufgerufen: ${modeId}, isRepeat: ${isRepeat}`);
         
         // FEHLERZÄHLER ZURÜCKSETZEN nur für normale Übungen (nicht für Wiederholungen)
