@@ -8,9 +8,14 @@
     "checkJs": false,
     "outDir": "./dist",
     "sourceMap": true,
-    "strict": false,
+    "strict": true,
     "noImplicitAny": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -25,7 +30,7 @@
     "*.ts",
     "shared/**/*",
     "packages/**/*"
-, "vokabular_person.backup.js", "vokabular_lernen.js", "vokabular_Kommunikationsmittel.ts", "vokabular_wohnen.ts"  ],
+  ],
   "exclude": [
     "node_modules",
     "dist"

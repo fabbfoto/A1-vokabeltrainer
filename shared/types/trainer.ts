@@ -14,6 +14,12 @@ export interface TestConfiguration {
   timeLimit?: number;
   variant: TestVariant;
   categories: TestCategory[];
+  // Zusätzliche Properties für UI-Kompatibilität
+  testTitle?: string;
+  type?: 'chaos' | 'structured' | string;
+  selectedCategory?: string;
+  mode?: string;
+  id?: string;
 }
 
 export interface TestResult {
@@ -235,6 +241,9 @@ export interface ProgressState {
     
     // Test-Ergebnisse
     lastTestScores: Record<string, TestResult>;
+    
+    // Index-Signaturen für dynamische Zugriffe
+    [key: string]: any;
 }
 
 // ========== TEST STATE ==========
@@ -252,6 +261,10 @@ export interface TestState {
     testStartTime: number | null;
     currentQuestionStartTime: number | null;
     questionTimes: number[];
+    
+    // Zusätzliche Properties für UI-Kompatibilität
+    lastTestScores: Record<string, TestScore>;
+    isRepeatSessionActive: boolean;
 }
 
 // ========== GESAMTER STATE ==========
@@ -260,6 +273,10 @@ export interface TrainerState {
     training: TrainingState;
     progress: ProgressState;
     test: TestState;
+    
+    // UI-bezogene Properties für Korrektur-Modus
+    _removeCorrectionEnterHandler?: () => void;
+    isCorrectionMode: boolean;
 }
 
 // ========== STATE MANAGER INTERFACES ==========
@@ -317,6 +334,12 @@ export interface UICallbacks {
     handleModeSelection: (modeId: ModeId) => void;
     handleAnswer: (isCorrect: boolean, correctAnswer?: string) => void;
     handleTestCompletion: () => void;
+    
+    // Zusätzliche Callbacks für Navigation und Tests
+    handleBackNavigation?: () => void;
+    setMode?: (mode: ModeId, isRepeat?: boolean) => void;
+    startTest?: (config: TestConfiguration) => void;
+    startRepeatSession?: (mode: ModeId) => void;
 }
 
 export interface AuthUI {
@@ -384,6 +407,8 @@ export function createInitialTestState(): TestState {
         testStartTime: null,
         currentQuestionStartTime: null,
         questionTimes: [],
+        lastTestScores: {},
+        isRepeatSessionActive: false,
     };
 }
 
@@ -393,5 +418,8 @@ export function createInitialTrainerState(): TrainerState {
         training: createInitialTrainingState(),
         progress: createInitialProgressState(),
         test: createInitialTestState(),
+        
+        // UI-bezogene Properties initialisieren
+        isCorrectionMode: false,
     };
 }

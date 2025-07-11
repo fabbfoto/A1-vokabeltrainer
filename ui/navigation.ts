@@ -95,11 +95,11 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
             const progressForKey = state.progress.globalProgress[progressKey] || {};
             totalWords += words.length * numberOfModes;
             Object.keys(learningModes).forEach(modeId => {
-                const masteredSet = progressForKey[modeId];
+                const masteredSet = progressForKey[modeId as ModeId];
                 if (masteredSet instanceof Set) {
                     totalMastered += masteredSet.size;
                 } else if (Array.isArray(masteredSet)) {
-                    totalMastered += masteredSet.length;
+                    totalMastered += (masteredSet as any[]).length;
                 }
             });
         });
@@ -253,7 +253,7 @@ export function initializeModeButtons(callbacks: UICallbacks, learningModes: Lea
     Object.keys(learningModes).forEach(modeId => {
         const button = document.getElementById(`mode-${modeId}`);
         if (button) {
-            button.addEventListener('click', () => callbacks.setMode(modeId as ModeId, false));
+            button.addEventListener('click', () => callbacks.setMode?.(modeId as ModeId, false));
         }
     });
 }
@@ -268,7 +268,7 @@ export function initializeRepeatButtons(callbacks: UICallbacks, learningModes: L
             repeatButton.addEventListener('click', () => {
                 // Nur ausführen, wenn der Button nicht deaktiviert ist
                 if (!(repeatButton as HTMLButtonElement).disabled) {
-                    callbacks.setMode(modeId as ModeId, true);
+                    callbacks.setMode?.(modeId as ModeId, true);
                 }
             });
         }
@@ -314,7 +314,7 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
                         'sentence-translation-en-de': 5
                     } as any
                 };
-                callbacks.startTest(testConfig as any);
+                callbacks.startTest?.(testConfig as any);
             } else {
                 // Struktur-Test - Modal für Kategorie-Auswahl
                 import('./test-modal').then(module => {

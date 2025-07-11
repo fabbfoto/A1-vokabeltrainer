@@ -84,20 +84,17 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     globalAuthUI = authUI;
 
     const state: TrainerState = {
-        // Navigation State
         navigation: {
             currentMainTopic: null,
             currentSubTopic: null,
             previousMainTopic: null,
             previousSubTopic: null,
-            lastUsedModeByTopic: {} as Record<string, ModeId>,
+            lastUsedModeByTopic: {},
         },
-        
-        // Training State
         training: {
             currentVocabularySet: [],
             shuffledWordsForMode: [],
-            currentWordIndex: -1,
+            currentWordIndex: 0,
             currentWord: null,
             currentMode: null,
             sessionId: null,
@@ -110,13 +107,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             isLoading: false,
             currentError: null,
         },
-        
-        // Progress State
         progress: {
             globalProgress: {},
             masteredWordsByMode: {},
             wordsToRepeatByMode: {},
-            perfectRunsByMode: {}, // Zählt perfekte Durchläufe pro Modus
+            perfectRunsByMode: {},
             lastTestScores: {},
         },
         
@@ -130,7 +125,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             testStartTime: null,
             currentQuestionStartTime: null,
             questionTimes: [],
-        }
+            lastTestScores: {},
+            isRepeatSessionActive: false,
+        },
+        
+        // UI-bezogene Properties
+        isCorrectionMode: false,
     };
 
     function loadProgress(): void {
@@ -178,12 +178,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                             
                             // Stelle sicher, dass es ein Set wird
                             if (Array.isArray(data)) {
-                                state.progress.globalProgress[topicKey][mode] = new Set(data);
+                                state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
                             } else if (data instanceof Set) {
-                                state.progress.globalProgress[topicKey][mode] = data;
+                                state.progress.globalProgress[topicKey][mode as ModeId] = data;
                             } else {
                                 console.warn(`⚠️ Unerwarteter Datentyp für ${topicKey}/${mode}:`, typeof data);
-                                state.progress.globalProgress[topicKey][mode] = new Set();
+                                state.progress.globalProgress[topicKey][mode as ModeId] = new Set();
                             }
                         });
                     } else {
@@ -488,7 +488,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         
         // Filtere Vokabeln, die noch nicht richtig beantwortet wurden
         const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
-        const progressForMode = state.progress.globalProgress[progressKey]?.[state.training.currentMode] || new Set();
+        const progressForMode = state.training.currentMode !== null ? state.progress.globalProgress[progressKey]?.[state.training.currentMode] || new Set() : new Set();
         const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
         
         const remainingWords = state.training.currentVocabularySet.filter(word => 
@@ -515,7 +515,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                             state.progress.globalProgress[progressKey][state.training.currentMode] = new Set();
                             saveProgress();
                         }
-                        setMode(state.training.currentMode, false);
+                        if (state.training.currentMode !== null) {
+                            setMode(state.training.currentMode, false);
+                        }
                     }
                 );
             }
@@ -552,7 +554,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     
                     // Filtere Vokabeln, die noch nicht richtig beantwortet wurden
                     const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
-                    const progressForMode = state.progress.globalProgress[progressKey]?.[state.training.currentMode] || new Set();
+                    const progressForMode = state.training.currentMode !== null ? state.progress.globalProgress[progressKey]?.[state.training.currentMode] || new Set() : new Set();
                     const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
                     
                     const remainingWords = state.training.currentVocabularySet.filter(word => 
@@ -577,7 +579,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                                         state.progress.globalProgress[progressKey][state.training.currentMode] = new Set();
                                         saveProgress();
                                     }
-                                    setMode(state.training.currentMode, false);
+                                    if (state.training.currentMode !== null) {
+                                        setMode(state.training.currentMode, false);
+                                    }
                                 }
                             );
                         } else {
@@ -602,7 +606,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             } else {
                 // Normaler Modus - nur noch nicht richtig beantwortete Wörter
                 const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
-                const progressForMode = state.progress.globalProgress[progressKey]?.[state.training.currentMode] || new Set();
+                const progressForMode = state.training.currentMode !== null ? state.progress.globalProgress[progressKey]?.[state.training.currentMode] || new Set() : new Set();
                 const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
                 
                 const remainingWords = state.training.currentVocabularySet.filter(word => 
@@ -634,7 +638,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                                     state.progress.globalProgress[progressKey][state.training.currentMode] = new Set();
                                     saveProgress();
                                 }
-                                setMode(state.training.currentMode, false);
+                                if (state.training.currentMode !== null) {
+                                    setMode(state.training.currentMode, false);
+                                }
                             }
                         );
                     } else {
@@ -841,7 +847,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         } else {
             // Normaler Modus - nur noch nicht richtig beantwortete Wörter
             const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
-            const progressForMode = state.progress.globalProgress[progressKey]?.[modeId] || new Set();
+            const progressForMode = state.training.currentMode !== null ? state.progress.globalProgress[progressKey]?.[state.training.currentMode] || new Set() : new Set();
             const progressSet = progressForMode instanceof Set ? progressForMode : new Set(progressForMode);
             
             wordsForSession = state.training.currentVocabularySet.filter(word => 

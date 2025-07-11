@@ -162,12 +162,10 @@ export function showCategoryModal(
                 variant: 'structured',
                 selectedCategory: category,
                 topicId: mainTopic as any,
-                name: title,
                 testTitle: `${title} - ${getCategoryDisplayName(category)}`,
-                modes: [mode],
+                modeIds: [mode],
                 mode: mode,
-                minAccuracy: 0.8,
-                maxAttempts: 1
+                questionCount: 10
             };
             
             callbacks.startTest(testConfig);
@@ -233,12 +231,10 @@ export function initTestModalListeners(
             type: scope === 'global' ? 'global' : 'mainTopic',
             variant: 'chaos',
             topicId: mainTopic as any,
-            name: title,
             testTitle: title,
-            modes: ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as ModeId[],
+            modeIds: ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as ModeId[],
             mode: 'mixed' as any, // Spezieller Modus
-            minAccuracy: 0.8,
-            maxAttempts: 1,
+            questionCount: 20,
             taskDistribution: {
                 'mc-de-en': 5,
                 'type-de-adj': 5,
