@@ -35,16 +35,25 @@ export class ErrorCounterManager {
     // Zentrale Methode zum Entfernen von Fehlern
     removeError(wordId: WordId, modeId: ModeId): void {
         console.log(`[ErrorManager] Removing error: ${wordId} from mode ${modeId}`);
+        console.log(`[ErrorManager] Before removal - errors in ${modeId}:`, this.state.progress.wordsToRepeatByMode[modeId]?.size || 0);
         
         // 1. State aktualisieren
         if (this.state.progress.wordsToRepeatByMode[modeId]) {
+            const wasPresent = this.state.progress.wordsToRepeatByMode[modeId].has(wordId);
+            console.log(`[ErrorManager] Word ${wordId} was present: ${wasPresent}`);
+            
             this.state.progress.wordsToRepeatByMode[modeId].delete(wordId);
             
             // Leere Sets entfernen
             if (this.state.progress.wordsToRepeatByMode[modeId].size === 0) {
                 delete this.state.progress.wordsToRepeatByMode[modeId];
+                console.log(`[ErrorManager] Deleted empty set for mode ${modeId}`);
             }
+        } else {
+            console.warn(`[ErrorManager] No error set found for mode ${modeId}`);
         }
+        
+        console.log(`[ErrorManager] After removal - errors in ${modeId}:`, this.state.progress.wordsToRepeatByMode[modeId]?.size || 0);
         
         // 2. Persistierung (debounced)
         this.scheduleSave();

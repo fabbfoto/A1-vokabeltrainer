@@ -13,7 +13,6 @@ declare global {
     exitTestMode?: () => void;
     setMode?: (modeId: string, isRepeat: boolean) => void;
     state?: any;
-    saveWordsToRepeat?: () => void;
   }
 }
 
@@ -169,10 +168,7 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
         window.state.progress.wordsToRepeatByMode[mode].add(id);
       });
       
-      // Speichern
-      if (window.saveWordsToRepeat) {
-        window.saveWordsToRepeat();
-      }
+      // Speichern wird automatisch durch ErrorManager gehandhabt
     }
     
     // Test-Modus beenden und Wiederholungsmodus starten

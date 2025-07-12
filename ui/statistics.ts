@@ -89,10 +89,17 @@ export function updateErrorCounts(dom: DOMElements, state: TrainerState, learnin
                 return;
             }
             
-            const errorCount = state.progress.wordsToRepeatByMode[mode as import('../shared/types/trainer').ModeId]?.size || 0;
+            // Verwende ErrorManager falls verfügbar, sonst direkten State-Zugriff
+            let errorCount = 0;
+            if ((window as any).errorManager && (window as any).errorManager.getErrorCount) {
+                errorCount = (window as any).errorManager.getErrorCount(mode);
+            } else {
+                errorCount = state.progress.wordsToRepeatByMode[mode as import('../shared/types/trainer').ModeId]?.size || 0;
+            }
             
             // UI aktualisieren
             countSpan.textContent = errorCount.toString();
+            console.log(`[UI] Set count for ${mode} to: ${errorCount}`);
             
             // Button-Zustand aktualisieren
             if (errorCount === 0) {

@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     removeFromErrorList();
                     
                     // Prüfe ob noch Fehler da sind
-                    const remainingErrors = state.training.currentMode ? state.progress.wordsToRepeatByMode[state.training.currentMode]?.size || 0 : 0;
+                    const remainingErrors = state.training.currentMode ? errorManager.getErrorCount(state.training.currentMode) : 0;
                     if (remainingErrors === 0) {
                         handleNoMoreErrors();
                         return;
@@ -479,10 +479,22 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     function removeFromErrorList(): void {
         if (state.training.currentWord && state.training.currentMode) {
+            console.log(`[DEBUG] Removing error for word: ${state.training.currentWord.id} in mode: ${state.training.currentMode}`);
+            console.log(`[DEBUG] Current word:`, state.training.currentWord);
+            console.log(`[DEBUG] Current mode:`, state.training.currentMode);
+            
             errorManager.removeError(
                 state.training.currentWord.id, 
                 state.training.currentMode
             );
+            
+            // Zusätzliche UI-Update nach kurzer Verzögerung
+            setTimeout(() => {
+                console.log(`[DEBUG] Forcing UI update after error removal`);
+                ui.updateErrorCounts(dom, state, learningModes);
+            }, 100);
+        } else {
+            console.warn(`[DEBUG] Cannot remove error: currentWord=${!!state.training.currentWord}, currentMode=${state.training.currentMode}`);
         }
     }
 
@@ -593,7 +605,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             // Shuffle und von vorne beginnen
             if (state.test.isRepeatSessionActive) {
                 // Im Wiederholungsmodus: Prüfe ob noch Fehler da sind
-                const remainingErrors = state.training.currentMode ? state.progress.wordsToRepeatByMode[state.training.currentMode]?.size || 0 : 0;
+                const remainingErrors = state.training.currentMode ? errorManager.getErrorCount(state.training.currentMode) : 0;
                 if (remainingErrors === 0) {
                     // Keine Fehler mehr - wechsle zu "noch nicht richtig beantworteten" Vokabeln
                     state.test.isRepeatSessionActive = false;
@@ -860,13 +872,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             state.training.attemptedInCurrentRound = 0;
             
             // Fehlerzähler für diesen Modus zurücksetzen
-            if (state.progress.wordsToRepeatByMode[modeId]) {
-                state.progress.wordsToRepeatByMode[modeId] = new Set();
-                saveWordsToRepeat();
-            }
-            
-            // localStorage direkt löschen (da Firebase-Services keine saveWordsToRepeat haben)
-            localStorage.removeItem('trainer-words-to-repeat');
+            errorManager.clearErrors(modeId);
             
             // Firebase Progress zurücksetzen (falls verfügbar)
             if ((window as unknown as { firebaseSyncService?: { saveProgress: (data: Record<string, unknown>) => void } }).firebaseSyncService) {
@@ -887,7 +893,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (key) state.navigation.lastUsedModeByTopic[key] = modeId;
         let wordsForSession: Word[] = [];
         if (isRepeat) {
-            const wordIdsToRepeat = state.progress.wordsToRepeatByMode[modeId] || new Set<WordId>();
+            const wordIdsToRepeat = errorManager.getErrors(modeId);
             if (wordIdsToRepeat.size === 0) {
                 ui.showMessage(dom, 'Keine Fehler zum Wiederholen in diesem Modus.', 'info');
                 state.test.isRepeatSessionActive = false;
@@ -1251,7 +1257,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     (window as any).exitTestMode = exitTestMode;
     (window as any).setMode = setMode;
     (window as any).state = state;
-    (window as any).saveWordsToRepeat = saveWordsToRepeat;
 
     // ErrorManager global verfügbar machen für Debugging
     (window as any).errorManager = errorManager;
