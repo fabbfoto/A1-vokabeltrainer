@@ -207,3 +207,115 @@ export function createUmlautButtonsUI(): HTMLElement {
     
     return container;
 }
+
+/**
+ * Zentrale Management-Funktion für Umlaut-Buttons
+ * Stellt eine konsistente API für alle Umlaut-Button-Operationen bereit
+ */
+export class UmlautButtonManager {
+    private static instance: UmlautButtonManager;
+    private initialized = false;
+
+    static getInstance(): UmlautButtonManager {
+        if (!UmlautButtonManager.instance) {
+            UmlautButtonManager.instance = new UmlautButtonManager();
+        }
+        return UmlautButtonManager.instance;
+    }
+
+    /**
+     * Initialisiert die Umlaut-Buttons für einen bestimmten Modus
+     */
+    async setupForMode(dom: DOMElements, state: TrainerState, modeId?: string): Promise<void> {
+        if (!this.initialized) {
+            this.initialized = true;
+        }
+        
+        const umlautModes = ['type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'];
+        
+        if (!modeId || umlautModes.includes(modeId)) {
+            setupUmlautButtons(dom, state);
+        } else {
+            hideUmlautButtons(dom);
+        }
+    }
+
+    /**
+     * Registriert ein Input-Element für Umlaut-Unterstützung
+     */
+    async registerInput(input: HTMLInputElement, state: TrainerState, dom: DOMElements): Promise<void> {
+        registerInputForUmlauts(input, state, dom);
+    }
+
+    /**
+     * Initialisiert Umlaut-Support für multiple Inputs
+     */
+    async initSupport(inputs: HTMLInputElement[], state: TrainerState, dom: DOMElements): Promise<void> {
+        initUmlautSupport(inputs, state, dom);
+    }
+
+    /**
+     * Versteckt alle Umlaut-Buttons
+     */
+    async hide(dom: DOMElements): Promise<void> {
+        hideUmlautButtons(dom);
+    }
+
+    /**
+     * Erstellt die Umlaut-Button UI
+     */
+    async createUI(): Promise<HTMLElement> {
+        return createUmlautButtonsUI();
+    }
+}
+
+/**
+ * Zentrale Initialisierungsfunktion für Umlaut-Buttons
+ * Diese Funktion ist der einzige Einstiegspunkt für alle Umlaut-Button-Operationen
+ * und stellt sicher, dass alle Imports konsistent sind.
+ */
+export async function initializeUmlautButtons(
+    operation: 'setup' | 'hide' | 'register' | 'init',
+    dom: DOMElements,
+    state: TrainerState,
+    options?: {
+        modeId?: string;
+        input?: HTMLInputElement;
+        inputs?: HTMLInputElement[];
+    }
+): Promise<void> {
+    try {
+        switch (operation) {
+            case 'setup':
+                const modeId = options?.modeId;
+                const umlautModes = ['type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'];
+                if (!modeId || umlautModes.includes(modeId)) {
+                    setupUmlautButtons(dom, state);
+                } else {
+                    hideUmlautButtons(dom);
+                }
+                break;
+                
+            case 'hide':
+                hideUmlautButtons(dom);
+                break;
+                
+            case 'register':
+                if (options?.input) {
+                    registerInputForUmlauts(options.input, state, dom);
+                }
+                break;
+                
+            case 'init':
+                if (options?.inputs) {
+                    initUmlautSupport(options.inputs, state, dom);
+                }
+                break;
+        }
+    } catch (error) {
+        console.error('❌ Fehler bei Umlaut-Button-Operation:', error);
+    }
+}
+
+// Export der Manager-Instanz für einfache Verwendung
+export const umlautManager = UmlautButtonManager.getInstance();

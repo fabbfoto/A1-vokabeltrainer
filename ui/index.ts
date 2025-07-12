@@ -45,15 +45,8 @@ export {
     setupAudioButtons
 } from './feedback';
 
-// Umlaut Button exports
-export {
-    insertTextAtCursor,
-    setupUmlautButtons,
-    hideUmlautButtons,
-    registerInputForUmlauts,
-    initUmlautSupport,
-    createUmlautButtonsUI
-} from './umlaut-buttons';
+// Umlaut Button exports - ENTFERNT: Alle statischen Exports entfernt
+// Dynamische Imports werden direkt in den jeweiligen Dateien verwendet
 
 // Combined init function for all UI event listeners
 export async function initEventListeners(

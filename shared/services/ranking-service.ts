@@ -84,41 +84,46 @@ export class RankingService {
    * Sendet ein Test-Ergebnis an Firebase
    */
   async submitTestResult(
-    testScore: TestResult, 
+    testResult: TestResult, 
     testVariant: TestType, 
     selectedCategory?: string
   ): Promise<string> {
+    // NEU: Validierung hinzufügen
+    if (!testResult || !testResult.score) {
+      console.error('❌ Ungültiges TestResult Objekt:', testResult);
+      throw new Error('TestResult oder score ist undefined');
+    }
     const user = this.authService.currentUser;
     if (!user) {
       console.warn('⚠️ User nicht angemeldet - Test-Ergebnis wird nicht gespeichert');
       throw new Error('User nicht angemeldet');
     }
 
-    const testResult: TestResultSubmission = {
+    const testResultSubmission: TestResultSubmission = {
       userId: user.uid,
       userName: user.displayName || 'Anonym',
       userEmail: user.email || 'unknown@email.com',
       testType: testVariant,
-      topic: testScore.score.topicId || 'global',
+      topic: testResult.score.topicId || 'global',
       category: selectedCategory,
-      score: testScore.score.finalScore,
-      correctAnswers: testScore.score.correct,
-      totalQuestions: testScore.score.total,
-      timeInSeconds: testScore.score.duration,
-      averageTimePerQuestion: testScore.score.averageTimePerQuestion,
-      timestamp: testScore.score.timestamp,
+      score: testResult.score.finalScore,
+      correctAnswers: testResult.score.correct,
+      totalQuestions: testResult.score.total,
+      timeInSeconds: testResult.score.duration,
+      averageTimePerQuestion: testResult.score.averageTimePerQuestion,
+      timestamp: testResult.score.timestamp,
       difficulty: 'A1',
-      baseScore: testScore.score.finalScore + testScore.score.timePenalty,
-      timePenalty: testScore.score.timePenalty,
-      finalScore: testScore.score.finalScore,
-      accuracy: testScore.score.accuracy,
-      modesUsed: testScore.score.modesUsed
+      baseScore: testResult.score.finalScore + testResult.score.timePenalty,
+      timePenalty: testResult.score.timePenalty,
+      finalScore: testResult.score.finalScore,
+      accuracy: testResult.score.accuracy,
+      modesUsed: testResult.score.modesUsed
     };
 
     try {
       const docRef = await addDoc(collection(db, 'testResults'), {
-        ...testResult,
-        timestamp: Timestamp.fromDate(testResult.timestamp)
+        ...testResultSubmission,
+        timestamp: Timestamp.fromDate(testResultSubmission.timestamp)
       });
       
       return docRef.id;

@@ -18,7 +18,7 @@ import {
 
 // Import der Helfer-Funktionen
 import { vergleicheAntwort, shuffleArray, speak, parseNounString } from './helfer';
-import { registerInputForUmlauts } from '../../ui/umlaut-buttons';
+// ENTFERNT: import { registerInputForUmlauts } from '../../ui/umlaut-buttons';
 
 // Importiere loadNextTask aus trainer.ts oben einfügen:
 // import { loadNextTask } from '../../trainer';
@@ -342,7 +342,7 @@ export function setupSpellingMode(
     if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
     if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'none';
     // Buttons erst jetzt initialisieren, wenn sie im DOM sind
-    import('../../ui/umlaut-buttons').then(mod => mod.setupUmlautButtons(dom, state));
+    import('../../ui/umlaut-buttons').then(mod => mod.initializeUmlautButtons('setup', dom, state));
     
     // ✅ KORREKT: currentWord statt currentWordData
     const currentWord = state.training.currentWord;
@@ -740,8 +740,7 @@ function generateClozeUI(
         const inputs = dom.clozeSentenceContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
         if (inputs.length > 0) {
             import('../../ui/umlaut-buttons').then(mod => {
-                mod.setupUmlautButtons(dom, state);
-
+                mod.initializeUmlautButtons('setup', dom, state);
             });
         }
     }, 0);
@@ -893,8 +892,7 @@ function generateSentenceInputs(
         const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
         if (inputs.length > 0) {
             import('../../ui/umlaut-buttons').then(mod => {
-                mod.setupUmlautButtons(dom, state);
-
+                mod.initializeUmlautButtons('setup', dom, state);
             });
         }
     }, 0);

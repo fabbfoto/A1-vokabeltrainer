@@ -26,7 +26,6 @@ import * as uiModes from './shared/utils/ui-modes';
 import * as ui from './ui/index';
 import { initializeAuth } from './shared/auth/index';
 import { NavigationEvents } from './shared/events/navigation-events';
-import { setupUmlautButtons } from './ui/umlaut-buttons';
 import { updateErrorCounts } from './ui/statistics';
 import { generateTestQuestions, TestGenerationResult } from './utils/test-generator';
 import { calculateTestScore, calculateAverageTimePerQuestion } from './shared/types/trainer';
@@ -905,10 +904,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Umlaut-Buttons nach jedem Moduswechsel initialisieren
         // Verzögert ausführen, damit die Input-Felder im DOM sind
         setTimeout(() => {
-            const umlautModes = ['type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'];
-            if (ui.setupUmlautButtons) {
-                ui.setupUmlautButtons(dom, state);
-            }
+            // Dynamischer Import für konsistente Chunk-Strategie
+            import('./ui/umlaut-buttons').then(mod => {
+                mod.initializeUmlautButtons('setup', dom, state, { modeId });
+            });
         }, 200); // Längere Verzögerung für dynamisch erstellte Input-Felder
     }
 
@@ -1000,7 +999,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 const windowWithRanking = window as unknown as { rankingService?: { submitTestResult: (testScore: TestScore, variant: string, category?: string) => Promise<string> } };
                 if (windowWithRanking.rankingService) {
                     await windowWithRanking.rankingService.submitTestResult(
-                        testScore,
+                        testResult,
                         state.test.currentTest.variant,
                         state.test.currentTest.selectedCategory
                     );
