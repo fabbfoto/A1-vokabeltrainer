@@ -1068,7 +1068,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             // Generiere Test-Aufgaben
             const result = generateTestQuestions(vokabular, {
                 variant: testConfig.variant,
-                scope: testConfig.type as 'subTopic' | 'mainTopic' | 'global',
+                scope: testConfig.testType as 'subTopic' | 'mainTopic' | 'global',
                 topicId: testConfig.topicId,
                 category: testConfig.selectedCategory as import('./shared/types/trainer').TestCategory,
                 totalQuestions: 20

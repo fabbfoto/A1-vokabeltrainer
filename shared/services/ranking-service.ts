@@ -118,8 +118,7 @@ export class RankingService {
       accuracy: testResult.score.accuracy,
       modesUsed: testResult.score.modesUsed
     };
-
-    // Nur category hinzufügen wenn selectedCategory definiert ist
+    // Füge category nur hinzu, wenn definiert
     if (selectedCategory) {
       testResultSubmission.category = selectedCategory;
     }
