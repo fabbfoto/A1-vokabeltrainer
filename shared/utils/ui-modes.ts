@@ -276,20 +276,21 @@ function generateMultipleChoiceAnswers(
             });
             
             // Visuelles Feedback
-            if (answer === correctAnswerEN) {
-                button.classList.remove('border-gray-300');
-                button.classList.add('border-green-500', 'bg-green-100');
-            } else {
-                button.classList.remove('border-gray-300');
-                button.classList.add('border-red-500', 'bg-red-100');
-                
-                // Richtige Antwort hervorheben
-                allButtons.forEach((btn: Element) => {
-                    if (btn.textContent === correctAnswerEN) {
-                        btn.classList.remove('border-gray-300');
-                        btn.classList.add('border-green-500', 'bg-green-100');
-                    }
-                });
+            if (!state.test.isTestModeActive) {
+                if (answer === correctAnswerEN) {
+                    button.classList.remove('border-gray-300');
+                    button.classList.add('border-green-500', 'bg-green-100');
+                } else {
+                    button.classList.remove('border-gray-300');
+                    button.classList.add('border-red-500', 'bg-red-100');
+                    // Richtige Antwort hervorheben
+                    allButtons.forEach((btn: Element) => {
+                        if (btn.textContent === correctAnswerEN) {
+                            btn.classList.remove('border-gray-300');
+                            btn.classList.add('border-green-500', 'bg-green-100');
+                        }
+                    });
+                }
             }
             
             const isCorrect = answer === correctAnswerEN;
@@ -439,23 +440,23 @@ export function setupSpellingMode(
             
 
             
-            // DIDAKTISCHES FEEDBACK: Jedes Feld bekommt sofort grün/rot (Tailwind)
-            if (isArticleCorrect) {
-                dom.spellingInputArticleEl.classList.add('border-green-400', 'bg-green-50');
-            } else {
-                dom.spellingInputArticleEl.classList.add('border-red-400', 'bg-red-50');
-            }
-            
-            if (isSingularCorrect) {
-                dom.spellingInputNoun1El.classList.add('border-green-400', 'bg-green-50');
-            } else {
-                dom.spellingInputNoun1El.classList.add('border-red-400', 'bg-red-50');
-            }
-            
-            if (isPluralCorrect) {
-                dom.spellingInputNoun2El.classList.add('border-green-400', 'bg-green-50');
-            } else {
-                dom.spellingInputNoun2El.classList.add('border-red-400', 'bg-red-50');
+            // DIDAKTISCHES FEEDBACK: Nur im Lern-Modus
+            if (!state.test.isTestModeActive) {
+                if (isArticleCorrect) {
+                    dom.spellingInputArticleEl.classList.add('border-green-400', 'bg-green-50');
+                } else {
+                    dom.spellingInputArticleEl.classList.add('border-red-400', 'bg-red-50');
+                }
+                if (isSingularCorrect) {
+                    dom.spellingInputNoun1El.classList.add('border-green-400', 'bg-green-50');
+                } else {
+                    dom.spellingInputNoun1El.classList.add('border-red-400', 'bg-red-50');
+                }
+                if (isPluralCorrect) {
+                    dom.spellingInputNoun2El.classList.add('border-green-400', 'bg-green-50');
+                } else {
+                    dom.spellingInputNoun2El.classList.add('border-red-400', 'bg-red-50');
+                }
             }
             
             // Felder sperren
@@ -574,11 +575,13 @@ export function setupSpellingMode(
             
 
             
-            // DIDAKTISCHES FEEDBACK: Feld bekommt sofort grün/rot (Tailwind)
-            if (isCorrect) {
-                dom.spellingInputSingleEl.classList.add('border-green-400', 'bg-green-50');
-            } else {
-                dom.spellingInputSingleEl.classList.add('border-red-400', 'bg-red-50');
+            // Visuelles Feedback nur im Lern-Modus
+            if (!state.test.isTestModeActive) {
+                if (isCorrect) {
+                    dom.spellingInputSingleEl.classList.add('border-green-400', 'bg-green-50');
+                } else {
+                    dom.spellingInputSingleEl.classList.add('border-red-400', 'bg-red-50');
+                }
             }
             
             // Feld sperren
@@ -761,7 +764,10 @@ function generateClozeUI(
             const correctAnswer = clozeAnswers[index];
             const isCorrect = vergleicheAntwort(userAnswer, correctAnswer);
             
-            input.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
+            // Farbfeedback nur im Lern-Modus
+            if (!state.test.isTestModeActive) {
+                input.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
+            }
             if (!isCorrect) allCorrect = false;
         });
         
@@ -920,7 +926,12 @@ function generateSentenceInputs(
             const userWord = input.value.trim();
             const expectedWord = input.dataset.expectedWord || '';
             const wordCorrect = vergleicheAntwort(userWord, expectedWord);
-            input.classList.add(wordCorrect ? 'correct-user-input' : 'incorrect-user-input');
+            // Farbfeedback nur im Lern-Modus
+            if (!state.test.isTestModeActive) {
+                input.classList.add(wordCorrect ? 'border-green-400' : 'border-red-400');
+                input.classList.add(wordCorrect ? 'bg-green-50' : 'bg-red-50');
+            }
+            input.disabled = true;
         });
         
         processAnswer(isCorrect, fullGermanSentence);

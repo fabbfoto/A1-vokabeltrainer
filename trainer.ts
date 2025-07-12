@@ -404,14 +404,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 break;
                 
             case 'testing':
-                // Im Test-Modus immer direkt weiter
+                // Im Test-Modus: Keine visuellen Hinweise, direkt weiter
                 if (isCorrect) {
                     state.training.correctInCurrentRound++;
-                    ui.showMessage(dom, '✓', 'success', 1000);
-                } else {
-                    ui.showMessage(dom, '✗', 'error', 1000);
                 }
-                setTimeout(() => loadNextTask(), 1000);
+                // Statistiken aktualisieren
+                updateStatistics();
+                // Sofort zur nächsten Aufgabe
+                loadNextTask();
                 break;
                 
             case 'repeating':
