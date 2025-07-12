@@ -988,10 +988,13 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         state.test.isTestModeActive = false;
         ui.updateTestStats(dom, state);
         
-        // Zeitmessung zurücksetzen
-        state.test.testStartTime = null;
-        state.test.currentQuestionStartTime = null;
-        state.test.questionTimes = [];
+        // Konvertiere TestScore zu TestResult für die Modal-Anzeige
+        const testResult: TestResult = {
+            testId: testScore.testId,
+            score: testScore,
+            wordResults: [], // Leere Array da wir keine einzelnen Wort-Ergebnisse haben
+            recommendations: [] // Leere Array da wir keine Empfehlungen haben
+        };
         
         // NEU: Test-Ergebnis an Firebase Ranking-System senden
         if (state.test.currentTest) {
@@ -1008,13 +1011,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 console.warn('⚠️ Fehler beim Senden an Ranking-System:', error);
             }
         }
-        // Konvertiere TestScore zu TestResult für die Modal-Anzeige
-        const testResult: TestResult = {
-            testId: testScore.testId,
-            score: testScore,
-            wordResults: [], // Leere Array da wir keine einzelnen Wort-Ergebnisse haben
-            recommendations: [] // Leere Array da wir keine Empfehlungen haben
-        };
+        
+        // Zeitmessung zurücksetzen
+        state.test.testStartTime = null;
+        state.test.currentQuestionStartTime = null;
+        state.test.questionTimes = [];
         showTestResultModal(testResult, state.test.currentTest as unknown as Record<string, unknown> || undefined);
     }
 
@@ -1059,6 +1060,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             // Wechsle zu Test-Modus
             ModeManager.switchToMode(state, 'testing');
             
+            // NEU: Zeitmessung starten
+            state.test.testStartTime = Date.now();
+            state.test.questionTimes = [];
+            state.test.isTestModeActive = true;
+            
             // Generiere Test-Aufgaben
             const result = generateTestQuestions(vokabular, {
                 variant: testConfig.variant,
@@ -1067,6 +1073,22 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 category: testConfig.selectedCategory as import('./shared/types/trainer').TestCategory,
                 totalQuestions: 20
             });
+            
+            // NEU: Debug-Ausgabe
+            console.log('Test-Generator Ergebnis:', {
+                wordsCount: result.words.length,
+                modeRotation: result.modeRotation,
+                scope: testConfig.type,
+                variant: testConfig.variant
+            });
+            
+            // NEU: Prüfung ob Wörter generiert wurden
+            if (!result.words || result.words.length === 0) {
+                console.error('Keine Wörter für Test generiert!');
+                ui.showMessage(dom, 'Fehler: Keine Wörter für Test gefunden!', 'error');
+                return;
+            }
+            
             // State für Test vorbereiten
             state.test.currentTest = testConfig;
             state.training.currentVocabularySet = result.words as import('./shared/types/trainer').Word[];
@@ -1080,10 +1102,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 state.test.testModeRotation = result.modeRotation as import('./shared/types/trainer').ModeId[];
                 state.test.currentTestModeIndex = 0;
             } else {
-                state.training.currentMode = testConfig.mode as ModeId || null; // Stelle sicher, dass es nicht undefined ist
+                state.training.currentMode = testConfig.mode as ModeId || null;
             }
+            
             // UI für Test starten
-            startTestUI(testConfig.testTitle || 'Test', testConfig.mode as ModeId || 'mc-de-en' as ModeId); // Stelle sicher, dass es nicht undefined ist
+            startTestUI(testConfig.testTitle || 'Test', testConfig.mode as ModeId || 'mc-de-en' as ModeId);
         },
     };
 

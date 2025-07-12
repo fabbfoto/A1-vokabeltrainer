@@ -41,6 +41,8 @@ export function generateTestQuestions(
 ): TestGenerationResult {
   const { variant, scope, topicId, category, totalQuestions = 20 } = config;
   
+  console.log('Test-Generator Config:', config);
+  
   // 1. Sammle alle relevanten Wörter
   let allWords: Word[] = [];
   
@@ -54,6 +56,7 @@ export function generateTestQuestions(
         }
       });
     });
+    console.log(`Globaler Test: ${allWords.length} Wörter gefunden`);
   } else if (scope === 'mainTopic' && topicId) {
     const mainTopic = vokabular[topicId];
     if (mainTopic) {
@@ -64,6 +67,7 @@ export function generateTestQuestions(
         }
       });
     }
+    console.log(`MainTopic Test (${topicId}): ${allWords.length} Wörter gefunden`);
   }
   
   // 2. Mische alle Wörter
@@ -96,6 +100,9 @@ export function generateTestQuestions(
   
   // 4. Wähle Wörter aus (mit Verteilung über Unterthemen)
   const selectedWords = distributeAcrossSubtopics(shuffledWords, totalQuestions);
+  
+  console.log(`Test generiert: ${selectedWords.length} Wörter ausgewählt`);
+  console.log('Modus-Verteilung:', modeDistribution);
   
   return {
     words: selectedWords,

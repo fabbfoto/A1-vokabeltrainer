@@ -105,7 +105,6 @@ export class RankingService {
       userEmail: user.email || 'unknown@email.com',
       testType: testVariant,
       topic: testResult.score.topicId || 'global',
-      category: selectedCategory,
       score: testResult.score.finalScore,
       correctAnswers: testResult.score.correct,
       totalQuestions: testResult.score.total,
@@ -119,6 +118,11 @@ export class RankingService {
       accuracy: testResult.score.accuracy,
       modesUsed: testResult.score.modesUsed
     };
+
+    // Nur category hinzufügen wenn selectedCategory definiert ist
+    if (selectedCategory) {
+      testResultSubmission.category = selectedCategory;
+    }
 
     try {
       const docRef = await addDoc(collection(db, 'testResults'), {
