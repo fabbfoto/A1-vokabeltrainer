@@ -1,6 +1,13 @@
 // shared/ui/test-result-modal.ts
 import type { TestResult } from '../types/trainer';
 
+// Erweitere Window-Interface für exitTestMode
+declare global {
+  interface Window {
+    exitTestMode?: () => void;
+  }
+}
+
 export function showTestResultModal(testResult: TestResult, testConfig?: Record<string, unknown>) {
   // Prüfe, ob schon ein Modal existiert
   if (document.getElementById('test-result-modal')) return;
@@ -64,6 +71,10 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
   // Schließen-Button
   document.getElementById('close-test-result-modal')?.addEventListener('click', () => {
     modal.remove();
+    // Test-Modus beenden wenn Modal geschlossen wird
+    if (window.exitTestMode && typeof window.exitTestMode === 'function') {
+      window.exitTestMode();
+    }
   });
 
   // Statistiken-Button

@@ -575,13 +575,19 @@ export function setupSpellingMode(
             
 
             
-            // Visuelles Feedback nur im Lern-Modus
+            // 4.1 Schreibweise-Modus (Einzelfeld): Farbfeedback nur im Lern-Modus
             if (!state.test.isTestModeActive) {
                 if (isCorrect) {
                     dom.spellingInputSingleEl.classList.add('border-green-400', 'bg-green-50');
                 } else {
                     dom.spellingInputSingleEl.classList.add('border-red-400', 'bg-red-50');
                 }
+            }
+            
+            // 4.4a Rotes Kreuz im Schreibweise-Modus (Einzelfeld) entfernen
+            if (state.test.isTestModeActive) {
+                // Direkt weiter ohne visuelles Feedback
+                processAnswer(false, correctAnswer);
             }
             
             // Feld sperren
@@ -764,9 +770,10 @@ function generateClozeUI(
             const correctAnswer = clozeAnswers[index];
             const isCorrect = vergleicheAntwort(userAnswer, correctAnswer);
             
-            // Farbfeedback nur im Lern-Modus
+            // 4.4 Cloze: Farbfeedback nur im Lern-Modus
             if (!state.test.isTestModeActive) {
-                input.classList.add(isCorrect ? 'correct-user-input' : 'incorrect-user-input');
+                input.classList.add(isCorrect ? 'border-green-400' : 'border-red-400');
+                input.classList.add(isCorrect ? 'bg-green-50' : 'bg-red-50');
             }
             if (!isCorrect) allCorrect = false;
         });
@@ -926,7 +933,7 @@ function generateSentenceInputs(
             const userWord = input.value.trim();
             const expectedWord = input.dataset.expectedWord || '';
             const wordCorrect = vergleicheAntwort(userWord, expectedWord);
-            // Farbfeedback nur im Lern-Modus
+            // 4.5 Satzübersetzung: Farbfeedback nur im Lern-Modus
             if (!state.test.isTestModeActive) {
                 input.classList.add(wordCorrect ? 'border-green-400' : 'border-red-400');
                 input.classList.add(wordCorrect ? 'bg-green-50' : 'bg-red-50');

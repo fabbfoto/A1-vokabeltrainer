@@ -790,6 +790,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // --- NEU: Testmodus sauber verlassen ---
     function exitTestMode(): void {
+        console.log('🔚 Beende Test-Modus...');
+        
         // Test-spezifische States zurücksetzen
         state.test.isTestModeActive = false;
         state.test.currentTest = null;
@@ -798,16 +800,37 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         state.test.testStartTime = null;
         state.test.currentQuestionStartTime = null;
         state.test.questionTimes = [];
-        // Test-Statistiken und UI zurücksetzen
+        
+        // WICHTIG: Zähler für Lernmodus zurücksetzen
+        state.training.correctInCurrentRound = 0;
+        state.training.attemptedInCurrentRound = 0;
+        state.training.currentWordIndex = -1;
+        
+        // Test-Statistiken verstecken, Practice-Statistiken zeigen
         dom.testStatsViewEl.classList.add('hidden');
         dom.practiceStatsViewEl.classList.remove('hidden');
+        
+        // KRITISCH: Mode-Button-Grid wieder anzeigen
         dom.modeButtonGridEl.classList.remove('hidden');
+        
         // Haupt-View wiederherstellen
         dom.trainerMainViewEl.classList.remove('hidden');
         dom.navigationViewEl.classList.add('hidden');
+        
+        // UI-Elemente zurücksetzen
+        ui.hideAllUIs(dom);
+        
         // Felder und Aufgaben-UI wieder anzeigen
         ui.showTrainingModes(dom, state);
+        
+        // Fehlerzähler aktualisieren
         updateRepeatButtons();
+        
+        // Statistiken für Lernmodus aktualisieren
+        ui.updatePracticeStats(dom, state, learningModes);
+        ui.updateCategoryStats(dom, state, learningModes);
+        
+        console.log('✅ Test-Modus beendet, Lernmodus wiederhergestellt');
     }
 
     function setMode(modeId: ModeId, isRepeat: boolean = false): void {
@@ -1014,6 +1037,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
         showTestResultModal(testResult, state.test.currentTest as unknown as Record<string, unknown> || undefined);
         
+        // KRITISCH: Test-Modus beenden und zum Lernmodus zurückkehren
+        exitTestMode();
+        
         // Zeitmessung zurücksetzen
         state.test.testStartTime = null;
         state.test.currentQuestionStartTime = null;
@@ -1173,6 +1199,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // Am Ende von document.addEventListener('DOMContentLoaded', ...)
     (window as unknown as { loadNextTask: typeof loadNextTask }).loadNextTask = loadNextTask;
+
+    // exitTestMode global verfügbar machen für Modal
+    (window as unknown as { exitTestMode: typeof exitTestMode }).exitTestMode = exitTestMode;
 
     // Event-Listener für Weiter-Button (nur einmalig registrieren)
     dom.continueButton.addEventListener('click', () => {
