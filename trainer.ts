@@ -1002,7 +1002,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 const windowWithRanking = window as unknown as { rankingService?: { submitTestResult: (testScore: TestScore, variant: string, category?: string) => Promise<string> } };
                 if (windowWithRanking.rankingService) {
                     await windowWithRanking.rankingService.submitTestResult(
-                        testResult,
+                        testResult,  // Verwende testResult statt testScore
                         state.test.currentTest.variant,
                         state.test.currentTest.selectedCategory
                     );
@@ -1078,7 +1078,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             console.log('Test-Generator Ergebnis:', {
                 wordsCount: result.words.length,
                 modeRotation: result.modeRotation,
-                scope: testConfig.type,
+                scope: testConfig.testType,
                 variant: testConfig.variant
             });
             

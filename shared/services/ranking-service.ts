@@ -105,6 +105,7 @@ export class RankingService {
       userEmail: user.email || 'unknown@email.com',
       testType: testVariant,
       topic: testResult.score.topicId || 'global',
+      // Entferne category hier
       score: testResult.score.finalScore,
       correctAnswers: testResult.score.correct,
       totalQuestions: testResult.score.total,
@@ -118,7 +119,8 @@ export class RankingService {
       accuracy: testResult.score.accuracy,
       modesUsed: testResult.score.modesUsed
     };
-    // Füge category nur hinzu, wenn definiert
+
+    // Füge category nur hinzu wenn definiert
     if (selectedCategory) {
       testResultSubmission.category = selectedCategory;
     }

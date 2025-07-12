@@ -20,6 +20,9 @@ import {
 import { vergleicheAntwort, shuffleArray, speak, parseNounString } from './helfer';
 // ENTFERNT: import { registerInputForUmlauts } from '../../ui/umlaut-buttons';
 
+// Import für UI-Feedback im Test-Modus
+import * as ui from '../../ui/index';
+
 // Importiere loadNextTask aus trainer.ts oben einfügen:
 // import { loadNextTask } from '../../trainer';
 
@@ -98,8 +101,13 @@ export function setupMultipleChoiceMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
-    // WICHTIG: Correction Mode explizit deaktivieren
-    state.training.isCorrectionMode = false;
+    // NEU: Test-Modus NIEMALS zurücksetzen
+    const wasInTestMode = state.test.isTestModeActive;
+    
+    // Korrekturmodus nur zurücksetzen wenn nicht im Test
+    if (!state.test.isTestModeActive) {
+        state.training.isCorrectionMode = false;
+    }
     
     ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
     // BUGFIX: Explizit alle Choice-Buttons aktivieren
@@ -327,8 +335,13 @@ export function setupSpellingMode(
     
 
     
-    // Korrekturmodus zurücksetzen
-    state.isCorrectionMode = false;
+    // NEU: Test-Modus NIEMALS zurücksetzen
+    const wasInTestMode = state.test.isTestModeActive;
+    
+    // Korrekturmodus nur zurücksetzen wenn nicht im Test
+    if (!state.test.isTestModeActive) {
+        state.training.isCorrectionMode = false;
+    }
     
     // UI zurücksetzen
     dom.checkSpellingButton.disabled = false;
@@ -463,17 +476,28 @@ export function setupSpellingMode(
                     processAnswer(true, correctAnswerText);
                 }, 1200);
             } else {
-                // FALSCHE ANTWORT: Korrekturlösung UND Weiter-Button anzeigen
-                dom.correctionSolutionEl.textContent = correctAnswerText;
-                dom.correctionSolutionEl.classList.remove('hidden');
-                dom.continueButton.classList.remove('hidden');
+                // Im Test-Modus: Keine Korrektur anzeigen
+                if (state.test.isTestModeActive) {
+                    // Kurze Fehlermeldung, dann weiter
+                    ui.showMessage(dom, '✗', 'error', 1000);
+                    setTimeout(() => {
+                        processAnswer(false, correctAnswerText);
+                    }, 1000);
+                } else {
+                    // Normaler Modus: Korrektur anzeigen
+                    dom.correctionSolutionEl.textContent = correctAnswerText;
+                    dom.correctionSolutionEl.classList.remove('hidden');
+                    dom.continueButton.classList.remove('hidden');
+                }
             }
             
             // Auswerten-Button deaktivieren
             dom.checkSpellingButton.disabled = true;
             
-            // Korrekturmodus aktivieren (nur bei falscher Antwort relevant)
-            state.training.isCorrectionMode = !(isArticleCorrect && isSingularCorrect && isPluralCorrect);
+            // Korrekturmodus nur aktivieren wenn NICHT im Test
+            if (!state.test.isTestModeActive) {
+                state.training.isCorrectionMode = !(isArticleCorrect && isSingularCorrect && isPluralCorrect);
+            }
             
             // Nur wenn alle drei Felder korrekt sind, ist die Antwort vollständig richtig
             const isFullyCorrect = isArticleCorrect && isSingularCorrect && isPluralCorrect;
@@ -572,17 +596,28 @@ export function setupSpellingMode(
                     processAnswer(true, correctAnswer);
                 }, 1200);
             } else {
-                // FALSCHE ANTWORT: Korrekturlösung UND Weiter-Button anzeigen
-                dom.correctionSolutionEl.textContent = correctAnswer;
-                dom.correctionSolutionEl.classList.remove('hidden');
-                dom.continueButton.classList.remove('hidden');
+                // Im Test-Modus: Keine Korrektur anzeigen
+                if (state.test.isTestModeActive) {
+                    // Kurze Fehlermeldung, dann weiter
+                    ui.showMessage(dom, '✗', 'error', 1000);
+                    setTimeout(() => {
+                        processAnswer(false, correctAnswer);
+                    }, 1000);
+                } else {
+                    // Normaler Modus: Korrektur anzeigen
+                    dom.correctionSolutionEl.textContent = correctAnswer;
+                    dom.correctionSolutionEl.classList.remove('hidden');
+                    dom.continueButton.classList.remove('hidden');
+                }
             }
             
             // Auswerten-Button deaktivieren
             dom.checkSpellingButton.disabled = true;
             
-            // Korrekturmodus aktivieren (nur bei falscher Antwort relevant)
-            state.isCorrectionMode = !isCorrect;
+            // Korrekturmodus nur aktivieren wenn NICHT im Test
+            if (!state.test.isTestModeActive) {
+                state.isCorrectionMode = !isCorrect;
+            }
             
             // Weiter-Button Handler (nur bei falscher Antwort relevant)
             const handleSingleContinueButtonClick = () => {
@@ -630,6 +665,9 @@ export function setupClozeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    // NEU: Test-Modus NIEMALS zurücksetzen
+    const wasInTestMode = state.test.isTestModeActive;
+    
     ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
 
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
@@ -752,6 +790,9 @@ export function setupSentenceTranslationEnDeMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    // NEU: Test-Modus NIEMALS zurücksetzen
+    const wasInTestMode = state.test.isTestModeActive;
+    
     ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
 
     if (state._removeCorrectionEnterHandler) { state._removeCorrectionEnterHandler(); delete state._removeCorrectionEnterHandler; }
