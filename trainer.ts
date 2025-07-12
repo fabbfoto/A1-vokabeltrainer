@@ -992,14 +992,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const testResult: TestResult = {
             testId: testScore.testId,
             score: testScore,
-            wordResults: [], // Leere Array da wir keine einzelnen Wort-Ergebnisse haben
-            recommendations: [] // Leere Array da wir keine Empfehlungen haben
+            wordResults: [],
+            recommendations: []
         };
-        
+
         // NEU: Test-Ergebnis an Firebase Ranking-System senden
         if (state.test.currentTest) {
             try {
-                const windowWithRanking = window as unknown as { rankingService?: { submitTestResult: (testScore: TestScore, variant: string, category?: string) => Promise<string> } };
+                const windowWithRanking = window as unknown as { rankingService?: { submitTestResult: (testResult: TestResult, variant: string, category?: string) => Promise<string> } };
                 if (windowWithRanking.rankingService) {
                     await windowWithRanking.rankingService.submitTestResult(
                         testResult,  // Verwende testResult statt testScore
@@ -1011,12 +1011,13 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 console.warn('⚠️ Fehler beim Senden an Ranking-System:', error);
             }
         }
+
+        showTestResultModal(testResult, state.test.currentTest as unknown as Record<string, unknown> || undefined);
         
         // Zeitmessung zurücksetzen
         state.test.testStartTime = null;
         state.test.currentQuestionStartTime = null;
         state.test.questionTimes = [];
-        showTestResultModal(testResult, state.test.currentTest as unknown as Record<string, unknown> || undefined);
     }
 
     const callbacks: UICallbacks = {
