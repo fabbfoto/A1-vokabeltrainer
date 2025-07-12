@@ -31,6 +31,7 @@ import { generateTestQuestions, TestGenerationResult } from './utils/test-genera
 import { calculateTestScore, calculateAverageTimePerQuestion } from './shared/types/trainer';
 import { showTestResultModal } from './shared/ui/test-result-modal';
 import { ModeManager } from './shared/services/mode-manager';
+import { ErrorCounterManager } from './shared/services/error-counter-manager';
 // import { validateVocabulary } from './validate-vocabulary'; // TEMPORÄR DEAKTIVIERT
 import type { AuthService } from './shared/services/auth-service';
 import type { SyncService } from './shared/services/sync-service';
@@ -183,6 +184,27 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         isCorrectionMode: false,
     };
 
+    // Test-Tracking für detaillierte Auswertung
+    const testAnswerLog: Array<{
+        word: Word;
+        userAnswer: string;
+        correctAnswer: string;
+        isCorrect: boolean;
+        mode: ModeId;
+        timeSpent: number;
+    }> = [];
+
+    // ErrorManager initialisieren
+    const errorManager = new ErrorCounterManager(state);
+
+    // UI-Update Callback registrieren
+    errorManager.onUpdate(() => {
+        ui.updateErrorCounts(dom, state, learningModes);
+    });
+
+    // Fehler aus Storage laden
+    errorManager.loadFromStorage();
+
     function loadProgress(): void {
         // Versuche zuerst trainer-progress
         let saved = localStorage.getItem('trainer-progress');
@@ -283,32 +305,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     }
 
-    function loadWordsToRepeat(): void {
-        const saved = localStorage.getItem('trainer-words-to-repeat');
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                Object.keys(parsed).forEach(mode => {
-                    state.progress.wordsToRepeatByMode[mode as ModeId] = new Set(parsed[mode] as WordId[]);
-                });
-            } catch (e) {
-                console.warn('⚠️ Fehler beim Laden words to repeat:', e);
-            }
-        }
-    }
-
-    function saveWordsToRepeat(): void {
-        try {
-            const toSave: Record<string, WordId[]> = {};
-            Object.keys(state.progress.wordsToRepeatByMode).forEach(key => {
-                const mode = key as ModeId;
-                toSave[mode] = Array.from(state.progress.wordsToRepeatByMode[mode]!);
-            });
-            localStorage.setItem('trainer-words-to-repeat', JSON.stringify(toSave));
-        } catch (e) {
-            console.warn('⚠️ Fehler beim Speichern words to repeat:', e);
-        }
-    }
+    // loadWordsToRepeat und saveWordsToRepeat wurden durch ErrorCounterManager ersetzt
 
     function loadLastTestScores(): void {
         const saved = localStorage.getItem('trainer-last-test-scores');
@@ -352,18 +349,35 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
 
     function updateRepeatButtons() {
+        // Wird jetzt automatisch durch errorManager.onUpdate() aufgerufen
         ui.updateErrorCounts(dom, state, learningModes);
     }
 
     loadProgress();
     loadMasteredWords();
-    loadWordsToRepeat();
+    // loadWordsToRepeat() wird jetzt durch errorManager.loadFromStorage() ersetzt
     loadLastTestScores();
     loadPerfectRuns();
 
     function processAnswer(isCorrect: boolean, correctAnswer?: string): void {
         
         state.training.attemptedInCurrentRound++;
+        
+        // Test-Antworten protokollieren
+        if (state.test.isTestModeActive && state.training.currentWord) {
+            const timeSpent = state.test.currentQuestionStartTime 
+                ? (Date.now() - state.test.currentQuestionStartTime) / 1000 
+                : 0;
+                
+            testAnswerLog.push({
+                word: state.training.currentWord,
+                userAnswer: correctAnswer || '', // Bei MC ist das die gewählte Antwort
+                correctAnswer: correctAnswer || state.training.currentWord.german,
+                isCorrect: isCorrect,
+                mode: state.training.currentMode || 'unknown' as ModeId,
+                timeSpent: timeSpent
+            });
+        }
         
         // Spezialbehandlung für Multiple Choice im normalen Modus
         if (state.training.currentMode === 'mc-de-en' && !state.test.isTestModeActive) {
@@ -456,18 +470,19 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Hilfsfunktionen
     function addToErrorList(): void {
         if (state.training.currentWord && state.training.currentMode) {
-            if (!state.progress.wordsToRepeatByMode[state.training.currentMode]) {
-                state.progress.wordsToRepeatByMode[state.training.currentMode] = new Set();
-            }
-            state.progress.wordsToRepeatByMode[state.training.currentMode].add(state.training.currentWord.id);
-            saveWordsToRepeat();
+            errorManager.addError(
+                state.training.currentWord.id, 
+                state.training.currentMode
+            );
         }
     }
 
     function removeFromErrorList(): void {
         if (state.training.currentWord && state.training.currentMode) {
-            state.progress.wordsToRepeatByMode[state.training.currentMode]?.delete(state.training.currentWord.id);
-            saveWordsToRepeat();
+            errorManager.removeError(
+                state.training.currentWord.id, 
+                state.training.currentMode
+            );
         }
     }
 
@@ -1011,12 +1026,38 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         state.test.isTestModeActive = false;
         ui.updateTestStats(dom, state);
         
+        // WordTestResults aus dem Log erstellen
+        const wordResults = testAnswerLog.map((entry, index) => ({
+            wordId: entry.word.id,
+            modeId: entry.mode,
+            correct: entry.isCorrect,
+            attempts: 1,
+            timeSpent: entry.timeSpent,
+            startTime: state.test.testStartTime || Date.now(),
+            endTime: Date.now(),
+            // Zusätzliche Felder für die Auswertung
+            word: entry.word,
+            userAnswer: entry.userAnswer,
+            correctAnswer: entry.correctAnswer
+        }));
+
+        // Empfehlungen basierend auf Fehlern
+        const incorrectWords = testAnswerLog
+            .filter(entry => !entry.isCorrect)
+            .map(entry => entry.word.id);
+
+        const recommendations = incorrectWords.length > 0 ? [{
+            type: 'repeat' as const,
+            wordIds: incorrectWords,
+            suggestedMode: state.training.currentMode
+        }] : [];
+        
         // Konvertiere TestScore zu TestResult für die Modal-Anzeige
         const testResult: TestResult = {
             testId: testScore.testId,
             score: testScore,
-            wordResults: [],
-            recommendations: []
+            wordResults: wordResults,
+            recommendations: recommendations
         };
 
         // NEU: Test-Ergebnis an Firebase Ranking-System senden
@@ -1036,6 +1077,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
 
         showTestResultModal(testResult, state.test.currentTest as unknown as Record<string, unknown> || undefined);
+        
+        // Test-Log für nächsten Test zurücksetzen
+        testAnswerLog.length = 0;
         
         // KRITISCH: Test-Modus beenden und zum Lernmodus zurückkehren
         exitTestMode();
@@ -1202,6 +1246,15 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // exitTestMode global verfügbar machen für Modal
     (window as unknown as { exitTestMode: typeof exitTestMode }).exitTestMode = exitTestMode;
+
+    // Globale Funktionen für Test-Auswertung
+    (window as any).exitTestMode = exitTestMode;
+    (window as any).setMode = setMode;
+    (window as any).state = state;
+    (window as any).saveWordsToRepeat = saveWordsToRepeat;
+
+    // ErrorManager global verfügbar machen für Debugging
+    (window as any).errorManager = errorManager;
 
     // Event-Listener für Weiter-Button (nur einmalig registrieren)
     dom.continueButton.addEventListener('click', () => {

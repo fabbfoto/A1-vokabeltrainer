@@ -73,45 +73,47 @@ export function getProgressColorClass(completed: number, total: number): string 
  * Aktualisiert die Fehlerzähler auf den Wiederholungs-Buttons.
  */
 export function updateErrorCounts(dom: DOMElements, state: TrainerState, learningModes: LearningModes): void {
+    console.log('[UI] Updating error counts...');
+    
     Object.keys(learningModes).forEach(mode => {
-        const repeatButton = document.getElementById(`mode-repeat-${mode}`);
-        if (!repeatButton) return;
-        
-        const countSpan = repeatButton.querySelector('.count-display');
-        if (!countSpan) {
-            console.warn(`[updateErrorCounts] Kein count-display in ${mode} gefunden`);
-            return;
-        }
-        
-        const errorCount = state.progress.wordsToRepeatByMode[mode as import('../shared/types/trainer').ModeId]?.size || 0;
-        
-        // Immer die Zahl anzeigen
-        countSpan.textContent = errorCount.toString();
-        
-        if (errorCount === 0) {
-            // Button deaktivieren
-            repeatButton.classList.add('opacity-50', 'cursor-not-allowed');
-            repeatButton.setAttribute('disabled', 'true');
-            
-            // WICHTIG: Stelle sicher, dass Button NICHT mehr rot ist
-            repeatButton.classList.remove('bg-red-600', 'text-white', 'hover:bg-red-700');
-            repeatButton.classList.add('bg-red-100', 'text-red-500');
-            
-            // Falls das der aktive Wiederholungsmodus war
-            if (state.training.isRepeatSessionActive && state.training.currentMode === mode) {
-                state.training.isRepeatSessionActive = false;
-            
+        try {
+            const repeatButton = document.getElementById(`mode-repeat-${mode}`);
+            if (!repeatButton) {
+                console.warn(`[UI] Button not found: mode-repeat-${mode}`);
+                return;
             }
-        } else {
-            // Button aktivieren
-            repeatButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            repeatButton.removeAttribute('disabled');
             
-            // Standard-Styling wenn nicht aktiv
-            if (!state.training.isRepeatSessionActive || state.training.currentMode !== mode) {
-                repeatButton.classList.remove('bg-red-600', 'text-white', 'hover:bg-red-700');
-                repeatButton.classList.add('bg-red-100', 'text-red-500', 'hover:enabled:bg-red-200');
+            const countSpan = repeatButton.querySelector('.count-display');
+            if (!countSpan) {
+                console.warn(`[UI] Count display not found for ${mode}`);
+                return;
             }
+            
+            const errorCount = state.progress.wordsToRepeatByMode[mode as import('../shared/types/trainer').ModeId]?.size || 0;
+            
+            // UI aktualisieren
+            countSpan.textContent = errorCount.toString();
+            
+            // Button-Zustand aktualisieren
+            if (errorCount === 0) {
+                repeatButton.classList.add('opacity-50', 'cursor-not-allowed');
+                repeatButton.setAttribute('disabled', 'true');
+                repeatButton.classList.remove('bg-red-600', 'text-white');
+                repeatButton.classList.add('bg-red-100', 'text-red-500');
+            } else {
+                repeatButton.classList.remove('opacity-50', 'cursor-not-allowed');
+                repeatButton.removeAttribute('disabled');
+                
+                // Nur wenn nicht aktiv
+                if (!state.training.isRepeatSessionActive || state.training.currentMode !== mode) {
+                    repeatButton.classList.remove('bg-red-600', 'text-white');
+                    repeatButton.classList.add('bg-red-100', 'text-red-500');
+                }
+            }
+            
+            console.log(`[UI] Updated ${mode}: ${errorCount} errors`);
+        } catch (error) {
+            console.error(`[UI] Failed to update ${mode}:`, error);
         }
     });
 }
