@@ -6,10 +6,102 @@ export type AppMode =
   | 'learning'      // Normaler Lernmodus mit Korrekturen
   | 'testing'       // Test-Modus ohne Korrekturen
   | 'repeating'     // Wiederholungs-Modus für Fehler
-  | 'correcting';   // Korrektur-Modus zeigt Lösung
+  | 'correcting';
+
+// Strategy Interface für Modus-spezifische Logik
+interface ModeStrategy {
+  processAnswer(state: TrainerState, isCorrect: boolean, correctAnswer?: string): void;
+  showFeedback(state: TrainerState, isCorrect: boolean, correctAnswer?: string): void;
+  handleNextTask(state: TrainerState): void;
+  cleanup(state: TrainerState): void;
+}
+
+// Konkrete Strategien für jeden Modus
+class LearningModeStrategy implements ModeStrategy {
+  processAnswer(state: TrainerState, isCorrect: boolean, correctAnswer?: string): void {
+    if (isCorrect) {
+      state.training.correctInCurrentRound++;
+      // Fehler aus Liste entfernen
+      if (state.training.currentMode) {
+        // Hier würde removeFromErrorList() aufgerufen werden
+      }
+    } else {
+      // Fehler hinzufügen und Korrekturmodus aktivieren
+      state.training.isCorrectionMode = true;
+    }
+  }
+
+  showFeedback(state: TrainerState, isCorrect: boolean, correctAnswer?: string): void {
+    // Im Lernmodus: Sofortiges Feedback
+    if (isCorrect) {
+      // Grüner Balken für richtig
+    } else {
+      // Rote Anzeige für falsch + Korrektur
+    }
+  }
+
+  handleNextTask(state: TrainerState): void {
+    // Im Lernmodus: Automatisch weiter nach 1.5s bei richtigen Antworten
+    // Bei falschen: Warten auf "Weiter"-Button
+  }
+
+  cleanup(state: TrainerState): void {
+    // Lernmodus-spezifische Bereinigung
+  }
+}
+
+class TestingModeStrategy implements ModeStrategy {
+  processAnswer(state: TrainerState, isCorrect: boolean, correctAnswer?: string): void {
+    // Im Testmodus: Nur Statistiken sammeln, keine Fehlerliste
+    if (isCorrect) {
+      state.training.correctInCurrentRound++;
+    }
+    // Keine Fehler hinzufügen, keine Korrekturmodus
+  }
+
+  showFeedback(state: TrainerState, isCorrect: boolean, correctAnswer?: string): void {
+    // Im Testmodus: KEIN visuelles Feedback
+    // Erst am Ende wird ausgewertet
+  }
+
+  handleNextTask(state: TrainerState): void {
+    // Im Testmodus: Sofort zur nächsten Aufgabe
+  }
+
+  cleanup(state: TrainerState): void {
+    // Testmodus-spezifische Bereinigung
+  }
+}
+
+class CorrectionModeStrategy implements ModeStrategy {
+  processAnswer(state: TrainerState, isCorrect: boolean, correctAnswer?: string): void {
+    // Im Korrekturmodus: Nur Statistiken, kein automatisches Weitergehen
+    if (isCorrect) {
+      state.training.correctInCurrentRound++;
+    }
+  }
+
+  showFeedback(state: TrainerState, isCorrect: boolean, correctAnswer?: string): void {
+    // Im Korrekturmodus: Sofortiges Feedback
+  }
+
+  handleNextTask(state: TrainerState): void {
+    // Im Korrekturmodus: Nur manuell über "Weiter"-Button
+  }
+
+  cleanup(state: TrainerState): void {
+    // Korrekturmodus-spezifische Bereinigung
+  }
+}
 
 export class ModeManager {
-  
+  private static strategies: Record<AppMode, ModeStrategy> = {
+    learning: new LearningModeStrategy(),
+    testing: new TestingModeStrategy(),
+    correcting: new CorrectionModeStrategy(),
+    repeating: new LearningModeStrategy() // Wiederholung nutzt Lernmodus-Strategie
+  };
+
   // Aktuellen Modus abrufen (Kompatibilität mit alten Flags)
   static getCurrentMode(state: TrainerState): AppMode {
     // Priorisierte Reihenfolge wichtig!
@@ -18,13 +110,28 @@ export class ModeManager {
     if (state.training.isRepeatSessionActive) return 'repeating';
     return 'learning';
   }
-  
 
-  
+  // Strategy Pattern: Modus-spezifische Logik delegieren
+  static processAnswer(state: TrainerState, isCorrect: boolean, correctAnswer?: string): void {
+    const currentMode = this.getCurrentMode(state);
+    const strategy = this.strategies[currentMode];
+    strategy.processAnswer(state, isCorrect, correctAnswer);
+  }
+
+  static showFeedback(state: TrainerState, isCorrect: boolean, correctAnswer?: string): void {
+    const currentMode = this.getCurrentMode(state);
+    const strategy = this.strategies[currentMode];
+    strategy.showFeedback(state, isCorrect, correctAnswer);
+  }
+
+  static handleNextTask(state: TrainerState): void {
+    const currentMode = this.getCurrentMode(state);
+    const strategy = this.strategies[currentMode];
+    strategy.handleNextTask(state);
+  }
+
   // Zu neuem Modus wechseln
   static switchToMode(state: TrainerState, newMode: AppMode): void {
-    
-    
     // Alten Modus beenden
     this.cleanupCurrentMode(state);
     
@@ -34,22 +141,11 @@ export class ModeManager {
     // Modus-spezifische Initialisierung
     this.initializeMode(state, newMode);
   }
-  
+
   private static cleanupCurrentMode(state: TrainerState): void {
     const currentMode = this.getCurrentMode(state);
-    
-    switch (currentMode) {
-      case 'correcting':
-        // Korrektur-Handler entfernen - wird in trainer.ts gehandhabt
-        break;
-        
-      case 'testing':
-        // Test-spezifische Aufräumarbeiten
-        state.test.testStartTime = null;
-        state.test.currentQuestionStartTime = null;
-        state.test.questionTimes = [];
-        break;
-    }
+    const strategy = this.strategies[currentMode];
+    strategy.cleanup(state);
   }
   
   private static updateLegacyFlags(state: TrainerState, newMode: AppMode): void {

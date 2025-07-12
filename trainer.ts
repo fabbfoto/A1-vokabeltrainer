@@ -360,6 +360,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     loadPerfectRuns();
 
     function processAnswer(isCorrect: boolean, correctAnswer?: string): void {
+        console.log('[processAnswer] Start:', { isCorrect, correctAnswer, currentMode: ModeManager.getCurrentMode(state), isCorrectionMode: state.training.isCorrectionMode });
         
         state.training.attemptedInCurrentRound++;
         
@@ -377,23 +378,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 mode: state.training.currentMode || 'unknown' as ModeId,
                 timeSpent: timeSpent
             });
-        }
-        
-        // Spezialbehandlung für Multiple Choice im normalen Modus
-        if (state.training.currentMode === 'mc-de-en' && !state.test.isTestModeActive) {
-            if (isCorrect) {
-                state.training.correctInCurrentRound++;
-                updateProgress(true);
-                ui.showMessage(dom, 'Richtig!', 'success');
-            } else {
-                addToErrorList();
-                ui.showMessage(dom, `Falsch! Richtig: ${correctAnswer}`, 'error');
-            }
-            
-            // Immer nach kurzer Pause weiter
-            setTimeout(() => loadNextTask(), isCorrect ? 1200 : 2000);
-            updateStatistics();
-            return; // Früh raus, keine weitere Verarbeitung
         }
         
         // Zeitmessung für Test-Modus
@@ -454,13 +438,25 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             default:
                 // Normaler Lernmodus
                 if (isCorrect) {
+                    console.log('[processAnswer] Richtige Antwort im Lernmodus - gehe weiter...');
                     state.training.correctInCurrentRound++;
                     updateProgress(true);
+                    
+                    // KRITISCH: Fehler aus der Liste entfernen, falls vorhanden
+                    removeFromErrorList();
+                    
                     ui.showMessage(dom, 'Richtig!', 'success');
-                    setTimeout(() => loadNextTask(), 1500);
+                    setTimeout(() => {
+                        console.log('[processAnswer] Rufe loadNextTask auf...');
+                        loadNextTask();
+                    }, 1500);
                 } else {
-                    // Wechsle zu Korrekturmodus
-                    ModeManager.switchToMode(state, 'correcting');
+                    console.log('[processAnswer] Falsche Antwort im Lernmodus - zeige Korrektur...');
+                    // Fehler hinzufügen
+                    addToErrorList();
+                    
+                    // Korrekturmodus aktivieren und UI anzeigen
+                    state.training.isCorrectionMode = true;
                     showCorrectionUI(correctAnswer);
                 }
                 break;
@@ -524,10 +520,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     function showCorrectionUI(correctAnswer?: string): void {
-        dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">${correctAnswer || ''}</span>`;
-        dom.correctionSolutionEl.classList.remove('hidden');
-        dom.continueButton.classList.remove('hidden');
-        dom.continueButton.focus();
+        // Korrektur-UI nur im Lernmodus anzeigen, nicht im Testmodus
+        if (!state.test.isTestModeActive) {
+            console.log('[showCorrectionUI] Zeige Korrektur-UI an...');
+            dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">Falsch! Richtig: ${correctAnswer || ''}</span>`;
+            dom.correctionSolutionEl.classList.remove('hidden');
+            dom.continueButton.classList.remove('hidden');
+            dom.continueButton.focus();
+        }
     }
 
     function updateProgress(isCorrect: boolean): void {
@@ -607,6 +607,28 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     };
 
     function loadNextTask(): void {
+        console.log('[loadNextTask] Lade nächste Aufgabe...', new Date().toISOString());
+        console.log('[loadNextTask] Aktueller Modus:', ModeManager.getCurrentMode(state));
+        console.log('[loadNextTask] Korrekturmodus:', state.training.isCorrectionMode);
+        
+        // KRITISCH: Alle visuellen Fehleranzeigen zurücksetzen
+        dom.feedbackContainerEl.innerHTML = '';
+        dom.correctionSolutionEl.classList.add('hidden');
+        dom.continueButton.classList.add('hidden');
+        
+        // Alle visuellen Fehleranzeigen entfernen
+        document.querySelectorAll('.feedback-incorrect').forEach(el => el.remove());
+        document.querySelectorAll('.border-red-500, .bg-red-100').forEach(el => {
+            el.classList.remove('border-red-500', 'bg-red-100');
+            el.classList.add('border-gray-300');
+        });
+        
+        // Korrekturmodus zurücksetzen
+        state.training.isCorrectionMode = false;
+        
+        // KRITISCH: Fehlerzähler-UI aktualisieren
+        ui.updateErrorCounts(dom, state, learningModes);
+        
         ui.hideAllUIs(dom);
         
         // Erhöhe Index
@@ -1225,7 +1247,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     });
     
 
-
     // Navigation Event Listeners initialisieren
     ui.initNavigationListeners(dom, state, callbacks, learningModes, vokabular);
     ui.initializeModeButtons(callbacks, learningModes);
@@ -1242,8 +1263,29 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Initialen Fehlerzählerstand anzeigen
     updateRepeatButtons();
 
+    // Event-Listener für Weiter-Button (nur einmalig registrieren)
+    dom.continueButton.addEventListener('click', () => {
+        console.log('[Continue Button] Korrekturmodus beenden...');
+        
+        // Verlasse Korrekturmodus
+        state.training.isCorrectionMode = false;
+        
+        // UI zurücksetzen
+        dom.correctionSolutionEl.classList.add('hidden');
+        dom.continueButton.classList.add('hidden');
+        dom.feedbackContainerEl.innerHTML = '';
+        
+        // KRITISCH: Alle visuellen Fehleranzeigen zurücksetzen
+        document.querySelectorAll('.feedback-incorrect').forEach(el => el.remove());
+        document.querySelectorAll('.border-red-500, .bg-red-100').forEach(el => {
+            el.classList.remove('border-red-500', 'bg-red-100');
+            el.classList.add('border-gray-300');
+        });
+        
+        // Nächstes Wort laden
+        loadNextTask();
+    });
 
-    
     // Globale initUmlautButtons Funktion für die Browser-Lösung
     // ENTFERNT: Doppelte Implementierung - wird jetzt durch ui/umlaut-buttons.ts gehandhabt
     (window as unknown as { initUmlautButtons: () => void }).initUmlautButtons = function() {
@@ -1278,23 +1320,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // ErrorManager global verfügbar machen für Debugging
     (window as any).errorManager = errorManager;
 
-    // Event-Listener für Weiter-Button (nur einmalig registrieren)
-    dom.continueButton.addEventListener('click', () => {
-        // Verlasse Korrekturmodus
-        const previousMode = ModeManager.getCurrentMode(state);
-        
-        if (previousMode === 'correcting') {
-            // Zurück zum vorherigen Modus (learning oder repeating)
-            if (state.training.currentMode && state.progress.wordsToRepeatByMode[state.training.currentMode]?.size > 0) {
-                ModeManager.switchToMode(state, 'repeating');
-            } else {
-                ModeManager.switchToMode(state, 'learning');
-            }
-        }
-        
-        loadNextTask();
-    });
-
     // Debug-Funktionen für Browser-Konsole
     (window as any).debugErrorCounts = () => {
         console.group('Current Error Counts');
@@ -1327,4 +1352,4 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         ui.updateErrorCounts(dom, state, learningModes);
     };
 
-});// Test-Änderung
+});

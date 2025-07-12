@@ -295,9 +295,10 @@ function generateMultipleChoiceAnswers(
             
             const isCorrect = answer === correctAnswerEN;
             
-            // Wichtig: Bei Multiple Choice NIE in Correction Mode gehen
-            // Das war das Problem!
-            state.training.isCorrectionMode = false;
+            // Korrekturmodus nur im Lernmodus aktivieren, nicht im Testmodus
+            if (!state.test.isTestModeActive && !isCorrect) {
+                state.training.isCorrectionMode = true;
+            }
             
             processAnswer(isCorrect, correctAnswerEN);
         };
