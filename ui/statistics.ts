@@ -210,41 +210,26 @@ export function updateTestStats(dom: DOMElements, state: TrainerState): void {
     const total = state.training.shuffledWordsForMode.length;
     const attempted = state.training.attemptedInCurrentRound;
     const progress = calculateProgressPercentage(attempted, total);
-    const accuracy = attempted > 0 ? (correct / attempted) * 100 : 0;
 
     // Fortschrittsbalken
     if (dom.testProgressEl) {
-        // Stelle sicher, dass alle Tailwind-Klassen gesetzt sind
         if (!dom.testProgressEl.classList.contains('transition-all')) {
             dom.testProgressEl.className = 'h-full transition-all duration-500 ease-in-out';
         }
-        
         setProgressBarWidth(dom.testProgressEl, progress);
         setProgressBarColor(dom.testProgressEl, progress, 'german');
     }
 
-    // Genauigkeitsbalken
-    if (dom.testAccuracyEl) {
-        // Stelle sicher, dass alle Tailwind-Klassen gesetzt sind
-        if (!dom.testAccuracyEl.classList.contains('transition-all')) {
-            dom.testAccuracyEl.className = 'h-full transition-all duration-500 ease-in-out';
-        }
-        
-        setProgressBarWidth(dom.testAccuracyEl, accuracy);
-        setProgressBarColor(dom.testAccuracyEl, accuracy, 'standard');
-    }
-
-    // Text-Updates (beide Elemente zeigen auf test-progress-text)
+    // Text-Update für Fortschritt
     dom.correctInRoundTestEl.textContent = `${attempted} / ${total}`;
-    dom.accuracyInRoundTestEl.textContent = `${accuracy.toFixed(0)}%`;
+
+    // Verstecke alle Genauigkeits-Elemente im Test-Modus
+    const separator = document.getElementById('test-accuracy-separator');
+    const paragraph = document.getElementById('test-accuracy-paragraph');
+    const container = document.getElementById('test-accuracy-container');
     
-    // Farbkodierung für Genauigkeit
-    if (accuracy >= 80) {
-        dom.accuracyInRoundTestEl.className = 'text-green-600 font-bold';
-    } else if (accuracy >= 60) {
-        dom.accuracyInRoundTestEl.className = 'text-yellow-600 font-bold';
-    } else {
-        dom.accuracyInRoundTestEl.className = 'text-red-600 font-bold';
-    }
+    if (separator) separator.style.display = 'none';
+    if (paragraph) paragraph.style.display = 'none';
+    if (container) container.style.display = 'none';
 }
 
