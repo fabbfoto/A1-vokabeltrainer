@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "dev:safe": "./start-dev.sh",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "git-sync": "./scripts/git-sync.sh",
+    "git-status": "git status && echo '---' && git log --oneline -3"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
