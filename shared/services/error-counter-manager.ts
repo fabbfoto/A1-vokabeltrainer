@@ -55,11 +55,25 @@ export class ErrorCounterManager {
         
         console.log(`[ErrorManager] After removal - errors in ${modeId}:`, this.state.progress.wordsToRepeatByMode[modeId]?.size || 0);
         
-        // 2. Persistierung (debounced)
-        this.scheduleSave();
+        // 2. KRITISCH: Direkte DOM-Manipulation als primäre Update-Methode
+        this.updateButtonDirectly(modeId);
         
-        // 3. UI sofort aktualisieren
+        // 3. Standard UI-Update als Backup
         this.notifyUIUpdate();
+        
+        // 4. Verzögertes Update als zweites Backup
+        setTimeout(() => {
+            this.updateButtonDirectly(modeId);
+            this.notifyUIUpdate();
+        }, 100);
+        
+        // 5. RequestAnimationFrame als drittes Backup
+        requestAnimationFrame(() => {
+            this.updateButtonDirectly(modeId);
+        });
+        
+        // 6. Persistierung
+        this.scheduleSave();
     }
     
     // Fehleranzahl für einen Modus abrufen
@@ -134,6 +148,43 @@ export class ErrorCounterManager {
                 console.error('[ErrorManager] UI update failed:', error);
             }
         });
+    }
+    
+    // Neue Methode: Direkte DOM-Manipulation
+    private updateButtonDirectly(modeId: ModeId): void {
+        const repeatButton = document.getElementById(`mode-repeat-${modeId}`);
+        if (!repeatButton) {
+            console.warn(`[ErrorManager] Button not found: mode-repeat-${modeId}`);
+            return;
+        }
+        
+        const countSpan = repeatButton.querySelector('.count-display');
+        if (!countSpan) {
+            console.warn(`[ErrorManager] Count display not found for ${modeId}`);
+            return;
+        }
+        
+        const errorCount = this.getErrorCount(modeId);
+        console.log(`[ErrorManager] Direct DOM update: ${modeId} = ${errorCount}`);
+        
+        // Direkte Aktualisierung des Textes
+        countSpan.textContent = errorCount.toString();
+        
+        // Button-Status aktualisieren
+        if (errorCount === 0) {
+            repeatButton.classList.add('opacity-50', 'cursor-not-allowed');
+            repeatButton.setAttribute('disabled', 'true');
+            repeatButton.classList.remove('bg-red-600', 'text-white');
+            repeatButton.classList.add('bg-red-100', 'text-red-500');
+        } else {
+            repeatButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            repeatButton.removeAttribute('disabled');
+        }
+        
+        // Force Browser Repaint
+        repeatButton.style.display = 'none';
+        repeatButton.offsetHeight; // Trigger reflow
+        repeatButton.style.display = '';
     }
     
     // Lade Fehler aus localStorage

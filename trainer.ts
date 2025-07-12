@@ -480,19 +480,36 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     function removeFromErrorList(): void {
         if (state.training.currentWord && state.training.currentMode) {
             console.log(`[DEBUG] Removing error for word: ${state.training.currentWord.id} in mode: ${state.training.currentMode}`);
-            console.log(`[DEBUG] Current word:`, state.training.currentWord);
-            console.log(`[DEBUG] Current mode:`, state.training.currentMode);
             
+            // Entferne den Fehler
             errorManager.removeError(
                 state.training.currentWord.id, 
                 state.training.currentMode
             );
             
-            // Zusätzliche UI-Update nach kurzer Verzögerung
+            // NEUE ZEILEN: Zusätzliche direkte UI-Updates
+            // Update 1: Sofort
+            const button = document.getElementById(`mode-repeat-${state.training.currentMode}`);
+            if (button) {
+                const span = button.querySelector('.count-display');
+                if (span) {
+                    const newCount = errorManager.getErrorCount(state.training.currentMode);
+                    span.textContent = newCount.toString();
+                    console.log(`[DEBUG] Direct update in removeFromErrorList: ${newCount}`);
+                }
+            }
+            
+            // Update 2: Nach kurzer Verzögerung
             setTimeout(() => {
-                console.log(`[DEBUG] Forcing UI update after error removal`);
                 ui.updateErrorCounts(dom, state, learningModes);
-            }, 100);
+                console.log(`[DEBUG] Delayed UI update completed`);
+            }, 50);
+            
+            // Update 3: Nach Animation Frame
+            requestAnimationFrame(() => {
+                ui.updateErrorCounts(dom, state, learningModes);
+                console.log(`[DEBUG] AnimationFrame UI update completed`);
+            });
         } else {
             console.warn(`[DEBUG] Cannot remove error: currentWord=${!!state.training.currentWord}, currentMode=${state.training.currentMode}`);
         }
@@ -1278,5 +1295,36 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         loadNextTask();
     });
 
+    // Debug-Funktionen für Browser-Konsole
+    (window as any).debugErrorCounts = () => {
+        console.group('Current Error Counts');
+        Object.keys(state.progress.wordsToRepeatByMode).forEach(mode => {
+            const count = state.progress.wordsToRepeatByMode[mode]?.size || 0;
+            console.log(`${mode}: ${count} errors`);
+        });
+        console.groupEnd();
+    };
+
+    (window as any).forceUpdateErrorUI = () => {
+        console.log('Forcing UI update...');
+        // Aktualisiere alle Buttons direkt
+        Object.keys(learningModes).forEach(mode => {
+            const button = document.getElementById(`mode-repeat-${mode}`);
+            if (button) {
+                const span = button.querySelector('.count-display');
+                if (span) {
+                    const count = state.progress.wordsToRepeatByMode[mode as ModeId]?.size || 0;
+                    span.textContent = count.toString();
+                    
+                    // Force repaint
+                    button.style.display = 'none';
+                    button.offsetHeight;
+                    button.style.display = '';
+                }
+            }
+        });
+        // Rufe auch die normale Update-Funktion auf
+        ui.updateErrorCounts(dom, state, learningModes);
+    };
 
 });// Test-Änderung
