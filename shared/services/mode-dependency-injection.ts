@@ -1,5 +1,6 @@
 // shared/services/mode-dependency-injection.ts
-import type { TrainerState, DOMElements } from '../types/trainer';
+import type { TrainerState } from '../types/trainer';
+import type { DOMElements } from '../types/ui';
 import { ModeManager, AppMode } from './mode-manager';
 
 // Service Interfaces

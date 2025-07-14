@@ -988,7 +988,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Verzögert ausführen, damit die Input-Felder im DOM sind
         setTimeout(() => {
             // Dynamischer Import für konsistente Chunk-Strategie
-            import('/ui/umlaut-buttons').then(mod => {
+            import('./ui/umlaut-buttons').then(mod => {
                 mod.initializeUmlautButtons('setup', dom, state, { modeId });
             });
         }, 200); // Längere Verzögerung für dynamisch erstellte Input-Felder
@@ -1094,7 +1094,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const recommendations = incorrectWords.length > 0 ? [{
             type: 'repeat' as const,
             wordIds: incorrectWords,
-            suggestedMode: state.training.currentMode
+            suggestedMode: state.training.currentMode || undefined,
+            reason: `Wiederhole ${incorrectWords.length} falsch beantwortete Wörter`
         }] : [];
         
         // Konvertiere TestScore zu TestResult für die Modal-Anzeige
@@ -1324,7 +1325,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     (window as any).debugErrorCounts = () => {
         console.group('Current Error Counts');
         Object.keys(state.progress.wordsToRepeatByMode).forEach(mode => {
-            const count = state.progress.wordsToRepeatByMode[mode]?.size || 0;
+            const count = state.progress.wordsToRepeatByMode[mode as ModeId]?.size || 0;
             console.log(`${mode}: ${count} errors`);
         });
         console.groupEnd();
