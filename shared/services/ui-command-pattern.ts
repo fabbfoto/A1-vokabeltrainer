@@ -1,6 +1,5 @@
 // shared/services/ui-command-pattern.ts
-import type { TrainerState } from '../types/trainer';
-import type { DOMElements } from '../types/ui';
+import type { TrainerState, DOMElements } from '../types/trainer';
 import { ModeManager, AppMode } from './mode-manager';
 
 // Command Interface
@@ -17,7 +16,9 @@ export class ShowSuccessFeedbackCommand implements UICommand {
     switch (currentMode) {
       case 'learning':
         // Im Lernmodus: Grüner Balken + automatisch weiter
-        dom.feedbackContainerEl.innerHTML = '<span class="feedback-correct">Richtig!</span>';
+        if (dom.feedbackContainerEl) {
+          dom.feedbackContainerEl.innerHTML = '<span class="feedback-correct">Richtig!</span>';
+        }
         setTimeout(() => {
           // loadNextTask() aufrufen
         }, 1500);
@@ -25,13 +26,17 @@ export class ShowSuccessFeedbackCommand implements UICommand {
         
       case 'testing':
         // Im Testmodus: KEIN visuelles Feedback
-        dom.feedbackContainerEl.innerHTML = '';
+        if (dom.feedbackContainerEl) {
+          dom.feedbackContainerEl.innerHTML = '';
+        }
         // Sofort weiter
         break;
         
       case 'correcting':
         // Im Korrekturmodus: Grüner Balken + manuell weiter
-        dom.feedbackContainerEl.innerHTML = '<span class="feedback-correct">Richtig!</span>';
+        if (dom.feedbackContainerEl) {
+          dom.feedbackContainerEl.innerHTML = '<span class="feedback-correct">Richtig!</span>';
+        }
         break;
     }
   }
@@ -50,19 +55,29 @@ export class ShowErrorFeedbackCommand implements UICommand {
     switch (currentMode) {
       case 'learning':
         // Im Lernmodus: Rote Anzeige + Korrekturmodus
-        dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${this.correctAnswer || ''}</span>`;
-        dom.correctionSolutionEl.classList.remove('hidden');
-        dom.continueButton.classList.remove('hidden');
+        if (dom.feedbackContainerEl) {
+          dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${this.correctAnswer || ''}</span>`;
+        }
+        if (dom.correctionSolutionEl) {
+          dom.correctionSolutionEl.classList.remove('hidden');
+        }
+        if (dom.continueButton) {
+          dom.continueButton.classList.remove('hidden');
+        }
         break;
         
       case 'testing':
         // Im Testmodus: KEIN visuelles Feedback
-        dom.feedbackContainerEl.innerHTML = '';
+        if (dom.feedbackContainerEl) {
+          dom.feedbackContainerEl.innerHTML = '';
+        }
         break;
         
       case 'correcting':
         // Im Korrekturmodus: Rote Anzeige
-        dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${this.correctAnswer || ''}</span>`;
+        if (dom.feedbackContainerEl) {
+          dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${this.correctAnswer || ''}</span>`;
+        }
         break;
     }
   }
@@ -102,9 +117,15 @@ export class ContinueToNextTaskCommand implements UICommand {
   }
 
   private resetUI(dom: DOMElements): void {
-    dom.feedbackContainerEl.innerHTML = '';
-    dom.correctionSolutionEl.classList.add('hidden');
-    dom.continueButton.classList.add('hidden');
+    if (dom.feedbackContainerEl) {
+      dom.feedbackContainerEl.innerHTML = '';
+    }
+    if (dom.correctionSolutionEl) {
+      dom.correctionSolutionEl.classList.add('hidden');
+    }
+    if (dom.continueButton) {
+      dom.continueButton.classList.add('hidden');
+    }
     
     // Alle visuellen Fehleranzeigen entfernen
     document.querySelectorAll('.feedback-incorrect').forEach(el => el.remove());

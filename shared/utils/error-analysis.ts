@@ -22,7 +22,7 @@ export function analyzeErrorCounts(): void {
     const wordsToRepeat: WordsToRepeat = JSON.parse(
         localStorage.getItem('trainer-words-to-repeat') || '{}'
     );
-    const currentVocab: Word[] = window.state?.training.currentVocabularySet || [];
+    const currentVocab: Word[] = (window as any).state?.training?.currentVocabularySet || [];
 
 
 

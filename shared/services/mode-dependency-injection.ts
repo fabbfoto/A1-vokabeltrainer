@@ -1,6 +1,5 @@
 // shared/services/mode-dependency-injection.ts
-import type { TrainerState } from '../types/trainer';
-import type { DOMElements } from '../types/ui';
+import type { TrainerState, DOMElements } from '../types/trainer';
 import { ModeManager, AppMode } from './mode-manager';
 
 // Service Interfaces
@@ -31,7 +30,9 @@ export class FeedbackService implements IFeedbackService {
       return;
     }
     
-    dom.feedbackContainerEl.innerHTML = '<span class="feedback-correct">Richtig!</span>';
+    if (dom.feedbackContainerEl) {
+      dom.feedbackContainerEl.innerHTML = '<span class="feedback-correct">Richtig!</span>';
+    }
   }
 
   showError(state: TrainerState, dom: DOMElements, correctAnswer?: string): void {
@@ -42,18 +43,30 @@ export class FeedbackService implements IFeedbackService {
       return;
     }
     
-    dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${correctAnswer || ''}</span>`;
+    if (dom.feedbackContainerEl) {
+      dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${correctAnswer || ''}</span>`;
+    }
     
     if (currentMode === 'learning') {
-      dom.correctionSolutionEl.classList.remove('hidden');
-      dom.continueButton.classList.remove('hidden');
+      if (dom.correctionSolutionEl) {
+        dom.correctionSolutionEl.classList.remove('hidden');
+      }
+      if (dom.continueButton) {
+        dom.continueButton.classList.remove('hidden');
+      }
     }
   }
 
   hide(state: TrainerState, dom: DOMElements): void {
-    dom.feedbackContainerEl.innerHTML = '';
-    dom.correctionSolutionEl.classList.add('hidden');
-    dom.continueButton.classList.add('hidden');
+    if (dom.feedbackContainerEl) {
+      dom.feedbackContainerEl.innerHTML = '';
+    }
+    if (dom.correctionSolutionEl) {
+      dom.correctionSolutionEl.classList.add('hidden');
+    }
+    if (dom.continueButton) {
+      dom.continueButton.classList.add('hidden');
+    }
   }
 }
 

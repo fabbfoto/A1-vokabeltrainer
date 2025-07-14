@@ -1303,7 +1303,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Globale Funktionen für Test-Auswertung
     (window as any).exitTestMode = exitTestMode;
     (window as any).setMode = setMode;
-    (window as any).state = state;
+    (window as any).state = state as any;
 
     // ErrorManager global verfügbar machen für Debugging
     (window as any).errorManager = errorManager;
