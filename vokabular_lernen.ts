@@ -168,19 +168,27 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 clozeAnswers: ["Sprachenschule"]
             } as Noun,
             {
-                id: "institut",
+                id: createWordId("lernen-schuleunterricht-027"),
+                wordType: "noun",
                 german: "Institut",
+                article: "das",
                 english: "institute",
                 plural: "Institute",
-                category: "education",
                 difficulty: 1,
-                examples: [
+                exampleGerman: [
+                    { text: "Ich", case: "nominativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "mache", case: "verb" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
+                    { text: "einen Kurs", case: "akkusativ" } as CaseElement,
+                    { text: " ", case: "none" } as CaseElement,
                     { text: "am Institut", case: "dativ" } as CaseElement,
+                    { text: ".", case: "none" } as CaseElement
                 ],
-                clozeSentence: "Ich mache einen Kurs ___ Institut.",
                 exampleEnglish: "I am taking a course at the institute.",
-                clozeAnswers: ["am"]
-            },
+                clozeParts: ["Ich mache einen Kurs am ", "."],
+                clozeAnswers: ["Institut"]
+            } as Noun,
             {
                 id: createWordId("lernen-schuleunterricht-028"),
                 wordType: "noun",
