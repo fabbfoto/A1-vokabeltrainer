@@ -174,7 +174,6 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 article: "das",
                 english: "institute",
                 plural: "Institute",
-                difficulty: 1,
                 exampleGerman: [
                     { text: "Ich", case: "nominativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
