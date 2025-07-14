@@ -275,32 +275,16 @@ function generateMultipleChoiceAnswers(
                 btn.classList.add('opacity-50', 'cursor-not-allowed');
             });
             
-            // Visuelles Feedback
-            if (!state.test.isTestModeActive) {
-                if (answer === correctAnswerEN) {
-                    button.classList.remove('border-gray-300');
-                    button.classList.add('border-green-500', 'bg-green-100');
-                } else {
-                    button.classList.remove('border-gray-300');
-                    button.classList.add('border-red-500', 'bg-red-100');
-                    // Richtige Antwort hervorheben
-                    allButtons.forEach((btn: Element) => {
-                        if (btn.textContent === correctAnswerEN) {
-                            btn.classList.remove('border-gray-300');
-                            btn.classList.add('border-green-500', 'bg-green-100');
-                        }
-                    });
-                }
-            }
-            
             const isCorrect = answer === correctAnswerEN;
             
-            // Korrekturmodus nur im Lernmodus aktivieren, nicht im Testmodus
-            if (!state.test.isTestModeActive && !isCorrect) {
-                state.training.isCorrectionMode = true;
+            // URSÜRÜNGLICHE LOGIK: Im Lernmodus sofort weiter, kein visuelles Feedback
+            if (!state.test.isTestModeActive) {
+                // Lernmodus: Sofort weiter ohne visuelles Feedback
+                processAnswer(isCorrect, correctAnswerEN);
+            } else {
+                // Testmodus: Kein Feedback, sofort weiter
+                processAnswer(isCorrect, correctAnswerEN);
             }
-            
-            processAnswer(isCorrect, correctAnswerEN);
         };
         dom.mcAnswersContainerEl.appendChild(button);
     });

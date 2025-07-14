@@ -1,4 +1,4 @@
-// packages/trainer-themen/vokabular_lernen.ts
+// vokabular_lernen.ts
 // VOLLSTÄNDIGE TypeScript Migration von vokabular_lernen.js
 
 import type { VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary';

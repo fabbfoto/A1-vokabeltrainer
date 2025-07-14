@@ -50,7 +50,7 @@ export class ShowErrorFeedbackCommand implements UICommand {
     switch (currentMode) {
       case 'learning':
         // Im Lernmodus: Rote Anzeige + Korrekturmodus
-        dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">Falsch! Richtig: ${this.correctAnswer || ''}</span>`;
+        dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${this.correctAnswer || ''}</span>`;
         dom.correctionSolutionEl.classList.remove('hidden');
         dom.continueButton.classList.remove('hidden');
         break;
@@ -62,7 +62,7 @@ export class ShowErrorFeedbackCommand implements UICommand {
         
       case 'correcting':
         // Im Korrekturmodus: Rote Anzeige
-        dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">Falsch! Richtig: ${this.correctAnswer || ''}</span>`;
+        dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${this.correctAnswer || ''}</span>`;
         break;
     }
   }

@@ -1,15 +1,18 @@
 #!/bin/bash
 
-echo "🛑 Stoppe alle Vite-Prozesse..."
-pkill -f "vite" 2>/dev/null || true
-sleep 2
+# A1 Vokabeltrainer Development Server Starter
+# Beendet automatisch blockierende Prozesse auf Port 5173
 
-echo "🧹 Prüfe ob Port 5173 frei ist..."
+echo "🚀 Starte A1 Vokabeltrainer Development Server..."
+
+# Prüfe ob Port 5173 belegt ist
 if lsof -Pi :5173 -sTCP:LISTEN -t >/dev/null ; then
-    echo "❌ Port 5173 ist noch belegt. Stoppe alle Node-Prozesse..."
-    pkill -f "node" 2>/dev/null || true
-    sleep 3
+    echo "⚠️  Port 5173 ist belegt. Beende blockierenden Prozess..."
+    lsof -ti:5173 | xargs kill -9
+    echo "✅ Blockierender Prozess beendet."
+    sleep 1
 fi
 
-echo "🚀 Starte Vite auf Port 5173..."
+# Starte Development Server
+echo "📡 Starte Vite Development Server..."
 npm run dev 

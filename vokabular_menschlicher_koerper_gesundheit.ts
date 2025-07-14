@@ -1,4 +1,4 @@
-// packages/trainer-themen/vokabular_menschlicher_koerper_gesundheit.ts
+// vokabular_menschlicher_koerper_gesundheit.ts
 // VOLLSTÄNDIGE TypeScript Migration von vokabular_menschlicher_koerper_gesundheit.js
 
 import type {VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary';

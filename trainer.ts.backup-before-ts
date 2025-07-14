@@ -328,7 +328,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 ui.showMessage(dom, 'Richtig!', 'success');
             } else {
                 addToErrorList();
-                ui.showMessage(dom, `Falsch! Richtig: ${correctAnswer}`, 'error');
+                ui.showMessage(dom, `${correctAnswer}`, 'error');
             }
             
             // Immer nach kurzer Pause weiter
@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     function showCorrectionUI(correctAnswer?: string): void {
-        dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">${correctAnswer || ''}</span>`;
+        dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${correctAnswer || ''}</span>`;
         dom.correctionSolutionEl.classList.remove('hidden');
         dom.continueButton.classList.remove('hidden');
         dom.continueButton.focus();

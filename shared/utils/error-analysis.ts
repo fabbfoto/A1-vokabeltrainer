@@ -11,9 +11,8 @@ interface WordsToRepeat {
     [mode: string]: string[];
 }
 
-interface TrainerState {
-    currentVocabularySet: Word[];
-}
+// Use the proper TrainerState from shared/types/trainer
+import type { TrainerState } from '../types/trainer';
 
 /**
  * Analysiert die gespeicherten Fehlerzähler im localStorage

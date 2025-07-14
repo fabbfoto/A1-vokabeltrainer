@@ -34,45 +34,20 @@ export class ErrorCounterManager {
     
     // Zentrale Methode zum Entfernen von Fehlern
     removeError(wordId: WordId, modeId: ModeId): void {
-        console.log(`[ErrorManager] Removing error: ${wordId} from mode ${modeId}`);
-        console.log(`[ErrorManager] Before removal - errors in ${modeId}:`, this.state.progress.wordsToRepeatByMode[modeId]?.size || 0);
-        
         // 1. State aktualisieren
         if (this.state.progress.wordsToRepeatByMode[modeId]) {
-            const wasPresent = this.state.progress.wordsToRepeatByMode[modeId].has(wordId);
-            console.log(`[ErrorManager] Word ${wordId} was present: ${wasPresent}`);
-            
             this.state.progress.wordsToRepeatByMode[modeId].delete(wordId);
             
             // Leere Sets entfernen
             if (this.state.progress.wordsToRepeatByMode[modeId].size === 0) {
                 delete this.state.progress.wordsToRepeatByMode[modeId];
-                console.log(`[ErrorManager] Deleted empty set for mode ${modeId}`);
             }
-        } else {
-            console.warn(`[ErrorManager] No error set found for mode ${modeId}`);
         }
         
-        console.log(`[ErrorManager] After removal - errors in ${modeId}:`, this.state.progress.wordsToRepeatByMode[modeId]?.size || 0);
-        
-        // 2. KRITISCH: Direkte DOM-Manipulation als primäre Update-Methode
+        // 2. UI-Update (nur einmal!)
         this.updateButtonDirectly(modeId);
         
-        // 3. Standard UI-Update als Backup
-        this.notifyUIUpdate();
-        
-        // 4. Verzögertes Update als zweites Backup
-        setTimeout(() => {
-            this.updateButtonDirectly(modeId);
-            this.notifyUIUpdate();
-        }, 100);
-        
-        // 5. RequestAnimationFrame als drittes Backup
-        requestAnimationFrame(() => {
-            this.updateButtonDirectly(modeId);
-        });
-        
-        // 6. Persistierung
+        // 3. Persistierung
         this.scheduleSave();
     }
     
@@ -154,18 +129,15 @@ export class ErrorCounterManager {
     private updateButtonDirectly(modeId: ModeId): void {
         const repeatButton = document.getElementById(`mode-repeat-${modeId}`);
         if (!repeatButton) {
-            console.warn(`[ErrorManager] Button not found: mode-repeat-${modeId}`);
             return;
         }
         
         const countSpan = repeatButton.querySelector('.count-display');
         if (!countSpan) {
-            console.warn(`[ErrorManager] Count display not found for ${modeId}`);
             return;
         }
         
         const errorCount = this.getErrorCount(modeId);
-        console.log(`[ErrorManager] Direct DOM update: ${modeId} = ${errorCount}`);
         
         // Direkte Aktualisierung des Textes
         countSpan.textContent = errorCount.toString();
@@ -180,11 +152,6 @@ export class ErrorCounterManager {
             repeatButton.classList.remove('opacity-50', 'cursor-not-allowed');
             repeatButton.removeAttribute('disabled');
         }
-        
-        // Force Browser Repaint
-        repeatButton.style.display = 'none';
-        repeatButton.offsetHeight; // Trigger reflow
-        repeatButton.style.display = '';
     }
     
     // Lade Fehler aus localStorage

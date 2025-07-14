@@ -1,4 +1,4 @@
-// packages/trainer-themen/vokabular_kommunikationsmittel.ts
+// vokabular_Kommunikationsmittel.ts
 // VOLLSTÄNDIGE TypeScript Migration von vokabular_kommunikationsmittel.js
 
 import type { VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary';

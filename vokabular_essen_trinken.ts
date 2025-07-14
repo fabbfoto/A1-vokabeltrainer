@@ -1,4 +1,4 @@
-// packages/trainer-themen/vokabular_essen_trinken.ts
+// vokabular_essen_trinken.ts
 
 import type {VocabularyStructure, Noun, Verb, Adjective, CaseElement } from './shared/types/vocabulary';
 import {createWordId, createVocabulary } from './shared/types/vocabulary';

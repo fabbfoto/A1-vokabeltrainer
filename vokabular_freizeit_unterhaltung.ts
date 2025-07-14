@@ -1,4 +1,4 @@
-// packages/trainer-themen/vokabular_freizeit_unterhaltung.ts
+// vokabular_freizeit_unterhaltung.ts
 
 import type { 
     VocabularyStructure, 

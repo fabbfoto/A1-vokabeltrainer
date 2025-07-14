@@ -42,7 +42,7 @@ export class FeedbackService implements IFeedbackService {
       return;
     }
     
-    dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">Falsch! Richtig: ${correctAnswer || ''}</span>`;
+    dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${correctAnswer || ''}</span>`;
     
     if (currentMode === 'learning') {
       dom.correctionSolutionEl.classList.remove('hidden');
