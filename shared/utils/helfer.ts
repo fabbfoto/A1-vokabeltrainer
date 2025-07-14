@@ -30,12 +30,19 @@ export async function speak(text: string, lang: string = 'de-DE'): Promise<void>
     
     const data = await response.json();
     
-    if (data.audioUrl) {
+    if (data.audioContent) {
+      // Aus base64 eine Data-URL bauen und abspielen
+      const audioUrl = "data:audio/mp3;base64," + data.audioContent;
+      const audio = new Audio(audioUrl);
+      window.currentAudio = audio;
+      await audio.play();
+    } else if (data.audioUrl) {
+      // Fallback für alte API
       const audio = new Audio(data.audioUrl);
       window.currentAudio = audio;
       await audio.play();
     } else {
-      throw new Error('Keine Audio-URL erhalten');
+      throw new Error('Keine Audio-URL oder Audio-Content erhalten');
     }
   } catch (error) {
     console.error('[speak] Fehler beim Abspielen der Sprache:', error);
