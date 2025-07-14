@@ -50,37 +50,37 @@
     </div>
 
     <!-- TRAINER MAIN VIEW -->
-    <div id="trainer-main-view" class="hidden p-4 max-w-2xl mx-auto flex flex-col items-center">
+    <div id="trainer-main-view" class="hidden p-2 max-w-4xl mx-auto flex flex-col items-center">
         <!-- Header mit Zurück-Button und Titel -->
-        <div class="p-4 bg-white/20 backdrop-blur-lg rounded-2xl shadow-[0_8px_32px_rgba(31,38,135,0.37)] border border-white/30 mb-4 w-full">
-            <div class="flex justify-between items-center mb-2">
-                <button id="back-to-subtopics" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&larr; Zurück</button>
-                <h2 id="current-training-title" class="text-lg font-semibold text-gray-700">Training</h2>
+        <div class="p-2 bg-white/25 backdrop-blur-xl rounded-3xl shadow-[0_10px_30px_rgba(31,38,135,0.15)] border border-white/40 mb-1 w-full">
+            <div class="flex justify-between items-center mb-1">
+                <button id="back-to-subtopics" class="px-2 py-1 border border-gray-300/50 rounded-xl text-sm font-medium hover:bg-white/30 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm">&larr; Zurück</button>
+                <h2 id="current-training-title" class="text-xl font-bold text-gray-800">Training</h2>
             </div>
             
             <!-- Lernmodus-Buttons Grid -->
-            <div id="mode-button-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <div class="flex flex-col gap-2">
-                    <button id="mode-mc-de-en" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Bedeutung</button>
-                    <button id="mode-repeat-mc-de-en" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">
+            <div id="mode-button-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="flex flex-col gap-3">
+                    <button id="mode-mc-de-en" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">Bedeutung</button>
+                    <button id="mode-repeat-mc-de-en" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">
                         <span class="count-display">0</span>
                     </button>
                 </div>
-                <div class="flex flex-col gap-2">
-                    <button id="mode-type-de-adj" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Schreibweise</button>
-                    <button id="mode-repeat-type-de-adj" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">
+                <div class="flex flex-col gap-3">
+                    <button id="mode-type-de-adj" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">Schreibweise</button>
+                    <button id="mode-repeat-type-de-adj" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">
                         <span class="count-display">0</span>
                     </button>
                 </div>
-                <div class="flex flex-col gap-2">
-                    <button id="mode-cloze-adj-de" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Lückentext</button>
-                    <button id="mode-repeat-cloze-adj-de" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">
+                <div class="flex flex-col gap-3">
+                    <button id="mode-cloze-adj-de" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">Lückentext</button>
+                    <button id="mode-repeat-cloze-adj-de" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">
                         <span class="count-display">0</span>
                     </button>
                 </div>
-                <div class="flex flex-col gap-2">
-                    <button id="mode-sentence-translation-en-de" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">Satzübersetzung</button>
-                    <button id="mode-repeat-sentence-translation-en-de" class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium transition-colors hover:bg-gray-200 disabled:opacity-50">
+                <div class="flex flex-col gap-3">
+                    <button id="mode-sentence-translation-en-de" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">Satzübersetzung</button>
+                    <button id="mode-repeat-sentence-translation-en-de" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">
                         <span class="count-display">0</span>
                     </button>
                 </div>
@@ -88,118 +88,120 @@
         </div>
 
         <!-- Haupt-Trainer-Card -->
-        <div class="w-full max-w-2xl mt-4 bg-white/20 backdrop-blur-lg p-8 rounded-2xl shadow-[0_8px_32px_rgba(31,38,135,0.37)] border border-white/30">
+        <div class="w-full max-w-3xl bg-white/25 backdrop-blur-xl p-10 rounded-3xl shadow-[0_20px_60px_rgba(31,38,135,0.25)] border border-white/40">
             <!-- Audio-Container für Wort und Satz -->
-            <div id="word-line-container" class="flex justify-center items-center gap-3 w-full mb-2">
-                <div id="question-display-area" class="text-center text-[1.75rem] font-semibold text-gray-900"></div>
-                <button id="audio-word-button" class="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors" title="Wort vorspielen"></button>
+            <div id="word-line-container" class="flex justify-center items-center gap-4 w-full mb-6">
+                <div id="question-display-area" class="text-center text-[2.25rem] font-bold text-gray-900"></div>
+                <button id="audio-word-button" class="flex-shrink-0 w-12 h-12 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-white/40 rounded-full transition-all duration-200 hover:shadow-lg" title="Wort vorspielen"></button>
             </div>
 
-            <div id="sentence-line-container" class="flex justify-center items-center gap-3 w-full mb-1">
-                <div id="example-sentence-display" class="italic text-gray-600 text-center text-lg"></div>
-                <button id="audio-sentence-button" class="flex-shrink-0 w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors" title="Satz vorspielen"></button>
+            <div id="sentence-line-container" class="flex justify-center items-center gap-4 w-full mb-6">
+                <div id="example-sentence-display" class="italic text-gray-700 text-center text-xl leading-relaxed"></div>
+                <button id="audio-sentence-button" class="flex-shrink-0 w-12 h-12 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-white/40 rounded-full transition-all duration-200 hover:shadow-lg" title="Satz vorspielen"></button>
             </div>
-            <div id="task-prompt-area" class="text-xl text-gray-900 mb-4 text-center min-h-[1.5em]"></div>
+            <div id="task-prompt-area" class="text-2xl text-gray-900 mb-8 text-center min-h-[2em] font-medium"></div>
 
             <!-- MULTIPLE CHOICE MODE -->
-            <div id="mc-de-en-ui" class="ui-mode my-4">
-                <div id="mc-answers-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+            <div id="mc-de-en-ui" class="ui-mode my-8">
+                <div id="mc-answers-container" class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
                     <!-- Multiple Choice Antworten werden hier eingefügt -->
                 </div>
             </div>
             
             <!-- SPELLING MODE (Tailwind-only) -->
-            <div id="spelling-mode-ui" class="ui-mode my-1 flex flex-col justify-center min-h-[150px]">
-                <div id="single-input-container" class="w-full flex mb-1">
+            <div id="spelling-mode-ui" class="ui-mode my-8 flex flex-col justify-center min-h-[200px]">
+                <div id="single-input-container" class="w-full flex mb-6">
                     <input type="text" id="spelling-input-single"
-                        class="w-full max-w-md border border-gray-300 rounded-lg text-center p-3 text-xl transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none shadow-none"
+                        class="w-full max-w-lg border-2 border-gray-300/50 rounded-2xl text-center p-4 text-2xl transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50 outline-none shadow-none bg-white/50 backdrop-blur-sm"
                         autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Antwort hier eingeben">
                 </div>
-                <div id="noun-input-container" class="hidden flex flex-wrap items-center gap-1 max-w-full w-full mx-auto mb-1">
+                <div id="noun-input-container" class="hidden flex flex-wrap items-center gap-3 max-w-full w-full mx-auto mb-6">
                     <input type="text" id="spelling-input-article"
-                        class="w-20 sm:w-24 border border-gray-300 rounded-lg text-center p-3 text-xl transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none shadow-none"
+                        class="w-24 sm:w-28 border-2 border-gray-300/50 rounded-2xl text-center p-4 text-2xl transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50 outline-none shadow-none bg-white/50 backdrop-blur-sm"
                         placeholder="Artikel" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
                     <input type="text" id="spelling-input-noun-1"
-                        class="flex-1 min-w-[100px] border border-gray-300 rounded-lg text-center p-3 text-xl transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none shadow-none"
+                        class="flex-1 min-w-[120px] border-2 border-gray-300/50 rounded-2xl text-center p-4 text-2xl transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50 outline-none shadow-none bg-white/50 backdrop-blur-sm"
                         placeholder="Singular" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
                     <input type="text" id="spelling-input-noun-2"
-                        class="flex-1 min-w-[100px] border border-gray-300 rounded-lg text-center p-3 text-xl transition focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none shadow-none"
+                        class="flex-1 min-w-[120px] border-2 border-gray-300/50 rounded-2xl text-center p-4 text-2xl transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50 outline-none shadow-none bg-white/50 backdrop-blur-sm"
                         placeholder="Plural" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
                 </div>
-                <button id="check-spelling-button" class="w-full font-semibold py-2 px-4 rounded-lg shadow bg-blue-500 text-white transition-colors hover:bg-blue-600 disabled:opacity-60 mb-1">Auswerten</button>
+                <button id="check-spelling-button" class="w-full font-bold py-4 px-6 rounded-2xl shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-xl disabled:opacity-60 mb-6 text-lg">Auswerten</button>
                 <!-- Umlaut-Buttons (Tailwind-only) -->
-                <div id="umlaut-buttons-container" class="mt-1 flex justify-center space-x-2 mb-1">
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ä</button>
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ö</button>
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ü</button>
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ß</button>
+                <div id="umlaut-buttons-container" class="mt-4 flex justify-center space-x-3 mb-4">
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ä</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ö</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ü</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ß</button>
                 </div>
             </div>
 
             <!-- CLOZE MODE -->
-            <div id="cloze-adj-de-ui" class="ui-mode my-4 space-y-3">
-                <div id="cloze-hint-container" class="text-center text-lg text-gray-500 mb-2" style="display: none;"></div>
-                <div id="cloze-sentence-container" class="text-center text-xl flex items-center justify-center gap-1"></div>
-                <button id="check-cloze-button" class="w-full font-semibold py-2 px-4 rounded-lg shadow bg-blue-500 text-white transition-colors hover:bg-blue-600 disabled:opacity-60">Auswerten</button>
+            <div id="cloze-adj-de-ui" class="ui-mode my-8 space-y-6">
+                <div id="cloze-hint-container" class="text-center text-xl text-gray-600 mb-4" style="display: none;"></div>
+                <div id="cloze-sentence-container" class="text-center text-2xl flex items-center justify-center gap-2"></div>
+                <button id="check-cloze-button" class="w-full font-bold py-4 px-6 rounded-2xl shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-xl disabled:opacity-60 text-lg">Auswerten</button>
                 <!-- Umlaut-Buttons für Cloze-Modus -->
-                <div id="umlaut-buttons-container-cloze" class="mt-1 flex justify-center space-x-2 mb-1">
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ä</button>
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ö</button>
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ü</button>
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ß</button>
+                <div id="umlaut-buttons-container-cloze" class="mt-4 flex justify-center space-x-3 mb-4">
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ä</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ö</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ü</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ß</button>
                 </div>
             </div>
 
             <!-- SENTENCE TRANSLATION MODE -->
-            <div id="sentence-translation-en-de-ui" class="ui-mode my-4 space-y-3">
-                <div id="sentence-word-input-container" class="flex gap-1 justify-center flex-wrap text-xl"></div>
-                <button id="check-sentence-translation-button" class="w-full font-semibold py-2 px-4 rounded-lg shadow bg-blue-500 text-white transition-colors hover:bg-blue-600 disabled:opacity-60">Auswerten</button>
+            <div id="sentence-translation-en-de-ui" class="ui-mode my-8 space-y-6">
+                <div id="sentence-word-input-container" class="flex gap-2 justify-center flex-wrap text-2xl"></div>
+                <button id="check-sentence-translation-button" class="w-full font-bold py-4 px-6 rounded-2xl shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-xl disabled:opacity-60 text-lg">Auswerten</button>
                 <!-- Umlaut-Buttons für Satzübersetzungs-Modus -->
-                <div id="umlaut-buttons-container-sentence" class="mt-1 flex justify-center space-x-2 mb-1">
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ä</button>
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ö</button>
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ü</button>
-                    <button type="button" class="umlaut-button px-3 py-1.5 border border-gray-300 rounded-md text-lg font-mono hover:bg-gray-200 transition-colors" title="Shift für Caps">ß</button>
+                <div id="umlaut-buttons-container-sentence" class="mt-4 flex justify-center space-x-3 mb-4">
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ä</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ö</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ü</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ß</button>
                 </div>
             </div>
 
             <!-- Feedback Container -->
-            <div id="feedback-container" class="my-1 text-center min-h-[3rem] flex flex-col justify-center items-center"></div>
+            <div id="feedback-container" class="my-6 text-center min-h-[4rem] flex flex-col justify-center items-center"></div>
             
             <!-- Bereich für die richtige Lösung (nur für Nomen-Übung) -->
-            <div id="correction-solution" class="hidden text-2xl text-red-600 font-bold text-center mt-1 mb-1"></div>
+            <div id="correction-solution" class="hidden text-3xl text-red-600 font-bold text-center mt-4 mb-4"></div>
             
-            <button id="continue-button" class="hidden w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg mt-2 transition-colors">Weiter</button>
+            <button id="continue-button" class="hidden w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 px-6 rounded-2xl mt-6 transition-all duration-200 shadow-lg hover:shadow-xl text-lg">Weiter</button>
 
             <!-- Statistiken -->
-            <div id="stats-container" class="mt-6 space-y-3">
+            <div id="stats-container" class="mt-10 space-y-6">
                 <!-- Practice Stats -->
                 <div id="practice-stats-view">
-                    <p class="text-sm text-gray-600 text-center">Richtig in dieser Runde: <span id="correct-in-round-practice">0</span> / <span id="attempted-in-round-practice">0</span></p>
-                    <div class="bg-gray-200 rounded-lg overflow-hidden h-5">
-                        <div id="accuracy-bar" class="h-full transition-all duration-500 ease-in-out"></div>
+                    <p class="text-base text-gray-700 text-center mb-3">Richtig in dieser Runde: <span id="correct-in-round-practice" class="font-semibold">0</span> / <span id="attempted-in-round-practice" class="font-semibold">0</span></p>
+                    <div class="bg-gray-200/50 rounded-2xl overflow-hidden h-6 backdrop-blur-sm">
+                        <div id="accuracy-bar" class="h-full transition-all duration-700 ease-out rounded-2xl"></div>
                     </div>
-                    <hr class="my-2">
-                    <p class="text-xs text-gray-500 text-center mb-1">Fortschritt pro Übungsmodus:</p>
-                    <div id="category-stats-container" class="text-xs text-gray-600 space-y-1"></div>
+                    <hr class="my-4 border-gray-300/50">
+                    <!-- Fortschritt pro Übungsmodus: (entfernt) -->
+                    <!-- <div class="text-sm text-gray-600 text-center mb-3">Fortschritt pro Übungsmodus:</div> -->
+                    <!-- <div class="text-lg font-medium text-gray-600 text-center mb-6">Fortschritt pro Übungsmodus:</div> -->
+                    <div id="category-stats-container" class="text-sm text-gray-700 space-y-2"></div>
                 </div>
 
                 <!-- Test Stats -->
                 <div id="test-stats-view" class="hidden">
-                    <p class="text-sm text-gray-600 text-center">Gesamtfortschritt: <span id="test-progress-text">0 / 36</span></p>
-                    <div class="bg-gray-200 rounded-lg overflow-hidden h-5">
-                        <div id="test-progress-bar" class="h-full transition-all duration-500 ease-in-out"></div>
+                    <p class="text-base text-gray-700 text-center mb-3">Gesamtfortschritt: <span id="test-progress-text" class="font-semibold">0 / 36</span></p>
+                    <div class="bg-gray-200/50 rounded-2xl overflow-hidden h-6 backdrop-blur-sm">
+                        <div id="test-progress-bar" class="h-full transition-all duration-700 ease-out rounded-2xl"></div>
                     </div>
-                    <hr id="test-accuracy-separator" class="my-2">
-                    <p id="test-accuracy-paragraph" class="text-sm text-gray-600 text-center">Genauigkeit: <span id="test-accuracy-text">0 / 0</span></p>
-                    <div id="test-accuracy-container" class="bg-gray-200 rounded-lg overflow-hidden h-5">
-                        <div id="test-accuracy-bar" class="h-full transition-all duration-500 ease-in-out"></div>
+                    <hr id="test-accuracy-separator" class="my-4 border-gray-300/50">
+                    <p id="test-accuracy-paragraph" class="text-base text-gray-700 text-center mb-3">Genauigkeit: <span id="test-accuracy-text" class="font-semibold">0 / 0</span></p>
+                    <div id="test-accuracy-container" class="bg-gray-200/50 rounded-2xl overflow-hidden h-6 backdrop-blur-sm">
+                        <div id="test-accuracy-bar" class="h-full transition-all duration-700 ease-out rounded-2xl"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Message Box -->
-            <div id="message-box" class="fixed bottom-5 right-5 bg-red-500 text-white p-3 rounded-lg shadow-xl hidden animate-pulse"></div>
+            <div id="message-box" class="fixed bottom-6 right-6 bg-red-500 text-white p-4 rounded-2xl shadow-2xl hidden animate-pulse"></div>
         </div>
     </div>
 
