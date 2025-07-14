@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 
             case 'learning':
             default:
-                // Normaler Lernmodus
+                // Normaler Lernmodus - EINFACHE LOGIK wie im Original
                 if (isCorrect) {
                     console.log('[processAnswer] Richtige Antwort im Lernmodus - gehe weiter...');
                     state.training.correctInCurrentRound++;
@@ -445,19 +445,31 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     // KRITISCH: Fehler aus der Liste entfernen, falls vorhanden
                     removeFromErrorList();
                     
-                    ui.showMessage(dom, 'Richtig!', 'success');
+                    // Einfaches Feedback wie im Original
+                    dom.feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
                     setTimeout(() => {
                         console.log('[processAnswer] Rufe loadNextTask auf...');
                         loadNextTask();
-                    }, 1500);
+                    }, 1200);
                 } else {
                     console.log('[processAnswer] Falsche Antwort im Lernmodus - zeige Korrektur...');
                     // Fehler hinzufügen
                     addToErrorList();
                     
-                    // Korrekturmodus aktivieren und UI anzeigen
-                    state.training.isCorrectionMode = true;
-                    showCorrectionUI(correctAnswer);
+                    // EINFACHE KORREKTUR-UI wie im Original
+                    dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect">${correctAnswer || ''}</span>`;
+                    dom.correctionSolutionEl.classList.remove('hidden');
+                    dom.continueButton.classList.remove('hidden');
+                    dom.continueButton.focus();
+                    
+                    // KRITISCH: Stelle sicher, dass die UI-Elemente sichtbar sind
+                    if (dom.correctionSolutionEl) {
+                        dom.correctionSolutionEl.style.display = 'block';
+                        dom.correctionSolutionEl.textContent = correctAnswer || '';
+                    }
+                    if (dom.continueButton) {
+                        dom.continueButton.style.display = 'block';
+                    }
                 }
                 break;
         }
@@ -527,6 +539,15 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             dom.correctionSolutionEl.classList.remove('hidden');
             dom.continueButton.classList.remove('hidden');
             dom.continueButton.focus();
+            
+            // KRITISCH: Stelle sicher, dass die UI-Elemente sichtbar sind
+            if (dom.correctionSolutionEl) {
+                dom.correctionSolutionEl.style.display = 'block';
+                dom.correctionSolutionEl.textContent = correctAnswer || '';
+            }
+            if (dom.continueButton) {
+                dom.continueButton.style.display = 'block';
+            }
         }
     }
 
@@ -615,6 +636,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         dom.feedbackContainerEl.innerHTML = '';
         dom.correctionSolutionEl.classList.add('hidden');
         dom.continueButton.classList.add('hidden');
+        
+        // KRITISCH: Stelle sicher, dass die UI-Elemente versteckt sind
+        if (dom.correctionSolutionEl) {
+            dom.correctionSolutionEl.style.display = 'none';
+        }
+        if (dom.continueButton) {
+            dom.continueButton.style.display = 'none';
+        }
         
         // Alle visuellen Fehleranzeigen entfernen
         document.querySelectorAll('.feedback-incorrect').forEach(el => el.remove());
@@ -1275,6 +1304,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         dom.correctionSolutionEl.classList.add('hidden');
         dom.continueButton.classList.add('hidden');
         dom.feedbackContainerEl.innerHTML = '';
+        
+        // KRITISCH: Stelle sicher, dass die UI-Elemente versteckt sind
+        if (dom.correctionSolutionEl) {
+            dom.correctionSolutionEl.style.display = 'none';
+        }
+        if (dom.continueButton) {
+            dom.continueButton.style.display = 'none';
+        }
         
         // KRITISCH: Alle visuellen Fehleranzeigen zurücksetzen
         document.querySelectorAll('.feedback-incorrect').forEach(el => el.remove());
