@@ -3,116 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goethe A1 Vokabeltrainer</title>
+    <title>A1 Vokabeltrainer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Zentrale Farb-Konfiguration für Tailwind
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              // Button Farben
+              'btn-bg': '#e9e9ed',
+              'btn-bg-hover': '#d1d5db',
+              'btn-text': '#374151',
+              'btn-border': '#d1d5db',
+              // Fortschrittsbalken
+              'progress-bg': '#d1d5db',
+              'de-black': '#1f2937',
+              'de-red': '#dc2626',
+              'de-gold': '#f59e0b',
+            }
+          }
+        }
+      }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="manifest.json">
+    
+    <link rel="manifest" href="manifest.json"> 
     <meta name="theme-color" content="#3b82f6">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="./shared/styles/minimal-legacy.css">
+    
+    <!-- Firebase wird über TypeScript-Module geladen -->
 </head>
-<body>
-    <div id="wortgruppen-selector-container">
-        <h1 class="text-2xl font-bold text-center mb-6 text-gray-700">Goethe A1 - Wortgruppen</h1>
-        <div id="wortgruppen-buttons" class="grid grid-cols-3 gap-3">
+<body class="bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 font-['Inter'] flex flex-col justify-start items-center min-h-screen p-4">
+
+    <!-- NAVIGATION VIEW -->
+    <div id="navigation-view" class="p-4 max-w-2xl mx-auto">
+        <header id="navigation-header" class="flex items-center mb-6">
+            <button id="back-to-main-topics" class="hidden mr-4 px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&larr; Zurück</button>
+            <h1 id="navigation-title" class="text-2xl font-bold text-gray-700">Themen</h1>
+        </header>
+        <div id="navigation-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Navigation Buttons werden hier dynamisch eingefügt -->
+        </div>
+        <div id="auth-button-container" class="mt-4 w-full"></div>
+        <div id="ranking-container" class="mt-4 w-full"></div>
+    </div>
+
+    <!-- TRAINER MAIN VIEW -->
+    <div id="trainer-main-view" class="hidden p-2 max-w-4xl mx-auto flex flex-col items-center">
+        <!-- Header mit Zurück-Button und Titel -->
+        <div class="p-2 bg-white/25 backdrop-blur-xl rounded-3xl shadow-[0_10px_30px_rgba(31,38,135,0.15)] border border-white/40 mb-1 w-full">
+            <div class="flex justify-between items-center mb-1">
+                <button id="back-to-subtopics" class="px-2 py-1 border border-gray-300/50 rounded-xl text-sm font-medium hover:bg-white/30 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm">&larr; Zurück</button>
+                <h2 id="current-training-title" class="text-xl font-bold text-gray-800">Training</h2>
+            </div>
+            
+            <!-- Lernmodus-Buttons Grid -->
+            <div id="mode-button-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="flex flex-col gap-3">
+                    <button id="mode-mc-de-en" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">Bedeutung</button>
+                    <button id="mode-repeat-mc-de-en" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">
+                        <span class="count-display">0</span>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <button id="mode-type-de-adj" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">Schreibweise</button>
+                    <button id="mode-repeat-type-de-adj" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">
+                        <span class="count-display">0</span>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <button id="mode-cloze-adj-de" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">Lückentext</button>
+                    <button id="mode-repeat-cloze-adj-de" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">
+                        <span class="count-display">0</span>
+                    </button>
+                </div>
+                <div class="flex flex-col gap-3">
+                    <button id="mode-sentence-translation-en-de" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">Satzübersetzung</button>
+                    <button id="mode-repeat-sentence-translation-en-de" class="w-full px-4 py-3 border border-gray-300/50 rounded-xl text-sm font-medium transition-all duration-200 hover:bg-white/30 hover:border-gray-400/60 hover:shadow-lg disabled:opacity-50 backdrop-blur-sm">
+                        <span class="count-display">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Haupt-Trainer-Card -->
+        <div class="w-full max-w-3xl bg-white/25 backdrop-blur-xl p-10 rounded-3xl shadow-[0_20px_60px_rgba(31,38,135,0.25)] border border-white/40">
+            <!-- Audio-Container für Wort und Satz -->
+            <div id="word-line-container" class="flex justify-center items-center gap-4 w-full mb-6">
+                <div id="question-display-area" class="text-center text-[2.25rem] font-bold text-gray-900"></div>
+                <button id="audio-word-button" class="flex-shrink-0 w-12 h-12 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-white/40 rounded-full transition-all duration-200 hover:shadow-lg" title="Wort vorspielen"></button>
+            </div>
+
+            <div id="sentence-line-container" class="flex justify-center items-center gap-4 w-full mb-6">
+                <div id="example-sentence-display" class="italic text-gray-700 text-center text-xl leading-relaxed"></div>
+                <button id="audio-sentence-button" class="flex-shrink-0 w-12 h-12 flex items-center justify-center text-gray-600 hover:text-gray-900 hover:bg-white/40 rounded-full transition-all duration-200 hover:shadow-lg" title="Satz vorspielen"></button>
+            </div>
+            <div id="task-prompt-area" class="text-2xl text-gray-900 mb-8 text-center min-h-[2em] font-medium"></div>
+
+            <!-- MULTIPLE CHOICE MODE -->
+            <div id="mc-de-en-ui" class="ui-mode my-8">
+                <div id="mc-answers-container" class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
+                    <!-- Multiple Choice Antworten werden hier eingefügt -->
+                </div>
+            </div>
+            
+            <!-- SPELLING MODE (Tailwind-only) -->
+            <div id="spelling-mode-ui" class="ui-mode my-8 flex flex-col justify-center min-h-[200px]">
+                <div id="single-input-container" class="w-full flex mb-6">
+                    <input type="text" id="spelling-input-single"
+                        class="w-full max-w-lg border-2 border-gray-300/50 rounded-2xl text-center p-4 text-2xl transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50 outline-none shadow-none bg-white/50 backdrop-blur-sm"
+                        autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Antwort hier eingeben">
+                </div>
+                <div id="noun-input-container" class="hidden flex flex-wrap items-center gap-3 max-w-full w-full mx-auto mb-6">
+                    <input type="text" id="spelling-input-article"
+                        class="w-24 sm:w-28 border-2 border-gray-300/50 rounded-2xl text-center p-4 text-2xl transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50 outline-none shadow-none bg-white/50 backdrop-blur-sm"
+                        placeholder="Artikel" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                    <input type="text" id="spelling-input-noun-1"
+                        class="flex-1 min-w-[120px] border-2 border-gray-300/50 rounded-2xl text-center p-4 text-2xl transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50 outline-none shadow-none bg-white/50 backdrop-blur-sm"
+                        placeholder="Singular" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                    <input type="text" id="spelling-input-noun-2"
+                        class="flex-1 min-w-[120px] border-2 border-gray-300/50 rounded-2xl text-center p-4 text-2xl transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-200/50 outline-none shadow-none bg-white/50 backdrop-blur-sm"
+                        placeholder="Plural" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false">
+                </div>
+                <button id="check-spelling-button" class="w-full font-bold py-4 px-6 rounded-2xl shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-xl disabled:opacity-60 mb-6 text-lg">Auswerten</button>
+                <!-- Umlaut-Buttons (Tailwind-only) -->
+                <div id="umlaut-buttons-container" class="mt-4 flex justify-center space-x-3 mb-4">
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ä</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ö</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ü</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ß</button>
+                </div>
+            </div>
+
+            <!-- CLOZE MODE -->
+            <div id="cloze-adj-de-ui" class="ui-mode my-8 space-y-6">
+                <div id="cloze-hint-container" class="text-center text-xl text-gray-600 mb-4" style="display: none;"></div>
+                <div id="cloze-sentence-container" class="text-center text-2xl flex items-center justify-center gap-2"></div>
+                <button id="check-cloze-button" class="w-full font-bold py-4 px-6 rounded-2xl shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-xl disabled:opacity-60 text-lg">Auswerten</button>
+                <!-- Umlaut-Buttons für Cloze-Modus -->
+                <div id="umlaut-buttons-container-cloze" class="mt-4 flex justify-center space-x-3 mb-4">
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ä</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ö</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ü</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ß</button>
+                </div>
+            </div>
+
+            <!-- SENTENCE TRANSLATION MODE -->
+            <div id="sentence-translation-en-de-ui" class="ui-mode my-8 space-y-6">
+                <div id="sentence-word-input-container" class="flex gap-2 justify-center flex-wrap text-2xl"></div>
+                <button id="check-sentence-translation-button" class="w-full font-bold py-4 px-6 rounded-2xl shadow-lg bg-gradient-to-r from-blue-500 to-blue-600 text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-xl disabled:opacity-60 text-lg">Auswerten</button>
+                <!-- Umlaut-Buttons für Satzübersetzungs-Modus -->
+                <div id="umlaut-buttons-container-sentence" class="mt-4 flex justify-center space-x-3 mb-4">
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ä</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ö</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ü</button>
+                    <button type="button" class="umlaut-button px-4 py-2 border-2 border-gray-300/50 rounded-xl text-xl font-mono hover:bg-white/40 hover:border-gray-400/60 transition-all duration-200 backdrop-blur-sm" title="Shift für Caps">ß</button>
+                </div>
+            </div>
+
+            <!-- Feedback Container -->
+            <div id="feedback-container" class="my-6 text-center min-h-[4rem] flex flex-col justify-center items-center"></div>
+            
+            <!-- Bereich für die richtige Lösung (nur für Nomen-Übung) -->
+            <div id="correction-solution" class="hidden text-3xl text-red-600 font-bold text-center mt-4 mb-4"></div>
+            
+            <button id="continue-button" class="hidden w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-4 px-6 rounded-2xl mt-6 transition-all duration-200 shadow-lg hover:shadow-xl text-lg">Weiter</button>
+
+            <!-- Statistiken -->
+            <div id="stats-container" class="mt-10 space-y-6">
+                <!-- Practice Stats -->
+                <div id="practice-stats-view">
+                    <p class="text-base text-gray-700 text-center mb-3">Richtig in dieser Runde: <span id="correct-in-round-practice" class="font-semibold">0</span> / <span id="attempted-in-round-practice" class="font-semibold">0</span></p>
+                    <div class="bg-gray-200/50 rounded-2xl overflow-hidden h-6 backdrop-blur-sm">
+                        <div id="accuracy-bar" class="h-full transition-all duration-700 ease-out rounded-2xl"></div>
+                    </div>
+                    <hr class="my-4 border-gray-300/50">
+                    <!-- Fortschritt pro Übungsmodus: (entfernt) -->
+                    <!-- <div class="text-sm text-gray-600 text-center mb-3">Fortschritt pro Übungsmodus:</div> -->
+                    <!-- <div class="text-lg font-medium text-gray-600 text-center mb-6">Fortschritt pro Übungsmodus:</div> -->
+                    <div id="category-stats-container" class="text-sm text-gray-700 space-y-2"></div>
+                </div>
+
+                <!-- Test Stats -->
+                <div id="test-stats-view" class="hidden">
+                    <p class="text-base text-gray-700 text-center mb-3">Gesamtfortschritt: <span id="test-progress-text" class="font-semibold">0 / 36</span></p>
+                    <div class="bg-gray-200/50 rounded-2xl overflow-hidden h-6 backdrop-blur-sm">
+                        <div id="test-progress-bar" class="h-full transition-all duration-700 ease-out rounded-2xl"></div>
+                    </div>
+                    <hr id="test-accuracy-separator" class="my-4 border-gray-300/50">
+                    <p id="test-accuracy-paragraph" class="text-base text-gray-700 text-center mb-3">Genauigkeit: <span id="test-accuracy-text" class="font-semibold">0 / 0</span></p>
+                    <div id="test-accuracy-container" class="bg-gray-200/50 rounded-2xl overflow-hidden h-6 backdrop-blur-sm">
+                        <div id="test-accuracy-bar" class="h-full transition-all duration-700 ease-out rounded-2xl"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message Box -->
+            <div id="message-box" class="fixed bottom-6 right-6 bg-red-500 text-white p-4 rounded-2xl shadow-2xl hidden animate-pulse"></div>
         </div>
     </div>
 
-    <div id="trainer-main-view" class="hidden-view w-full flex flex-col items-center">
-        <div id="mode-selector" class="p-2 bg-white rounded-lg shadow-md mb-4">
-            <div class="flex justify-between items-center mb-2">
-                <button id="back-to-wortgruppen" class="px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&leftarrow; Zurück</button>
-                <h2 id="current-wortgruppe-title" class="text-lg font-semibold text-gray-700">Wortgruppe</h2>
-            </div>
-            
-            <div class="button-grid">
-                <div class="flex flex-col gap-2">
-                    <button id="mode-mc-de-en" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Bedeutung</button>
-                    <button id="mode-repeat-mc-de-en" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm"><span class="count-display">0</span></button>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <button id="mode-type-de-adj" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Schreibweise</button>
-                    <button id="mode-repeat-type-de-adj" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm"><span class="count-display">0</span></button>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <button id="mode-cloze-adj-de" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Lückentext</button>
-                    <button id="mode-repeat-cloze-adj-de" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm"><span class="count-display">0</span></button>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <button id="mode-sentence-translation-en-de" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Satzübersetzung</button>
-                    <button id="mode-repeat-sentence-translation-en-de" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm"><span class="count-display">0</span></button>
-                </div>
-                <div id="land-adj-column" class="flex flex-col gap-2">
-                    <button id="mode-type-land-adj" class="mode-button w-full px-3 py-2 border border-gray-300 rounded-md text-sm font-medium">Land → Adjektiv</button>
-                    <button id="mode-repeat-type-land-adj" class="mode-button repeat-button w-full px-3 py-2 rounded-md text-sm"><span class="count-display">0</span></button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div id="word-line-container" class="audio-line-container">
-                <div id="question-display-area"></div>
-                <button id="audio-word-button" class="audio-button" title="Wort vorspielen"></button>
-            </div>
-            <div id="sentence-line-container" class="audio-line-container">
-                <div id="example-sentence-display"></div>
-                <button id="audio-sentence-button" class="audio-button" title="Satz vorspielen"></button>
-            </div>
-            <div id="task-prompt-area"></div>
-
-            <div id="mc-de-en-ui" class="ui-mode my-4">
-                <div id="mc-answers-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4"></div>
-            </div>
-            
-            <div id="spelling-mode-ui" class="ui-mode my-4 space-y-3">
-                <div id="single-input-container">
-                    <input type="text" id="spelling-input-single" class="single-word-input" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
-                </div>
-
-                <div id="noun-input-container" class="hidden flex items-center gap-2">
-                    <input type="text" id="spelling-input-noun-1" class="single-word-input flex-grow" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
-                    <input type="text" id="spelling-input-noun-2" class="single-word-input flex-grow" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false">
-                </div>
-                
-                <button id="check-spelling-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
-            </div>
-
-            <div id="cloze-adj-de-ui" class="ui-mode my-4 space-y-3">
-                <div id="cloze-sentence-container" class="text-center text-xl"></div>
-                <button id="check-cloze-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
-            </div>
-            <div id="sentence-translation-en-de-ui" class="ui-mode my-4 space-y-3">
-                <div id="sentence-word-input-container" class="word-input-row"></div>
-                <button id="check-sentence-translation-button" class="action-button w-full font-semibold py-2 px-4 rounded-lg shadow">Auswerten</button>
-            </div>
-
-            <div id="feedback-container" class="my-6 text-center min-h-[3rem] flex flex-col justify-center items-center"></div>
-            <button id="continue-button" class="action-button hidden w-full bg-green-500 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg mt-4">Weiter</button>
-
-            <div id="stats-container" class="mt-6 space-y-2">
-                <p class="text-sm text-gray-600 text-center">
-                    Richtig in dieser Runde (aktuelle Wortgruppe): <span id="correct-in-round">0</span> / <span id="attempted-in-round">0</span>
-                </p>
-                <div class="stats-bar-container">
-                    <div id="accuracy-bar" class="stats-bar" style="width: 0%;">0%</div>
-                </div>
-                <hr class="my-2">
-                <p class="text-xs text-gray-500 text-center mb-1">Fortschritt pro Übungsmodus:</p>
-                <div id="category-stats-container" class="text-xs text-gray-600 space-y-1">
-                </div>
-            </div>
-            <div id="message-box" class="fixed bottom-5 right-5 bg-red-500 text-white p-3 rounded-lg shadow-xl hidden animate-pulse"></div>
-        </div>
-    </div>
-
+    <!-- REWARD POPUP -->
     <div id="reward-popup" class="fixed inset-0 flex justify-center items-center hidden z-50 pointer-events-none">
         <div id="reward-content" class="text-center p-6 bg-white rounded-xl shadow-2xl">
             <span id="reward-emoji" class="text-7xl block mb-2"></span>
             <p id="reward-text" class="text-xl font-semibold text-gray-700"></p>
         </div>
     </div>
-
-    <script src="vokabular.js" defer></script>
-    <script type="module" src="trainer.js"></script>
     
+    <!-- TEST SELECTION MODAL -->
+    <div id="test-selection-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-40">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div class="p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Test auswählen</h2>
+                <div id="test-options-grid" class="grid grid-cols-1 gap-3">
+                    <!-- Test-Optionen werden hier dynamisch eingefügt -->
+                </div>
+                <button class="mt-4 w-full px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg transition-colors" 
+                        onclick="document.getElementById('test-selection-modal').classList.add('hidden')">
+                    Abbrechen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <!-- Firebase SDKs -->
+    <script type="module" src="/trainer.ts"></script>
+
+    <!-- Authentifizierungs-Modal -->
+    <div id="auth-modal-overlay" class="modal-overlay hidden">
+        <div id="auth-modal" class="modal-content">
+            <button class="modal-close" onclick="deviceSyncUI.hideAuthModal()">×</button>
+            <h2>Auf allen Geräten lernen</h2>
+            <p>Sichere deinen Fortschritt in der Cloud und lerne nahtlos auf all deinen Geräten weiter.</p>
+            
+            <!-- Status-Anzeige -->
+            <div id="auth-status" class="auth-status hidden">
+                <p class="status-message"></p>
+            </div>
+            
+            <div class="auth-options">
+                <!-- Google Login -->
+                <button id="googleAuthBtn" class="auth-button google-auth-button">
+                    <svg class="auth-icon" viewBox="0 0 24 24" width="18" height="18">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    <span>Mit Google verbinden</span>
+                </button>
+                
+                <!-- Email Login -->
+                <div class="divider">
+                    <span>oder</span>
+                </div>
+                
+                <form id="emailAuthForm" class="email-form">
+                    <input type="email" id="emailInput" placeholder="deine.email@beispiel.de" required class="email-input">
+                    <button type="submit" class="auth-button email-auth-button">
+                        📧 Login-Link per E-Mail senden
+                    </button>
+                </form>
+            </div>
+            
+            <p class="auth-info">Kostenlos & sicher. Deine Daten gehören nur dir.</p>
+            
+            <!-- Debug Info -->
+            <div id="debug-info" class="debug-info" style="margin-top: 1rem; padding: 1rem; background: #f5f5f5; border-radius: 8px; font-size: 0.875rem;">
+                <p><strong>Status:</strong> <span id="auth-status-text">Prüfe...</span></p>
+                <p><strong>User ID:</strong> <span id="user-id-text">-</span></p>
+                <p><strong>Angemeldet:</strong> <span id="is-signed-in">-</span></p>
+            </div>
+        </div>
+    </div>
+<!-- Deploy Test: 2025-06-27 -->
+
+<!-- Fehlende DOM-Elemente für TypeScript-Validierung -->
+<div id="word-sentence-block" style="display:none"></div>
+<div id="loading-indicator" style="display:none">
+  <span class="animate-spin">⏳</span> Wird geladen...
+</div>
+
 </body>
 </html>

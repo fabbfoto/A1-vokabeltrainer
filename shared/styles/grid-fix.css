@@ -1,0 +1,71 @@
+/* 🔧 FINAL-FIX: CSS Grid Layout Consistency 
+   Problem: Bei unterschiedlichen Anzahlen von Buttons sieht das Grid anders aus
+   Lösung: Explizite Grid-Template-Columns mit min-max für konsistente Spaltenbreiten */
+
+/* Füge diese CSS-Regel zu minimal-legacy.css hinzu oder erstelle neue Datei: */
+
+/* ✅ KONSISTENTE GRID-SPALTEN für Navigation Container */
+#navigation-container {
+    /* Explizite Spalten-Definition für konsistente Breiten */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    
+    /* Alternative: Feste 3-Spalten-Layout erzwingen */
+    /* grid-template-columns: repeat(3, 1fr) !important; */
+    
+    /* Konsistente Zeilenhöhen */
+    grid-auto-rows: minmax(110px, auto) !important;
+    
+    /* Bessere Ausrichtung */
+    align-items: stretch !important;
+    justify-items: stretch !important;
+}
+
+/* ✅ BUTTON KONSISTENZ - alle Buttons haben gleiche Mindestgröße */
+#navigation-container > button {
+    /* Erzwinge einheitliche Mindesthöhe */
+    min-height: 110px !important;
+    max-height: 110px !important;
+    
+    /* Verhindere Flex-Shrinking */
+    flex-shrink: 0 !important;
+    
+    /* Konsistente Breite */
+    width: 100% !important;
+    
+    /* Konsistente Innenabstände */
+    padding: 12px !important;
+    
+    /* Bessere Text-Verteilung */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
+/* ✅ RESPONSIVE BREAKPOINTS - explizite Kontrolle */
+@media (max-width: 640px) {
+    #navigation-container {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+    #navigation-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    #navigation-container {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+/* ✅ ACTION BUTTONS - überspannen alle Spalten korrekt */
+#navigation-container > button[data-test-main-topic-only],
+#navigation-container > button#start-test-mode-btn,
+#navigation-container > button#device-sync-btn {
+    grid-column: 1 / -1 !important; /* Überspannt alle Spalten */
+    min-height: 110px !important;
+    max-height: 110px !important;
+}

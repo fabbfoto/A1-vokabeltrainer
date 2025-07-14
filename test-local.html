@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Test</title>
+</head>
+<body>
+    <h1>Firebase Connection Test</h1>
+    <div id="status">Testing...</div>
+    
+    <script type="module">
+        // Teste Firebase direkt ohne Module
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDvbEE9u2-y1sB8COT3zw4dQ6nJAry2Z2g",
+            authDomain: "a1-vokabeltrainer.firebaseapp.com",
+            projectId: "a1-vokabeltrainer",
+            storageBucket: "a1-vokabeltrainer.firebasestorage.app",
+            messagingSenderId: "149333337863",
+            appId: "1:149333337863:web:71e5894cca5086024c47a2",
+            measurementId: "G-WZELR67WKZ"
+        };
+        
+        try {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            document.getElementById('status').textContent = '✅ Firebase erfolgreich geladen!';
+            document.getElementById('status').style.color = 'green';
+        } catch (error) {
+            document.getElementById('status').textContent = '❌ Fehler: ' + error.message;
+            document.getElementById('status').style.color = 'red';
+        }
+    </script>
+</body>
+</html> 

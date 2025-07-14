@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Test - A1 Vokabeltrainer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'btn-bg': '#e9e9ed',
+              'btn-bg-hover': '#d1d5db',
+              'btn-text': '#374151',
+              'btn-border': '#d1d5db',
+              'progress-bg': '#d1d5db',
+              'de-black': '#1f2937',
+              'de-red': '#dc2626',
+              'de-gold': '#f59e0b',
+            }
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 font-['Inter'] flex flex-col justify-start items-center min-h-screen p-4">
+
+    <!-- NAVIGATION VIEW -->
+    <div id="navigation-view" class="p-4 max-w-2xl mx-auto">
+        <header id="navigation-header" class="flex items-center mb-6">
+            <button id="back-to-main-topics" class="hidden mr-4 px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&larr; Zurück</button>
+            <h1 id="navigation-title" class="text-2xl font-bold text-gray-700">Themen</h1>
+        </header>
+        <div id="navigation-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Navigation Buttons werden hier dynamisch eingefügt -->
+        </div>
+    </div>
+
+    <!-- TEST SELECTION MODAL -->
+    <div id="test-selection-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-40">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div class="p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Test auswählen</h2>
+                <div id="test-options-grid" class="grid grid-cols-1 gap-3">
+                    <!-- Test-Optionen werden hier dynamisch eingefügt -->
+                </div>
+                <button class="mt-4 w-full px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-lg transition-colors" 
+                        onclick="document.getElementById('test-selection-modal').classList.add('hidden')">
+                    Abbrechen
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <!-- Vokabular laden -->
+    <script type="module">
+        // Vokabular importieren
+        import { vokabular } from './vokabular';
+        
+        // Vokabular dem JavaScript-Trainer zur Verfügung stellen
+        window.vokabular = vokabular;
+        console.log('Vokabular geladen:', Object.keys(vokabular));
+        
+        // JavaScript-Trainer laden
+        const script = document.createElement('script');
+        script.src = './packages/trainer-themen/trainer.js';
+        script.onload = function() {
+            console.log('JavaScript-Trainer geladen');
+            if (window.trainerJS && window.trainerJS.setVokabular) {
+                window.trainerJS.setVokabular(vokabular);
+                console.log('Vokabular an Trainer übergeben');
+            }
+        };
+        document.head.appendChild(script);
+    </script>
+
+</body>
+</html> 

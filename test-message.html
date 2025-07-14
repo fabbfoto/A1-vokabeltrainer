@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Fehlermeldungsfunktionalität</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-4">Test Fehlermeldungsfunktionalität</h1>
+        
+        <div class="space-y-4">
+            <button onclick="testSuccessMessage()" class="w-full bg-green-500 text-white p-3 rounded hover:bg-green-600">
+                Erfolgs-Nachricht testen
+            </button>
+            
+            <button onclick="testErrorMessage()" class="w-full bg-red-500 text-white p-3 rounded hover:bg-red-600">
+                Fehler-Nachricht testen
+            </button>
+            
+            <button onclick="testInfoMessage()" class="w-full bg-blue-500 text-white p-3 rounded hover:bg-blue-600">
+                Info-Nachricht testen
+            </button>
+        </div>
+        
+        <div class="mt-6 p-4 bg-gray-100 rounded">
+            <h2 class="font-semibold mb-2">Debug-Info:</h2>
+            <div id="debug-info" class="text-sm text-gray-600"></div>
+        </div>
+    </div>
+
+    <!-- Message Box -->
+    <div id="message-box" class="fixed bottom-5 right-5 bg-red-500 text-white p-3 rounded-lg shadow-xl hidden animate-pulse"></div>
+
+    <script>
+        // Debug-Info anzeigen
+        function updateDebugInfo() {
+            const messageBox = document.getElementById('message-box');
+            const debugInfo = document.getElementById('debug-info');
+            debugInfo.innerHTML = `
+                <p><strong>Message Box gefunden:</strong> ${messageBox ? 'Ja' : 'Nein'}</p>
+                <p><strong>Message Box ID:</strong> ${messageBox ? messageBox.id : 'N/A'}</p>
+                <p><strong>Message Box Klassen:</strong> ${messageBox ? messageBox.className : 'N/A'}</p>
+                <p><strong>Message Box versteckt:</strong> ${messageBox ? messageBox.classList.contains('hidden') : 'N/A'}</p>
+            `;
+        }
+
+        // Fehlermeldungsfunktion
+        function showMessage(message, type = 'error', duration = 3000) {
+            console.log('[showMessage] Aufgerufen mit:', { message, type, duration });
+            
+            const messageBox = document.getElementById('message-box');
+            console.log('[showMessage] messageBox gefunden:', messageBox);
+            
+            if (!messageBox) {
+                console.error('Message box element not found');
+                return;
+            }
+            
+            messageBox.textContent = message;
+            
+            // CSS-Klassen basierend auf Typ
+            const baseClasses = 'fixed bottom-5 right-5 text-white p-3 rounded-lg shadow-xl';
+            const typeClasses = {
+                success: 'bg-green-500',
+                info: 'bg-blue-500',
+                error: 'bg-red-500'
+            };
+            
+            messageBox.className = `${baseClasses} ${typeClasses[type]}`;
+            messageBox.classList.remove('hidden');
+            
+            console.log('[showMessage] Nachricht angezeigt:', message);
+            updateDebugInfo();
+            
+            // Auto-hide nach duration
+            setTimeout(() => {
+                if (messageBox) {
+                    messageBox.classList.add('hidden');
+                    console.log('[showMessage] Nachricht versteckt');
+                    updateDebugInfo();
+                }
+            }, duration);
+        }
+
+        // Test-Funktionen
+        function testSuccessMessage() {
+            showMessage('✅ Erfolgs-Nachricht funktioniert!', 'success', 3000);
+        }
+
+        function testErrorMessage() {
+            showMessage('❌ Fehler-Nachricht funktioniert!', 'error', 3000);
+        }
+
+        function testInfoMessage() {
+            showMessage('ℹ️ Info-Nachricht funktioniert!', 'info', 3000);
+        }
+
+        // Initialisiere Debug-Info
+        updateDebugInfo();
+    </script>
+</body>
+</html> 
