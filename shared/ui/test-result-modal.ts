@@ -12,7 +12,7 @@ declare global {
   interface Window {
     exitTestMode?: () => void;
     setMode?: (modeId: string, isRepeat: boolean) => void;
-    state?: any;
+    state?: import('../types/trainer').TrainerState;
   }
 }
 
@@ -159,13 +159,13 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
     // Falsche Wörter in die Fehlerliste eintragen
     const incorrectWordIds = incorrectWords.map(r => r.wordId);
     
-    if (window.state && window.state.training.currentMode) {
+    if (window.state?.training?.currentMode && window.state?.progress) {
       const mode = window.state.training.currentMode;
       if (!window.state.progress.wordsToRepeatByMode[mode]) {
         window.state.progress.wordsToRepeatByMode[mode] = new Set();
       }
       incorrectWordIds.forEach(id => {
-        window.state.progress.wordsToRepeatByMode[mode].add(id);
+        window.state!.progress!.wordsToRepeatByMode[mode].add(id);
       });
       
       // Speichern wird automatisch durch ErrorManager gehandhabt

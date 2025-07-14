@@ -15,12 +15,6 @@ interface TrainerState {
     currentVocabularySet: Word[];
 }
 
-declare global {
-    interface Window {
-        state?: any;
-    }
-}
-
 /**
  * Analysiert die gespeicherten Fehlerzähler im localStorage
  * und vergleicht sie mit den aktuellen Vokabeln
@@ -29,7 +23,7 @@ export function analyzeErrorCounts(): void {
     const wordsToRepeat: WordsToRepeat = JSON.parse(
         localStorage.getItem('trainer-words-to-repeat') || '{}'
     );
-    const currentVocab: Word[] = window.state?.currentVocabularySet || [];
+    const currentVocab: Word[] = window.state?.training.currentVocabularySet || [];
 
 
 
