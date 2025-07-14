@@ -1,6 +1,7 @@
 [build]
-  # Der Thementrainer liegt direkt im Root, also kein Build-Command nötig
-  publish = "."
+  # Vite-Build für TypeScript-Projekt
+  command = "npm run build"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
