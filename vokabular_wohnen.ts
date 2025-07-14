@@ -15,15 +15,15 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Zimmer",
                 english: "room",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-001"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-002"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-003"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-004"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-005"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-006"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-007"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-008"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-sichzuhausefhlen-001"), text: "Ich", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-sichzuhausefhlen-002"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-sichzuhausefhlen-003"), text: "fühle", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-sichzuhausefhlen-004"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-sichzuhausefhlen-005"), text: "mich", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-sichzuhausefhlen-006"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-sichzuhausefhlen-007"), text: "zu", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-sichzuhausefhlen-008"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-sichzuhausefhlen-009"), text: "Hause.", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "Please tidy up your room.",
                 clozeParts: ["Räum bitte dein ", " auf."],
@@ -36,15 +36,14 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Fenster",
                 english: "window",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-009"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-010"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-011"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-012"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-013"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-014"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-015"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-016"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-009"), text: "Ich", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-010"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-011"), text: "möchte", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-012"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-013"), text: "einen Platz", case: "akkusativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-014"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-015"), text: "am Fenster", case: "dativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-016"), text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "I would like a seat by the window.",
                 clozeParts: ["Ich möchte einen Platz am ", "."],
@@ -57,13 +56,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Türen",
                 english: "door",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-017"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-018"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-019"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-020"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-021"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-022"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-017"), text: "Die Tür", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-018"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-019"), text: "ist", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-020"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-021"), text: "zu", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-022"), text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "The door is closed.",
                 clozeParts: ["Die ", " ist zu."],
@@ -76,13 +74,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Wände",
                 english: "wall",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-023"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-024"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-025"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-026"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-027"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-028"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-023"), text: "An der Wand", case: "dativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-024"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-025"), text: "hängt", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-026"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-027"), text: "ein Bild", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-028"), text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "A picture hangs on the wall.",
                 clozeParts: ["An der ", " hängt ein Bild."],
@@ -95,13 +92,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Böden",
                 english: "floor / ground",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-029"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-030"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-031"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-032"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-033"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-034"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-029"), text: "Die Tasche", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-030"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-031"), text: "steht", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-032"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-033"), text: "auf dem Boden", case: "dativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-034"), text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "The bag is on the floor.",
                 clozeParts: ["Die Tasche steht auf dem ", "."],
@@ -114,13 +110,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Bäder",
                 english: "bathroom",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-035"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-036"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-037"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-038"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-039"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-040"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-035"), text: "Wo", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-036"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-037"), text: "ist", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-038"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-039"), text: "das Bad", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-040"), text: "?", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "Where is the bathroom?",
                 clozeParts: ["Wo ist das ", "?"],
@@ -133,13 +128,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Duschen",
                 english: "shower",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-041"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-042"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-043"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-044"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-045"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-046"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-041"), text: "Die Dusche", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-042"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-043"), text: "ist", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-044"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-045"), text: "kaputt", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-046"), text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "The shower is broken.",
                 clozeParts: ["Die ", " ist kaputt."],
@@ -152,13 +146,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Toiletten/WCs",
                 english: "toilet / WC",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-047"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-048"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-049"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-050"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-051"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-052"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-047"), text: "Wo", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-048"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-049"), text: "ist", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-050"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-051"), text: "die Toilette", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-052"), text: "?", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "Where is the toilet?",
                 clozeParts: ["Wo ist die ", "?"],
@@ -171,13 +164,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Küchen",
                 english: "kitchen",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-053"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-054"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-055"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-056"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-057"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-058"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-053"), text: "In der Küche", case: "dativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-054"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-055"), text: "kocht", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-056"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-057"), text: "meine Mutter", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-058"), text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "My mother is cooking in the kitchen.",
                 clozeParts: ["In der ", " kocht meine Mutter."],
@@ -190,13 +182,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Fensterbänke",
                 english: "windowsill",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-059"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-060"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-061"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-062"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-063"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-064"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-059"), text: "Die Blumen", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-060"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-061"), text: "stehen", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-062"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-063"), text: "auf der Fensterbank", case: "dativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-064"), text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "The flowers are on the windowsill.",
                 clozeParts: ["Die Blumen stehen auf der ", "."],
@@ -209,13 +200,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Flure",
                 english: "hallway / corridor",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-065"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-066"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-067"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-068"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-069"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-070"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-065"), text: "Die Schuhe", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-066"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-067"), text: "stehen", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-068"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-069"), text: "im Flur", case: "dativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-070"), text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "The shoes are in the hallway.",
                 clozeParts: ["Die Schuhe stehen im ", "."],
@@ -228,13 +218,12 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
                 plural: "Balkone",
                 english: "balcony",
                 exampleGerman: [
-                    {
-    id: createWordId("wohnen-r-ume-und-geb-udetei-071"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-072"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-073"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-074"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-075"), text: "", case: "none" } as CaseElement,
-                    {id: createWordId("wohnen-r-ume-und-geb-udetei-076"), text: "", case: "none" } as CaseElement
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-071"), text: "Wir", case: "nominativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-072"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-073"), text: "haben", case: "verb" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-074"), text: " ", case: "none" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-075"), text: "einen Balkon", case: "akkusativ" } as CaseElement,
+                    { id: createWordId("wohnen-r-ume-und-geb-udetei-076"), text: ".", case: "none" } as CaseElement
                 ],
                 exampleEnglish: "We have a balcony.",
                 clozeParts: ["Wir haben einen ", "."],

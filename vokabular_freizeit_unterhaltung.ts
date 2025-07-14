@@ -3,8 +3,8 @@
 import type { 
     VocabularyStructure, 
     Word, 
-    Noun, 
-    Verb, 
+    Noun,
+    Verb,
     Adjective,
     WordId,
     CaseElement 
