@@ -1074,7 +1074,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const recommendations = incorrectWords.length > 0 ? [{
             type: 'repeat' as const,
             wordIds: incorrectWords,
-            suggestedMode: state.training.currentMode || undefined,
+            suggestedMode: state.training.currentMode || 'mc-de-en' as ModeId,
             reason: `Wiederhole ${incorrectWords.length} falsch beantwortete Wörter`
         }] : [];
         
@@ -1166,7 +1166,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             const result = generateTestQuestions(vokabular, {
                 variant: testConfig.variant,
                 scope: testConfig.testType as 'subTopic' | 'mainTopic' | 'global',
-                topicId: testConfig.topicId,
+                topicId: testConfig.topicId || '' as TopicId,
                 category: testConfig.selectedCategory as import('./shared/types/trainer').TestCategory,
                 totalQuestions: 20
             });

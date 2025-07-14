@@ -5,7 +5,7 @@
     "module": "ES2020",
     "moduleResolution": "node",
     "allowJs": true,
-    "checkJs": false,
+    "checkJs": true,
     "outDir": "./dist",
     "sourceMap": true,
     "strict": true,
@@ -26,7 +26,14 @@
       "@services/*": ["shared/services/*"]
     },
     "noEmit": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/.tsbuildinfo",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "*.ts",
@@ -36,5 +43,8 @@
   "exclude": [
     "node_modules",
     "dist"
-  ]
+  ],
+  "ts-node": {
+    "esm": true
+  }
 }
