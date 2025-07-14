@@ -1,8 +1,6 @@
-# Kontext: Migration & Feature-Check – A1-Vokabeltrainer
+# A1-Vokabeltrainer Kontext
 
-## 1. Projektüberblick
-
-Der A1-Vokabeltrainer ist eine modulare Lernanwendung für Deutsch als Fremdsprache (Goethe A1). Er bietet verschiedene Trainingsmodi (Multiple Choice, Schreibweise, Lückentext, Satzübersetzung) und eine thematische Navigation. Die Migration von JavaScript zu TypeScript und Vite ist im Gange.
+Der A1-Vokabeltrainer ist eine modulare Lernanwendung für Deutsch als Fremdsprache (A1). Er bietet verschiedene Trainingsmodi (Multiple Choice, Schreibweise, Lückentext, Satzübersetzung) und eine thematische Navigation. Die Migration von JavaScript zu TypeScript und Vite ist im Gange.
 
 ## 2. Zielsetzung der Migration
 

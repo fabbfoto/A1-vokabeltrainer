@@ -45,9 +45,9 @@ function resetAllErrorCounts(): void {
         // 2. localStorage zurücksetzen
         const localStorageKeys = [
             'a1ThemenProgress',
-            'goetheA1LastTestScores', 
+            'a1LastTestScores',
             'trainer-words-to-repeat',
-            'goetheA1Progress'
+            'a1Progress'
         ];
         
         localStorageKeys.forEach(key => {

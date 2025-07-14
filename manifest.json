@@ -1,7 +1,7 @@
 {
-  "name": "Goethe A1 Vokabeltrainer",
-  "short_name": "A1-Trainer",
-  "description": "Ein interaktiver Vokabeltrainer für den Goethe A1 Wortschatz.",
+  "name": "A1 Vokabeltrainer",
+  "short_name": "A1 Vokabeltrainer",
+  "description": "Ein interaktiver Vokabeltrainer für den A1 Wortschatz.",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
