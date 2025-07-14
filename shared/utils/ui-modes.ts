@@ -791,9 +791,7 @@ function generateClozeUI(
         // Umlaut-Buttons für dynamisch erstellte Input-Felder initialisieren
         const inputs = dom.clozeSentenceContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
         if (inputs.length > 0) {
-            import('../../ui/umlaut-buttons').then(mod => {
-                mod.initializeUmlautButtons('setup', dom, state);
-            });
+            import('../../ui/umlaut-buttons').then(mod => mod.initializeUmlautButtons('setup', dom, state));
         }
     }, 0);
 }

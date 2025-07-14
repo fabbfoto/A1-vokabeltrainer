@@ -423,3 +423,9 @@ export function createInitialTrainerState(): TrainerState {
         isCorrectionMode: false,
     };
 }
+
+// ========== DOM TYPEN FÜR UI ===========
+export type DOMElement = HTMLElement;
+export interface DOMElements {
+  [key: string]: HTMLElement | null;
+}
