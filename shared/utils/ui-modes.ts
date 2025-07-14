@@ -357,7 +357,7 @@ export function setupSpellingMode(
     if (dom.audioWordButtonEl) dom.audioWordButtonEl.style.display = 'none';
     if (dom.audioSentenceButtonEl) dom.audioSentenceButtonEl.style.display = 'none';
     // Buttons erst jetzt initialisieren, wenn sie im DOM sind
-    import('../../ui/umlaut-buttons').then(mod => mod.initializeUmlautButtons('setup', dom, state));
+    import('/ui/umlaut-buttons').then(mod => mod.initializeUmlautButtons('setup', dom, state));
     
     // ✅ KORREKT: currentWord statt currentWordData
     const currentWord = state.training.currentWord;
@@ -791,7 +791,7 @@ function generateClozeUI(
         // Umlaut-Buttons für dynamisch erstellte Input-Felder initialisieren
         const inputs = dom.clozeSentenceContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
         if (inputs.length > 0) {
-            import('../../ui/umlaut-buttons').then(mod => {
+            import('/ui/umlaut-buttons').then(mod => {
                 mod.initializeUmlautButtons('setup', dom, state);
             });
         }
@@ -951,7 +951,7 @@ function generateSentenceInputs(
         // Umlaut-Buttons für dynamisch erstellte Input-Felder initialisieren
         const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
         if (inputs.length > 0) {
-            import('../../ui/umlaut-buttons').then(mod => {
+            import('/ui/umlaut-buttons').then(mod => {
                 mod.initializeUmlautButtons('setup', dom, state);
             });
         }

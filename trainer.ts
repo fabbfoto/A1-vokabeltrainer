@@ -988,7 +988,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Verzögert ausführen, damit die Input-Felder im DOM sind
         setTimeout(() => {
             // Dynamischer Import für konsistente Chunk-Strategie
-            import('./ui/umlaut-buttons').then(mod => {
+            import('/ui/umlaut-buttons').then(mod => {
                 mod.initializeUmlautButtons('setup', dom, state, { modeId });
             });
         }, 200); // Längere Verzögerung für dynamisch erstellte Input-Felder
