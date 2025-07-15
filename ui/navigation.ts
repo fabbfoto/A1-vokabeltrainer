@@ -51,7 +51,7 @@ function createTestButton(
     id: string,
     text: string,
     icon: string,
-    variant: 'chaos' | 'structured',
+    variant: 'chaos' | 'structured' | 'global-ranking',
     dataset: Record<string, string>
 ): HTMLButtonElement {
     const button = document.createElement('button');
@@ -130,8 +130,17 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
         'structured',
         { testVariant: 'structured', testScope: 'global' }
     );
+    // NEU: Globaler Ranglisten-Test Button
+    const globalRankingTest = createTestButton(
+        'global-ranking-test',
+        '🏆 Globaler Ranglisten-Test',
+        '🏆',
+        'global-ranking',
+        { testVariant: 'global-ranking', testScope: 'global' }
+    );
     testContainer.appendChild(globalChaosTest);
     testContainer.appendChild(globalStructuredTest);
+    testContainer.appendChild(globalRankingTest);
     dom.navigationContainerEl.appendChild(testContainer);
 
     // NEU: Ranking-Button
@@ -291,7 +300,7 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
         } else if (subTopicButton) {
             callbacks.handleTopicSelection(state.navigation.currentMainTopic!, subTopicButton.dataset.subTopic! as SubTopicId);
         } else if (testButton) {
-            const variant = testButton.dataset.testVariant as 'chaos' | 'structured';
+            const variant = testButton.dataset.testVariant as 'chaos' | 'structured' | 'global-ranking';
             const scope = testButton.dataset.testScope as 'global' | 'mainTopic';
             const topicId = testButton.dataset.topicId;
             if (variant === 'chaos') {
@@ -302,6 +311,20 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
                     variant: 'chaos',
                     topicId: topicId as TopicId,
                     testTitle: scope === 'global' ? 'Globaler Chaos-Test' : `${topicId} Chaos-Test`,
+                    modeIds: ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as ModeId[],
+                    mode: 'mc-de-en' as ModeId,
+                    questionCount: 20,
+                    categories: ['bedeutung', 'schreibweise', 'luecke', 'satz']
+                };
+                callbacks.startTest?.(testConfig);
+            } else if (variant === 'global-ranking') {
+                // Globaler Ranglisten-Test direkt starten
+                const testConfig: TestConfiguration = {
+                    testId: `test_${Date.now()}` as TestId,
+                    testType: 'global',
+                    variant: 'global-ranking',
+                    topicId: 'global' as TopicId,
+                    testTitle: '🏆 Globaler Ranglisten-Test',
                     modeIds: ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as ModeId[],
                     mode: 'mc-de-en' as ModeId,
                     questionCount: 20,

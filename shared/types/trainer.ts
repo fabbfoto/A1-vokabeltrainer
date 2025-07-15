@@ -60,7 +60,7 @@ export interface LearningModes {
 
 // ========== TEST SYSTEM (WICHTIG - WERDEN NOCH VERWENDET) ==========
 export type TestType = 'subTopic' | 'mainTopic' | 'global' | 'custom';
-export type TestVariant = 'chaos' | 'structured';
+export type TestVariant = 'chaos' | 'structured' | 'global-ranking';
 export type TestCategory = 'bedeutung' | 'schreibweise' | 'luecke' | 'satz';
 
 export const CATEGORY_MODE_MAP: Record<TestCategory, ModeId> = {
@@ -133,6 +133,30 @@ export function calculateTestScore(
   return {
     baseScore,
     timePenalty,
+    finalScore
+  };
+}
+
+// NEU: Globale Ranglisten-Bewertungsformel
+export function calculateGlobalRankingScore(
+  correctAnswers: number, 
+  totalQuestions: number, 
+  timeInSeconds: number
+): { baseScore: number; timeFactor: number; finalScore: number } {
+  // Basis-Score (0-100 Punkte)
+  const accuracy = totalQuestions > 0 ? correctAnswers / totalQuestions : 0;
+  const baseScore = accuracy * 100;
+  
+  // Zeitfaktor (0.5 bis 1.5)
+  const referenceTime = 600; // 10 Minuten = 600 Sekunden
+  const timeFactor = Math.max(0.5, Math.min(1.5, referenceTime / timeInSeconds));
+  
+  // Finaler Score
+  const finalScore = Math.round(baseScore * timeFactor);
+  
+  return {
+    baseScore: Math.round(baseScore),
+    timeFactor: Math.round(timeFactor * 100) / 100, // Auf 2 Dezimalstellen
     finalScore
   };
 }

@@ -7,9 +7,10 @@ import type { QueryDocumentSnapshot, QuerySnapshot } from 'firebase/firestore';
 import { db } from '../auth/firebase-config';
 import type { AuthService } from './auth-service';
 import type { TrainerState, SessionStats, TestResult } from '../types/trainer';
+import { calculateGlobalRankingScore } from '../types/trainer';
 
 // ========== ENHANCED TYPED INTERFACES ==========
-export type TestType = 'chaos' | 'structured';
+export type TestType = 'chaos' | 'structured' | 'global-ranking';
 export type DifficultyLevel = 'A1' | 'A2' | 'B1' | 'B2' | 'C1' | 'C2';
 
 export interface TestResultSubmission {
@@ -32,6 +33,11 @@ export interface TestResultSubmission {
   finalScore: number;
   accuracy: number;
   modesUsed: string[];
+  // NEU: Globale Ranglisten-spezifische Felder
+  timeFactor?: number;
+  isGlobalRanking?: boolean;
+  categoryDistribution?: Record<string, number>;
+  testModeDistribution?: Record<string, number>;
 }
 
 export interface RankingEntry {
@@ -47,6 +53,10 @@ export interface RankingEntry {
   timestamp: Date;
   rank?: number;
   difficulty: DifficultyLevel;
+  // NEU: Zusätzliche Felder für globale Ranglisten
+  correctAnswers?: number;
+  totalQuestions?: number;
+  timeFactor?: number;
 }
 
 export interface UserStats {
@@ -99,25 +109,43 @@ export class RankingService {
       throw new Error('User nicht angemeldet');
     }
 
+    // NEU: Spezielle Behandlung für globale Ranglisten
+    let finalScore = testResult.score.finalScore;
+    let timeFactor: number | undefined;
+    let baseScore = testResult.score.finalScore + testResult.score.timePenalty;
+
+    if (testVariant === 'global-ranking') {
+      const globalScore = calculateGlobalRankingScore(
+        testResult.score.correct,
+        testResult.score.total,
+        testResult.score.duration
+      );
+      finalScore = globalScore.finalScore;
+      timeFactor = globalScore.timeFactor;
+      baseScore = globalScore.baseScore;
+    }
+
     const testResultSubmission: TestResultSubmission = {
       userId: user.uid,
       userName: user.displayName || 'Anonym',
       userEmail: user.email || 'unknown@email.com',
       testType: testVariant,
       topic: testResult.score.topicId || 'global',
-      // Entferne category hier
-      score: testResult.score.finalScore,
+      score: finalScore,
       correctAnswers: testResult.score.correct,
       totalQuestions: testResult.score.total,
       timeInSeconds: testResult.score.duration,
       averageTimePerQuestion: testResult.score.averageTimePerQuestion,
       timestamp: testResult.score.timestamp,
       difficulty: 'A1',
-      baseScore: testResult.score.finalScore + testResult.score.timePenalty,
+      baseScore: baseScore,
       timePenalty: testResult.score.timePenalty,
-      finalScore: testResult.score.finalScore,
+      finalScore: finalScore,
       accuracy: testResult.score.accuracy,
-      modesUsed: testResult.score.modesUsed
+      modesUsed: testResult.score.modesUsed,
+      // NEU: Globale Ranglisten-spezifische Felder
+      timeFactor: timeFactor,
+      isGlobalRanking: testVariant === 'global-ranking'
     };
 
     // Füge category nur hinzu wenn definiert
@@ -131,6 +159,7 @@ export class RankingService {
         timestamp: Timestamp.fromDate(testResultSubmission.timestamp)
       });
       
+      console.log(`✅ Test-Ergebnis gespeichert: ${testVariant} - Score: ${finalScore}`);
       return docRef.id;
     } catch (error: unknown) {
       console.error('❌ Fehler beim Speichern des Test-Ergebnisses:', error);
@@ -231,6 +260,70 @@ export class RankingService {
   }
 
   /**
+   * NEU: Lädt spezielle globale Ranglisten
+   */
+  async getGlobalRankingList(limitCount: number = 100): Promise<RankingResponse> {
+    try {
+      const q = query(
+        collection(db, 'testResults'),
+        where('testType', '==', 'global-ranking'),
+        orderBy('finalScore', 'desc'),
+        limit(limitCount)
+      );
+      
+      const snapshot = await getDocs(q);
+      const entries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
+        id: doc.id,
+        ...doc.data(),
+        timestamp: doc.data().timestamp?.toDate() || new Date(),
+        rank: index + 1
+      })) as RankingEntry[];
+      
+      console.log(`🏆 Globale Rangliste geladen: ${entries.length} Einträge`);
+      
+      return {
+        entries,
+        totalCount: entries.length,
+        filters: { testType: 'global-ranking', limit: limitCount }
+      };
+    } catch (error: unknown) {
+      console.error('❌ Fehler beim Laden der globalen Rangliste:', error);
+      throw new Error(`Fehler beim Laden der globalen Rangliste: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+    }
+  }
+
+  /**
+   * NEU: Lädt die besten globalen Ranglisten-Ergebnisse des aktuellen Benutzers
+   */
+  async getCurrentUserGlobalRanking(): Promise<RankingEntry | null> {
+    const user = this.authService.currentUser;
+    if (!user) return null;
+
+    try {
+      const q = query(
+        collection(db, 'testResults'),
+        where('userId', '==', user.uid),
+        where('testType', '==', 'global-ranking'),
+        orderBy('finalScore', 'desc'),
+        limit(1)
+      );
+      
+      const snapshot = await getDocs(q);
+      if (snapshot.empty) return null;
+      
+      const bestResult = snapshot.docs[0].data();
+      return {
+        id: snapshot.docs[0].id,
+        ...bestResult,
+        timestamp: bestResult.timestamp?.toDate() || new Date()
+      } as RankingEntry;
+    } catch (error: unknown) {
+      console.error('❌ Fehler beim Laden des User-Global-Rankings:', error);
+      throw new Error(`Fehler beim Laden des Global-Rankings: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+    }
+  }
+
+  /**
    * Lädt detaillierte Statistiken für einen Benutzer
    */
   async getUserStats(userId: string): Promise<UserStats | null> {
@@ -265,7 +358,8 @@ export class RankingService {
       // Test-Typen zählen
       const testCountByType: Record<TestType, number> = {
         chaos: 0,
-        structured: 0
+        structured: 0,
+        'global-ranking': 0
       };
       results.forEach(r => {
         testCountByType[r.testType]++;

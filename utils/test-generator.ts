@@ -10,6 +10,28 @@ const CATEGORY_MODE_MAP: Record<TestCategory, ModeId> = {
   'satz': 'sentence-translation-en-de' as ModeId
 };
 
+// NEU: Globale Ranglisten-Konfiguration
+const GLOBAL_RANKING_CONFIG = {
+  // Kategorie-Quota für 20 Fragen
+  KATEGORIE_QUOTA: {
+    "Einkaufen": 4,      // 20% von 20 Fragen
+    "Essen & Trinken": 4,
+    "Freizeit & Unterhaltung": 4,
+    "Kommunikationsmittel": 2,  // 10% (kleinere Kategorie)
+    "Lernen": 2,
+    "Menschlicher Körper & Gesundheit": 2,
+    "Persönliche Beziehungen": 1,  // 5% (kleinste Kategorie)
+    "Person": 1
+  },
+  // Test-Modus-Quota für 20 Fragen
+  TEST_MODE_QUOTA: {
+    "bedeutung": 5,        // 25% von 20 Fragen
+    "luecke": 5,           // 25%
+    "schreibweise": 5,     // 25%
+    "satz": 5              // 25%
+  }
+};
+
 // Hilfsfunktion
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -21,7 +43,7 @@ function shuffleArray<T>(array: T[]): T[] {
 }
 
 export interface TestGeneratorConfig {
-  variant: 'chaos' | 'structured';
+  variant: 'chaos' | 'structured' | 'global-ranking';
   scope: 'global' | 'mainTopic' | 'subTopic';
   topicId?: TopicId;
   subTopicId?: SubTopicId;
@@ -33,6 +55,7 @@ export interface TestGenerationResult {
   words: Word[];
   modeDistribution: Record<ModeId, number>;
   modeRotation?: ModeId[];
+  testModeMapping?: Array<{ word: Word; testMode: TestCategory }>;
 }
 
 export function generateTestQuestions(
@@ -42,6 +65,11 @@ export function generateTestQuestions(
   const { variant, scope, topicId, category, totalQuestions = 20 } = config;
   
   console.log('Test-Generator Config:', config);
+  
+  // NEU: Spezielle Logik für globale Ranglisten
+  if (variant === 'global-ranking') {
+    return generateGlobalRankingTest(vokabular, totalQuestions);
+  }
   
   // 1. Sammle alle relevanten Wörter
   let allWords: Word[] = [];
@@ -109,6 +137,99 @@ export function generateTestQuestions(
     modeDistribution,
     modeRotation
   };
+}
+
+// NEU: Spezielle Funktion für globale Ranglisten-Tests
+function generateGlobalRankingTest(
+  vokabular: VocabularyStructure,
+  totalQuestions: number = 20
+): TestGenerationResult {
+  console.log('🎯 Generiere globalen Ranglisten-Test mit ausgewogener Verteilung');
+  
+  // 1. Sammle Wörter nach Kategorien
+  const wordsByCategory: Record<string, Word[]> = {};
+  
+  Object.keys(vokabular).forEach(mainTopicKey => {
+    const mainTopic = vokabular[mainTopicKey];
+    Object.keys(mainTopic).forEach(subTopicKey => {
+      const subTopic = mainTopic[subTopicKey];
+      if (Array.isArray(subTopic)) {
+        const category = getCategoryFromTopic(mainTopicKey, subTopicKey);
+        if (!wordsByCategory[category]) {
+          wordsByCategory[category] = [];
+        }
+        wordsByCategory[category].push(...(subTopic as Word[]));
+      }
+    });
+  });
+  
+  // 2. Wähle Wörter nach Kategorie-Quota
+  const selectedWords: Word[] = [];
+  for (const [category, quota] of Object.entries(GLOBAL_RANKING_CONFIG.KATEGORIE_QUOTA)) {
+    const categoryWords = wordsByCategory[category] || [];
+    if (categoryWords.length > 0) {
+      const shuffled = shuffleArray(categoryWords);
+      selectedWords.push(...shuffled.slice(0, quota));
+    }
+  }
+  
+  // 3. Erstelle Test-Modus-Mapping
+  const testModes: TestCategory[] = [];
+  for (const [mode, quota] of Object.entries(GLOBAL_RANKING_CONFIG.TEST_MODE_QUOTA)) {
+    for (let i = 0; i < quota; i++) {
+      testModes.push(mode as TestCategory);
+    }
+  }
+  
+  // 4. Mische Test-Modi und erstelle Mapping
+  const shuffledModes = shuffleArray(testModes);
+  const testModeMapping = selectedWords.map((word, index) => ({
+    word,
+    testMode: shuffledModes[index] || 'bedeutung'
+  }));
+  
+  // 5. Finale zufällige Reihenfolge
+  const finalMapping = shuffleArray(testModeMapping);
+  
+  // 6. Modus-Verteilung für Kompatibilität
+  const modeDistribution: Record<ModeId, number> = {
+    'mc-de-en': 0,
+    'type-de-adj': 0,
+    'cloze-adj-de': 0,
+    'sentence-translation-en-de': 0
+  } as Record<ModeId, number>;
+  
+  finalMapping.forEach(({ testMode }) => {
+    const mode = CATEGORY_MODE_MAP[testMode];
+    modeDistribution[mode]++;
+  });
+  
+  console.log('✅ Globaler Ranglisten-Test generiert:');
+  console.log('- Kategorie-Verteilung:', GLOBAL_RANKING_CONFIG.KATEGORIE_QUOTA);
+  console.log('- Test-Modus-Verteilung:', GLOBAL_RANKING_CONFIG.TEST_MODE_QUOTA);
+  console.log('- Finale Modus-Verteilung:', modeDistribution);
+  
+  return {
+    words: finalMapping.map(m => m.word),
+    modeDistribution,
+    testModeMapping: finalMapping
+  };
+}
+
+// NEU: Hilfsfunktion zur Kategorie-Zuordnung
+function getCategoryFromTopic(mainTopic: string, subTopic: string): string {
+  const categoryMap: Record<string, string> = {
+    'einkaufen': 'Einkaufen',
+    'essen_trinken': 'Essen & Trinken',
+    'freizeit_unterhaltung': 'Freizeit & Unterhaltung',
+    'kommunikationsmittel': 'Kommunikationsmittel',
+    'lernen': 'Lernen',
+    'menschlicher_koerper_gesundheit': 'Menschlicher Körper & Gesundheit',
+    'persoenliche_beziehungen': 'Persönliche Beziehungen',
+    'person': 'Person'
+  };
+  
+  return categoryMap[mainTopic] || 'Sonstiges';
 }
 
 function distributeAcrossSubtopics(words: Word[], count: number): Word[] {

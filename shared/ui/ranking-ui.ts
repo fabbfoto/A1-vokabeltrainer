@@ -35,6 +35,19 @@ export class RankingUI {
     }
   }
 
+  // NEU: Spezielle Methode für globale Ranglisten
+  async showGlobalRankingList(): Promise<void> {
+    if (!this.container) return;
+    
+    this.showLoading('🏆 Lade globale Ranglisten-Liste...');
+    try {
+      const response = await this.rankingService.getGlobalRankingList(50);
+      this.renderGlobalRankings(response.entries, '🏆 Globale Ranglisten-Liste', 'Ausgewogene 20-Fragen-Tests');
+    } catch (error) {
+      this.showError('Fehler beim Laden der globalen Ranglisten-Liste');
+    }
+  }
+
   async showTopicRankings(topic: string): Promise<void> {
     if (!this.container) return;
     
@@ -158,6 +171,86 @@ export class RankingUI {
     document.body.appendChild(modal);
   }
 
+  // NEU: Spezielle Render-Methode für globale Ranglisten
+  private renderGlobalRankings(rankings: RankingEntry[], title: string, subtitle: string): void {
+    if (!this.container) return;
+
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    
+    modal.innerHTML = `
+      <div class="bg-white rounded-lg p-6 max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-3xl font-bold text-gray-800">${title}</h2>
+            <p class="text-gray-600">${subtitle}</p>
+            <p class="text-sm text-gray-500 mt-1">
+              🎯 20 Fragen • 5 Bedeutung • 5 Lückentext • 5 Schreibweise • 5 Satzübersetzung
+            </p>
+          </div>
+          <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="this.parentElement.parentElement.parentElement.remove()">
+            ✕
+          </button>
+        </div>
+        
+        <div class="space-y-3">
+          ${rankings.map((entry, index) => `
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+              <div class="flex items-center space-x-4">
+                <div class="flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-lg ${
+                  index === 0 ? 'bg-yellow-500' : 
+                  index === 1 ? 'bg-gray-400' : 
+                  index === 2 ? 'bg-orange-500' : 'bg-blue-500'
+                }">
+                  ${index + 1}
+                </div>
+                <div>
+                  <div class="font-semibold text-lg">${entry.userName}</div>
+                  <div class="text-sm text-gray-600">
+                    ${Math.round(entry.accuracy)}% Genauigkeit • ${Math.floor(entry.timeInSeconds)}s • 
+                    ${new Date(entry.timestamp).toLocaleDateString('de-DE')}
+                  </div>
+                  ${(entry as any).timeFactor ? `
+                    <div class="text-xs text-gray-500">
+                      ⏱️ Zeitfaktor: ${(entry as any).timeFactor}x
+                    </div>
+                  ` : ''}
+                </div>
+              </div>
+              <div class="text-right">
+                <div class="font-bold text-2xl text-blue-600">${entry.score}</div>
+                <div class="text-sm text-gray-600">
+                  ${entry.correctAnswers}/${entry.totalQuestions} • ${Math.floor(entry.timeInSeconds / 60)}:${(entry.timeInSeconds % 60).toString().padStart(2, '0')}
+                </div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+        
+        ${rankings.length === 0 ? `
+          <div class="text-center py-8 text-gray-500">
+            <div class="text-4xl mb-2">🏆</div>
+            <div class="text-xl">Noch keine globalen Ranglisten-Ergebnisse</div>
+            <div class="text-sm">Starte den ersten globalen Ranglisten-Test!</div>
+          </div>
+        ` : ''}
+        
+        <div class="mt-6 flex justify-center space-x-4">
+          <button class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors" 
+                  onclick="window.location.reload()">
+            🏆 Test starten
+          </button>
+          <button class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" 
+                  onclick="this.parentElement.parentElement.parentElement.remove()">
+            Schließen
+          </button>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(modal);
+  }
+
   private renderUserStats(stats: UserStats): void {
     if (!this.container) return;
 
@@ -258,6 +351,10 @@ export class RankingUI {
       <div class="bg-white rounded-lg p-6 shadow-lg">
         <h3 class="text-xl font-bold mb-4">🏆 Ranglisten</h3>
         <div class="grid grid-cols-2 gap-3">
+          <button class="p-3 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors" 
+                  onclick="window.rankingUI.showGlobalRankingList()">
+            🏆 Global Ranking
+          </button>
           <button class="p-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors" 
                   onclick="window.rankingUI.showGlobalRankings()">
             🌍 Global
