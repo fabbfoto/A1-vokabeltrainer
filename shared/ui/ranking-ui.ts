@@ -142,7 +142,7 @@ export class RankingUI {
                 </div>
               </div>
               <div class="text-right">
-                <div class="font-bold text-2xl text-blue-600">${entry.score}</div>
+                <div class="font-bold text-2xl text-blue-600">${entry.score.toFixed(2)}</div>
                 <div class="text-sm text-gray-600">
                   ${Math.floor(entry.timeInSeconds)}s • ${Math.round(entry.accuracy * 100)}%
                 </div>
@@ -223,7 +223,7 @@ export class RankingUI {
                 </div>
               </div>
               <div class="text-right">
-                <div class="font-bold text-2xl text-blue-600">${entry.score.toFixed(1)}</div>
+                <div class="font-bold text-2xl text-blue-600">${entry.score.toFixed(2)}</div>
                 <div class="text-sm text-gray-600">
                   ${entry.correctAnswers}/${entry.totalQuestions} • ${Math.floor(entry.timeInSeconds / 60)}:${(entry.timeInSeconds % 60).toString().padStart(2, '0')}
                 </div>

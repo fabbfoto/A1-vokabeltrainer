@@ -112,18 +112,20 @@ export function generateMotivationalDummyResults(count: number = 10): RankingEnt
   for (let i = 0; i < count; i++) {
     const user = MOTIVATIONAL_DUMMY_USERS[i % MOTIVATIONAL_DUMMY_USERS.length];
     
-    // Realistische aber motivierende Scores generieren
-    // Höhere Scores für bessere Plätze, aber nicht perfekt
-    const baseScore = 85 + Math.random() * 15; // 85-100 Punkte
-    const timeInSeconds = 120 + Math.random() * 180; // 2-5 Minuten
+    // Realistische aber erreichbare Scores für echte Spieler
+    // Der beste sollte bei etwa 7 Minuten liegen, andere langsamer
+    const baseTimeInSeconds = 420 + (i * 30) + Math.random() * 60; // 7-12 Minuten, steigend
+    const timeInSeconds = Math.floor(baseTimeInSeconds);
     
-    // Score basierend auf Platzierung anpassen
-    const rankBonus = Math.max(0, (count - i - 1) * 2); // Bessere Plätze = höhere Scores
-    const finalScore = Math.min(100, baseScore + rankBonus);
+    // Score basierend auf Zeit und Platzierung
+    // Langsamere Zeiten = niedrigere Scores
+    const timePenalty = Math.max(0, (timeInSeconds - 300) / 10); // Abzug für langsame Zeiten
+    const baseScore = 70 + Math.random() * 20; // 70-90 Punkte Basis
+    const rankBonus = Math.max(0, (count - i - 1) * 1); // Kleiner Bonus für bessere Plätze
+    const finalScore = Math.max(50, Math.min(95, baseScore + rankBonus - timePenalty));
     
     // Genauigkeit basierend auf finalem Score berechnen
-    // Bei perfektem Score (100) sollte Genauigkeit auch 100% sein
-    const accuracy = finalScore === 100 ? 1.0 : 0.75 + Math.random() * 0.25; // 75-100% Genauigkeit
+    const accuracy = finalScore >= 90 ? 0.9 + Math.random() * 0.1 : 0.7 + Math.random() * 0.2;
     
     // Realistische Zeitstempel (letzte 2 Wochen)
     const daysAgo = Math.floor(Math.random() * 14);
