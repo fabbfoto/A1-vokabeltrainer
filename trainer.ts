@@ -1045,6 +1045,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const scoreMessage = `🏆 Score: ${scoreCalculation.finalScore} (${scoreCalculation.baseScore} - ${scoreCalculation.timePenalty} Zeitstrafe)`;
         const accuracyMessage = `📊 Genauigkeit: ${Math.round(accuracy * 100)}%`;
         
+        // KORREKTUR: Nur eine Zeile, keine mehrzeilige Template-Literal!
         ui.showMessage(dom, `Test beendet! ${accuracyMessage} | ${timeMessage} | ${scoreMessage}`,
             accuracy >= 0.8 ? 'success' : 'info');
         
@@ -1307,6 +1308,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // ErrorManager global verfügbar machen für Debugging
     (window as any).errorManager = errorManager;
+    
+    // RankingUI ist bereits global verfügbar durch shared/auth/index.ts
 
     // Debug-Funktionen für Browser-Konsole
     (window as any).debugErrorCounts = () => {
