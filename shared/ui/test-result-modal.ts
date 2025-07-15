@@ -14,7 +14,7 @@ declare global {
     setMode?: (modeId: string, isRepeat: boolean) => void;
     state?: import('../types/trainer').TrainerState;
     rankingService?: {
-      submitTestResult: (testResult: TestResult, variant: string, category?: string, artistName?: string) => Promise<string>;
+      submitTestResult: (testResult: TestResult, variant: string, category?: string) => Promise<string>;
     };
   }
 }
@@ -134,7 +134,7 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
                   <h4 class="text-lg font-medium text-blue-700 mb-3">🏆 Globales Ranking</h4>
                   <p class="text-sm text-blue-600 mb-4">
                       Möchtest du dein Ergebnis in der globalen Rangliste veröffentlichen? 
-                      Du kannst einen Künstlernamen wählen, um anonym zu bleiben.
+                      Dein Benutzername wird automatisch verwendet (anonym oder normal).
                   </p>
                   
                   <div class="space-y-3">
@@ -145,29 +145,6 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
                       <div class="flex items-center">
                           <input type="radio" id="ranking-no" name="ranking-choice" value="no" class="mr-2" checked>
                           <label for="ranking-no" class="text-sm font-medium">Nein, nur lokal speichern</label>
-                      </div>
-                  </div>
-                  
-                  <div id="artist-name-section" class="mt-4 hidden">
-                      <label for="artist-name" class="block text-sm font-medium text-blue-700 mb-2">
-                          Anonymer Benutzername (für Datenschutz):
-                      </label>
-                      <div class="space-y-2">
-                          <input type="text" id="artist-name" 
-                                 placeholder="z.B. Anonymous2024, LanguageLearner, Student123, etc."
-                                 class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                          <div class="flex gap-2">
-                              <button id="generate-random-name" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition-colors">
-                                  🎲 Zufälligen Namen generieren
-                              </button>
-                              <button id="suggest-names" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition-colors">
-                                  💡 Namen vorschlagen
-                              </button>
-                          </div>
-                          <p class="text-xs text-blue-500">
-                              💡 <strong>Datenschutz-Tipp:</strong> Verwende niemals deinen echten Namen oder persönliche Informationen. 
-                              Falls leer gelassen, wird ein zufälliger Name generiert.
-                          </p>
                       </div>
                   </div>
               </div>
@@ -198,96 +175,13 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
   if (isGlobalChaosTest) {
     const rankingYes = document.getElementById('ranking-yes') as HTMLInputElement;
     const rankingNo = document.getElementById('ranking-no') as HTMLInputElement;
-    const artistNameSection = document.getElementById('artist-name-section') as HTMLDivElement;
-    const artistNameInput = document.getElementById('artist-name') as HTMLInputElement;
-    const generateRandomNameBtn = document.getElementById('generate-random-name') as HTMLButtonElement;
-    const suggestNamesBtn = document.getElementById('suggest-names') as HTMLButtonElement;
     
     rankingYes?.addEventListener('change', () => {
-      artistNameSection.classList.remove('hidden');
+      // No longer need artist name section or input
     });
     
     rankingNo?.addEventListener('change', () => {
-      artistNameSection.classList.add('hidden');
-    });
-    
-    // Zufälligen Namen generieren
-    generateRandomNameBtn?.addEventListener('click', () => {
-      const randomNames = [
-        'Anonymous' + Math.floor(Math.random() * 9999),
-        'Learner' + Math.floor(Math.random() * 999),
-        'Student' + Math.floor(Math.random() * 999),
-        'User' + Math.floor(Math.random() * 9999),
-        'Player' + Math.floor(Math.random() * 999),
-        'Champion' + Math.floor(Math.random() * 999),
-        'Master' + Math.floor(Math.random() * 999),
-        'Pro' + Math.floor(Math.random() * 999),
-        'Elite' + Math.floor(Math.random() * 999),
-        'Ninja' + Math.floor(Math.random() * 999),
-        'Hero' + Math.floor(Math.random() * 999),
-        'Legend' + Math.floor(Math.random() * 999),
-        'Star' + Math.floor(Math.random() * 999),
-        'Guru' + Math.floor(Math.random() * 999),
-        'Wizard' + Math.floor(Math.random() * 999)
-      ];
-      const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
-      artistNameInput.value = randomName;
-    });
-    
-    // Namen vorschlagen
-    suggestNamesBtn?.addEventListener('click', () => {
-      const suggestions = [
-        'Anonymous2024',
-        'LanguageLearner',
-        'Student123',
-        'GlobalUser',
-        'LearningPro',
-        'Champion2024',
-        'MasterLearner',
-        'EliteStudent',
-        'NinjaUser',
-        'Hero2024',
-        'LegendaryLearner',
-        'StarStudent',
-        'GuruUser',
-        'Wizard2024',
-        'GlobalChampion'
-      ];
-      
-      // Zeige Vorschläge in einem Popup
-      const suggestionModal = document.createElement('div');
-      suggestionModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-      suggestionModal.innerHTML = `
-        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-          <h3 class="text-lg font-semibold mb-4">💡 Anonyme Benutzernamen vorschlagen</h3>
-          <div class="grid grid-cols-2 gap-2 mb-4">
-            ${suggestions.map(name => `
-              <button class="suggestion-btn px-3 py-2 text-sm border border-gray-300 rounded hover:bg-blue-50 hover:border-blue-300 transition-colors">
-                ${name}
-              </button>
-            `).join('')}
-          </div>
-          <div class="flex justify-end">
-            <button id="close-suggestions" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">
-              Schließen
-            </button>
-          </div>
-        </div>
-      `;
-      
-      document.body.appendChild(suggestionModal);
-      
-      // Event-Handler für Vorschläge
-      suggestionModal.querySelectorAll('.suggestion-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          artistNameInput.value = (btn as HTMLElement).textContent || '';
-          suggestionModal.remove();
-        });
-      });
-      
-      suggestionModal.querySelector('#close-suggestions')?.addEventListener('click', () => {
-        suggestionModal.remove();
-      });
+      // No longer need artist name section or input
     });
   }
 
@@ -352,17 +246,13 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
     if (isGlobalChaosTest && window.rankingService) {
       const rankingChoice = (document.querySelector('input[name="ranking-choice"]:checked') as HTMLInputElement)?.value;
       
-      if (rankingChoice === 'yes') {
-        try {
-          const artistNameInput = document.getElementById('artist-name') as HTMLInputElement;
-          const artistName = artistNameInput?.value?.trim() || '';
-          
-          await window.rankingService.submitTestResult(
-            testResult,
-            testConfig?.variant as string,
-            testConfig?.selectedCategory as string,
-            artistName
-          );
+              if (rankingChoice === 'yes') {
+          try {
+            await window.rankingService.submitTestResult(
+              testResult,
+              testConfig?.variant as string,
+              testConfig?.selectedCategory as string
+            );
           
           // Erfolgs-Feedback
           const button = document.getElementById('save-test-result') as HTMLButtonElement;

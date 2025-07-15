@@ -1,5 +1,5 @@
 // Firebase-Imports für Runtime
-import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut, updateProfile } from 'firebase/auth';
 import type { User as FirebaseUser, Auth } from 'firebase/auth';
 import { app } from '../auth/firebase-config';
 
@@ -15,6 +15,9 @@ export interface AppUser {
         creationTime: string | null;
         lastSignInTime: string | null;
     };
+    // Neue Felder für anonyme Username-Funktionalität
+    anonymousUsername?: string;
+    isAnonymousUser?: boolean;
 }
 
 // ========== AUTH SERVICE WITH FULL TYPE SAFETY ==========
@@ -39,6 +42,10 @@ export class AuthService {
      * Konvertiert Firebase User zu AppUser für bessere Typsicherheit
      */
     private convertFirebaseUser(firebaseUser: FirebaseUser): AppUser {
+        // Lade anonyme Username-Daten aus localStorage
+        const storedData = localStorage.getItem(`user_${firebaseUser.uid}_anonymous`);
+        const anonymousData = storedData ? JSON.parse(storedData) : {};
+        
         return {
             uid: firebaseUser.uid,
             email: firebaseUser.email,
@@ -49,8 +56,79 @@ export class AuthService {
             metadata: {
                 creationTime: firebaseUser.metadata.creationTime ?? null,
                 lastSignInTime: firebaseUser.metadata.lastSignInTime ?? null
-            }
+            },
+            anonymousUsername: anonymousData.anonymousUsername,
+            isAnonymousUser: anonymousData.isAnonymousUser || false
         };
+    }
+
+    /**
+     * Generiert einen zufälligen anonymen Username
+     */
+    generateAnonymousUsername(): string {
+        const prefixes = [
+            'Anonymous', 'Learner', 'Student', 'User', 'Player', 
+            'Champion', 'Master', 'Pro', 'Elite', 'Ninja', 
+            'Hero', 'Legend', 'Star', 'Guru', 'Wizard'
+        ];
+        const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+        const number = Math.floor(Math.random() * 9999);
+        return `${prefix}${number}`;
+    }
+
+    /**
+     * Setzt einen anonymen Username für den aktuellen User
+     */
+    async setAnonymousUsername(username: string): Promise<void> {
+        if (!this.currentUser) {
+            throw new Error('Kein User angemeldet');
+        }
+
+        // Speichere in localStorage
+        const anonymousData = {
+            anonymousUsername: username,
+            isAnonymousUser: true
+        };
+        localStorage.setItem(`user_${this.currentUser.uid}_anonymous`, JSON.stringify(anonymousData));
+
+        // Aktualisiere Firebase DisplayName (optional, für Konsistenz)
+        if (this.firebaseUser) {
+            try {
+                await updateProfile(this.firebaseUser, {
+                    displayName: username
+                });
+            } catch (error) {
+                console.warn('Konnte Firebase DisplayName nicht aktualisieren:', error);
+            }
+        }
+
+        // Aktualisiere currentUser
+        this.currentUser.anonymousUsername = username;
+        this.currentUser.isAnonymousUser = true;
+    }
+
+    /**
+     * Gibt den anonymen Username zurück (falls gesetzt)
+     */
+    getAnonymousUsername(): string | null {
+        return this.currentUser?.anonymousUsername || null;
+    }
+
+    /**
+     * Prüft, ob der User anonym ist
+     */
+    isAnonymousUser(): boolean {
+        return this.currentUser?.isAnonymousUser || false;
+    }
+
+    /**
+     * Gibt den Anzeigenamen zurück (anonym oder normal)
+     */
+    getDisplayNameForRanking(): string {
+        if (this.currentUser?.isAnonymousUser && this.currentUser?.anonymousUsername) {
+            return this.currentUser.anonymousUsername;
+        }
+        return this.currentUser?.displayName || this.currentUser?.email || 'Anonymous';
     }
 
     /**

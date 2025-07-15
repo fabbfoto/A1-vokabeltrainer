@@ -200,8 +200,7 @@ export class RankingService {
   async submitTestResult(
     testResult: TestResult, 
     testVariant: TestType, 
-    selectedCategory?: string,
-    artistName?: string
+    selectedCategory?: string
   ): Promise<string> {
     // NEU: Validierung hinzufügen
     if (!testResult || !testResult.score) {
@@ -230,10 +229,8 @@ export class RankingService {
       baseScore = globalScore.baseScore;
     }
 
-    // Künstlername oder zufälligen Namen generieren
-    const displayName = artistName?.trim() || 
-      user.displayName || 
-      generateRandomArtistName();
+    // Username aus AuthService verwenden (anonym oder normal)
+    const displayName = this.authService.getDisplayNameForRanking();
     
     const testResultSubmission: TestResultSubmission = {
       userId: user.uid,
