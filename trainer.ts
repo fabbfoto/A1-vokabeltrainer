@@ -507,6 +507,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             if (dom.continueButton) {
                 dom.continueButton.style.display = 'block';
             }
+        } else {
+            // Test-Modus: Kein visuelles Feedback
+            console.log('Test-Modus: Kein visuelles Feedback für falsche Antwort');
         }
     }
 

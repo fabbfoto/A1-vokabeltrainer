@@ -464,11 +464,10 @@ export function setupSpellingMode(
             } else {
                 // Im Test-Modus: Keine Korrektur anzeigen
                 if (state.test.isTestModeActive) {
-                    // Kurze Fehlermeldung, dann weiter
-                    ui.showMessage(dom, '✗', 'error', 1000);
+                    // Test-Modus: Kein visuelles Feedback, direkt weiter
                     setTimeout(() => {
                         processAnswer(false, correctAnswerText);
-                    }, 1000);
+                    }, 100);
                 } else {
                     // Normaler Modus: Korrektur anzeigen
                     dom.correctionSolutionEl.textContent = correctAnswerText;
@@ -592,11 +591,10 @@ export function setupSpellingMode(
             } else {
                 // Im Test-Modus: Keine Korrektur anzeigen
                 if (state.test.isTestModeActive) {
-                    // Kurze Fehlermeldung, dann weiter
-                    ui.showMessage(dom, '✗', 'error', 1000);
+                    // Test-Modus: Kein visuelles Feedback, direkt weiter
                     setTimeout(() => {
                         processAnswer(false, correctAnswer);
-                    }, 1000);
+                    }, 100);
                 } else {
                     // Normaler Modus: Korrektur anzeigen
                     dom.correctionSolutionEl.textContent = correctAnswer;
