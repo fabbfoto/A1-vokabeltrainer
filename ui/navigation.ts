@@ -51,7 +51,7 @@ function createTestButton(
     id: string,
     text: string,
     icon: string,
-    variant: 'chaos' | 'structured' | 'global-ranking',
+    variant: 'chaos' | 'structured',
     dataset: Record<string, string>
 ): HTMLButtonElement {
     const button = document.createElement('button');
@@ -130,17 +130,8 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
         'structured',
         { testVariant: 'structured', testScope: 'global' }
     );
-    // NEU: Globaler Ranglisten-Test Button
-    const globalRankingTest = createTestButton(
-        'global-ranking-test',
-        '🏆 Globaler Ranglisten-Test',
-        '🏆',
-        'global-ranking',
-        { testVariant: 'global-ranking', testScope: 'global' }
-    );
     testContainer.appendChild(globalChaosTest);
     testContainer.appendChild(globalStructuredTest);
-    testContainer.appendChild(globalRankingTest);
     dom.navigationContainerEl.appendChild(testContainer);
 
     // NEU: Ranking-Button
@@ -149,6 +140,15 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
     rankingButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2', 'mt-2');
     rankingButton.style.backgroundColor = '#10b981';
     rankingButton.style.color = 'white';
+    
+    // Event Listener für Ranking-Button
+    rankingButton.addEventListener('click', () => {
+        // Globale Rangliste anzeigen
+        if (window.rankingUI) {
+            window.rankingUI.showGlobalRankings();
+        }
+    });
+    
     dom.navigationContainerEl.appendChild(rankingButton);
     
     // Copyright Footer
@@ -300,15 +300,15 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
         } else if (subTopicButton) {
             callbacks.handleTopicSelection(state.navigation.currentMainTopic!, subTopicButton.dataset.subTopic! as SubTopicId);
         } else if (testButton) {
-            const variant = testButton.dataset.testVariant as 'chaos' | 'structured' | 'global-ranking';
+            const variant = testButton.dataset.testVariant as 'chaos' | 'structured';
             const scope = testButton.dataset.testScope as 'global' | 'mainTopic';
             const topicId = testButton.dataset.topicId;
             if (variant === 'chaos') {
-                // Chaos-Test direkt starten
+                // Chaos-Test direkt starten - für globale Tests wird das Ergebnis in die Rangliste gespeichert
                 const testConfig: TestConfiguration = {
                     testId: `test_${Date.now()}` as TestId,
                     testType: scope === 'global' ? 'global' : 'mainTopic',
-                    variant: 'chaos',
+                    variant: scope === 'global' ? 'global-ranking' : 'chaos', // Globale Tests werden als global-ranking gespeichert
                     topicId: topicId as TopicId,
                     testTitle: scope === 'global' ? 'Globaler Chaos-Test' : `${topicId} Chaos-Test`,
                     modeIds: ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as ModeId[],
@@ -317,21 +317,7 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
                     categories: ['bedeutung', 'schreibweise', 'luecke', 'satz']
                 };
                 callbacks.startTest?.(testConfig);
-            } else if (variant === 'global-ranking') {
-                // Globaler Ranglisten-Test direkt starten
-                const testConfig: TestConfiguration = {
-                    testId: `test_${Date.now()}` as TestId,
-                    testType: 'global',
-                    variant: 'global-ranking',
-                    topicId: 'global' as TopicId,
-                    testTitle: '🏆 Globaler Ranglisten-Test',
-                    modeIds: ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as ModeId[],
-                    mode: 'mc-de-en' as ModeId,
-                    questionCount: 20,
-                    categories: ['bedeutung', 'schreibweise', 'luecke', 'satz']
-                };
-                callbacks.startTest?.(testConfig);
-            } else {
+            } else if (variant === 'structured') {
                 // Struktur-Test - Modal für Kategorie-Auswahl
                 import('./test-modal').then(module => {
                     module.showCategoryModal(scope, topicId, 
