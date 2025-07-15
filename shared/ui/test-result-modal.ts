@@ -150,14 +150,25 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
                   
                   <div id="artist-name-section" class="mt-4 hidden">
                       <label for="artist-name" class="block text-sm font-medium text-blue-700 mb-2">
-                          Künstlername (optional, für Anonymität):
+                          Anonymer Benutzername (für Datenschutz):
                       </label>
-                      <input type="text" id="artist-name" 
-                             placeholder="z.B. DeutschLerner2024, VokabelMeister, etc."
-                             class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
-                      <p class="text-xs text-blue-500 mt-1">
-                          Falls leer gelassen, wird ein zufälliger Name generiert.
-                      </p>
+                      <div class="space-y-2">
+                          <input type="text" id="artist-name" 
+                                 placeholder="z.B. DeutschLerner2024, VokabelMeister, Anonym123, etc."
+                                 class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                          <div class="flex gap-2">
+                              <button id="generate-random-name" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition-colors">
+                                  🎲 Zufälligen Namen generieren
+                              </button>
+                              <button id="suggest-names" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition-colors">
+                                  💡 Namen vorschlagen
+                              </button>
+                          </div>
+                          <p class="text-xs text-blue-500">
+                              💡 <strong>Datenschutz-Tipp:</strong> Verwende niemals deinen echten Namen oder persönliche Informationen. 
+                              Falls leer gelassen, wird ein zufälliger Name generiert.
+                          </p>
+                      </div>
                   </div>
               </div>
           ` : ''}
@@ -188,6 +199,9 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
     const rankingYes = document.getElementById('ranking-yes') as HTMLInputElement;
     const rankingNo = document.getElementById('ranking-no') as HTMLInputElement;
     const artistNameSection = document.getElementById('artist-name-section') as HTMLDivElement;
+    const artistNameInput = document.getElementById('artist-name') as HTMLInputElement;
+    const generateRandomNameBtn = document.getElementById('generate-random-name') as HTMLButtonElement;
+    const suggestNamesBtn = document.getElementById('suggest-names') as HTMLButtonElement;
     
     rankingYes?.addEventListener('change', () => {
       artistNameSection.classList.remove('hidden');
@@ -195,6 +209,80 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
     
     rankingNo?.addEventListener('change', () => {
       artistNameSection.classList.add('hidden');
+    });
+    
+    // Zufälligen Namen generieren
+    generateRandomNameBtn?.addEventListener('click', () => {
+      const randomNames = [
+        'DeutschLerner' + Math.floor(Math.random() * 9999),
+        'VokabelMeister' + Math.floor(Math.random() * 999),
+        'Anonym' + Math.floor(Math.random() * 9999),
+        'Lerner' + Math.floor(Math.random() * 999),
+        'Student' + Math.floor(Math.random() * 999),
+        'DeutschFan' + Math.floor(Math.random() * 999),
+        'VokabelPro' + Math.floor(Math.random() * 999),
+        'AnonymLerner' + Math.floor(Math.random() * 999),
+        'DeutschStudent' + Math.floor(Math.random() * 999),
+        'VokabelChamp' + Math.floor(Math.random() * 999)
+      ];
+      const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
+      artistNameInput.value = randomName;
+    });
+    
+    // Namen vorschlagen
+    suggestNamesBtn?.addEventListener('click', () => {
+      const suggestions = [
+        'DeutschLerner2024',
+        'VokabelMeister',
+        'Anonym123',
+        'LernerXYZ',
+        'DeutschFan',
+        'VokabelPro',
+        'AnonymLerner',
+        'DeutschStudent',
+        'VokabelChamp',
+        'Lerner2024',
+        'DeutschFreak',
+        'VokabelKing',
+        'AnonymUser',
+        'DeutschLover',
+        'VokabelQueen'
+      ];
+      
+      // Zeige Vorschläge in einem Popup
+      const suggestionModal = document.createElement('div');
+      suggestionModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+      suggestionModal.innerHTML = `
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+          <h3 class="text-lg font-semibold mb-4">💡 Anonyme Benutzernamen vorschlagen</h3>
+          <div class="grid grid-cols-2 gap-2 mb-4">
+            ${suggestions.map(name => `
+              <button class="suggestion-btn px-3 py-2 text-sm border border-gray-300 rounded hover:bg-blue-50 hover:border-blue-300 transition-colors">
+                ${name}
+              </button>
+            `).join('')}
+          </div>
+          <div class="flex justify-end">
+            <button id="close-suggestions" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">
+              Schließen
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(suggestionModal);
+      
+      // Event-Handler für Vorschläge
+      suggestionModal.querySelectorAll('.suggestion-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          artistNameInput.value = (btn as HTMLElement).textContent || '';
+          suggestionModal.remove();
+        });
+      });
+      
+      suggestionModal.querySelector('#close-suggestions')?.addEventListener('click', () => {
+        suggestionModal.remove();
+      });
     });
   }
 
