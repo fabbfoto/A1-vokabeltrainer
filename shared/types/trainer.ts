@@ -281,6 +281,9 @@ export interface TestState {
     testModeRotation: ModeId[];
     currentTestModeIndex: number;
     
+    // NEU: Test-Modus-Mapping für Global-Ranking-Tests
+    testModeMapping?: Array<{ word: Word; testMode: TestCategory }>;
+    
     // Zeitmessung
     testStartTime: number | null;
     currentQuestionStartTime: number | null;

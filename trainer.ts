@@ -28,7 +28,7 @@ import { initializeAuth } from './shared/auth/index';
 import { NavigationEvents } from './shared/events/navigation-events';
 import { updateErrorCounts } from './ui/statistics';
 import { generateTestQuestions, TestGenerationResult } from './utils/test-generator';
-import { calculateTestScore, calculateAverageTimePerQuestion } from './shared/types/trainer';
+import { calculateTestScore, calculateAverageTimePerQuestion, CATEGORY_MODE_MAP } from './shared/types/trainer';
 import { showTestResultModal } from './shared/ui/test-result-modal';
 import { ModeManager } from './shared/services/mode-manager';
 import { ErrorCounterManager } from './shared/services/error-counter-manager';
@@ -745,9 +745,25 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (state.test.isTestModeActive && 
             (state.test.currentTest?.variant === 'chaos' || state.test.currentTest?.testType === 'global') && 
             state.test.testModeRotation.length > 0) {
-            // Nächster Modus aus der Rotation
-            state.training.currentMode = state.test.testModeRotation[state.test.currentTestModeIndex % state.test.testModeRotation.length];
-            state.test.currentTestModeIndex++;
+            
+            // NEU: Für Global-Ranking-Test das spezifische Mapping verwenden
+            if (state.test.currentTest?.testType === 'global' && state.test.testModeMapping) {
+                const currentWord = state.training.currentWord;
+                const mapping = state.test.testModeMapping.find(m => m.word.id === currentWord?.id);
+                if (mapping) {
+                    state.training.currentMode = CATEGORY_MODE_MAP[mapping.testMode];
+                    console.log('🎯 Global-Ranking: Wort', currentWord?.id, '→ Modus', mapping.testMode, '→', state.training.currentMode);
+                } else {
+                    // Fallback auf Rotation
+                    state.training.currentMode = state.test.testModeRotation[state.test.currentTestModeIndex % state.test.testModeRotation.length];
+                    state.test.currentTestModeIndex++;
+                }
+            } else {
+                // Chaos-Test: Nächster Modus aus der Rotation
+                state.training.currentMode = state.test.testModeRotation[state.test.currentTestModeIndex % state.test.testModeRotation.length];
+                state.test.currentTestModeIndex++;
+            }
+            
             console.log('🎯 Nächster Test-Modus:', state.training.currentMode, 'Index:', state.test.currentTestModeIndex);
             // BUGFIX: UI-Reset nach Mode-Wechsel im Chaos-Test
             requestAnimationFrame(() => {
@@ -1188,6 +1204,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             state.training.currentWordIndex = -1;
             state.training.correctInCurrentRound = 0;
             state.training.attemptedInCurrentRound = 0;
+            
+            // NEU: Test-Modus-Mapping für Global-Ranking-Test speichern
+            if (testConfig.testType === 'global' && result.testModeMapping) {
+                state.test.testModeMapping = result.testModeMapping;
+                console.log('🎯 Test-Modus-Mapping für Global-Ranking gesetzt:', result.testModeMapping.length, 'Einträge');
+            }
             
             // Mode-Rotation für Chaos-Test und Global-Ranking-Test
             if ((testConfig.variant === 'chaos' || testConfig.testType === 'global') && result.modeRotation) {
