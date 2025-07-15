@@ -736,11 +736,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Hole nächstes Wort
         state.training.currentWord = state.training.shuffledWordsForMode[state.training.currentWordIndex];
         
-        // Mode-Rotation für Chaos-Test
-        if (state.test.isTestModeActive && state.test.currentTest?.variant === 'chaos' && state.test.testModeRotation.length > 0) {
+        // Mode-Rotation für Chaos-Test und Global-Ranking-Test
+        if (state.test.isTestModeActive && 
+            (state.test.currentTest?.variant === 'chaos' || state.test.currentTest?.testType === 'global') && 
+            state.test.testModeRotation.length > 0) {
             // Nächster Modus aus der Rotation
             state.training.currentMode = state.test.testModeRotation[state.test.currentTestModeIndex % state.test.testModeRotation.length];
             state.test.currentTestModeIndex++;
+            console.log('🎯 Nächster Test-Modus:', state.training.currentMode, 'Index:', state.test.currentTestModeIndex);
             // BUGFIX: UI-Reset nach Mode-Wechsel im Chaos-Test
             requestAnimationFrame(() => {
                 document.querySelectorAll('[disabled]').forEach(el => {
@@ -1181,10 +1184,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             state.training.correctInCurrentRound = 0;
             state.training.attemptedInCurrentRound = 0;
             
-            // Mode-Rotation für Chaos-Test
-            if (testConfig.variant === 'chaos' && result.modeRotation) {
+            // Mode-Rotation für Chaos-Test und Global-Ranking-Test
+            if ((testConfig.variant === 'chaos' || testConfig.testType === 'global') && result.modeRotation) {
                 state.test.testModeRotation = result.modeRotation as import('./shared/types/trainer').ModeId[];
                 state.test.currentTestModeIndex = 0;
+                console.log('🎯 Mode-Rotation für Test gesetzt:', result.modeRotation);
             } else {
                 state.training.currentMode = testConfig.mode as ModeId || null;
             }
