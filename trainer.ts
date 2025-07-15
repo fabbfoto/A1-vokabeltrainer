@@ -401,14 +401,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 break;
                 
             case 'testing':
-                // Im Test-Modus: Keine visuellen Hinweise, direkt weiter
+                // Im Test-Modus: Keine visuellen Hinweise, aber kurze Pause
                 if (isCorrect) {
                     state.training.correctInCurrentRound++;
                 }
                 // Statistiken aktualisieren
                 updateStatistics();
-                // Sofort zur nächsten Aufgabe
-                loadNextTask();
+                // Kurze Pause vor der nächsten Aufgabe
+                setTimeout(() => {
+                    loadNextTask();
+                }, 500); // 500ms Pause für bessere UX
                 break;
                 
             case 'repeating':

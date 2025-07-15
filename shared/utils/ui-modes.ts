@@ -896,6 +896,14 @@ function generateSentenceInputs(
         input.addEventListener('focus', () => {
             state.training.activeTextInput = input;
         });
+        
+        // Enter-Taste für schnelle Antwort
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                dom.checkSentenceButton.click();
+            }
+        });
     });
     
     // ✅ ROBUSTE AKTIVIERUNG: Alle Satzübersetzungs-Felder explizit aktivieren
@@ -910,7 +918,16 @@ function generateSentenceInputs(
         const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
         const userSentence = Array.from(inputs).map(input => input.value.trim()).join(' ');
         
+        // Prüfe ob überhaupt etwas eingegeben wurde
+        if (!userSentence || userSentence.trim() === '') {
+            console.log('Keine Antwort eingegeben, warte auf Benutzereingabe...');
+            return;
+        }
+        
         const isCorrect = vergleicheAntwort(userSentence, fullGermanSentence);
+        
+        // Button deaktivieren um mehrfache Klicks zu verhindern
+        dom.checkSentenceButton.disabled = true;
         
         inputs.forEach((input, index) => {
             const userWord = input.value.trim();
@@ -924,11 +941,18 @@ function generateSentenceInputs(
             input.disabled = true;
         });
         
-        processAnswer(isCorrect, fullGermanSentence);
+        // Kurze Verzögerung vor processAnswer um UI-Updates zu ermöglichen
+        setTimeout(() => {
+            processAnswer(isCorrect, fullGermanSentence);
+        }, 100);
     };
     setTimeout(() => {
         const firstInput = dom.sentenceWordInputContainerEl.querySelector('input[type="text"]') as HTMLInputElement;
-        if (firstInput) { firstInput.focus(); state.training.activeTextInput = firstInput; }
+        if (firstInput) { 
+            firstInput.focus(); 
+            state.training.activeTextInput = firstInput; 
+            console.log('🎯 Satzübersetzung: Erstes Input-Feld fokussiert');
+        }
         
         // Umlaut-Buttons für dynamisch erstellte Input-Felder initialisieren
         const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
@@ -937,7 +961,10 @@ function generateSentenceInputs(
                 mod.initializeUmlautButtons('setup', dom, state);
             });
         }
-    }, 0);
+        
+        // Debug-Ausgabe
+        console.log('🎯 Satzübersetzung: UI initialisiert mit', inputs.length, 'Input-Feldern');
+    }, 50); // Längere Verzögerung für bessere Initialisierung
 }
 
 function addCorrectionEnterHandler(dom: DOMElements, state: TrainerState) {
