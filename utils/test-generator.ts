@@ -181,6 +181,23 @@ function generateGlobalRankingTest(
     }
   }
   
+  // Fallback: Falls keine Wörter nach Kategorien gefunden, nimm alle verfügbaren
+  if (selectedWords.length === 0) {
+    console.log('⚠️ Keine Wörter nach Kategorien gefunden, verwende Fallback');
+    const allWords: Word[] = [];
+    Object.keys(vokabular).forEach(mainTopicKey => {
+      const mainTopic = vokabular[mainTopicKey];
+      Object.keys(mainTopic).forEach(subTopicKey => {
+        const subTopic = mainTopic[subTopicKey];
+        if (Array.isArray(subTopic)) {
+          allWords.push(...(subTopic as Word[]));
+        }
+      });
+    });
+    const shuffled = shuffleArray(allWords);
+    selectedWords.push(...shuffled.slice(0, totalQuestions));
+  }
+  
   // 3. Erstelle Test-Modus-Mapping
   const testModes: TestCategory[] = [];
   for (const [mode, quota] of Object.entries(GLOBAL_RANKING_CONFIG.TEST_MODE_QUOTA)) {
@@ -217,9 +234,12 @@ function generateGlobalRankingTest(
   console.log('- Test-Modus-Verteilung:', GLOBAL_RANKING_CONFIG.TEST_MODE_QUOTA);
   console.log('- Finale Modus-Verteilung:', modeDistribution);
   
+  console.log('Debug: Finale Wörter-Anzahl:', finalMapping.length);
+  
   return {
     words: finalMapping.map(m => m.word),
     modeDistribution,
+    modeRotation: finalMapping.map(m => CATEGORY_MODE_MAP[m.testMode]),
     testModeMapping: finalMapping
   };
 }
