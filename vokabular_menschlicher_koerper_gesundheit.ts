@@ -260,8 +260,8 @@ export const vokabularMenschlicherKoerperGesundheit: VocabularyStructure = creat
             } as Noun
         ],
 
-        // --- UNTER-THEMA: Körperpflege/Hygiene (4 Wörter) ---
-        "Körperpflege/Hygiene": [
+        // --- UNTER-THEMA: Körperpflege, Hygiene (4 Wörter) ---
+        "Körperpflege, Hygiene": [
             {id: createWordId("menschlicher-koerper-gesundheit-koerperpflege-001"),
                 wordType: "verb",
                 german: "duschen",
@@ -550,8 +550,8 @@ export const vokabularMenschlicherKoerperGesundheit: VocabularyStructure = creat
             } as Adjective
         ],
 
-        // --- UNTER-THEMA: Gesundheit/Krankheit (13 Wörter) ---
-        "Gesundheit/Krankheit": [
+        // --- UNTER-THEMA: Gesundheit, Krankheit (13 Wörter) ---
+        "Gesundheit, Krankheit": [
             {id: createWordId("menschlicher-koerper-gesundheit-gesundheit-001"),
                 wordType: "noun",
                 german: "Arzt",

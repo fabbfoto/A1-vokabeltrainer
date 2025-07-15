@@ -14,8 +14,8 @@ import { createWordId, createVocabulary } from './shared/types/vocabulary';
 export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabulary({
     "Freizeit und Unterhaltung": {
 
-        // --- UNTER-THEMA: Hobbys/Interessen ---
-        "Hobbys/Interessen": [
+        // --- UNTER-THEMA: Hobbys, Interessen ---
+        "Hobbys, Interessen": [
             {
                 id: createWordId("freizeit-unterhaltung-hobbys-001"),
                 wordType: 'noun',
@@ -420,8 +420,8 @@ export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabula
             } as Verb
         ],
 
-        // --- UNTER-THEMA: Kino/Konzert/Fernsehen/Radio ---
-        "Kino/Konzert/Fernsehen/Radio": [
+        // --- UNTER-THEMA: Kino, Konzert, Fernsehen, Radio ---
+        "Kino, Konzert, Fernsehen, Radio": [
             {
                 id: createWordId("freizeit-unterhaltung-kino-001"),
                 wordType: 'noun',
@@ -1217,8 +1217,8 @@ export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabula
             }
         ],
 
-        // --- UNTER-THEMA: Ausgehen (Disco) ---
-        "Ausgehen (Disco)": [
+        // --- UNTER-THEMA: Ausgehen, Club ---
+        "Ausgehen, Club": [
             {
                 id: createWordId("freizeit-unterhaltung-ausgehen-001"),
                 wordType: 'noun',
@@ -1429,8 +1429,8 @@ export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabula
             }
         ],
 
-        // --- UNTER-THEMA: Feste/Feiern ---
-        "Feste/Feiern": [
+        // --- UNTER-THEMA: Feste, Feiern ---
+        "Feste, Feiern": [
             {
                 id: createWordId("freizeit-unterhaltung-feste-001"),
                 wordType: 'noun',

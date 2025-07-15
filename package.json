@@ -8,19 +8,66 @@
     "dev:safe": "./start-dev.sh",
     "dev:clean": "./scripts/clean-git-locks.sh && npm run dev",
     "build": "tsc && vite build",
+    "build:analyze": "tsc && vite build --mode analyze",
     "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
     "git-sync": "./scripts/git-sync.sh",
     "git-status": "git status && echo '---' && git log --oneline -3",
     "git-clean": "./scripts/clean-git-locks.sh",
-    "port-clean": "lsof -ti:5173 | xargs kill -9 2>/dev/null || echo 'Port 5173 ist frei'"
+    "port-clean": "lsof -ti:5173 | xargs kill -9 2>/dev/null || echo 'Port 5173 ist frei'",
+    "analyze": "npm run build:analyze && npx vite-bundle-analyzer dist/assets",
+    "clean": "rm -rf dist node_modules/.vite",
+    "preinstall": "npx only-allow pnpm",
+    "postinstall": "echo '✅ Dependencies installed successfully'"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-legacy": "^5.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.0.0",
+    "prettier": "^3.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.0.0",
-    "vite": "^7.0.4"
+    "vite": "^7.0.4",
+    "vite-bundle-analyzer": "^0.7.0",
+    "vitest": "^1.0.0",
+    "@vitest/ui": "^1.0.0",
+    "@vitest/coverage-v8": "^1.0.0"
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^6.2.0",
     "firebase": "^11.10.0"
-  }
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.0.0",
+  "keywords": [
+    "vocabulary",
+    "trainer",
+    "german",
+    "a1",
+    "typescript",
+    "vite"
+  ],
+  "author": "Frank Burkert",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fabbfoto/A1-vokabeltrainer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fabbfoto/A1-vokabeltrainer/issues"
+  },
+  "homepage": "https://github.com/fabbfoto/A1-vokabeltrainer#readme"
 }

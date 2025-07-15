@@ -1554,8 +1554,8 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({"Person": 
             } as Noun
         ],
 
-        // --- SUB-TOPIC: Gewohnheiten/Tagesablauf ---
-        "Gewohnheiten/Tagesablauf": [
+        // --- SUB-TOPIC: Gewohnheiten, Tagesablauf ---
+        "Gewohnheiten, Tagesablauf": [
             {id: createWordId("person-gewohnheiten-001"),
                 wordType: 'verb',
                 german: "aufstehen",

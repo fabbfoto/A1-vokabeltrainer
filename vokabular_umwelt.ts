@@ -6,8 +6,8 @@ import {createWordId, createVocabulary } from './shared/types/vocabulary';
 
 export const vokabularUmwelt: VocabularyStructure = createVocabulary({"Umwelt": {
 
-        // --- UNTER-THEMA: Gegend/Stadt/Land (12 Wörter) ---
-        "Gegend/Stadt/Land": [
+        // --- UNTER-THEMA: Gegend, Stadt, Land (12 Wörter) ---
+        "Gegend, Stadt, Land": [
             {
                 id: createWordId("umwelt-gegendstadtland-001"),
                 wordType: "noun",
