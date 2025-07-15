@@ -14,14 +14,17 @@ const CATEGORY_MODE_MAP: Record<TestCategory, ModeId> = {
 const GLOBAL_RANKING_CONFIG = {
   // Kategorie-Quota für 20 Fragen
   KATEGORIE_QUOTA: {
-    "Einkaufen": 4,      // 20% von 20 Fragen
-    "Essen & Trinken": 4,
-    "Freizeit & Unterhaltung": 4,
-    "Kommunikationsmittel": 2,  // 10% (kleinere Kategorie)
+    "Einkaufen": 3,      // 15% von 20 Fragen
+    "Essen & Trinken": 3,
+    "Freizeit & Unterhaltung": 3,
+    "Kommunikationsmittel": 2,  // 10%
     "Lernen": 2,
     "Menschlicher Körper & Gesundheit": 2,
-    "Persönliche Beziehungen": 1,  // 5% (kleinste Kategorie)
-    "Person": 1
+    "Persönliche Beziehungen": 1,  // 5%
+    "Person": 1,
+    "Reisen & Verkehr": 1,  // 5%
+    "Umwelt": 1,  // 5%
+    "Wohnen": 1   // 5%
   },
   // Test-Modus-Quota für 20 Fragen
   TEST_MODE_QUOTA: {
@@ -163,6 +166,11 @@ function generateGlobalRankingTest(
     });
   });
   
+  console.log('Debug: Gefundene Kategorien:', Object.keys(wordsByCategory));
+  console.log('Debug: Wörter pro Kategorie:', Object.fromEntries(
+    Object.entries(wordsByCategory).map(([cat, words]) => [cat, words.length])
+  ));
+  
   // 2. Wähle Wörter nach Kategorie-Quota
   const selectedWords: Word[] = [];
   for (const [category, quota] of Object.entries(GLOBAL_RANKING_CONFIG.KATEGORIE_QUOTA)) {
@@ -226,7 +234,10 @@ function getCategoryFromTopic(mainTopic: string, subTopic: string): string {
     'lernen': 'Lernen',
     'menschlicher_koerper_gesundheit': 'Menschlicher Körper & Gesundheit',
     'persoenliche_beziehungen': 'Persönliche Beziehungen',
-    'person': 'Person'
+    'person': 'Person',
+    'reisen_verkehr': 'Reisen & Verkehr',
+    'umwelt': 'Umwelt',
+    'wohnen': 'Wohnen'
   };
   
   return categoryMap[mainTopic] || 'Sonstiges';
