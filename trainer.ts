@@ -1087,21 +1087,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             recommendations: recommendations
         };
 
-        // NEU: Test-Ergebnis an Firebase Ranking-System senden
-        if (state.test.currentTest) {
-            try {
-                const windowWithRanking = window as unknown as { rankingService?: { submitTestResult: (testResult: TestResult, variant: string, category?: string) => Promise<string> } };
-                if (windowWithRanking.rankingService) {
-                    await windowWithRanking.rankingService.submitTestResult(
-                        testResult,  // Verwende testResult statt testScore
-                        state.test.currentTest.variant,
-                        state.test.currentTest.selectedCategory
-                    );
-                }
-            } catch (error) {
-                console.warn('⚠️ Fehler beim Senden an Ranking-System:', error);
-            }
-        }
+        // ENTFERNT: Automatische Ranking-Submission
+        // Ranking wird jetzt nur über die Test-Ergebnis-Modal mit Datenschutz-Option durchgeführt
 
         showTestResultModal(testResult, state.test.currentTest as unknown as Record<string, unknown> || undefined);
         

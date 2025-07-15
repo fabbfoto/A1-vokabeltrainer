@@ -13,6 +13,9 @@ declare global {
     exitTestMode?: () => void;
     setMode?: (modeId: string, isRepeat: boolean) => void;
     state?: import('../types/trainer').TrainerState;
+    rankingService?: {
+      submitTestResult: (testResult: TestResult, variant: string, category?: string, artistName?: string) => Promise<string>;
+    };
   }
 }
 
@@ -37,6 +40,9 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
   const avgTimeIncorrect = incorrectWords.length > 0 
       ? incorrectWords.reduce((sum, r) => sum + r.timeSpent, 0) / incorrectWords.length 
       : 0;
+
+  // Prüfe ob es ein Globaler Chaos-Test ist (für Ranking)
+  const isGlobalChaosTest = testConfig?.variant === 'chaos' && testConfig?.testType === 'global';
 
   modal.innerHTML = `
       <div class="bg-white rounded-2xl shadow-xl p-6 max-w-4xl w-full mx-4 my-8 max-h-[90vh] overflow-y-auto">
@@ -122,6 +128,40 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
               </div>
           </div>
           
+          <!-- Datenschutz-Option für Globalen Chaos-Test -->
+          ${isGlobalChaosTest ? `
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <h4 class="text-lg font-medium text-blue-700 mb-3">🏆 Globales Ranking</h4>
+                  <p class="text-sm text-blue-600 mb-4">
+                      Möchtest du dein Ergebnis in der globalen Rangliste veröffentlichen? 
+                      Du kannst einen Künstlernamen wählen, um anonym zu bleiben.
+                  </p>
+                  
+                  <div class="space-y-3">
+                      <div class="flex items-center">
+                          <input type="radio" id="ranking-yes" name="ranking-choice" value="yes" class="mr-2">
+                          <label for="ranking-yes" class="text-sm font-medium">Ja, in der Rangliste erscheinen</label>
+                      </div>
+                      <div class="flex items-center">
+                          <input type="radio" id="ranking-no" name="ranking-choice" value="no" class="mr-2" checked>
+                          <label for="ranking-no" class="text-sm font-medium">Nein, nur lokal speichern</label>
+                      </div>
+                  </div>
+                  
+                  <div id="artist-name-section" class="mt-4 hidden">
+                      <label for="artist-name" class="block text-sm font-medium text-blue-700 mb-2">
+                          Künstlername (optional, für Anonymität):
+                      </label>
+                      <input type="text" id="artist-name" 
+                             placeholder="z.B. DeutschLerner2024, VokabelMeister, etc."
+                             class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                      <p class="text-xs text-blue-500 mt-1">
+                          Falls leer gelassen, wird ein zufälliger Name generiert.
+                      </p>
+                  </div>
+              </div>
+          ` : ''}
+          
           <!-- Aktions-Buttons -->
           <div class="flex flex-wrap gap-3 justify-center">
               ${incorrectWords.length > 0 ? `
@@ -142,6 +182,21 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
   `;
 
   document.body.appendChild(modal);
+
+  // Event Handlers für Datenschutz-Option
+  if (isGlobalChaosTest) {
+    const rankingYes = document.getElementById('ranking-yes') as HTMLInputElement;
+    const rankingNo = document.getElementById('ranking-no') as HTMLInputElement;
+    const artistNameSection = document.getElementById('artist-name-section') as HTMLDivElement;
+    
+    rankingYes?.addEventListener('change', () => {
+      artistNameSection.classList.remove('hidden');
+    });
+    
+    rankingNo?.addEventListener('change', () => {
+      artistNameSection.classList.add('hidden');
+    });
+  }
 
   // Event Handlers
   document.getElementById('close-test-result-modal')?.addEventListener('click', () => {
@@ -179,7 +234,7 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
   });
 
   // Ergebnis speichern
-  document.getElementById('save-test-result')?.addEventListener('click', () => {
+  document.getElementById('save-test-result')?.addEventListener('click', async () => {
     // Langzeit-Statistik speichern
     const testHistory = JSON.parse(localStorage.getItem('test-history') || '[]');
     testHistory.push({
@@ -200,10 +255,61 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
     
     localStorage.setItem('test-history', JSON.stringify(testHistory));
     
-    // Feedback
-    const button = document.getElementById('save-test-result') as HTMLButtonElement;
-    button.textContent = '✅ Gespeichert!';
-    button.disabled = true;
-    button.classList.add('opacity-50');
+    // Globales Ranking (nur für Globalen Chaos-Test)
+    if (isGlobalChaosTest && window.rankingService) {
+      const rankingChoice = (document.querySelector('input[name="ranking-choice"]:checked') as HTMLInputElement)?.value;
+      
+      if (rankingChoice === 'yes') {
+        try {
+          const artistNameInput = document.getElementById('artist-name') as HTMLInputElement;
+          const artistName = artistNameInput?.value?.trim() || '';
+          
+          await window.rankingService.submitTestResult(
+            testResult,
+            testConfig?.variant as string,
+            testConfig?.selectedCategory as string,
+            artistName
+          );
+          
+          // Erfolgs-Feedback
+          const button = document.getElementById('save-test-result') as HTMLButtonElement;
+          button.textContent = '✅ Gespeichert & Ranking!';
+          button.disabled = true;
+          button.classList.add('opacity-50');
+          
+          // Erfolgs-Nachricht
+          setTimeout(() => {
+            const successMsg = document.createElement('div');
+            successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+            successMsg.textContent = '🏆 Ergebnis in globaler Rangliste veröffentlicht!';
+            document.body.appendChild(successMsg);
+            setTimeout(() => successMsg.remove(), 3000);
+          }, 100);
+          
+        } catch (error) {
+          console.error('Fehler beim Senden an Ranking:', error);
+          // Fehler-Feedback
+          const button = document.getElementById('save-test-result') as HTMLButtonElement;
+          button.textContent = '❌ Fehler beim Ranking';
+          button.classList.add('bg-red-500');
+          setTimeout(() => {
+            button.textContent = '💾 Ergebnis speichern';
+            button.classList.remove('bg-red-500');
+          }, 2000);
+        }
+      } else {
+        // Nur lokal speichern
+        const button = document.getElementById('save-test-result') as HTMLButtonElement;
+        button.textContent = '✅ Gespeichert!';
+        button.disabled = true;
+        button.classList.add('opacity-50');
+      }
+    } else {
+      // Normales Speichern für andere Tests
+      const button = document.getElementById('save-test-result') as HTMLButtonElement;
+      button.textContent = '✅ Gespeichert!';
+      button.disabled = true;
+      button.classList.add('opacity-50');
+    }
   });
 } 

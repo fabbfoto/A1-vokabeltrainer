@@ -106,6 +106,40 @@ export const MOTIVATIONAL_DUMMY_USERS: DummyUser[] = [
   { name: "Kofi Mensah", email: "kofi.mensah@example.com" }
 ];
 
+/**
+ * Generiert einen zufälligen Künstlernamen für anonyme Nutzer
+ */
+export function generateRandomArtistName(): string {
+  const prefixes = [
+    'Deutsch', 'Vokabel', 'Sprach', 'Lern', 'Meister', 'Champion', 
+    'Star', 'Pro', 'Elite', 'Top', 'Super', 'Ultra', 'Mega'
+  ];
+  
+  const suffixes = [
+    'Lerner', 'Meister', 'Champion', 'Star', 'Pro', 'Elite', 
+    'Guru', 'Ninja', 'Hero', 'Legend', 'Master', 'Expert'
+  ];
+  
+  const numbers = [
+    '2024', '2025', 'X', 'Z', 'Alpha', 'Beta', 'Gamma', 'Delta',
+    'One', 'Two', 'Three', 'Prime', 'Ultra', 'Max'
+  ];
+  
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+  const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+  const number = numbers[Math.floor(Math.random() * numbers.length)];
+  
+  // 50% Chance für verschiedene Formate
+  const format = Math.random();
+  if (format < 0.33) {
+    return `${prefix}${suffix}`;
+  } else if (format < 0.66) {
+    return `${prefix}${suffix}${number}`;
+  } else {
+    return `${prefix}${number}`;
+  }
+}
+
 export function generateMotivationalDummyResults(count: number = 10): RankingEntry[] {
   const dummyResults: RankingEntry[] = [];
   
@@ -166,7 +200,8 @@ export class RankingService {
   async submitTestResult(
     testResult: TestResult, 
     testVariant: TestType, 
-    selectedCategory?: string
+    selectedCategory?: string,
+    artistName?: string
   ): Promise<string> {
     // NEU: Validierung hinzufügen
     if (!testResult || !testResult.score) {
@@ -195,9 +230,14 @@ export class RankingService {
       baseScore = globalScore.baseScore;
     }
 
+    // Künstlername oder zufälligen Namen generieren
+    const displayName = artistName?.trim() || 
+      user.displayName || 
+      generateRandomArtistName();
+    
     const testResultSubmission: TestResultSubmission = {
       userId: user.uid,
-      userName: user.displayName || 'Anonym',
+      userName: displayName,
       userEmail: user.email || 'unknown@email.com',
       testType: testVariant,
       topic: testResult.score.topicId || 'global',
