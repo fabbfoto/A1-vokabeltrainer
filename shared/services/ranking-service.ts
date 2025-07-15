@@ -233,12 +233,13 @@ export class RankingService {
   }
 
   /**
-   * Lädt globale Ranglisten mit motivierenden Dummy-Daten
+   * Lädt globale Ranglisten - NUR Ergebnisse aus dem Globaler Chaos-Test
    */
   async getGlobalRankings(limitCount: number = 100): Promise<RankingResponse> {
     try {
       const q = query(
         collection(db, 'testResults'),
+        where('testType', '==', 'global-ranking'),
         orderBy('finalScore', 'desc'),
         limit(limitCount)
       );
@@ -357,68 +358,10 @@ export class RankingService {
   }
 
   /**
-   * NEU: Lädt spezielle globale Ranglisten mit motivierenden Dummy-Daten
+   * Alias für getGlobalRankings - lädt globale Ranglisten (nur Globaler Chaos-Test Ergebnisse)
    */
   async getGlobalRankingList(limitCount: number = 100): Promise<RankingResponse> {
-    try {
-      const q = query(
-        collection(db, 'testResults'),
-        where('testType', '==', 'global-ranking'),
-        orderBy('finalScore', 'desc'),
-        limit(limitCount)
-      );
-      
-      const snapshot = await getDocs(q);
-      const realEntries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate() || new Date(),
-        rank: index + 1
-      })) as RankingEntry[];
-      
-      // Wenn weniger als 3 echte globale Ranking-Ergebnisse vorhanden sind, füge Dummy-Daten hinzu
-      if (realEntries.length < 3) {
-        const dummyCount = Math.min(8, limitCount - realEntries.length);
-        const dummyEntries = generateMotivationalDummyResults(dummyCount);
-        
-        // Kombiniere echte und Dummy-Daten, sortiere nach Score
-        const combinedEntries = [...realEntries, ...dummyEntries]
-          .sort((a, b) => b.score - a.score)
-          .slice(0, limitCount)
-          .map((entry, index) => ({
-            ...entry,
-            rank: index + 1
-          }));
-        
-        console.log(`🏆 Globale Ranking-Liste: ${realEntries.length} echte + ${dummyEntries.length} Dummy-Ergebnisse`);
-        
-        return {
-          entries: combinedEntries,
-          totalCount: combinedEntries.length,
-          filters: { testType: 'global-ranking', limit: limitCount }
-        };
-      }
-      
-      console.log(`🏆 Globale Rangliste geladen: ${realEntries.length} echte Einträge`);
-      
-      return {
-        entries: realEntries,
-        totalCount: realEntries.length,
-        filters: { testType: 'global-ranking', limit: limitCount }
-      };
-    } catch (error: unknown) {
-      console.error('❌ Fehler beim Laden der globalen Rangliste:', error);
-      
-      // Fallback: Zeige nur Dummy-Daten bei Fehlern
-      console.log('🔄 Verwende Dummy-Daten als Fallback für globale Ranking-Liste');
-      const dummyEntries = generateMotivationalDummyResults(Math.min(8, limitCount));
-      
-      return {
-        entries: dummyEntries,
-        totalCount: dummyEntries.length,
-        filters: { testType: 'global-ranking', limit: limitCount }
-      };
-    }
+    return this.getGlobalRankings(limitCount);
   }
 
   /**
