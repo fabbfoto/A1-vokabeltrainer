@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     loadLastTestScores();
     loadPerfectRuns();
 
-    function processAnswer(isCorrect: boolean, correctAnswer?: string): void {
+    function processAnswer(isCorrect: boolean, correctAnswer?: string, timeSpent?: number, userAnswer?: string): void {
         
         state.training.attemptedInCurrentRound++;
         
@@ -368,14 +368,42 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             const timeSpent = state.test.currentQuestionStartTime 
                 ? (Date.now() - state.test.currentQuestionStartTime) / 1000 
                 : 0;
+            
+            // NEU: Korrekte Benutzerantwort ermitteln
+            let userAnswer = '';
+            if (state.training.currentMode === 'mc-de-en') {
+                // Bei Multiple Choice: Benutzerantwort aus dem DOM holen
+                const selectedButton = document.querySelector('.choice-button.selected');
+                userAnswer = selectedButton?.textContent?.trim() || '';
+            } else if (state.training.currentMode === 'type-de-adj') {
+                // Bei Schreibweise: Aus dem Input-Feld
+                const input = document.querySelector('#word-input') as HTMLInputElement;
+                userAnswer = input?.value?.trim() || '';
+            } else if (state.training.currentMode === 'cloze-adj-de') {
+                // Bei Lücken: Aus dem Input-Feld
+                const input = document.querySelector('#cloze-input') as HTMLInputElement;
+                userAnswer = input?.value?.trim() || '';
+            } else if (state.training.currentMode === 'sentence-translation-en-de') {
+                // Bei Satzübersetzung: Aus den Input-Feldern
+                const inputs = document.querySelectorAll('#sentence-word-input-container input[type="text"]') as NodeListOf<HTMLInputElement>;
+                userAnswer = Array.from(inputs).map(input => input.value.trim()).join(' ');
+            }
                 
             testAnswerLog.push({
                 word: state.training.currentWord,
-                userAnswer: correctAnswer || '', // Bei MC ist das die gewählte Antwort
+                userAnswer: userAnswer || '', // Verwende übergebene Benutzerantwort oder leeren String
                 correctAnswer: correctAnswer || state.training.currentWord.german,
                 isCorrect: isCorrect,
                 mode: state.training.currentMode || 'unknown' as ModeId,
                 timeSpent: timeSpent
+            });
+            
+            console.log('📝 Test-Antwort protokolliert:', {
+                word: state.training.currentWord.english,
+                userAnswer,
+                correctAnswer: correctAnswer || state.training.currentWord.german,
+                isCorrect,
+                mode: state.training.currentMode
             });
         }
         

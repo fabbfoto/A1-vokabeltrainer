@@ -27,7 +27,7 @@ import * as ui from '../../ui/index';
 // import { loadNextTask } from '../../trainer';
 
 // ✅ KORREKTE PROCESS-ANSWER-FUNCTION TYPE
-type ProcessAnswerFunction = (isCorrect: boolean, correctAnswer?: string, timeSpent?: number) => void;
+type ProcessAnswerFunction = (isCorrect: boolean, correctAnswer?: string, timeSpent?: number, userAnswer?: string) => void;
 
 // Lokale insertTextAtCursor Funktion
 function insertTextAtCursor(inputElement: HTMLInputElement | null, text: string): void {
@@ -280,10 +280,10 @@ function generateMultipleChoiceAnswers(
             // URSÜRÜNGLICHE LOGIK: Im Lernmodus sofort weiter, kein visuelles Feedback
             if (!state.test.isTestModeActive) {
                 // Lernmodus: Sofort weiter ohne visuelles Feedback
-                processAnswer(isCorrect, correctAnswerEN);
+                processAnswer(isCorrect, correctAnswerEN, undefined, answer);
             } else {
                 // Testmodus: Kein Feedback, sofort weiter
-                processAnswer(isCorrect, correctAnswerEN);
+                processAnswer(isCorrect, correctAnswerEN, undefined, answer);
             }
         };
         dom.mcAnswersContainerEl.appendChild(button);
@@ -423,7 +423,8 @@ export function setupSpellingMode(
             const isSingularCorrect = vergleicheAntwort(userInputSingular, correctSingular);
             const isPluralCorrect = vergleicheAntwort(userInputPlural, correctPlural);
             
-
+            // NEU: Benutzerantwort für Test-Protokollierung
+            const userAnswer = `${userInputArticle} ${userInputSingular} / ${userInputPlural}`;
             
             // DIDAKTISCHES FEEDBACK: Nur im Lern-Modus
             if (!state.test.isTestModeActive) {
@@ -459,14 +460,14 @@ export function setupSpellingMode(
                 
                 // Kurze Verzögerung für grünes Feedback, dann nächste Aufgabe
                 setTimeout(() => {
-                    processAnswer(true, correctAnswerText);
+                    processAnswer(true, correctAnswerText, undefined, userAnswer);
                 }, 1200);
             } else {
                 // Im Test-Modus: Keine Korrektur anzeigen
                 if (state.test.isTestModeActive) {
                     // Test-Modus: Kein visuelles Feedback, direkt weiter
                     setTimeout(() => {
-                        processAnswer(false, correctAnswerText);
+                        processAnswer(false, correctAnswerText, undefined, userAnswer);
                     }, 100);
                 } else {
                     // Normaler Modus: Korrektur anzeigen
@@ -571,7 +572,7 @@ export function setupSpellingMode(
             // 4.4a Rotes Kreuz im Schreibweise-Modus (Einzelfeld) entfernen
             if (state.test.isTestModeActive) {
                 // Direkt weiter ohne visuelles Feedback
-                processAnswer(false, correctAnswer);
+                processAnswer(false, correctAnswer, undefined, userInput);
             }
             
             // Feld sperren
@@ -586,14 +587,14 @@ export function setupSpellingMode(
                 
                 // Kurze Verzögerung für grünes Feedback, dann nächste Aufgabe
                 setTimeout(() => {
-                    processAnswer(true, correctAnswer);
+                    processAnswer(true, correctAnswer, undefined, userInput);
                 }, 1200);
             } else {
                 // Im Test-Modus: Keine Korrektur anzeigen
                 if (state.test.isTestModeActive) {
                     // Test-Modus: Kein visuelles Feedback, direkt weiter
                     setTimeout(() => {
-                        processAnswer(false, correctAnswer);
+                        processAnswer(false, correctAnswer, undefined, userInput);
                     }, 100);
                 } else {
                     // Normaler Modus: Korrektur anzeigen
@@ -761,7 +762,10 @@ function generateClozeUI(
             if (!isCorrect) allCorrect = false;
         });
         
-        processAnswer(allCorrect, clozeAnswers.join(', '));
+        // NEU: Benutzerantwort für Test-Protokollierung
+        const userAnswers = Array.from(inputs).map(input => input.value.trim());
+        const userAnswer = userAnswers.join(', ');
+        processAnswer(allCorrect, clozeAnswers.join(', '), undefined, userAnswer);
     };
     setTimeout(() => {
         const firstInput = dom.clozeSentenceContainerEl.querySelector('input[type="text"]') as HTMLInputElement;
@@ -941,7 +945,7 @@ function generateSentenceInputs(
         
         // Kurze Verzögerung vor processAnswer um UI-Updates zu ermöglichen
         setTimeout(() => {
-            processAnswer(isCorrect, fullGermanSentence);
+            processAnswer(isCorrect, fullGermanSentence, undefined, userSentence);
         }, 100);
     };
     setTimeout(() => {
