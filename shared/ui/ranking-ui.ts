@@ -209,7 +209,7 @@ export class RankingUI {
                 <div>
                   <div class="font-semibold text-lg flex items-center">
                     ${entry.userName}
-                    ${isDummy ? '<span class="ml-2 text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded-full">Beispiel</span>' : ''}
+                    ${isDummy ? '<span class="ml-2 text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded-full">⭐ Beispiel</span>' : ''}
                   </div>
                   <div class="text-sm text-gray-600">
                     ${Math.round(entry.accuracy)}% Genauigkeit • ${Math.floor(entry.timeInSeconds)}s • 
@@ -233,10 +233,10 @@ export class RankingUI {
         </div>
         
         ${rankings.some(entry => entry.userId.startsWith('dummy-user-')) ? `
-          <div class="mt-4 p-3 bg-orange-100 border border-orange-300 rounded-lg">
-            <div class="text-sm text-orange-800">
-              <span class="font-semibold">💡 Hinweis:</span> Einige Ergebnisse sind Beispiel-Daten, um das Ranking-System zu demonstrieren. 
-              Starte deinen eigenen Test, um dich mit echten Ergebnissen zu messen!
+          <div class="mt-4 p-3 bg-purple-100 border border-purple-300 rounded-lg">
+            <div class="text-sm text-purple-800">
+              <span class="font-semibold">🌟 Willkommen!</span> Die Ergebnisse mit ⭐ sind Beispiel-Daten von anderen Lernenden. 
+              Starte deinen eigenen Test und schaue, wo du landest!
             </div>
           </div>
         ` : ''}

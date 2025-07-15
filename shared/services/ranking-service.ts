@@ -94,16 +94,16 @@ export interface DummyUser {
 }
 
 export const MOTIVATIONAL_DUMMY_USERS: DummyUser[] = [
-  { name: "Anna Schmidt", email: "anna.s@example.com" },
-  { name: "Max Müller", email: "max.m@example.com" },
-  { name: "Lisa Weber", email: "lisa.w@example.com" },
-  { name: "Tom Fischer", email: "tom.f@example.com" },
-  { name: "Sarah Wagner", email: "sarah.w@example.com" },
-  { name: "Paul Meyer", email: "paul.m@example.com" },
-  { name: "Julia Becker", email: "julia.b@example.com" },
-  { name: "Felix Hoffmann", email: "felix.h@example.com" },
-  { name: "Nina Schulz", email: "nina.s@example.com" },
-  { name: "Lukas Klein", email: "lukas.k@example.com" }
+  { name: "Lena Stern", email: "lena.stern@example.com" },
+  { name: "Finn Adler", email: "finn.adler@example.com" },
+  { name: "Maya Blau", email: "maya.blau@example.com" },
+  { name: "Leo Sommer", email: "leo.sommer@example.com" },
+  { name: "Zoe Regenbogen", email: "zoe.regenbogen@example.com" },
+  { name: "Kai Wolke", email: "kai.wolke@example.com" },
+  { name: "Luna Stern", email: "luna.stern@example.com" },
+  { name: "Nova Funkel", email: "nova.funkel@example.com" },
+  { name: "Aria Melodie", email: "aria.melodie@example.com" },
+  { name: "Jasper Kristall", email: "jasper.kristall@example.com" }
 ];
 
 export function generateMotivationalDummyResults(count: number = 10): RankingEntry[] {
