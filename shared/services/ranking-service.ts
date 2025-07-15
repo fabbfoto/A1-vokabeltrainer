@@ -107,17 +107,17 @@ export const MOTIVATIONAL_DUMMY_USERS: DummyUser[] = [
 ];
 
 /**
- * Generiert einen zufälligen Künstlernamen für anonyme Nutzer
+ * Generiert einen zufälligen internationalen Künstlernamen für anonyme Nutzer
  */
 export function generateRandomArtistName(): string {
   const prefixes = [
-    'Deutsch', 'Vokabel', 'Sprach', 'Lern', 'Meister', 'Champion', 
+    'Anonymous', 'Global', 'Language', 'Learning', 'Student', 'Champion', 
     'Star', 'Pro', 'Elite', 'Top', 'Super', 'Ultra', 'Mega'
   ];
   
   const suffixes = [
-    'Lerner', 'Meister', 'Champion', 'Star', 'Pro', 'Elite', 
-    'Guru', 'Ninja', 'Hero', 'Legend', 'Master', 'Expert'
+    'Learner', 'Master', 'Champion', 'Star', 'Pro', 'Elite', 
+    'Guru', 'Ninja', 'Hero', 'Legend', 'Wizard', 'Expert'
   ];
   
   const numbers = [

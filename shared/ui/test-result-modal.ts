@@ -154,7 +154,7 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
                       </label>
                       <div class="space-y-2">
                           <input type="text" id="artist-name" 
-                                 placeholder="z.B. DeutschLerner2024, VokabelMeister, Anonym123, etc."
+                                 placeholder="z.B. Anonymous2024, LanguageLearner, Student123, etc."
                                  class="w-full px-3 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
                           <div class="flex gap-2">
                               <button id="generate-random-name" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition-colors">
@@ -214,16 +214,21 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
     // Zufälligen Namen generieren
     generateRandomNameBtn?.addEventListener('click', () => {
       const randomNames = [
-        'DeutschLerner' + Math.floor(Math.random() * 9999),
-        'VokabelMeister' + Math.floor(Math.random() * 999),
-        'Anonym' + Math.floor(Math.random() * 9999),
-        'Lerner' + Math.floor(Math.random() * 999),
+        'Anonymous' + Math.floor(Math.random() * 9999),
+        'Learner' + Math.floor(Math.random() * 999),
         'Student' + Math.floor(Math.random() * 999),
-        'DeutschFan' + Math.floor(Math.random() * 999),
-        'VokabelPro' + Math.floor(Math.random() * 999),
-        'AnonymLerner' + Math.floor(Math.random() * 999),
-        'DeutschStudent' + Math.floor(Math.random() * 999),
-        'VokabelChamp' + Math.floor(Math.random() * 999)
+        'User' + Math.floor(Math.random() * 9999),
+        'Player' + Math.floor(Math.random() * 999),
+        'Champion' + Math.floor(Math.random() * 999),
+        'Master' + Math.floor(Math.random() * 999),
+        'Pro' + Math.floor(Math.random() * 999),
+        'Elite' + Math.floor(Math.random() * 999),
+        'Ninja' + Math.floor(Math.random() * 999),
+        'Hero' + Math.floor(Math.random() * 999),
+        'Legend' + Math.floor(Math.random() * 999),
+        'Star' + Math.floor(Math.random() * 999),
+        'Guru' + Math.floor(Math.random() * 999),
+        'Wizard' + Math.floor(Math.random() * 999)
       ];
       const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
       artistNameInput.value = randomName;
@@ -232,21 +237,21 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
     // Namen vorschlagen
     suggestNamesBtn?.addEventListener('click', () => {
       const suggestions = [
-        'DeutschLerner2024',
-        'VokabelMeister',
-        'Anonym123',
-        'LernerXYZ',
-        'DeutschFan',
-        'VokabelPro',
-        'AnonymLerner',
-        'DeutschStudent',
-        'VokabelChamp',
-        'Lerner2024',
-        'DeutschFreak',
-        'VokabelKing',
-        'AnonymUser',
-        'DeutschLover',
-        'VokabelQueen'
+        'Anonymous2024',
+        'LanguageLearner',
+        'Student123',
+        'GlobalUser',
+        'LearningPro',
+        'Champion2024',
+        'MasterLearner',
+        'EliteStudent',
+        'NinjaUser',
+        'Hero2024',
+        'LegendaryLearner',
+        'StarStudent',
+        'GuruUser',
+        'Wizard2024',
+        'GlobalChampion'
       ];
       
       // Zeige Vorschläge in einem Popup
