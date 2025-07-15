@@ -115,12 +115,15 @@ export function generateMotivationalDummyResults(count: number = 10): RankingEnt
     // Realistische aber motivierende Scores generieren
     // Höhere Scores für bessere Plätze, aber nicht perfekt
     const baseScore = 85 + Math.random() * 15; // 85-100 Punkte
-    const accuracy = 0.75 + Math.random() * 0.25; // 75-100% Genauigkeit
     const timeInSeconds = 120 + Math.random() * 180; // 2-5 Minuten
     
     // Score basierend auf Platzierung anpassen
     const rankBonus = Math.max(0, (count - i - 1) * 2); // Bessere Plätze = höhere Scores
     const finalScore = Math.min(100, baseScore + rankBonus);
+    
+    // Genauigkeit basierend auf finalem Score berechnen
+    // Bei perfektem Score (100) sollte Genauigkeit auch 100% sein
+    const accuracy = finalScore === 100 ? 1.0 : 0.75 + Math.random() * 0.25; // 75-100% Genauigkeit
     
     // Realistische Zeitstempel (letzte 2 Wochen)
     const daysAgo = Math.floor(Math.random() * 14);

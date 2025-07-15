@@ -144,7 +144,7 @@ export class RankingUI {
               <div class="text-right">
                 <div class="font-bold text-2xl text-blue-600">${entry.score}</div>
                 <div class="text-sm text-gray-600">
-                  ${Math.floor(entry.timeInSeconds)}s • ${Math.round(entry.accuracy)}%
+                  ${Math.floor(entry.timeInSeconds)}s • ${Math.round(entry.accuracy * 100)}%
                 </div>
               </div>
             </div>
@@ -212,7 +212,7 @@ export class RankingUI {
                     ${isDummy ? '<span class="ml-2 text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded-full">⭐ Beispiel</span>' : ''}
                   </div>
                   <div class="text-sm text-gray-600">
-                    ${Math.round(entry.accuracy)}% Genauigkeit • ${Math.floor(entry.timeInSeconds)}s • 
+                    ${Math.round(entry.accuracy * 100)}% Genauigkeit • ${Math.floor(entry.timeInSeconds)}s • 
                     ${new Date(entry.timestamp).toLocaleDateString('de-DE')}
                   </div>
                   ${(entry as any).timeFactor ? `
