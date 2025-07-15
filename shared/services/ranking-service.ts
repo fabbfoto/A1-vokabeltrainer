@@ -86,6 +86,71 @@ export interface RankingResponse {
   filters: RankingFilters;
 }
 
+// ========== DUMMY DATA GENERATOR ==========
+export interface DummyUser {
+  name: string;
+  email: string;
+  avatar?: string;
+}
+
+export const MOTIVATIONAL_DUMMY_USERS: DummyUser[] = [
+  { name: "Anna Schmidt", email: "anna.s@example.com" },
+  { name: "Max Müller", email: "max.m@example.com" },
+  { name: "Lisa Weber", email: "lisa.w@example.com" },
+  { name: "Tom Fischer", email: "tom.f@example.com" },
+  { name: "Sarah Wagner", email: "sarah.w@example.com" },
+  { name: "Paul Meyer", email: "paul.m@example.com" },
+  { name: "Julia Becker", email: "julia.b@example.com" },
+  { name: "Felix Hoffmann", email: "felix.h@example.com" },
+  { name: "Nina Schulz", email: "nina.s@example.com" },
+  { name: "Lukas Klein", email: "lukas.k@example.com" }
+];
+
+export function generateMotivationalDummyResults(count: number = 10): RankingEntry[] {
+  const dummyResults: RankingEntry[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    const user = MOTIVATIONAL_DUMMY_USERS[i % MOTIVATIONAL_DUMMY_USERS.length];
+    
+    // Realistische aber motivierende Scores generieren
+    // Höhere Scores für bessere Plätze, aber nicht perfekt
+    const baseScore = 85 + Math.random() * 15; // 85-100 Punkte
+    const accuracy = 0.75 + Math.random() * 0.25; // 75-100% Genauigkeit
+    const timeInSeconds = 120 + Math.random() * 180; // 2-5 Minuten
+    
+    // Score basierend auf Platzierung anpassen
+    const rankBonus = Math.max(0, (count - i - 1) * 2); // Bessere Plätze = höhere Scores
+    const finalScore = Math.min(100, baseScore + rankBonus);
+    
+    // Realistische Zeitstempel (letzte 2 Wochen)
+    const daysAgo = Math.floor(Math.random() * 14);
+    const hoursAgo = Math.floor(Math.random() * 24);
+    const timestamp = new Date();
+    timestamp.setDate(timestamp.getDate() - daysAgo);
+    timestamp.setHours(timestamp.getHours() - hoursAgo);
+    
+    dummyResults.push({
+      id: `dummy-${i + 1}`,
+      userId: `dummy-user-${i + 1}`,
+      userName: user.name,
+      userEmail: user.email,
+      score: finalScore,
+      timeInSeconds: timeInSeconds,
+      accuracy: accuracy,
+      topic: 'global',
+      testType: 'global-ranking',
+      timestamp: timestamp,
+      rank: i + 1,
+      difficulty: 'A1',
+      correctAnswers: Math.floor(accuracy * 20), // 20 Fragen pro Test
+      totalQuestions: 20,
+      timeFactor: 1 - (timeInSeconds / 600) // Zeitfaktor basierend auf 10 Minuten
+    });
+  }
+  
+  return dummyResults.sort((a, b) => b.score - a.score);
+}
+
 // ========== RANKING SERVICE MIT VOLLER TYPSICHERHEIT ==========
 export class RankingService {
   constructor(private authService: AuthService) {}
@@ -168,7 +233,7 @@ export class RankingService {
   }
 
   /**
-   * Lädt globale Ranglisten
+   * Lädt globale Ranglisten mit motivierenden Dummy-Daten
    */
   async getGlobalRankings(limitCount: number = 100): Promise<RankingResponse> {
     try {
@@ -179,21 +244,53 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const entries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
+      const realEntries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
         rank: index + 1
       })) as RankingEntry[];
       
+      // Wenn weniger als 5 echte Ergebnisse vorhanden sind, füge motivierende Dummy-Daten hinzu
+      if (realEntries.length < 5) {
+        const dummyCount = Math.min(10, limitCount - realEntries.length);
+        const dummyEntries = generateMotivationalDummyResults(dummyCount);
+        
+        // Kombiniere echte und Dummy-Daten, sortiere nach Score
+        const combinedEntries = [...realEntries, ...dummyEntries]
+          .sort((a, b) => b.score - a.score)
+          .slice(0, limitCount)
+          .map((entry, index) => ({
+            ...entry,
+            rank: index + 1
+          }));
+        
+        console.log(`📊 Rangliste: ${realEntries.length} echte + ${dummyEntries.length} Dummy-Ergebnisse`);
+        
+        return {
+          entries: combinedEntries,
+          totalCount: combinedEntries.length,
+          filters: { limit: limitCount }
+        };
+      }
+      
       return {
-        entries,
-        totalCount: entries.length,
+        entries: realEntries,
+        totalCount: realEntries.length,
         filters: { limit: limitCount }
       };
     } catch (error: unknown) {
       console.error('❌ Fehler beim Laden der globalen Rangliste:', error);
-      throw new Error(`Fehler beim Laden der Rangliste: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+      
+      // Fallback: Zeige nur Dummy-Daten bei Fehlern
+      console.log('🔄 Verwende Dummy-Daten als Fallback');
+      const dummyEntries = generateMotivationalDummyResults(Math.min(10, limitCount));
+      
+      return {
+        entries: dummyEntries,
+        totalCount: dummyEntries.length,
+        filters: { limit: limitCount }
+      };
     }
   }
 
@@ -260,7 +357,7 @@ export class RankingService {
   }
 
   /**
-   * NEU: Lädt spezielle globale Ranglisten
+   * NEU: Lädt spezielle globale Ranglisten mit motivierenden Dummy-Daten
    */
   async getGlobalRankingList(limitCount: number = 100): Promise<RankingResponse> {
     try {
@@ -272,23 +369,55 @@ export class RankingService {
       );
       
       const snapshot = await getDocs(q);
-      const entries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
+      const realEntries = snapshot.docs.map((doc: QueryDocumentSnapshot, index: number) => ({
         id: doc.id,
         ...doc.data(),
         timestamp: doc.data().timestamp?.toDate() || new Date(),
         rank: index + 1
       })) as RankingEntry[];
       
-      console.log(`🏆 Globale Rangliste geladen: ${entries.length} Einträge`);
+      // Wenn weniger als 3 echte globale Ranking-Ergebnisse vorhanden sind, füge Dummy-Daten hinzu
+      if (realEntries.length < 3) {
+        const dummyCount = Math.min(8, limitCount - realEntries.length);
+        const dummyEntries = generateMotivationalDummyResults(dummyCount);
+        
+        // Kombiniere echte und Dummy-Daten, sortiere nach Score
+        const combinedEntries = [...realEntries, ...dummyEntries]
+          .sort((a, b) => b.score - a.score)
+          .slice(0, limitCount)
+          .map((entry, index) => ({
+            ...entry,
+            rank: index + 1
+          }));
+        
+        console.log(`🏆 Globale Ranking-Liste: ${realEntries.length} echte + ${dummyEntries.length} Dummy-Ergebnisse`);
+        
+        return {
+          entries: combinedEntries,
+          totalCount: combinedEntries.length,
+          filters: { testType: 'global-ranking', limit: limitCount }
+        };
+      }
+      
+      console.log(`🏆 Globale Rangliste geladen: ${realEntries.length} echte Einträge`);
       
       return {
-        entries,
-        totalCount: entries.length,
+        entries: realEntries,
+        totalCount: realEntries.length,
         filters: { testType: 'global-ranking', limit: limitCount }
       };
     } catch (error: unknown) {
       console.error('❌ Fehler beim Laden der globalen Rangliste:', error);
-      throw new Error(`Fehler beim Laden der globalen Rangliste: ${error instanceof Error ? error.message : 'Unbekannter Fehler'}`);
+      
+      // Fallback: Zeige nur Dummy-Daten bei Fehlern
+      console.log('🔄 Verwende Dummy-Daten als Fallback für globale Ranking-Liste');
+      const dummyEntries = generateMotivationalDummyResults(Math.min(8, limitCount));
+      
+      return {
+        entries: dummyEntries,
+        totalCount: dummyEntries.length,
+        filters: { testType: 'global-ranking', limit: limitCount }
+      };
     }
   }
 

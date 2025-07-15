@@ -194,8 +194,10 @@ export class RankingUI {
         </div>
         
         <div class="space-y-3">
-          ${rankings.map((entry, index) => `
-            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+          ${rankings.map((entry, index) => {
+            const isDummy = entry.userId.startsWith('dummy-user-');
+            return `
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-50 to-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow ${isDummy ? 'border-dashed border-orange-300 bg-orange-50' : ''}">
               <div class="flex items-center space-x-4">
                 <div class="flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-lg ${
                   index === 0 ? 'bg-yellow-500' : 
@@ -205,27 +207,39 @@ export class RankingUI {
                   ${index + 1}
                 </div>
                 <div>
-                  <div class="font-semibold text-lg">${entry.userName}</div>
+                  <div class="font-semibold text-lg flex items-center">
+                    ${entry.userName}
+                    ${isDummy ? '<span class="ml-2 text-xs bg-orange-200 text-orange-800 px-2 py-1 rounded-full">Beispiel</span>' : ''}
+                  </div>
                   <div class="text-sm text-gray-600">
                     ${Math.round(entry.accuracy)}% Genauigkeit • ${Math.floor(entry.timeInSeconds)}s • 
                     ${new Date(entry.timestamp).toLocaleDateString('de-DE')}
                   </div>
                   ${(entry as any).timeFactor ? `
                     <div class="text-xs text-gray-500">
-                      ⏱️ Zeitfaktor: ${(entry as any).timeFactor}x
+                      ⏱️ Zeitfaktor: ${(entry as any).timeFactor.toFixed(2)}x
                     </div>
                   ` : ''}
                 </div>
               </div>
               <div class="text-right">
-                <div class="font-bold text-2xl text-blue-600">${entry.score}</div>
+                <div class="font-bold text-2xl text-blue-600">${entry.score.toFixed(1)}</div>
                 <div class="text-sm text-gray-600">
                   ${entry.correctAnswers}/${entry.totalQuestions} • ${Math.floor(entry.timeInSeconds / 60)}:${(entry.timeInSeconds % 60).toString().padStart(2, '0')}
                 </div>
               </div>
             </div>
-          `).join('')}
+          `}).join('')}
         </div>
+        
+        ${rankings.some(entry => entry.userId.startsWith('dummy-user-')) ? `
+          <div class="mt-4 p-3 bg-orange-100 border border-orange-300 rounded-lg">
+            <div class="text-sm text-orange-800">
+              <span class="font-semibold">💡 Hinweis:</span> Einige Ergebnisse sind Beispiel-Daten, um das Ranking-System zu demonstrieren. 
+              Starte deinen eigenen Test, um dich mit echten Ergebnissen zu messen!
+            </div>
+          </div>
+        ` : ''}
         
         ${rankings.length === 0 ? `
           <div class="text-center py-8 text-gray-500">
