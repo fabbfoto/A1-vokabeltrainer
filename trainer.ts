@@ -1046,8 +1046,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const accuracyMessage = `📊 Genauigkeit: ${Math.round(accuracy * 100)}%`;
         
         // KORREKTUR: Nur eine Zeile, keine mehrzeilige Template-Literal!
-        ui.showMessage(dom, `Test beendet! ${accuracyMessage} | ${timeMessage} | ${scoreMessage}`,
-            accuracy >= 0.8 ? 'success' : 'info');
+        ui.showMessage(dom, `Test beendet! ${accuracyMessage} | ${timeMessage} | ${scoreMessage}`, accuracy >= 0.8 ? 'success' : 'info');
         
         state.test.isTestModeActive = false;
         ui.updateTestStats(dom, state);
