@@ -8,6 +8,8 @@
 
 [build.environment]
   NODE_VERSION = "20.19.3"
+  NPM_FLAGS = "--legacy-peer-deps"
+  NPM_CONFIG_PACKAGE_MANAGER = "npm"
 
 [[headers]]
   for = "/*"

@@ -23,7 +23,7 @@
     "port-clean": "lsof -ti:5173 | xargs kill -9 2>/dev/null || echo 'Port 5173 ist frei'",
     "analyze": "npm run build:analyze && npx vite-bundle-analyzer dist/assets",
     "clean": "rm -rf dist node_modules/.vite",
-    "preinstall": "npx only-allow pnpm",
+    "preinstall": "echo 'Using npm for package management'",
     "postinstall": "echo '✅ Dependencies installed successfully'"
   },
   "devDependencies": {
@@ -48,10 +48,8 @@
     "firebase": "^11.10.0"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "node": ">=18.0.0"
   },
-  "packageManager": "pnpm@8.0.0",
   "keywords": [
     "vocabulary",
     "trainer",
