@@ -946,6 +946,35 @@ function generateSentenceInputs(
         // Kurze Verzögerung vor processAnswer um UI-Updates zu ermöglichen
         setTimeout(() => {
             processAnswer(isCorrect, fullGermanSentence, undefined, userSentence);
+            
+            // NEU: Weiter-Button-Handler für falsche Antworten setzen
+            if (!isCorrect && !state.test.isTestModeActive) {
+                // Weiter-Button-Handler setzen
+                const handleContinueButtonClick = () => {
+                    // Korrekturmodus beenden
+                    state.training.isCorrectionMode = false;
+                    
+                    // UI zurücksetzen
+                    dom.correctionSolutionEl.classList.add('hidden');
+                    dom.continueButton.classList.add('hidden');
+                    dom.checkSentenceButton.disabled = false;
+                    
+                    // Alle Input-Felder zurücksetzen
+                    const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
+                    inputs.forEach(input => {
+                        input.disabled = false;
+                        input.value = '';
+                        input.classList.remove('border-green-400', 'bg-green-50', 'border-red-400', 'bg-red-50');
+                        input.classList.add('border-gray-300');
+                    });
+                    
+                    // Nächstes Wort laden - verwende processAnswer mit einem speziellen Flag
+                    processAnswer(true, '', undefined, 'continue');
+                };
+                
+                // Event-Handler für Weiter-Button setzen
+                dom.continueButton.onclick = handleContinueButtonClick;
+            }
         }, 100);
     };
     setTimeout(() => {

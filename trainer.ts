@@ -361,6 +361,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     function processAnswer(isCorrect: boolean, correctAnswer?: string, timeSpent?: number, userAnswer?: string): void {
         
+        // NEU: Spezieller Fall für "continue" - direkt zur nächsten Aufgabe
+        if (userAnswer === 'continue') {
+            loadNextTask();
+            return;
+        }
+        
         state.training.attemptedInCurrentRound++;
         
         // Test-Antworten protokollieren
@@ -416,6 +422,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Aktueller Modus bestimmt das Verhalten
         const currentMode = ModeManager.getCurrentMode(state);
         
+        console.log('🔧 processAnswer - Modus:', currentMode, 'isCorrect:', isCorrect, 'currentMode:', state.training.currentMode);
+        
         switch (currentMode) {
             case 'correcting':
                 // Im Korrekturmodus nur Statistiken aktualisieren
@@ -467,6 +475,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             default:
                 // Normaler Lernmodus
                 if (isCorrect) {
+                    console.log('🔧 Richtige Antwort im Lernmodus');
                     state.training.correctInCurrentRound++;
                     updateProgress(true);
                     
@@ -479,6 +488,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         loadNextTask();
                     }, 1200);
                 } else {
+                    console.log('🔧 Falsche Antwort im Lernmodus - zeige Korrektur-UI');
                     // Fehler hinzufügen
                     addToErrorList();
                     
@@ -521,6 +531,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Korrektur-UI nur im Lernmodus anzeigen, nicht im Testmodus
         if (!state.test.isTestModeActive) {
             
+            console.log('🔧 showCorrectionUI aufgerufen mit:', correctAnswer);
+            
             // NUR das rote Korrekturwort anzeigen - OHNE "Falsch! Richtig:" - GRÖSSER
             dom.feedbackContainerEl.innerHTML = `<span class="feedback-incorrect" style="color: #ef4444; font-weight: bold; font-size: 1.5rem; text-align: center; display: block; margin: 1rem 0;">${correctAnswer || ''}</span>`;
             
@@ -534,6 +546,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             // KRITISCH: Stelle sicher, dass der Button sichtbar ist
             if (dom.continueButton) {
                 dom.continueButton.style.display = 'block';
+                console.log('🔧 Weiter-Button sichtbar gemacht');
+            } else {
+                console.error('❌ Weiter-Button nicht gefunden!');
             }
         } else {
             // Test-Modus: Kein visuelles Feedback
