@@ -94,49 +94,56 @@ export interface DummyUser {
 }
 
 export const MOTIVATIONAL_DUMMY_USERS: DummyUser[] = [
-  { name: "Maria Rodriguez", email: "maria.rodriguez@example.com" },
-  { name: "Ahmed Hassan", email: "ahmed.hassan@example.com" },
-  { name: "Yuki Tanaka", email: "yuki.tanaka@example.com" },
-  { name: "Priya Patel", email: "priya.patel@example.com" },
-  { name: "Carlos Silva", email: "carlos.silva@example.com" },
-  { name: "Fatima Al-Zahra", email: "fatima.alzahra@example.com" },
-  { name: "Ivan Petrov", email: "ivan.petrov@example.com" },
-  { name: "Li Wei", email: "li.wei@example.com" },
-  { name: "Sofia Kowalski", email: "sofia.kowalski@example.com" },
-  { name: "Kofi Mensah", email: "kofi.mensah@example.com" }
+  { name: "AnonymousLearner", email: "anonymous@example.com" },
+  { name: "GlobalChampion", email: "champion@example.com" },
+  { name: "LanguageMaster", email: "master@example.com" },
+  { name: "LearningStar", email: "star@example.com" },
+  { name: "StudentPro", email: "pro@example.com" },
+  { name: "EliteGuru", email: "guru@example.com" },
+  { name: "TopNinja", email: "ninja@example.com" },
+  { name: "SuperHero", email: "hero@example.com" },
+  { name: "UltraLegend", email: "legend@example.com" },
+  { name: "MegaWizard", email: "wizard@example.com" }
 ];
 
 /**
- * Generiert einen zufälligen internationalen Künstlernamen für anonyme Nutzer
+ * Generiert einen zufälligen anonymen Namen für die Rangliste
  */
 export function generateRandomArtistName(): string {
   const prefixes = [
     'Anonymous', 'Global', 'Language', 'Learning', 'Student', 'Champion', 
-    'Star', 'Pro', 'Elite', 'Top', 'Super', 'Ultra', 'Mega'
+    'Star', 'Pro', 'Elite', 'Top', 'Super', 'Ultra', 'Mega', 'Cool',
+    'Fast', 'Quick', 'Smart', 'Bright', 'Sharp', 'Swift', 'Rapid',
+    'Speedy', 'Agile', 'Nimble', 'Clever', 'Wise', 'Brilliant', 'Genius'
   ];
   
   const suffixes = [
     'Learner', 'Master', 'Champion', 'Star', 'Pro', 'Elite', 
-    'Guru', 'Ninja', 'Hero', 'Legend', 'Wizard', 'Expert'
+    'Guru', 'Ninja', 'Hero', 'Legend', 'Wizard', 'Expert', 'Ace',
+    'Whiz', 'Brain', 'Mind', 'Thinker', 'Solver', 'Cracker', 'Hacker',
+    'Coder', 'Builder', 'Creator', 'Maker', 'Artist', 'Poet', 'Writer'
   ];
   
   const numbers = [
     '2024', '2025', 'X', 'Z', 'Alpha', 'Beta', 'Gamma', 'Delta',
-    'One', 'Two', 'Three', 'Prime', 'Ultra', 'Max'
+    'One', 'Two', 'Three', 'Prime', 'Ultra', 'Max', 'Plus', 'Pro',
+    '42', '007', '1337', '999', '777', '555', '123', '456', '789'
   ];
   
   const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
   const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
   const number = numbers[Math.floor(Math.random() * numbers.length)];
   
-  // 50% Chance für verschiedene Formate
+  // Verschiedene Formate für mehr Variation
   const format = Math.random();
-  if (format < 0.33) {
+  if (format < 0.25) {
     return `${prefix}${suffix}`;
-  } else if (format < 0.66) {
+  } else if (format < 0.5) {
     return `${prefix}${suffix}${number}`;
-  } else {
+  } else if (format < 0.75) {
     return `${prefix}${number}`;
+  } else {
+    return `${suffix}${number}`;
   }
 }
 
@@ -144,7 +151,22 @@ export function generateMotivationalDummyResults(count: number = 10): RankingEnt
   const dummyResults: RankingEntry[] = [];
   
   for (let i = 0; i < count; i++) {
-    const user = MOTIVATIONAL_DUMMY_USERS[i % MOTIVATIONAL_DUMMY_USERS.length];
+    // 90% Chance für anonyme Namen, 10% für echte Namen (für Realismus)
+    const useAnonymousName = Math.random() < 0.9;
+    
+    let userName: string;
+    let userEmail: string;
+    
+    if (useAnonymousName) {
+      // Generiere zufälligen anonymen Namen
+      userName = generateRandomArtistName();
+      userEmail = `${userName.toLowerCase().replace(/\s+/g, '')}@anonymous.com`;
+    } else {
+      // Verwende einen der vordefinierten anonymen Namen
+      const user = MOTIVATIONAL_DUMMY_USERS[i % MOTIVATIONAL_DUMMY_USERS.length];
+      userName = user.name;
+      userEmail = user.email;
+    }
     
     // Realistische aber erreichbare Scores für echte Spieler
     // Der beste sollte bei etwa 7 Minuten liegen, andere langsamer
@@ -171,8 +193,8 @@ export function generateMotivationalDummyResults(count: number = 10): RankingEnt
     dummyResults.push({
       id: `dummy-${i + 1}`,
       userId: `dummy-user-${i + 1}`,
-      userName: user.name,
-      userEmail: user.email,
+      userName: userName,
+      userEmail: userEmail,
       score: finalScore,
       timeInSeconds: timeInSeconds,
       accuracy: accuracy,
