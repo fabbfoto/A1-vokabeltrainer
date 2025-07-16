@@ -17,7 +17,7 @@ interface TrainerState {
 
 declare global {
     interface Window {
-        state?: TrainerState;
+        state?: any;
     }
 }
 

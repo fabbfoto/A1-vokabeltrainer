@@ -1072,7 +1072,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const recommendations = incorrectWords.length > 0 ? [{
             type: 'repeat' as const,
             wordIds: incorrectWords,
-            suggestedMode: state.training.currentMode
+            suggestedMode: state.training.currentMode || undefined,
+            reason: `Test abgeschlossen mit ${incorrectWords.length} falschen Antworten`
         }] : [];
         
         // Konvertiere TestScore zu TestResult für die Modal-Anzeige
@@ -1299,7 +1300,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     (window as any).debugErrorCounts = () => {
         console.group('Current Error Counts');
         Object.keys(state.progress.wordsToRepeatByMode).forEach(mode => {
-            const count = state.progress.wordsToRepeatByMode[mode]?.size || 0;
+            const count = state.progress.wordsToRepeatByMode[mode as ModeId]?.size || 0;
             console.log(`${mode}: ${count} errors`);
         });
         console.groupEnd();
