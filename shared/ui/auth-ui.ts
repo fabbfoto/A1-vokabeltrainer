@@ -102,7 +102,10 @@ export class AuthUI {
                 ? this.authService.getAnonymousUsername() 
                 : userEmail;
             
-            this.syncButton.innerHTML = `${displayName || 'Angemeldet'} (Klick zum Abmelden)`;
+            // Zeige Auth-Status (Firebase oder lokal)
+            const authStatus = this.authService.isUsingLocalAuth() ? ' (Lokal)' : '';
+            
+            this.syncButton.innerHTML = `${displayName || 'Angemeldet'}${authStatus} (Klick zum Abmelden)`;
             this.syncButton.style.background = 'linear-gradient(to right, #000000, #DD0000, #FFCC00)';
             this.syncButton.style.cursor = 'pointer';
             this.syncButton.addEventListener('click', () => this.authService.logout());
@@ -115,7 +118,13 @@ export class AuthUI {
             this.syncButton.className = loggedOutClasses;
             this.syncButton.style.backgroundColor = '#3b82f6';
             this.syncButton.style.color = 'white';
-            this.syncButton.innerHTML = '🔄 Geräte synchronisieren';
+            
+            // Zeige Auth-Status
+            const authText = this.authService.isUsingLocalAuth() 
+                ? '🔄 Lokale Synchronisation' 
+                : '🔄 Geräte synchronisieren';
+            
+            this.syncButton.innerHTML = authText;
             this.syncButton.addEventListener('click', () => this.showAuthModal());
         }
         
