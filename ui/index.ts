@@ -39,6 +39,7 @@ export {
 export {
     showMessage,
     showSuccessMessageWithButton,
+    closeSuccessPopup,
     hideAllUIs,
     showCorrectFeedback,
     showIncorrectFeedback,

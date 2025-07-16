@@ -133,6 +133,13 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     NavigationEvents.dispatchRoot();
     globalAuthUI = authUI;
+    
+    // NEU: Tastenkombination zum Schließen des "Perfekt!"-Popups
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            ui.closeSuccessPopup(dom);
+        }
+    });
 
     const state: TrainerState = {
         navigation: {

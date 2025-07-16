@@ -61,29 +61,69 @@ export function showSuccessMessageWithButton(
     dom.messageBoxEl.innerHTML = `
         <div class="text-center">
             <div class="mb-3">${message}</div>
-            <button class="px-4 py-2 bg-white text-green-500 rounded shadow hover:bg-gray-100 transition font-semibold">
+            <button id="repeat-exercise-button" class="px-4 py-2 bg-white text-green-500 rounded shadow hover:bg-gray-100 transition font-semibold cursor-pointer">
                 ${buttonText}
             </button>
         </div>
     `;
     
     // CSS-Klassen für Erfolgsmeldung
-    dom.messageBoxEl.className = 'fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-xl';
+    dom.messageBoxEl.className = 'fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-xl z-50';
     dom.messageBoxEl.classList.remove('hidden');
     
-    // Event Listener für den Button
-    const button = dom.messageBoxEl.querySelector('button');
-    if (button) {
-        console.log('Button gefunden, Event Listener hinzugefügt');
-        button.addEventListener('click', (e: Event) => {
-            console.log('Button geklickt!');
-            e.preventDefault();
-            e.stopPropagation();
-            onButtonClick();
-            dom.messageBoxEl.classList.add('hidden');
-        });
-    } else {
-        console.error('Button nicht gefunden!');
+    // Event Listener für den Button - mit Verzögerung für bessere Stabilität
+    setTimeout(() => {
+        const button = dom.messageBoxEl?.querySelector('#repeat-exercise-button') as HTMLButtonElement;
+        if (button) {
+            console.log('🔧 Button gefunden, Event Listener hinzugefügt');
+            
+            // Entferne alte Event Listener
+            button.replaceWith(button.cloneNode(true));
+            const newButton = dom.messageBoxEl?.querySelector('#repeat-exercise-button') as HTMLButtonElement;
+            
+            if (newButton) {
+                newButton.addEventListener('click', (e: Event) => {
+                    console.log('🔧 Button geklickt!');
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Verstecke die Nachricht sofort
+                    dom.messageBoxEl?.classList.add('hidden');
+                    
+                    // Führe die Callback-Funktion aus
+                    try {
+                        onButtonClick();
+                    } catch (error) {
+                        console.error('Fehler beim Ausführen der Callback-Funktion:', error);
+                    }
+                });
+                
+                // Zusätzlich: Klick außerhalb schließt auch die Nachricht
+                const handleOutsideClick = (e: Event) => {
+                    if (e.target !== newButton && !newButton.contains(e.target as Node)) {
+                        dom.messageBoxEl?.classList.add('hidden');
+                        document.removeEventListener('click', handleOutsideClick);
+                    }
+                };
+                
+                // Verzögerung für Outside-Click-Handler
+                setTimeout(() => {
+                    document.addEventListener('click', handleOutsideClick);
+                }, 100);
+            }
+        } else {
+            console.error('❌ Button nicht gefunden!');
+        }
+    }, 50);
+}
+
+/**
+ * Schließt das "Perfekt!"-Popup manuell.
+ */
+export function closeSuccessPopup(dom: DOMElements): void {
+    if (dom.messageBoxEl) {
+        dom.messageBoxEl.classList.add('hidden');
+        dom.messageBoxEl.innerHTML = '';
     }
 }
 
