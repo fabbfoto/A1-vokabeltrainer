@@ -294,3 +294,5 @@ export function getVocabularyStats(vocabulary: VocabularyStructure): {
     wordsByType
   };
 }
+
+export type VocabularyItem = Word;
