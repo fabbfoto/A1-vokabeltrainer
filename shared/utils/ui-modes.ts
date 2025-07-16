@@ -926,7 +926,7 @@ function generateSentenceInputs(
             return;
         }
         
-        const isCorrect = vergleicheAntwort(userSentence, fullGermanSentence);
+        const isCorrect = vergleicheAntwort(userSentence, fullGermanSentence, { caseSensitive: true });
         
         // Button deaktivieren um mehrfache Klicks zu verhindern
         dom.checkSentenceButton.disabled = true;
@@ -934,7 +934,7 @@ function generateSentenceInputs(
         inputs.forEach((input, index) => {
             const userWord = input.value.trim();
             const expectedWord = input.dataset.expectedWord || '';
-            const wordCorrect = vergleicheAntwort(userWord, expectedWord);
+            const wordCorrect = vergleicheAntwort(userWord, expectedWord, { caseSensitive: true });
             // 4.5 Satzübersetzung: Farbfeedback nur im Lern-Modus
             if (!state.test.isTestModeActive) {
                 input.classList.add(wordCorrect ? 'border-green-400' : 'border-red-400');

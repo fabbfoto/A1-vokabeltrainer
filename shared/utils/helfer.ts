@@ -49,9 +49,15 @@ export async function speak(text: string, lang: string = 'de-DE'): Promise<void>
   }
 }
 
-export function vergleicheAntwort(userAnswer: string, correctAnswer: string, { ignorePunctuation = false } = {}): boolean {
-  let processedUserAnswer = userAnswer.trim().toLowerCase();
-  let processedCorrectAnswer = correctAnswer.trim().toLowerCase();
+export function vergleicheAntwort(userAnswer: string, correctAnswer: string, { ignorePunctuation = false, caseSensitive = false } = {}): boolean {
+  let processedUserAnswer = userAnswer.trim();
+  let processedCorrectAnswer = correctAnswer.trim();
+  
+  // Nur zu Kleinbuchstaben konvertieren, wenn caseSensitive = false
+  if (!caseSensitive) {
+    processedUserAnswer = processedUserAnswer.toLowerCase();
+    processedCorrectAnswer = processedCorrectAnswer.toLowerCase();
+  }
   
   // Artikel am Anfang entfernen (der, die, das, ein, eine, einen, einem, einer, eines)
   const artikelRegex = /^(der|die|das|ein|eine|einen|einem|einer|eines)\s+/i;
