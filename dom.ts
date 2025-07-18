@@ -1,7 +1,7 @@
 // dom.ts
 // Zentrale DOM-Element-Referenzen mit Type-Safety und robuster Validierung
 
-import type { DOMElements } from './shared/types/ui';
+import type { DOMElements } from './src/core/types/ui';
 
 // ========== DOM VALIDATION AND ERROR HANDLING ==========
 

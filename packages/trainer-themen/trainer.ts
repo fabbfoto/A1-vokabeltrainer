@@ -1,7 +1,7 @@
 // packages/trainer-themen/trainer.ts
 // TypeScript-Version der Navigation-Funktionen
 
-import type { VocabularyStructure } from '../../shared/types/vocabulary';
+import type { VocabularyStructure } from '../../src/core/types/vocabulary';
 
 // DOM-Elemente
 const navigationContainerEl = document.getElementById('navigation-container');

@@ -1,8 +1,8 @@
 // packages/trainer-themen/vokabular_reisen_verkehr.ts
 // VOLLSTÄNDIGE TypeScript Migration von vokabular_reisen_verkehr.js
 
-import type { VocabularyStructure, Noun, Verb, WordId, CaseElement } from './shared/types/vocabulary';
-import { createWordId, createVocabulary } from './shared/types/vocabulary';
+import type { VocabularyStructure, Noun, Verb, WordId, CaseElement } from './src/core/types/vocabulary';
+import { createWordId, createVocabulary } from './src/core/types/vocabulary';
 
 export const vokabularReisenVerkehr: VocabularyStructure = createVocabulary({
     "Reisen und Verkehr": {

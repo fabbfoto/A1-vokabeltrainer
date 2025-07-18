@@ -8,8 +8,8 @@ import type {
     Adjective,
     WordId,
     CaseElement 
-} from './shared/types/vocabulary';
-import { createWordId, createVocabulary } from './shared/types/vocabulary';
+} from './src/core/types/vocabulary';
+import { createWordId, createVocabulary } from './src/core/types/vocabulary';
 
 export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabulary({
     "Freizeit und Unterhaltung": {

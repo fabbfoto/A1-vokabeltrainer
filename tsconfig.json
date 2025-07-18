@@ -21,11 +21,13 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["shared/*"],
-      "@utils/*": ["shared/utils/*"],
-      "@services/*": ["shared/services/*"],
-      "@types/*": ["shared/types/*"],
-      "@ui/*": ["ui/*"]
+      "@core/*": ["./src/core/*"],
+      "@services/*": ["./src/services/*"],
+      "@ui/*": ["./src/ui/*"],
+      "@ui/views/*": ["./src/ui/views/*"],
+      "@ui/components/*": ["./src/ui/components/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@infrastructure/*": ["./src/infrastructure/*"]
     },
     "noEmit": true,
     "allowImportingTsExtensions": true,
@@ -54,17 +56,14 @@
     "noImplicitOverride": true
   },
   "include": [
+    "src/**/*.ts",
     "*.ts",
-    "shared/**/*",
-    "packages/**/*",
-    "ui/**/*",
-    "utils/**/*"
+    "**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
     "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts"
+    "shared"  // Falls noch vorhanden
   ],
   "ts-node": {
     "esm": true,

@@ -16,26 +16,26 @@ import type {
     TestResult,
     TestId,
     TestType
-} from './shared/types/trainer';
+} from './src/core/types/trainer';
 
 import { dom } from './dom';
-import type { DOMElements } from './shared/types/ui';
+import type { DOMElements } from './src/core/types/ui';
 import { vokabular } from './vokabular';
-import { shuffleArray } from './shared/utils/helfer';
-import * as uiModes from './shared/utils/ui-modes';
-import * as ui from './ui/index';
-import { initializeAuth } from './shared/auth/index';
-import { NavigationEvents } from './shared/events/navigation-events';
-import { updateErrorCounts } from './ui/statistics';
-import { generateTestQuestions, TestGenerationResult } from './utils/test-generator';
-import { calculateTestScore, calculateAverageTimePerQuestion, CATEGORY_MODE_MAP } from './shared/types/trainer';
-import { showTestResultModal } from './shared/ui/test-result-modal';
-import { ModeManager } from './shared/services/mode-manager';
-import { ErrorCounterManager } from './shared/services/error-counter-manager';
+import { shuffleArray } from './src/utils/helfer';
+import * as uiModes from './src/utils/ui-modes';
+import * as ui from './src/ui/views/index';
+import { initializeAuth } from './src/infrastructure/auth/index';
+import { NavigationEvents } from './src/core/events/navigation-events';
+import { updateErrorCounts } from './src/ui/views/statistics';
+import { generateTestQuestions, TestGenerationResult } from './src/utils/test-generator';
+import { calculateTestScore, calculateAverageTimePerQuestion, CATEGORY_MODE_MAP } from './src/core/types/trainer';
+import { showTestResultModal } from './src/ui/components/test-result-modal';
+import { ModeManager } from './src/services/mode-manager';
+import { ErrorCounterManager } from './src/services/error-counter-manager';
 // import { validateVocabulary } from './validate-vocabulary'; // TEMPORÄR DEAKTIVIERT
-import type { AuthService } from './shared/services/auth-service';
-import type { SyncService } from './shared/services/sync-service';
-import type { RankingService } from './shared/services/ranking-service';
+import type { AuthService } from './src/services/auth-service';
+import type { SyncService } from './src/services/sync-service';
+import type { RankingService } from './src/services/ranking-service';
 
 let globalAuthUI: AuthUI | null = null;
 
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     try {
         // Firebase Auth initialisieren
-        const { initializeAuth } = await import('./shared/auth/index.js');
+        const { initializeAuth } = await import('./src/infrastructure/auth/index.js');
         const services = initializeAuth('a1-vokabeltrainer', {
             buttonContainerId: 'auth-button-container',
             rankingContainerId: 'ranking-container'
@@ -1042,7 +1042,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Verzögert ausführen, damit die Input-Felder im DOM sind
         setTimeout(() => {
             // Dynamischer Import für konsistente Chunk-Strategie
-            import('./ui/umlaut-buttons').then(mod => {
+            import('./src/ui/views/umlaut-buttons').then(mod => {
                 mod.initializeUmlautButtons('setup', dom, state, { modeId });
             });
         }, 200); // Längere Verzögerung für dynamisch erstellte Input-Felder
@@ -1229,7 +1229,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 variant: testConfig.testType === 'global' ? 'global-ranking' : testConfig.variant,
                 scope: testConfig.testType as 'subTopic' | 'mainTopic' | 'global',
                 topicId: testConfig.topicId || '' as TopicId,
-                category: testConfig.selectedCategory as import('./shared/types/trainer').TestCategory,
+                category: testConfig.selectedCategory as import('./src/core/types/trainer').TestCategory,
                 totalQuestions: 20
             });
             
@@ -1250,8 +1250,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             
             // State für Test vorbereiten
             state.test.currentTest = testConfig;
-            state.training.currentVocabularySet = result.words as import('./shared/types/trainer').Word[];
-            state.training.shuffledWordsForMode = result.words as import('./shared/types/trainer').Word[];
+            state.training.currentVocabularySet = result.words as import('./src/core/types/trainer').Word[];
+            state.training.shuffledWordsForMode = result.words as import('./src/core/types/trainer').Word[];
             state.training.currentWordIndex = -1;
             state.training.correctInCurrentRound = 0;
             state.training.attemptedInCurrentRound = 0;
@@ -1264,7 +1264,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             
             // Mode-Rotation für Chaos-Test und Global-Ranking-Test
             if ((testConfig.variant === 'chaos' || testConfig.testType === 'global') && result.modeRotation) {
-                state.test.testModeRotation = result.modeRotation as import('./shared/types/trainer').ModeId[];
+                state.test.testModeRotation = result.modeRotation as import('./src/core/types/trainer').ModeId[];
                 state.test.currentTestModeIndex = 0;
                 console.log('🎯 Mode-Rotation für Test gesetzt:', result.modeRotation);
             } else {

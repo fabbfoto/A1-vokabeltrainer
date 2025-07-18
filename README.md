@@ -42,18 +42,42 @@ pnpm type-check
 pnpm test
 ```
 
+## 📚 Dokumentation
+
+### 🏗️ Architecture Decision Records (ADRs)
+- [ADR-0001: TypeScript-Migration](./docs/adr/0001-typescript-migration.md) - Migration von JavaScript zu TypeScript
+- [ADR-0002: Ordner-Restrukturierung](./docs/adr/0002-folder-restructuring.md) - Umstellung auf src/-basiertes Layout
+- [ADR-0003: Testing-Strategie](./docs/adr/0003-testing-strategy.md) - Vitest-basierte Testing-Strategie
+- [ADR-0004: Path-Aliases](./docs/adr/0004-path-aliases.md) - Semantische Import-Pfade
+
+### 📖 Entwickler-Guides
+- [Entwickler-Guide](./docs/guides/developer-guide.md) - Umfassender Guide für Entwickler
+- [Testing-Guide](./docs/guides/testing-guide.md) - Testing-Dokumentation und Best Practices
+- [Migration-Guide](./docs/guides/migration-guide.md) - Migration von der alten Struktur
+
+### 📋 Weitere Dokumentation
+- [ARCHITECTURE.md](./ARCHITECTURE.md) - Architektur-Übersicht
+- [TEST-PLAN.md](./TEST-PLAN.md) - Test-Strategie
+- [FIREBASE-SETUP.md](./FIREBASE-SETUP.md) - Firebase-Konfiguration
+- [TYPESCRIPT-MIGRATION-COMPLETE.md](./TYPESCRIPT-MIGRATION-COMPLETE.md) - TypeScript-Migration
+- [TYPESCRIPT-TYPIZATION-IMPROVEMENTS.md](./TYPESCRIPT-TYPIZATION-IMPROVEMENTS.md) - TypeScript-Verbesserungen
+
 ## 🏗️ Projektstruktur
 
 ```
 A1-vokabeltrainer-typescript/
-├── shared/                    # Gemeinsame Module
-│   ├── auth/                  # Firebase Authentifizierung
-│   ├── services/              # Business Logic Services
-│   ├── types/                 # TypeScript Typdefinitionen
-│   ├── utils/                 # Utility-Funktionen
-│   └── ui/                    # UI-Komponenten
-├── ui/                        # UI-Layer
-├── utils/                     # Projekt-spezifische Utils
+├── src/                       # Hauptquellcode
+│   ├── core/                  # Kern-Funktionalitäten
+│   │   ├── auth/              # Firebase Authentifizierung
+│   │   ├── services/          # Business Logic Services
+│   │   ├── types/             # TypeScript Typdefinitionen
+│   │   ├── utils/             # Utility-Funktionen
+│   │   ├── events/            # Event-System
+│   │   └── infrastructure/    # Infrastruktur-Services
+│   ├── ui/                    # UI-Komponenten
+│   │   ├── components/        # Wiederverwendbare UI-Komponenten
+│   │   └── views/             # View-spezifische UI-Komponenten
+│   └── utils/                 # Projekt-spezifische Utils
 ├── packages/                  # Zusätzliche Pakete
 └── netlify/                   # Netlify-spezifische Konfiguration
 ```

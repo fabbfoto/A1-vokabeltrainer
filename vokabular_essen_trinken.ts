@@ -1,7 +1,7 @@
 // vokabular_essen_trinken.ts
 
-import type {VocabularyStructure, Noun, Verb, Adjective, CaseElement } from './shared/types/vocabulary';
-import {createWordId, createVocabulary } from './shared/types/vocabulary';
+import type {VocabularyStructure, Noun, Verb, Adjective, CaseElement } from './src/core/types/vocabulary';
+import {createWordId, createVocabulary } from './src/core/types/vocabulary';
 
 export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({"Essen und Trinken": {
 

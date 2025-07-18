@@ -2,7 +2,7 @@
 // Validierungsfunktion für alle Vokabular-Dateien
 
 import { vokabular } from './vokabular';
-import type { Word } from './shared/types/vocabulary';
+import type { Word } from './src/core/types/vocabulary';
 
 interface ValidationResult {
   isValid: boolean;

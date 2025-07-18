@@ -1,8 +1,8 @@
 // vokabular_Kommunikationsmittel.ts
 // VOLLSTÄNDIGE TypeScript Migration von vokabular_kommunikationsmittel.js
 
-import type { VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './shared/types/vocabulary';
-import { createWordId, createVocabulary } from './shared/types/vocabulary';
+import type { VocabularyStructure, Noun, Verb, Adjective, WordId, CaseElement } from './src/core/types/vocabulary';
+import { createWordId, createVocabulary } from './src/core/types/vocabulary';
 
 export const vokabularKommunikationsmittel: VocabularyStructure = createVocabulary({
     "Kommunikationsmittel": {
