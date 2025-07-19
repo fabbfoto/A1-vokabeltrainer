@@ -30,9 +30,11 @@ function calculateProgressPercentage(completed: number, total: number): number {
 
 function getProgressColorClass(completed: number, total: number): string {
     const percentage = calculateProgressPercentage(completed, total);
-    if (percentage < 34) return 'bg-de-black';
-    if (percentage < 67) return 'bg-de-red';
-    return 'bg-de-gold';
+    if (percentage >= 100) return 'bg-de-green';
+    if (percentage >= 75) return 'bg-de-blue';
+    if (percentage >= 50) return 'bg-de-gold';
+    if (percentage >= 25) return 'bg-de-gold-dark';
+    return 'bg-de-gray-400';
 }
 
 function optimizeSubTopicGrid(container: HTMLElement): void {
@@ -57,11 +59,11 @@ function createTestButton(
     const button = document.createElement('button');
     button.id = id;
     // Tailwind-Klassen basierend auf Variante
-    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-3 px-4 font-medium shadow-lg hover:shadow-xl flex items-center justify-center gap-2';
+    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-3 px-4 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2';
     if (variant === 'chaos') {
-        button.className = `${baseClasses} bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white`;
+        button.className = `${baseClasses} bg-de-red hover:bg-de-red/90 text-white`;
     } else {
-        button.className = `${baseClasses} bg-blue-500 hover:bg-blue-600 text-white`;
+        button.className = `${baseClasses} bg-de-blue hover:bg-de-blue/90 text-white`;
     }
     // Dataset attributes
     Object.entries(dataset).forEach(([key, value]) => {
@@ -137,9 +139,7 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
     // NEU: Ranking-Button
     const rankingButton = createActionButton('ranking', '🏆 Ranglisten');
     rankingButton.className = '';
-    rankingButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2', 'mt-2');
-    rankingButton.style.backgroundColor = '#10b981';
-    rankingButton.style.color = 'white';
+    rankingButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2', 'mt-2', 'bg-de-gold', 'hover:bg-de-gold/90', 'text-white');
     
     // Event Listener für Ranking-Button
     rankingButton.addEventListener('click', () => {

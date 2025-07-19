@@ -2,7 +2,7 @@
 
 export function createTopicButton(text: string, percentage: number, progressColorClass: string): HTMLButtonElement {
     const button = document.createElement('button');
-    button.className = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-3 px-4 font-medium shadow-lg hover:shadow-xl min-h-[90px] max-h-[110px]';
+    button.className = 'relative flex flex-col items-center justify-center p-5 text-center cursor-pointer font-semibold transition-all duration-300 rounded-2xl whitespace-normal break-words bg-white border-2 border-gray-300 shadow-md hover:shadow-lg hover:-translate-y-1 min-h-[80px] hover:border-gray-400';
     
     // Progress-Bar
     const progressBar = document.createElement('div');
@@ -23,7 +23,7 @@ export function createTopicButton(text: string, percentage: number, progressColo
 export function createActionButton(id: string, text: string): HTMLButtonElement {
     const button = document.createElement('button');
     button.id = id;
-    button.className = 'bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded transition-colors duration-200';
+    button.className = 'bg-de-blue hover:bg-de-blue/90 text-white font-medium py-2 px-4 rounded transition-colors duration-200';
     button.textContent = text;
     
     return button;

@@ -45,7 +45,7 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
   const isGlobalChaosTest = testConfig?.variant === 'chaos' && testConfig?.testType === 'global';
 
   modal.innerHTML = `
-      <div class="bg-white rounded-2xl shadow-xl p-6 max-w-4xl w-full mx-4 my-8 max-h-[90vh] overflow-y-auto">
+      <div class="bg-white rounded-2xl shadow-de-gray-400/50 p-6 max-w-4xl w-full mx-4 my-8 max-h-[90vh] overflow-y-auto">
           <!-- Header -->
           <div class="text-center mb-6">
               <h2 class="text-3xl font-bold text-blue-700 mb-2">Test-Auswertung</h2>
@@ -56,13 +56,13 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
           <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-6">
               <div class="grid grid-cols-3 gap-4 text-center">
                   <div>
-                      <div class="text-3xl font-bold ${score.accuracy >= 0.8 ? 'text-green-600' : score.accuracy >= 0.5 ? 'text-yellow-600' : 'text-red-600'}">
-                          ${Math.round(score.accuracy * 100)}%
+                      <div class="text-3xl font-bold ${score.accuracy >= 0.8 ? 'text-de-green' : score.accuracy >= 0.5 ? 'text-de-gold' : 'text-de-red'}">
+                          ${(score.accuracy * 100).toFixed(0)}%
                       </div>
                       <div class="text-sm text-gray-600">Genauigkeit</div>
                   </div>
                   <div>
-                      <div class="text-3xl font-bold text-blue-600">${score.correct}/${score.total}</div>
+                      <div class="text-3xl font-bold text-de-blue">${score.correct}/${score.total}</div>
                       <div class="text-sm text-gray-600">Richtige Antworten</div>
                   </div>
                   <div>
@@ -79,17 +79,17 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
               <!-- Falsche Antworten -->
               ${incorrectWords.length > 0 ? `
                   <div class="mb-6">
-                      <h4 class="text-lg font-medium text-red-600 mb-3">❌ Falsche Antworten (${incorrectWords.length})</h4>
+                      <h4 class="text-lg font-medium text-de-red mb-3">❌ Falsche Antworten (${incorrectWords.length})</h4>
                       <div class="space-y-2">
                           ${incorrectWords.map(result => `
-                              <div class="bg-red-50 border border-red-200 rounded-lg p-3">
+                              <div class="bg-de-red/10 border border-de-red/20 rounded-lg p-3">
                                   <div class="flex justify-between items-start">
                                       <div class="flex-1">
                                           <div class="font-medium">${result.word?.english || 'N/A'}</div>
                                           <div class="text-sm text-gray-600 mt-1">
-                                              <span class="text-red-600">Deine Antwort: ${result.userAnswer || '(keine Antwort)'}</span>
+                                              <span class="text-de-red">Deine Antwort: ${result.userAnswer || '(keine Antwort)'}</span>
                                               <br>
-                                              <span class="text-green-600 font-medium">Richtig: ${result.correctAnswer || result.word?.german || 'N/A'}</span>
+                                              <span class="text-de-green font-medium">Richtig: ${result.correctAnswer || result.word?.german || 'N/A'}</span>
                                           </div>
                                       </div>
                                       <div class="text-sm text-gray-500">${result.timeSpent.toFixed(1)}s</div>
@@ -102,10 +102,10 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
               
               <!-- Richtige Antworten -->
               <div>
-                  <h4 class="text-lg font-medium text-green-600 mb-3">✅ Richtige Antworten (${correctWords.length})</h4>
+                  <h4 class="text-lg font-medium text-de-green mb-3">✅ Richtige Antworten (${correctWords.length})</h4>
                   <div class="grid grid-cols-2 gap-2">
                       ${correctWords.map(result => `
-                          <div class="bg-green-50 border border-green-200 rounded-lg p-2">
+                          <div class="bg-de-green/10 border border-de-green/20 rounded-lg p-2">
                               <div class="flex justify-between items-center">
                                   <div>
                                       <div class="font-medium text-sm">${result.word?.english || 'N/A'}</div>
@@ -130,9 +130,9 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
           
           <!-- Datenschutz-Option für Globalen Chaos-Test -->
           ${isGlobalChaosTest ? `
-              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                  <h4 class="text-lg font-medium text-blue-700 mb-3">🏆 Globales Ranking</h4>
-                  <p class="text-sm text-blue-600 mb-4">
+              <div class="bg-de-blue/10 border border-de-blue/20 rounded-lg p-4 mb-6">
+                  <h4 class="text-lg font-medium text-de-blue mb-3">🏆 Globales Ranking</h4>
+                  <p class="text-sm text-de-blue mb-4">
                       Möchtest du dein Ergebnis in der globalen Rangliste veröffentlichen? 
                       Dein Benutzername wird automatisch verwendet (anonym oder normal).
                   </p>
@@ -158,12 +158,12 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
                   </button>
               ` : ''}
               
-              <button id="save-test-result" class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors font-semibold">
-                  💾 Ergebnis speichern
+              <button id="save-test-result" class="px-6 py-3 bg-de-green text-white rounded-lg hover:bg-de-green/90 transition-colors font-semibold">
+                  💾 Speichern
               </button>
               
-              <button id="close-test-result-modal" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold">
-                  ✅ Schließen
+              <button id="close-test-result-modal" class="px-6 py-3 bg-de-blue text-white rounded-lg hover:bg-de-blue/90 transition-colors font-semibold">
+                  ✕ Schließen
               </button>
           </div>
       </div>
@@ -263,7 +263,7 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
           // Erfolgs-Nachricht
           setTimeout(() => {
             const successMsg = document.createElement('div');
-            successMsg.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+            successMsg.className = 'fixed top-4 right-4 bg-de-green text-white px-4 py-2 rounded-lg shadow-de-gray-300/50 z-50';
             successMsg.textContent = '🏆 Ergebnis in globaler Rangliste veröffentlicht!';
             document.body.appendChild(successMsg);
             setTimeout(() => successMsg.remove(), 3000);
@@ -274,10 +274,10 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
           // Fehler-Feedback
           const button = document.getElementById('save-test-result') as HTMLButtonElement;
           button.textContent = '❌ Fehler beim Ranking';
-          button.classList.add('bg-red-500');
+          button.classList.add('bg-de-red');
           setTimeout(() => {
-            button.textContent = '💾 Ergebnis speichern';
-            button.classList.remove('bg-red-500');
+            button.textContent = '💾 Speichern';
+            button.classList.remove('bg-de-red');
           }, 2000);
         }
       } else {

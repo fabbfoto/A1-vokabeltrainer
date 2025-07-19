@@ -32,12 +32,16 @@ function setProgressBarColor(element: HTMLElement, percentage: number, type: 'ge
     
     if (type === 'german') {
         // Deutschland-Farben
-        if (percentage < 34) {
-            element.classList.add('bg-black');
-        } else if (percentage < 67) {
-            element.classList.add('bg-red-600');
+        if (percentage >= 100) {
+            element.classList.add('bg-de-green');
+        } else if (percentage >= 75) {
+            element.classList.add('bg-de-blue');
+        } else if (percentage >= 50) {
+            element.classList.add('bg-de-gold');
+        } else if (percentage >= 25) {
+            element.classList.add('bg-de-gold-dark');
         } else {
-            element.classList.add('bg-yellow-400');
+            element.classList.add('bg-de-gray-400');
         }
     } else {
         // Standard-Farben (rot/gelb/grün)
@@ -64,9 +68,11 @@ export function calculateProgressPercentage(completed: number, total: number): n
  */
 export function getProgressColorClass(completed: number, total: number): string {
     const percentage = calculateProgressPercentage(completed, total);
-    if (percentage < 34) return 'bg-de-black';
-    if (percentage < 67) return 'bg-de-red';
-    return 'bg-de-gold';
+    if (percentage >= 100) return 'bg-de-green';
+    if (percentage >= 75) return 'bg-de-blue';
+    if (percentage >= 50) return 'bg-de-gold';
+    if (percentage >= 25) return 'bg-de-gold-dark';
+    return 'bg-de-gray-400';
 }
 
 /**
@@ -106,7 +112,7 @@ export function updateErrorCounts(dom: DOMElements, state: TrainerState, learnin
                 repeatButton.classList.add('opacity-50', 'cursor-not-allowed');
                 repeatButton.setAttribute('disabled', 'true');
                 repeatButton.classList.remove('bg-red-600', 'text-white');
-                repeatButton.classList.add('bg-red-100', 'text-red-500');
+                repeatButton.classList.add('bg-de-red/10', 'text-de-red');
             } else {
                 repeatButton.classList.remove('opacity-50', 'cursor-not-allowed');
                 repeatButton.removeAttribute('disabled');
@@ -114,7 +120,7 @@ export function updateErrorCounts(dom: DOMElements, state: TrainerState, learnin
                 // Nur wenn nicht aktiv
                 if (!state.training.isRepeatSessionActive || state.training.currentMode !== mode) {
                     repeatButton.classList.remove('bg-red-600', 'text-white');
-                    repeatButton.classList.add('bg-red-100', 'text-red-500');
+                    repeatButton.classList.add('bg-de-red/10', 'text-de-red');
                 }
             }
             

@@ -25,11 +25,11 @@ export function showMessage(
     dom.messageBoxEl.textContent = message;
     
     // CSS-Klassen basierend auf Typ
-    const baseClasses = 'fixed bottom-5 right-5 text-white p-3 rounded-lg shadow-xl';
+    const baseClasses = 'fixed bottom-5 right-5 text-white p-3 rounded-lg shadow-de-gray-400/50';
     const typeClasses = {
-        success: 'bg-green-500',
-        info: 'bg-blue-500',
-        error: 'bg-red-500'
+        success: 'bg-de-green',
+        info: 'bg-de-blue',
+        error: 'bg-de-red'
     };
     
     dom.messageBoxEl.className = `${baseClasses} ${typeClasses[type]}`;
@@ -68,7 +68,7 @@ export function showSuccessMessageWithButton(
     `;
     
     // CSS-Klassen für Erfolgsmeldung
-    dom.messageBoxEl.className = 'fixed bottom-5 right-5 bg-green-500 text-white p-4 rounded-lg shadow-xl z-50';
+    dom.messageBoxEl.className = 'fixed bottom-5 right-5 bg-de-green text-white p-4 rounded-lg shadow-de-gray-400/50 z-50';
     dom.messageBoxEl.classList.remove('hidden');
     
     // Event Listener für den Button - mit Verzögerung für bessere Stabilität

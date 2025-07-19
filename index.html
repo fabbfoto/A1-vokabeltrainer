@@ -11,16 +11,27 @@
         theme: {
           extend: {
             colors: {
-              // Button Farben
-              'btn-bg': '#e9e9ed',
-              'btn-bg-hover': '#d1d5db',
-              'btn-text': '#374151',
-              'btn-border': '#d1d5db',
-              // Fortschrittsbalken
-              'progress-bg': '#d1d5db',
-              'de-black': '#1f2937',
-              'de-red': '#dc2626',
-              'de-gold': '#f59e0b',
+              // Adobe Farbpalette + Grün
+              'de-red': '#F23054',
+              'de-blue': '#6089BF',
+              'de-blue-light': '#89B3D9',
+              'de-gold': '#F2AE2E',
+              'de-gold-dark': '#D98B2B',
+              'de-green': '#10B981',
+              
+              // Graustufen
+              'de-gray': {
+                50: '#FAFAFA',
+                100: '#F5F5F5',
+                200: '#E5E7EB',
+                300: '#D1D5DB',
+                400: '#9CA3AF',
+                500: '#6B7280',
+                600: '#4B5563',
+                700: '#374151',
+                800: '#1F2937',
+                900: '#111827'
+              }
             }
           }
         }
@@ -273,7 +284,7 @@
             <p class="auth-info">Kostenlos & sicher. Deine Daten gehören nur dir.</p>
             
             <!-- Debug Info -->
-            <div id="debug-info" class="debug-info" style="margin-top: 1rem; padding: 1rem; background: #f5f5f5; border-radius: 8px; font-size: 0.875rem;">
+            <div id="debug-info" class="debug-info" style="margin-top: 1rem; padding: 1rem; background: var(--de-gray-100); border-radius: 8px; font-size: 0.875rem;">
                 <p><strong>Status:</strong> <span id="auth-status-text">Prüfe...</span></p>
                 <p><strong>User ID:</strong> <span id="user-id-text">-</span></p>
                 <p><strong>Angemeldet:</strong> <span id="is-signed-in">-</span></p>

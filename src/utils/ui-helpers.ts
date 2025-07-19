@@ -79,15 +79,14 @@ export function formatExampleSentence(sentence: string | null): string {
  * Zentrale Funktion zum Erstellen von Tailwind-Klassen für Kasus
  */
 export function getTailwindCaseClass(kasus: string): string {
-    const caseClasses: Record<string, string> = {
-        'nominativ': 'text-green-700 font-semibold',
-        'genitiv': 'text-yellow-600 font-semibold',
-        'dativ': 'text-red-700 font-semibold',
-        'akkusativ': 'text-blue-700 font-semibold',
-        'verb': 'text-fuchsia-500 italic font-semibold'
+    const caseColors: Record<string, string> = {
+        'nominativ': 'text-de-green font-semibold',
+        'genitiv': 'text-de-gold font-semibold',
+        'dativ': 'text-de-red font-semibold',
+        'akkusativ': 'text-de-blue font-semibold',
     };
     
-    return caseClasses[kasus] || 'text-gray-500';
+    return caseColors[kasus] || 'text-gray-500';
 }
 
 /**

@@ -132,7 +132,7 @@ export class RankingUI {
                 <div class="flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-lg ${
                   index === 0 ? 'bg-yellow-500' : 
                   index === 1 ? 'bg-gray-400' : 
-                  index === 2 ? 'bg-orange-500' : 'bg-blue-500'
+                  index === 2 ? 'bg-orange-500' : 'bg-de-blue'
                 }">
                   ${index + 1}
                 </div>
@@ -145,7 +145,7 @@ export class RankingUI {
                 </div>
               </div>
               <div class="text-right">
-                <div class="font-bold text-2xl text-blue-600">${entry.score.toFixed(2)}</div>
+                <div class="font-bold text-2xl text-de-blue">${entry.score.toFixed(2)}</div>
                 <div class="text-sm text-gray-600">
                   ${Math.floor(entry.timeInSeconds)}s • ${Math.round(entry.accuracy * 100)}%
                 </div>
@@ -163,7 +163,7 @@ export class RankingUI {
         ` : ''}
         
         <div class="mt-6 flex justify-center">
-          <button class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" 
+          <button class="px-6 py-2 bg-de-blue text-white rounded-lg hover:bg-de-blue/90 transition-colors" 
                   onclick="this.parentElement.parentElement.parentElement.remove()">
             Schließen
           </button>
@@ -205,7 +205,7 @@ export class RankingUI {
                 <div class="flex items-center justify-center w-12 h-12 rounded-full text-white font-bold text-lg ${
                   index === 0 ? 'bg-yellow-500' : 
                   index === 1 ? 'bg-gray-400' : 
-                  index === 2 ? 'bg-orange-500' : 'bg-blue-500'
+                  index === 2 ? 'bg-orange-500' : 'bg-de-blue'
                 }">
                   ${index + 1}
                 </div>
@@ -226,7 +226,7 @@ export class RankingUI {
                 </div>
               </div>
               <div class="text-right">
-                <div class="font-bold text-2xl text-blue-600">${entry.score.toFixed(2)}</div>
+                <div class="font-bold text-2xl text-de-blue">${entry.score.toFixed(2)}</div>
                 <div class="text-sm text-gray-600">
                   ${entry.correctAnswers}/${entry.totalQuestions} • ${Math.floor(entry.timeInSeconds / 60)}:${(entry.timeInSeconds % 60).toString().padStart(2, '0')}
                 </div>
@@ -253,11 +253,11 @@ export class RankingUI {
         ` : ''}
         
         <div class="mt-6 flex justify-center space-x-4">
-          <button class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors" 
+          <button class="px-6 py-2 bg-de-green text-white rounded-lg hover:bg-de-green/90 transition-colors" 
                   onclick="window.location.reload()">
             🏆 Test starten
           </button>
-          <button class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" 
+          <button class="px-6 py-2 bg-de-blue text-white rounded-lg hover:bg-de-blue/90 transition-colors" 
                   onclick="this.parentElement.parentElement.parentElement.remove()">
             Schließen
           </button>
@@ -285,15 +285,15 @@ export class RankingUI {
         
         <div class="grid grid-cols-2 gap-4 mb-6">
           <div class="bg-blue-50 p-4 rounded-lg">
-            <div class="text-2xl font-bold text-blue-600">${stats.totalTests}</div>
-            <div class="text-sm text-gray-600">Tests absolviert</div>
+            <div class="text-2xl font-bold text-de-blue">${stats.totalTests}</div>
+            <div class="text-sm text-gray-600">Tests</div>
           </div>
           <div class="bg-green-50 p-4 rounded-lg">
-            <div class="text-2xl font-bold text-green-600">${stats.averageScore}</div>
+            <div class="text-2xl font-bold text-de-green">${stats.averageScore}</div>
             <div class="text-sm text-gray-600">Ø Score</div>
           </div>
           <div class="bg-yellow-50 p-4 rounded-lg">
-            <div class="text-2xl font-bold text-yellow-600">${stats.bestScore}</div>
+            <div class="text-2xl font-bold text-de-gold">${stats.bestScore}</div>
             <div class="text-sm text-gray-600">Bester Score</div>
           </div>
           <div class="bg-purple-50 p-4 rounded-lg">
@@ -327,7 +327,7 @@ export class RankingUI {
         </div>
         
         <div class="mt-6 flex justify-center">
-          <button class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors" 
+          <button class="px-6 py-2 bg-de-blue text-white rounded-lg hover:bg-de-blue/90 transition-colors" 
                   onclick="this.parentElement.parentElement.remove()">
             Schließen
           </button>
@@ -353,7 +353,7 @@ export class RankingUI {
     if (!this.container) return;
     
     this.container.innerHTML = `
-      <div class="text-center p-8 text-red-600">
+      <div class="text-center p-8 text-de-red">
         <div class="text-2xl mb-2">⚠️</div>
         <div>${message}</div>
       </div>
@@ -365,18 +365,18 @@ export class RankingUI {
     if (!this.container) return;
     
     this.container.innerHTML = `
-      <div class="bg-white rounded-lg p-6 shadow-lg">
+      <div class="bg-white rounded-lg p-6 shadow-de-gray-300/50">
         <h3 class="text-xl font-bold mb-4">🏆 Ranglisten</h3>
         <div class="grid grid-cols-2 gap-3">
-          <button class="p-3 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors" 
+          <button class="p-3 bg-de-gold/10 text-de-gold rounded-lg hover:bg-de-gold/20 transition-colors" 
                   onclick="window.rankingUI.showGlobalRankingList()">
             🏆 Global Ranking
           </button>
-          <button class="p-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors" 
+          <button class="p-3 bg-de-blue/10 text-de-blue rounded-lg hover:bg-de-blue/20 transition-colors" 
                   onclick="window.rankingUI.showGlobalRankings()">
             🌍 Global
           </button>
-          <button class="p-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors" 
+          <button class="p-3 bg-de-green/10 text-de-green rounded-lg hover:bg-de-green/20 transition-colors" 
                   onclick="window.rankingUI.showWeeklyRankings()">
             📅 Diese Woche
           </button>
@@ -390,7 +390,7 @@ export class RankingUI {
           </button>
         </div>
         <div class="mt-4">
-          <button class="w-full p-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors" 
+          <button class="w-full p-3 bg-de-gray-100 text-gray-700 rounded-lg hover:bg-de-gray-200 transition-colors" 
                   onclick="window.rankingUI.showUserStats()">
             📊 Meine Statistiken
           </button>

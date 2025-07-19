@@ -658,7 +658,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         document.querySelectorAll('.feedback-incorrect').forEach(el => el.remove());
         document.querySelectorAll('.border-red-500, .bg-red-100').forEach(el => {
             el.classList.remove('border-red-500', 'bg-red-100');
-            el.classList.add('border-gray-300');
+            el.classList.add('border-de-gray-300');
         });
         
         // Korrekturmodus zurücksetzen
@@ -1021,21 +1021,21 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
         document.querySelectorAll('#mode-button-grid .mode-button').forEach(btn => {
             if (!btn.id.includes('repeat')) {
-                btn.classList.remove('bg-blue-500', 'text-white', 'border-blue-500');
-                btn.classList.add('border-gray-300');
+                btn.classList.remove('bg-de-blue', 'text-white', 'border-de-blue');
+                btn.classList.add('border-de-gray-300');
             } else {
-                btn.classList.remove('bg-red-500', 'text-white');
+                btn.classList.remove('bg-de-red/10', 'text-de-red');
                 btn.classList.add('bg-red-100', 'text-red-500');
             }
         });
         if (isRepeat) {
             const repeatButton = document.getElementById(`mode-repeat-${modeId}`);
             repeatButton?.classList.remove('bg-red-100', 'text-red-500');
-            repeatButton?.classList.add('bg-red-500', 'text-white');
+            repeatButton?.classList.add('bg-de-red', 'text-white');
         } else {
             const modeButton = document.getElementById(`mode-${modeId}`);
-            modeButton?.classList.remove('border-gray-300');
-            modeButton?.classList.add('bg-blue-500', 'text-white', 'border-blue-500');
+            modeButton?.classList.remove('border-de-gray-300');
+            modeButton?.classList.add('bg-de-blue', 'text-white', 'border-de-blue');
         }
         loadNextTask();
         // Umlaut-Buttons nach jedem Moduswechsel initialisieren
@@ -1336,7 +1336,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         document.querySelectorAll('.feedback-incorrect').forEach(el => el.remove());
         document.querySelectorAll('.border-red-500, .bg-red-100').forEach(el => {
             el.classList.remove('border-red-500', 'bg-red-100');
-            el.classList.add('border-gray-300');
+            el.classList.add('border-de-gray-300');
         });
         
         // Nächstes Wort laden

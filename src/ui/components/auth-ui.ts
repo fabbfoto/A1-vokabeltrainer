@@ -118,8 +118,7 @@ export class AuthUI {
             }
             
             this.syncButton.className = loggedOutClasses;
-            this.syncButton.style.backgroundColor = '#3b82f6';
-            this.syncButton.style.color = 'white';
+            this.syncButton.classList.add('bg-de-blue-light', 'hover:bg-de-blue-light/90', 'text-white');
             
             // Zeige Auth-Status
             const authText = this.authService.isUsingLocalAuth() 
@@ -167,7 +166,7 @@ export class AuthUI {
         modal.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50';
         
         modal.innerHTML = `
-            <div class="bg-white rounded-2xl shadow-xl p-6 max-w-md w-full mx-4">
+            <div class="bg-white rounded-2xl shadow-de-gray-400/50 p-6 max-w-md w-full mx-4">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold text-blue-700 mb-2">🏆 Globales Ranking</h2>
                     <p class="text-gray-600">
@@ -197,12 +196,12 @@ export class AuthUI {
                         </label>
                         <input type="text" id="anonymous-username" 
                                placeholder="z.B. Anonymous2024, LanguageLearner, etc."
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                               class="w-full px-3 py-2 border border-de-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-de-blue text-sm">
                         <div class="flex gap-2 mt-2">
-                            <button id="generate-random-username" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition-colors">
+                            <button id="generate-random-username" class="px-3 py-1 bg-de-gray-200 text-gray-700 rounded text-xs hover:bg-de-gray-300 transition-colors">
                                 🎲 Zufällig generieren
                             </button>
-                            <button id="suggest-usernames" class="px-3 py-1 bg-gray-200 text-gray-700 rounded text-xs hover:bg-gray-300 transition-colors">
+                            <button id="suggest-usernames" class="px-3 py-1 bg-de-gray-200 text-gray-700 rounded text-xs hover:bg-de-gray-300 transition-colors">
                                 💡 Vorschläge
                             </button>
                         </div>
@@ -213,7 +212,7 @@ export class AuthUI {
                 </div>
                 
                 <div class="flex gap-3 mt-6">
-                    <button id="save-username" class="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold">
+                    <button id="save-username" class="flex-1 px-4 py-2 bg-de-blue text-white rounded-lg hover:bg-de-blue/90 transition-colors font-semibold">
                         Speichern
                     </button>
                     <button id="skip-username" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
@@ -265,7 +264,7 @@ export class AuthUI {
                     <h3 class="text-lg font-semibold mb-4">💡 Anonyme Benutzernamen vorschlagen</h3>
                     <div class="grid grid-cols-2 gap-2 mb-4">
                         ${suggestions.map(name => `
-                            <button class="suggestion-btn px-3 py-2 text-sm border border-gray-300 rounded hover:bg-blue-50 hover:border-blue-300 transition-colors">
+                            <button class="suggestion-btn px-3 py-2 text-sm border border-de-gray-300 rounded hover:bg-de-blue-light/10 hover:border-de-blue transition-colors">
                                 ${name}
                             </button>
                         `).join('')}

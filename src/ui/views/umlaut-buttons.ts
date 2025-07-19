@@ -198,7 +198,7 @@ export function createUmlautButtonsUI(): HTMLElement {
     
     umlauts.forEach(umlaut => {
         const button = document.createElement('button');
-        button.className = 'umlaut-button px-3 py-2 bg-gray-200 hover:bg-gray-300 rounded-md font-medium transition-colors';
+        button.className = 'umlaut-button px-3 py-2 bg-de-gray-200 hover:bg-de-gray-300 rounded-md font-medium transition-colors';
         button.textContent = umlaut;
         button.title = 'Shift für Großbuchstaben';
         button.type = 'button'; // Verhindert Form-Submit

@@ -124,9 +124,11 @@ export function getProgressColorClass(completed: number, total: number): string 
   const percentage = calculateProgressPercentage(completed, total);
   
   if (currentColorTheme === 'german') {
-    if (percentage < 34) return 'bg-de-black';
-    if (percentage < 67) return 'bg-de-red';
-    return 'bg-de-gold';
+    if (percentage >= 100) return 'bg-de-green';
+    if (percentage >= 75) return 'bg-de-blue';
+    if (percentage >= 50) return 'bg-de-gold';
+    if (percentage >= 25) return 'bg-de-gold-dark';
+    return 'bg-de-gray-400';
   }
   
   return 'bg-blue-500';

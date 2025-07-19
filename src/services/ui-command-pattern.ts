@@ -129,9 +129,9 @@ export class ContinueToNextTaskCommand implements UICommand {
     
     // Alle visuellen Fehleranzeigen entfernen
     document.querySelectorAll('.feedback-incorrect').forEach(el => el.remove());
-    document.querySelectorAll('.border-red-500, .bg-red-100').forEach(el => {
-      el.classList.remove('border-red-500', 'bg-red-100');
-      el.classList.add('border-gray-300');
+    document.querySelectorAll('.border-red-500, .bg-de-red/10').forEach(el => {
+      el.classList.remove('border-red-500', 'bg-de-red/10');
+      el.classList.add('border-de-gray-300');
     });
   }
 }

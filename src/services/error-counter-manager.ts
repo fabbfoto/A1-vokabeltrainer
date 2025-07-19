@@ -147,7 +147,7 @@ export class ErrorCounterManager {
             repeatButton.classList.add('opacity-50', 'cursor-not-allowed');
             repeatButton.setAttribute('disabled', 'true');
             repeatButton.classList.remove('bg-red-600', 'text-white');
-            repeatButton.classList.add('bg-red-100', 'text-red-500');
+            repeatButton.classList.add('bg-de-red/10', 'text-de-red');
         } else {
             repeatButton.classList.remove('opacity-50', 'cursor-not-allowed');
             repeatButton.removeAttribute('disabled');
