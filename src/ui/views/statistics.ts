@@ -33,7 +33,7 @@ function setProgressBarColor(element: HTMLElement, percentage: number, type: 'ge
     if (type === 'german') {
         // Deutschland-Farben
         if (percentage >= 100) {
-            element.classList.add('bg-de-green');
+            element.classList.add('bg-[#F2AE2E]');
         } else if (percentage >= 75) {
             element.classList.add('bg-de-blue');
         } else if (percentage >= 50) {
@@ -50,7 +50,7 @@ function setProgressBarColor(element: HTMLElement, percentage: number, type: 'ge
         } else if (percentage < 80) {
             element.classList.add('bg-yellow-500');
         } else {
-            element.classList.add('bg-green-500');
+            element.classList.add('bg-[#F2AE2E]');
         }
     }
 }
@@ -68,7 +68,7 @@ export function calculateProgressPercentage(completed: number, total: number): n
  */
 export function getProgressColorClass(completed: number, total: number): string {
     const percentage = calculateProgressPercentage(completed, total);
-    if (percentage >= 100) return 'bg-de-green';
+    if (percentage >= 100) return 'bg-[#F2AE2E]';
     if (percentage >= 75) return 'bg-de-blue';
     if (percentage >= 50) return 'bg-de-gold';
     if (percentage >= 25) return 'bg-de-gold-dark';

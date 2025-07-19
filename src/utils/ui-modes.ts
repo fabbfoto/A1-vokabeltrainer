@@ -265,7 +265,7 @@ function generateMultipleChoiceAnswers(
     
     allAnswers.forEach(answer => {
         const button = document.createElement('button');
-        button.className = 'mc-answer-button w-full p-4 text-left border-2 border-de-gray-200 rounded-lg hover:border-de-blue hover:bg-de-blue-light/10 transition-colors';
+        button.className = 'mc-answer-button px-4 py-3 bg-white text-gray-800 rounded-xl border-2 border-gray-300 shadow-sm hover:shadow-md hover:bg-gray-100 transition-all duration-200 font-medium';
         button.textContent = answer;
         button.onclick = () => {
             // Alle Buttons deaktivieren
