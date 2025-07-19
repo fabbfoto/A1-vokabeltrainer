@@ -490,7 +490,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     removeFromErrorList();
                     
                     // Einfaches Feedback
-                    dom.feedbackContainerEl.innerHTML = `<span class="feedback-correct">Richtig!</span>`;
+                    dom.feedbackContainerEl.innerHTML = `<div class="mt-4 animate-bounce"><span class="inline-flex items-center gap-2 px-6 py-3 bg-[#F2AE2E]/10 rounded-xl border-2 border-[#F2AE2E]"><span class="text-2xl">✨</span><span class="text-2xl font-bold text-[#F2AE2E]">Richtig!</span><span class="text-2xl">🎉</span></span></div>`;
                     setTimeout(() => {
                         loadNextTask();
                     }, 1200);
