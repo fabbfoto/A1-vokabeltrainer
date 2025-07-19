@@ -284,9 +284,9 @@ function generateMultipleChoiceAnswers(
             } else {
                 // Testmodus: Farbfeedback
                 if (isCorrect) {
-                    button.classList.add('bg-de-green/10', 'border-de-green');
+                    button.classList.add('bg-green-100', 'border-green-500');
                 } else {
-                    button.classList.add('bg-de-red/10', 'border-de-red');
+                    button.classList.add('bg-red-100', 'border-red-500');
                 }
                 // Testmodus: Kein Feedback, sofort weiter
                 processAnswer(isCorrect, correctAnswerEN, undefined, answer);
@@ -370,8 +370,8 @@ export function setupSpellingMode(
     // Reset styles (Tailwind-Klassen)
     [dom.spellingInputSingleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El].forEach(input => {
         if(input) {
-            input.classList.remove('border-de-green', 'bg-de-green/10', 'border-de-red', 'bg-de-red/10');
-            input.classList.add('border-de-gray-300');
+            input.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
+            input.classList.add('bg-white', 'border-gray-300');
         }
     });
     
@@ -435,19 +435,19 @@ export function setupSpellingMode(
             // DIDAKTISCHES FEEDBACK: Nur im Lern-Modus
             if (!state.test.isTestModeActive) {
                 if (isArticleCorrect) {
-                    dom.spellingInputArticleEl.classList.add('border-de-green', 'bg-de-green/10');
+                    dom.spellingInputArticleEl.classList.add('border-green-500', 'bg-green-100');
                 } else {
-                    dom.spellingInputArticleEl.classList.add('border-de-red', 'bg-de-red/10');
+                    dom.spellingInputArticleEl.classList.add('border-red-500', 'bg-red-100');
                 }
                 if (isSingularCorrect) {
-                    dom.spellingInputNoun1El.classList.add('border-de-green', 'bg-de-green/10');
+                    dom.spellingInputNoun1El.classList.add('border-green-500', 'bg-green-100');
                 } else {
-                    dom.spellingInputNoun1El.classList.add('border-de-red', 'bg-de-red/10');
+                    dom.spellingInputNoun1El.classList.add('border-red-500', 'bg-red-100');
                 }
                 if (isPluralCorrect) {
-                    dom.spellingInputNoun2El.classList.add('border-de-green', 'bg-de-green/10');
+                    dom.spellingInputNoun2El.classList.add('border-green-500', 'bg-green-100');
                 } else {
-                    dom.spellingInputNoun2El.classList.add('border-de-red', 'bg-de-red/10');
+                    dom.spellingInputNoun2El.classList.add('border-red-500', 'bg-red-100');
                 }
             }
             
@@ -508,8 +508,8 @@ export function setupSpellingMode(
                 [dom.spellingInputArticleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El].forEach(input => {
                     input.disabled = false;
                     input.value = '';
-                    input.classList.remove('border-de-green', 'bg-de-green/10', 'border-de-red', 'bg-de-red/10');
-                    input.classList.add('border-de-gray-300');
+                    input.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
+                    input.classList.add('bg-white', 'border-gray-300');
                 });
                 
                 // ✅ FOKUSSIERUNG: Mittleres Feld (Singular) fokussieren
@@ -569,9 +569,9 @@ export function setupSpellingMode(
             // 4.1 Schreibweise-Modus (Einzelfeld): Farbfeedback nur im Lern-Modus
             if (!state.test.isTestModeActive) {
                 if (isCorrect) {
-                    dom.spellingInputSingleEl.classList.add('border-de-green', 'bg-de-green/10');
+                    dom.spellingInputSingleEl.classList.add('border-green-500', 'bg-green-100');
                 } else {
-                    dom.spellingInputSingleEl.classList.add('border-de-red', 'bg-de-red/10');
+                    dom.spellingInputSingleEl.classList.add('border-red-500', 'bg-red-100');
                 }
             }
             
@@ -631,8 +631,8 @@ export function setupSpellingMode(
                 // ✅ ROBUSTE AKTIVIERUNG: Einzelfeld explizit aktivieren und zurücksetzen
                 dom.spellingInputSingleEl.disabled = false;
                 dom.spellingInputSingleEl.value = '';
-                dom.spellingInputSingleEl.classList.remove('border-de-green', 'bg-de-green/10', 'border-de-red', 'bg-de-red/10');
-                dom.spellingInputSingleEl.classList.add('border-de-gray-300');
+                dom.spellingInputSingleEl.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
+                dom.spellingInputSingleEl.classList.add('bg-white', 'border-gray-300');
                 
                 // ✅ FOKUSSIERUNG: Einzelfeld fokussieren
                 dom.spellingInputSingleEl.focus();
@@ -762,8 +762,8 @@ function generateClozeUI(
             
             // 4.4 Cloze: Farbfeedback nur im Lern-Modus
             if (!state.test.isTestModeActive) {
-                input.classList.add(isCorrect ? 'border-de-green' : 'border-de-red');
-                input.classList.add(isCorrect ? 'bg-de-green/10' : 'bg-de-red/10');
+                input.classList.add(isCorrect ? 'border-green-500' : 'border-red-500');
+                input.classList.add(isCorrect ? 'bg-green-100' : 'bg-red-100');
             }
             if (!isCorrect) allCorrect = false;
         });
@@ -918,8 +918,8 @@ function generateSentenceInputs(
     const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
     inputs.forEach(input => {
         input.disabled = false;
-        input.classList.remove('border-de-green', 'bg-de-green/10', 'border-de-red', 'bg-de-red/10');
-        input.classList.add('border-de-gray-300');
+        input.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
+        input.classList.add('bg-white', 'border-gray-300');
     });
     
     dom.checkSentenceButton.onclick = () => {
@@ -943,8 +943,8 @@ function generateSentenceInputs(
             const wordCorrect = vergleicheAntwort(userWord, expectedWord, { caseSensitive: true });
             // 4.5 Satzübersetzung: Farbfeedback nur im Lern-Modus
             if (!state.test.isTestModeActive) {
-                input.classList.add(wordCorrect ? 'border-de-green' : 'border-de-red');
-                input.classList.add(wordCorrect ? 'bg-de-green/10' : 'bg-de-red/10');
+                input.classList.add(wordCorrect ? 'border-green-500' : 'border-red-500');
+                input.classList.add(wordCorrect ? 'bg-green-100' : 'bg-red-100');
             }
             input.disabled = true;
         });
@@ -970,8 +970,8 @@ function generateSentenceInputs(
                     inputs.forEach(input => {
                         input.disabled = false;
                         input.value = '';
-                        input.classList.remove('border-de-green', 'bg-de-green/10', 'border-de-red', 'bg-de-red/10');
-                        input.classList.add('border-de-gray-300');
+                        input.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
+                        input.classList.add('bg-white', 'border-gray-300');
                     });
                     
                     // Nächstes Wort laden - verwende processAnswer mit einem speziellen Flag
