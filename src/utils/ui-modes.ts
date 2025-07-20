@@ -174,7 +174,9 @@ export function setupMultipleChoiceMode(
             if (joined.trim() !== '') {
                 dom.exampleSentenceDisplayEl.innerHTML = exampleSentence.map(part => {
                     try {
-                        return `<span class="${getTailwindCaseClass(part.case || part.kasus || 'none')}" style="font-family: 'Times New Roman', Times, serif; font-size: 2.5rem; line-height: 1.5;">${part.text}</span>`;
+                        // WICHTIG: white-space: pre für Leerzeichen
+                        const whiteSpaceStyle = part.text === ' ' ? 'white-space: pre;' : '';
+                        return `<span class="${getTailwindCaseClass(part.case || part.kasus || 'none')}" style="font-family: 'Times New Roman', Times, serif; font-size: 2.5rem; line-height: 1.5; ${whiteSpaceStyle}">${part.text}</span>`;
                     } catch (e) {
     
                         return `<span>${part.text}</span>`;

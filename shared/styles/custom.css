@@ -136,4 +136,29 @@ input[type="text"]:focus {
   background: linear-gradient(135deg, rgba(137, 179, 217, 0.9) 0%, rgba(96, 137, 191, 0.9) 100%);
   transform: translateY(-4px);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-} 
+}
+
+/* Globaler Fix für Leerzeichen-Problem */
+.text-de-green,
+.text-de-gold, 
+.text-de-red,
+.text-de-blue,
+.text-fuchsia-500,
+.text-gray-500 {
+  white-space: pre-wrap !important;
+}
+
+/* Spezifischer Fix für Satz-Container */
+[class*="example"], 
+[class*="sentence"],
+#example-sentence-display {
+  white-space: pre-wrap !important;
+}
+
+/* Für die bunten Satz-Teile */
+.sentence-part,
+[class*="text-de-"],
+[class*="text-fuchsia-"],
+[class*="text-gray-"] {
+  white-space: pre !important;
+}
