@@ -312,6 +312,18 @@ export function setupSpellingMode(
     state: TrainerState, 
     processAnswer: ProcessAnswerFunction
 ): void {
+    // Sicherheitsnetz: Im normalen Lernmodus darf isTestModeActive false sein
+    if (!state.test.currentTestWords && state.test.isTestModeActive) {
+        console.warn('⚠️ Test-Modus war fälschlicherweise aktiv, korrigiere...');
+        state.test.isTestModeActive = false;
+    }
+    
+    console.log('🔍 setupSpellingMode aufgerufen:', {
+        isTestModeActive: state.test.isTestModeActive,
+        currentTestWords: state.test.currentTestWords,
+        currentWord: state.training.currentWord?.german
+    });
+    
     ensureInputsEnabled(); // BUGFIX: Alle Inputs aktivieren
 
     // Robustes Reset: Alle Felder aktivieren
@@ -496,6 +508,26 @@ export function setupSpellingMode(
             // Auswerten-Button deaktivieren
             dom.checkSpellingButton.disabled = true;
             
+            // NOTFALL-FIX: Stelle sicher, dass Korrektur angezeigt wird (Nomen-Modus)
+            if (!(isArticleCorrect && isSingularCorrect && isPluralCorrect) && !state.test.isTestModeActive) {
+                console.log('🚨 NOTFALL-FIX: Force-zeige Korrektur (Nomen)');
+                
+                // Warte kurz, dann zeige Korrektur
+                setTimeout(() => {
+                    if (dom.correctionSolutionEl && correctAnswerText) {
+                        dom.correctionSolutionEl.textContent = correctAnswerText;
+                        dom.correctionSolutionEl.classList.remove('hidden');
+                        dom.correctionSolutionEl.style.cssText = 'display: block !important; color: #ef4444 !important; font-size: 1.5rem !important; font-weight: bold !important;';
+                    }
+                    
+                    if (dom.continueButton) {
+                        dom.continueButton.classList.remove('hidden');
+                        dom.continueButton.style.cssText = 'display: block !important;';
+                        dom.continueButton.focus();
+                    }
+                }, 100);
+            }
+            
             // Korrekturmodus nur aktivieren wenn NICHT im Test
             if (!state.test.isTestModeActive) {
                 state.training.isCorrectionMode = !(isArticleCorrect && isSingularCorrect && isPluralCorrect);
@@ -572,7 +604,14 @@ export function setupSpellingMode(
         const handleSingleCheckButtonClick = () => {
             const userInput = dom.spellingInputSingleEl.value.trim();
             const correctAnswer = currentWord.german;
+            console.log('🔍 handleSingleCheckButtonClick aufgerufen:', {
+                userInput,
+                correctAnswer,
+                userInputLength: userInput.length,
+                correctAnswerLength: correctAnswer.length
+            });
             const isCorrect = vergleicheAntwort(userInput, correctAnswer);
+            console.log('→ vergleicheAntwort Ergebnis:', isCorrect);
             
 
             
@@ -606,22 +645,66 @@ export function setupSpellingMode(
                     processAnswer(true, correctAnswer, undefined, userInput);
                 }, 1200);
             } else {
+                // FALSCHE ANTWORT
+                console.log('🔍 Schreibweise-Modus: Falsche Antwort');
+                console.log('- Test-Modus aktiv?', state.test.isTestModeActive);
+                console.log('- Korrekte Antwort:', correctAnswer);
+                console.log('- DOM Elemente verfügbar?', {
+                    correctionSolutionEl: !!dom.correctionSolutionEl,
+                    continueButton: !!dom.continueButton
+                });
+                
                 // Im Test-Modus: Keine Korrektur anzeigen
                 if (state.test.isTestModeActive) {
+                    console.log('→ Test-Modus: Keine Korrektur');
                     // Test-Modus: Kein visuelles Feedback, direkt weiter
                     setTimeout(() => {
                         processAnswer(false, correctAnswer, undefined, userInput);
                     }, 100);
                 } else {
+                    console.log('→ Lern-Modus: Zeige Korrektur');
                     // Normaler Modus: Korrektur anzeigen
                     dom.correctionSolutionEl.textContent = correctAnswer;
                     dom.correctionSolutionEl.classList.remove('hidden');
                     dom.continueButton.classList.remove('hidden');
+                    
+                    // WICHTIG: Stelle sicher, dass die Elemente wirklich sichtbar sind
+                    dom.correctionSolutionEl.style.display = 'block';
+                    dom.continueButton.style.display = 'block';
+                    
+                    console.log('- Korrektur Element sichtbar?', !dom.correctionSolutionEl.classList.contains('hidden'));
+                    console.log('- Weiter-Button sichtbar?', !dom.continueButton.classList.contains('hidden'));
+                    console.log('- Korrektur Text gesetzt:', dom.correctionSolutionEl.textContent);
+                    
+                    // Focus auf den Weiter-Button
+                    setTimeout(() => {
+                        dom.continueButton.focus();
+                    }, 100);
                 }
             }
             
             // Auswerten-Button deaktivieren
             dom.checkSpellingButton.disabled = true;
+            
+            // NOTFALL-FIX: Stelle sicher, dass Korrektur angezeigt wird (Einzelwort-Modus)
+            if (!isCorrect && !state.test.isTestModeActive) {
+                console.log('🚨 NOTFALL-FIX: Force-zeige Korrektur (Einzelwort)');
+                
+                // Warte kurz, dann zeige Korrektur
+                setTimeout(() => {
+                    if (dom.correctionSolutionEl && correctAnswer) {
+                        dom.correctionSolutionEl.textContent = correctAnswer;
+                        dom.correctionSolutionEl.classList.remove('hidden');
+                        dom.correctionSolutionEl.style.cssText = 'display: block !important; color: #ef4444 !important; font-size: 1.5rem !important; font-weight: bold !important;';
+                    }
+                    
+                    if (dom.continueButton) {
+                        dom.continueButton.classList.remove('hidden');
+                        dom.continueButton.style.cssText = 'display: block !important;';
+                        dom.continueButton.focus();
+                    }
+                }, 100);
+            }
             
             // Korrekturmodus nur aktivieren wenn NICHT im Test
             if (!state.test.isTestModeActive) {
@@ -662,7 +745,9 @@ export function setupSpellingMode(
         };
         
         // Event-Handler für Auswerten-Button setzen
+        console.log('🔍 Setze Event-Handler für Auswerten-Button');
         dom.checkSpellingButton.onclick = handleSingleCheckButtonClick;
+        console.log('✅ Event-Handler gesetzt, Button verfügbar:', !!dom.checkSpellingButton);
         // Automatisch erstes Feld fokussieren
         setTimeout(() => { dom.spellingInputSingleEl.focus(); state.training.activeTextInput = dom.spellingInputSingleEl; }, 0);
     }

@@ -81,6 +81,12 @@ export function getProgressColorClass(completed: number, total: number): string 
 export function updateErrorCounts(dom: DOMElements, state: TrainerState, learningModes: LearningModes): void {
     console.log('[UI] Updating error counts...');
     
+    // Sicherheitscheck: learningModes ist definiert
+    if (!learningModes || typeof learningModes !== 'object') {
+        console.error('[UI] learningModes ist nicht definiert oder kein Objekt:', learningModes);
+        return;
+    }
+    
     Object.keys(learningModes).forEach(mode => {
         try {
             const repeatButton = document.getElementById(`mode-repeat-${mode}`);

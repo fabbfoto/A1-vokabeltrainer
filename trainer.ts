@@ -206,7 +206,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // UI-Update Callback registrieren
     errorManager.onUpdate(() => {
-        ui.updateErrorCounts(dom, state, learningModes);
+        try {
+            // Sicherheitscheck: learningModes ist verfügbar
+            if (typeof learningModes !== 'undefined' && learningModes) {
+                ui.updateErrorCounts(dom, state, learningModes);
+            } else {
+                console.warn('[ErrorManager] learningModes noch nicht verfügbar, überspringe UI-Update');
+            }
+        } catch (error) {
+            console.error('[ErrorManager] UI update failed:', error);
+        }
     });
 
     // Fehler aus Storage laden
@@ -367,6 +376,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     loadPerfectRuns();
 
     function processAnswer(isCorrect: boolean, correctAnswer?: string, timeSpent?: number, userAnswer?: string): void {
+        console.log('🔧 processAnswer:', { isCorrect, correctAnswer, userAnswer, testMode: state.test.isTestModeActive });
         
         // NEU: Spezieller Fall für "continue" - direkt zur nächsten Aufgabe
         if (userAnswer === 'continue') {
@@ -375,6 +385,40 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
         
         state.training.attemptedInCurrentRound++;
+        
+        // WICHTIG: updateStatistics in Try-Catch wrappen
+        try {
+            updateStatistics();
+        } catch (error) {
+            console.error('❌ Statistik-Update fehlgeschlagen:', error);
+        }
+        
+        // KRITISCH: Korrektur IMMER anzeigen im Lernmodus, egal was passiert
+        if (!state.test.isTestModeActive && !isCorrect && correctAnswer) {
+            console.log('🔴 Zeige Korrektur für:', correctAnswer);
+            
+            // Direkt die DOM-Elemente manipulieren
+            if (dom.correctionSolutionEl) {
+                dom.correctionSolutionEl.textContent = correctAnswer;
+                dom.correctionSolutionEl.classList.remove('hidden');
+                dom.correctionSolutionEl.style.display = 'block';
+                dom.correctionSolutionEl.style.color = '#ef4444';
+                dom.correctionSolutionEl.style.fontSize = '1.5rem';
+                dom.correctionSolutionEl.style.fontWeight = 'bold';
+            }
+            
+            if (dom.continueButton) {
+                dom.continueButton.classList.remove('hidden');
+                dom.continueButton.style.display = 'block';
+                dom.continueButton.focus();
+            }
+            
+            // Korrekturmodus aktivieren
+            state.training.isCorrectionMode = true;
+            
+            // Verhindere weiteres Processing
+            return;
+        }
         
         // Test-Antworten protokollieren
         if (state.test.isTestModeActive && state.training.currentWord) {
@@ -508,21 +552,29 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // Hilfsfunktionen
     function addToErrorList(): void {
-        if (state.training.currentWord && state.training.currentMode) {
-            errorManager.addError(
-                state.training.currentWord.id, 
-                state.training.currentMode
-            );
+        try {
+            if (state.training.currentWord && state.training.currentMode) {
+                errorManager.addError(
+                    state.training.currentWord.id, 
+                    state.training.currentMode
+                );
+            }
+        } catch (error) {
+            console.error('❌ Fehler beim Hinzufügen zur Fehlerliste:', error);
         }
     }
 
     function removeFromErrorList(): void {
-        if (state.training.currentWord && state.training.currentMode) {
-            // Entferne den Fehler - der ErrorManager macht das UI-Update automatisch
-            errorManager.removeError(
-                state.training.currentWord.id, 
-                state.training.currentMode
-            );
+        try {
+            if (state.training.currentWord && state.training.currentMode) {
+                // Entferne den Fehler - der ErrorManager macht das UI-Update automatisch
+                errorManager.removeError(
+                    state.training.currentWord.id, 
+                    state.training.currentMode
+                );
+            }
+        } catch (error) {
+            console.error('❌ Fehler beim Entfernen aus Fehlerliste:', error);
         }
     }
 
