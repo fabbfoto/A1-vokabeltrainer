@@ -78,21 +78,21 @@ function splitSentence(sentence: string): string[] {
     const punctuationMatch = sentence.match(/[.,;:!?]+$/);
     const punctuation = punctuationMatch ? punctuationMatch[0] : '';
     
-    // Satz in Wörter aufteilen, aber Leerzeichen als separate Elemente behandeln
-    const parts = sentence
+    // Satz in Wörter aufteilen, Leerzeichen entfernen
+    const words = sentence
         .replace(/[.,;:!?]+$/, '')
-        .split(/(\s+)/) // Leerzeichen als separate Elemente behalten
-        .filter(part => part.length > 0); // Nur leere Strings entfernen
+        .split(' ')
+        .filter(word => word.length > 0); // Nur leere Strings entfernen
     
-    console.log('[DEBUG] splitSentence parts before punctuation:', parts);
+    console.log('[DEBUG] splitSentence words before punctuation:', words);
     
     // Satzzeichen zum letzten Wort hinzufügen
-    if (punctuation && parts.length > 0) {
-        parts[parts.length - 1] = parts[parts.length - 1] + punctuation;
+    if (punctuation && words.length > 0) {
+        words[words.length - 1] = words[words.length - 1] + punctuation;
     }
     
-    console.log('[DEBUG] splitSentence final result:', parts);
-    return parts;
+    console.log('[DEBUG] splitSentence final result:', words);
+    return words;
 }
 
 // BUGFIX: Hilfsfunktion zum Aktivieren aller Eingabefelder
