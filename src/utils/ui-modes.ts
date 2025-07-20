@@ -67,22 +67,32 @@ function getTailwindCaseClass(kasus: string): string {
 
 // Neue splitSentence Funktion
 function splitSentence(sentence: string): string[] {
-
+    console.log('[DEBUG] splitSentence input:', sentence);
+    
+    // Wenn der Satz leer ist, leeres Array zurückgeben
+    if (!sentence || sentence.trim() === '') {
+        console.log('[DEBUG] splitSentence: empty sentence, returning empty array');
+        return [];
+    }
     
     const punctuationMatch = sentence.match(/[.,;:!?]+$/);
     const punctuation = punctuationMatch ? punctuationMatch[0] : '';
     
-    const words = sentence
+    // Satz in Wörter aufteilen, aber Leerzeichen als separate Elemente behandeln
+    const parts = sentence
         .replace(/[.,;:!?]+$/, '')
-        .split(' ')
-        .filter(word => word.length > 0);
+        .split(/(\s+)/) // Leerzeichen als separate Elemente behalten
+        .filter(part => part.length > 0); // Nur leere Strings entfernen
     
-    if (punctuation && words.length > 0) {
-        words[words.length - 1] = words[words.length - 1] + punctuation;
+    console.log('[DEBUG] splitSentence parts before punctuation:', parts);
+    
+    // Satzzeichen zum letzten Wort hinzufügen
+    if (punctuation && parts.length > 0) {
+        parts[parts.length - 1] = parts[parts.length - 1] + punctuation;
     }
     
-
-    return words;
+    console.log('[DEBUG] splitSentence final result:', parts);
+    return parts;
 }
 
 // BUGFIX: Hilfsfunktion zum Aktivieren aller Eingabefelder

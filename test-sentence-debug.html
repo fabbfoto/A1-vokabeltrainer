@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satzübersetzung Debug Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-6">Satzübersetzung Debug Test</h1>
+        
+        <div class="bg-white rounded-lg p-6 shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">Test-Daten</h2>
+            <div id="debug-output" class="space-y-4">
+                <!-- Debug-Ausgabe wird hier eingefügt -->
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import der notwendigen Funktionen
+        import { getExampleSentenceText, isExampleSentencePartArray } from './src/core/types/vocabulary.js';
+        
+        // Test-Daten (wie im Vokabular)
+        const testExampleGerman = [
+            { id: "test-001", text: "Ich", case: "nominativ" },
+            { id: "test-002", text: " ", case: "none" },
+            { id: "test-003", text: "gehe", case: "verb" },
+            { id: "test-004", text: " ", case: "none" },
+            { id: "test-005", text: "ins", case: "none" },
+            { id: "test-006", text: " ", case: "none" },
+            { id: "test-007", text: "Bett", case: "akkusativ" },
+            { id: "test-008", text: ".", case: "none" }
+        ];
+
+        function splitSentence(sentence) {
+            const punctuationMatch = sentence.match(/[.,;:!?]+$/);
+            const punctuation = punctuationMatch ? punctuationMatch[0] : '';
+            
+            const words = sentence
+                .replace(/[.,;:!?]+$/, '')
+                .split(' ')
+                .filter(word => word.length > 0);
+            
+            if (punctuation && words.length > 0) {
+                words[words.length - 1] = words[words.length - 1] + punctuation;
+            }
+            
+            return words;
+        }
+
+        function debugOutput() {
+            const output = document.getElementById('debug-output');
+            
+            // Test 1: Direkte Verarbeitung
+            output.innerHTML += `
+                <div class="border p-4 rounded">
+                    <h3 class="font-semibold">Test 1: Direkte Verarbeitung</h3>
+                    <p><strong>Input:</strong> ${JSON.stringify(testExampleGerman)}</p>
+                    <p><strong>isExampleSentencePartArray:</strong> ${isExampleSentencePartArray(testExampleGerman)}</p>
+                    <p><strong>getExampleSentenceText Result:</strong> ${getExampleSentenceText(testExampleGerman)}</p>
+                </div>
+            `;
+
+            // Test 2: splitSentence Test
+            const sentenceText = getExampleSentenceText(testExampleGerman);
+            const words = splitSentence(sentenceText);
+            
+            output.innerHTML += `
+                <div class="border p-4 rounded">
+                    <h3 class="font-semibold">Test 2: splitSentence Test</h3>
+                    <p><strong>Sentence Text:</strong> "${sentenceText}"</p>
+                    <p><strong>Split Words:</strong> ${JSON.stringify(words)}</p>
+                    <p><strong>Word Count:</strong> ${words.length}</p>
+                </div>
+            `;
+
+            // Test 3: Input-Felder Simulation
+            output.innerHTML += `
+                <div class="border p-4 rounded">
+                    <h3 class="font-semibold">Test 3: Input-Felder Simulation</h3>
+                    <div class="flex gap-2 flex-wrap">
+                        ${words.map((word, index) => `
+                            <input type="text" 
+                                   class="px-4 py-3 text-lg text-center border-2 border-gray-300 rounded-lg min-w-[120px]" 
+                                   style="width: ${Math.max(120, word.length * 12)}px"
+                                   placeholder="${word}"
+                                   data-expected="${word}">
+                        `).join('')}
+                    </div>
+                    <p class="mt-2 text-sm text-gray-600">Erwartete Anzahl Input-Felder: ${words.length}</p>
+                </div>
+            `;
+        }
+
+        // Debug-Ausgabe starten
+        debugOutput();
+    </script>
+</body>
+</html> 
