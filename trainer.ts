@@ -887,36 +887,19 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Hole nächstes Wort
         state.training.currentWord = state.training.shuffledWordsForMode[state.training.currentWordIndex];
         
-        // Mode-Rotation für Chaos-Test und Global-Ranking-Test
-        if (state.test.isTestModeActive && 
-            (state.test.currentTest?.variant === 'chaos' || state.test.currentTest?.testType === 'global') && 
-            state.test.testModeRotation.length > 0) {
-            
-            // NEU: Für Global-Ranking-Test das spezifische Mapping verwenden
-            if (state.test.currentTest?.testType === 'global' && state.test.testModeMapping) {
-                const currentWord = state.training.currentWord;
-                const mapping = state.test.testModeMapping.find(m => m.word.id === currentWord?.id);
-                if (mapping) {
-                    state.training.currentMode = CATEGORY_MODE_MAP[mapping.testMode];
-                    console.log('🎯 Global-Ranking: Wort', currentWord?.id, '→ Modus', mapping.testMode, '→', state.training.currentMode);
-                } else {
-                    // Fallback auf Rotation
-                    state.training.currentMode = state.test.testModeRotation[state.test.currentTestModeIndex % state.test.testModeRotation.length];
-                    state.test.currentTestModeIndex++;
-                }
-            } else {
-                // Chaos-Test: Nächster Modus aus der Rotation
+        // Mode-Rotation NUR für Chaos-Test
+        if (state.test.isTestModeActive && state.test.currentTest) {
+            if (state.test.currentTest.variant === 'chaos') {
+                // Chaos-Test: Rotation durch verschiedene Modi
                 state.training.currentMode = state.test.testModeRotation[state.test.currentTestModeIndex % state.test.testModeRotation.length];
                 state.test.currentTestModeIndex++;
+                console.log('🎯 Chaos-Test Modus:', state.training.currentMode);
+            } else if (state.test.currentTest.variant === 'structured' && state.test.currentTest.selectedCategory) {
+                // Strukturiert: Immer der gleiche Modus basierend auf Kategorie
+                const category = state.test.currentTest.selectedCategory as TestCategory;
+                state.training.currentMode = CATEGORY_MODE_MAP[category];
+                console.log('📐 Struktur-Test Modus:', category, '→', state.training.currentMode);
             }
-            
-            console.log('🎯 Nächster Test-Modus:', state.training.currentMode, 'Index:', state.test.currentTestModeIndex);
-            // BUGFIX: UI-Reset nach Mode-Wechsel im Chaos-Test
-            requestAnimationFrame(() => {
-                document.querySelectorAll('[disabled]').forEach(el => {
-                    el.removeAttribute('disabled');
-                });
-            });
         }
         
         if (!state.training.currentWord) {

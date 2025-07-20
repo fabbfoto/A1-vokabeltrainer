@@ -105,6 +105,38 @@ function ensureInputsEnabled() {
     }, 0);
 }
 
+// Hilfsfunktion für Länder-Artikel-Logik
+function needsArticle(word: { german: string; article?: string }): boolean {
+    // Länder mit Artikel: Schweiz, Türkei, Ukraine, Niederlande, etc.
+    const countriesWithArticle = [
+        'Schweiz', 'Türkei', 'Ukraine', 'Niederlande', 'Philippinen', 'Bahamas',
+        'Vereinigten Staaten', 'USA', 'Vereinigte Staaten'
+    ];
+    
+    if (countriesWithArticle.includes(word.german)) {
+        return true; // Immer Artikel verwenden
+    }
+    
+    // Länder ohne Artikel: Deutschland, Frankreich, Spanien, etc.
+    const countriesWithoutArticle = [
+        'Deutschland', 'Frankreich', 'Spanien', 'Italien', 'Österreich', 'Polen',
+        'England', 'Schottland', 'Wales', 'Irland', 'Norwegen', 'Schweden',
+        'Dänemark', 'Finnland', 'Russland', 'China', 'Japan', 'Korea',
+        'Brasilien', 'Argentinien', 'Chile', 'Peru', 'Kolumbien', 'Venezuela',
+        'Mexiko', 'Kanada', 'Australien', 'Neuseeland', 'Südafrika', 'Ägypten',
+        'Marokko', 'Tunesien', 'Algerien', 'Libyen', 'Sudan', 'Äthiopien',
+        'Kenia', 'Uganda', 'Tansania', 'Sambia', 'Simbabwe', 'Botswana',
+        'Namibia', 'Angola', 'Mozambique', 'Madagaskar', 'Mauritius', 'Seychellen'
+    ];
+    
+    if (countriesWithoutArticle.includes(word.german)) {
+        return false; // Nie Artikel verwenden
+    }
+    
+    // Normale Nomen: Verwende vorhandenen Artikel oder null
+    return word.article !== undefined;
+}
+
 // ✅ MULTIPLE CHOICE MODE - mit korrekten Property-Namen
 export function setupMultipleChoiceMode(
     dom: DOMElements, 
@@ -163,7 +195,12 @@ export function setupMultipleChoiceMode(
     // Genus und Plural anzeigen
     let displayGermanWord = currentWord.german || "";
     if ('article' in currentWord && 'plural' in currentWord) {
-        displayGermanWord = `${currentWord.article} ${currentWord.german}, ${currentWord.plural || '-'}`;
+        // Verwende Länder-Artikel-Logik
+        if (needsArticle(currentWord)) {
+            displayGermanWord = `${currentWord.article} ${currentWord.german}, ${currentWord.plural || '-'}`;
+        } else {
+            displayGermanWord = `${currentWord.german}, ${currentWord.plural || '-'}`;
+        }
     }
     dom.questionDisplayEl.textContent = displayGermanWord;
 
@@ -407,6 +444,16 @@ export function setupSpellingMode(
         dom.nounInputContainerEl.classList.remove('hidden');
         dom.singleInputContainerEl.classList.add('hidden');
         
+        // Artikel-Feld basierend auf Länder-Logik anzeigen/verstecken
+        const needsArticleForWord = needsArticle(currentWord);
+        if (needsArticleForWord) {
+            dom.spellingInputArticleEl.style.display = 'block';
+            dom.spellingInputArticleEl.placeholder = 'Artikel (der/die/das)';
+        } else {
+            dom.spellingInputArticleEl.style.display = 'none';
+            dom.spellingInputArticleEl.placeholder = '';
+        }
+        
         // Reset alle Felder
         dom.spellingInputArticleEl.value = '';
         dom.spellingInputArticleEl.disabled = false;
@@ -438,7 +485,9 @@ export function setupSpellingMode(
         
         // Button Click Handler mit didaktischem Feedback
         const handleCheckButtonClick = () => {
-            const correctArticle = (currentWord as { article?: string }).article || '';
+            // Verwende Länder-Artikel-Logik
+            const needsArticleForWord = needsArticle(currentWord);
+            const correctArticle = needsArticleForWord ? ((currentWord as { article?: string }).article || '') : '';
             const correctSingular = currentWord.german;
             const correctPlural = (currentWord as { plural?: string }).plural || '';
             
@@ -449,20 +498,27 @@ export function setupSpellingMode(
 
             
             // Separate Prüfung für jedes Feld
-            const isArticleCorrect = vergleicheAntwort(userInputArticle, correctArticle);
+            const isArticleCorrect = needsArticleForWord ? vergleicheAntwort(userInputArticle, correctArticle) : true;
             const isSingularCorrect = vergleicheAntwort(userInputSingular, correctSingular);
             const isPluralCorrect = vergleicheAntwort(userInputPlural, correctPlural);
             
             // NEU: Benutzerantwort für Test-Protokollierung
-            const userAnswer = `${userInputArticle} ${userInputSingular} / ${userInputPlural}`;
+            const userAnswer = needsArticleForWord ? 
+                `${userInputArticle} ${userInputSingular} / ${userInputPlural}` : 
+                `${userInputSingular} / ${userInputPlural}`;
             
-            // DIDAKTISCHES FEEDBACK: Nur im Lern-Modus
-            if (!state.test.isTestModeActive) {
+                    // DIDAKTISCHES FEEDBACK: Nur im Lern-Modus
+        if (!state.test.isTestModeActive) {
+            if (needsArticleForWord) {
                 if (isArticleCorrect) {
                     dom.spellingInputArticleEl.classList.add('border-green-500', 'bg-green-100');
                 } else {
                     dom.spellingInputArticleEl.classList.add('border-red-500', 'bg-red-100');
                 }
+            } else {
+                // Länder ohne Artikel: Artikel-Feld als korrekt markieren
+                dom.spellingInputArticleEl.classList.add('border-green-500', 'bg-green-100');
+            }
                 if (isSingularCorrect) {
                     dom.spellingInputNoun1El.classList.add('border-green-500', 'bg-green-100');
                 } else {
@@ -481,7 +537,9 @@ export function setupSpellingMode(
             dom.spellingInputNoun2El.disabled = true;
             
             // Richtige Lösung anzeigen (groß und rot)
-            const correctAnswerText = `${correctArticle} ${correctSingular} / ${correctPlural}`;
+            const correctAnswerText = needsArticleForWord ? 
+                `${correctArticle} ${correctSingular} / ${correctPlural}` : 
+                `${correctSingular} / ${correctPlural}`;
             if (isArticleCorrect && isSingularCorrect && isPluralCorrect) {
                 // RICHTIGE ANTWORT: Keine Korrekturlösung, kein Weiter-Button, direkt nächste Aufgabe
                 dom.correctionSolutionEl.classList.add('hidden');

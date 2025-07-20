@@ -1072,19 +1072,19 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-herkunft-009"),
                 wordType: 'adjective',
-                german: "italienisch",
+                german: "Italienisch",
                 english: "Italian (adjective)",
                 exampleGerman: [
                     { text: "Ich", case: "nominativ" },
                     { text: " ", case: "none" },
                     { text: "spreche", case: "verb" },
                     { text: " ", case: "none" },
-                    { text: "italienisch", case: "none" },
+                    { text: "Italienisch", case: "none" },
                     { text: ".", case: "none" }
                 ],
                 exampleEnglish: "I speak Italian.",
                 clozeParts: ["Ich spreche ", "."],
-                clozeAnswers: ["italienisch"]
+                clozeAnswers: ["Italienisch"]
             } as Adjective,
             {
                 id: createWordId("person-herkunft-010"),
@@ -1127,19 +1127,19 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-herkunft-012"),
                 wordType: 'adjective',
-                german: "türkisch",
+                german: "Türkisch",
                 english: "Turkish (adjective)",
                 exampleGerman: [
                     { text: "Ich", case: "nominativ" },
                     { text: " ", case: "none" },
                     { text: "spreche", case: "verb" },
                     { text: " ", case: "none" },
-                    { text: "türkisch", case: "none" },
+                    { text: "Türkisch", case: "none" },
                     { text: ".", case: "none" }
                 ],
                 exampleEnglish: "I speak Turkish.",
                 clozeParts: ["Ich spreche ", "."],
-                clozeAnswers: ["türkisch"]
+                clozeAnswers: ["Türkisch"]
             } as Adjective,
             {
                 id: createWordId("person-herkunft-013"),
