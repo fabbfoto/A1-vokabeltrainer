@@ -308,7 +308,7 @@ export function initNavigationListeners(dom: DOMElements, state: TrainerState, c
                 const testConfig: TestConfiguration = {
                     testId: `test_${Date.now()}` as TestId,
                     testType: scope === 'global' ? 'global' : 'mainTopic',
-                    variant: scope === 'global' ? 'global-ranking' : 'chaos', // Globale Tests werden als global-ranking gespeichert
+                    variant: 'chaos', // Immer Chaos für Chaos-Tests
                     topicId: topicId as TopicId,
                     testTitle: scope === 'global' ? 'Globaler Chaos-Test' : `${topicId} Chaos-Test`,
                     modeIds: ['mc-de-en', 'type-de-adj', 'cloze-adj-de', 'sentence-translation-en-de'] as ModeId[],
