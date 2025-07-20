@@ -896,10 +896,10 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({"Wohnen": 
             } as Noun,
             {id: createWordId(""),
                 wordType: "noun",
-                german: "Nachbar/Nachbarin",
+                german: "Nachbar",
                 article: "der",
-                plural: "Nachbarn/Nachbarinnen",
-                english: "neighbor (male/female)",
+                plural: "Nachbarn",
+                english: "neighbor",
                 exampleGerman: [
                     {
     id: createWordId("wohnen-haus--ger-te-und-adr-101"), text: "", case: "none" },

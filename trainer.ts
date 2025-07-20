@@ -15,7 +15,8 @@ import type {
     TestConfiguration,
     TestResult,
     TestId,
-    TestType
+    TestType,
+    TestCategory
 } from './src/core/types/trainer';
 
 import { dom } from './dom';

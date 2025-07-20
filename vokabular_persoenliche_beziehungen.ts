@@ -277,9 +277,9 @@ export const vokabularPersoenlicheBeziehungen: VocabularyStructure = createVocab
             } as Noun,
             {id: createWordId("persoenliche-beziehungen-familie-015"),
                 wordType: "noun",
-                german: "Partner/Partnerin",
-                article: "der/die",
-                plural: "Partner/Partnerinnen",
+                german: "Partner",
+                article: "der",
+                plural: "Partner",
                 english: "partner",
                 exampleGerman: [
                     {
@@ -562,10 +562,10 @@ export const vokabularPersoenlicheBeziehungen: VocabularyStructure = createVocab
             } as Noun,
             {id: createWordId("persoenliche-beziehungen-schule-002"),
                 wordType: "noun",
-                german: "Klassenkamerad/Klassenkameradin",
-                article: "der/die",
-                plural: "Klassenkameraden/Klassenkameradinnen",
-                english: "classmate (male/female)",
+                german: "Klassenkamerad",
+                article: "der",
+                plural: "Klassenkameraden",
+                english: "classmate",
                 exampleGerman: [
                     {
     id: createWordId("pers-nliche-beziehun-in-der-schule-007"), text: "Mein Klassenkamerad", case: "nominativ" } as CaseElement,
@@ -581,10 +581,10 @@ export const vokabularPersoenlicheBeziehungen: VocabularyStructure = createVocab
             } as Noun,
             {id: createWordId("persoenliche-beziehungen-schule-003"),
                 wordType: "noun",
-                german: "Lehrer/Lehrerin",
-                article: "der/die",
-                plural: "Lehrer/Lehrerinnen",
-                english: "teacher (male/female)",
+                german: "Lehrer",
+                article: "der",
+                plural: "Lehrer",
+                english: "teacher",
                 exampleGerman: [
                     {
     id: createWordId("pers-nliche-beziehun-in-der-schule-013"), text: "Der Lehrer", case: "nominativ" } as CaseElement,
@@ -600,10 +600,10 @@ export const vokabularPersoenlicheBeziehungen: VocabularyStructure = createVocab
             } as Noun,
             {id: createWordId("persoenliche-beziehungen-schule-004"),
                 wordType: "noun",
-                german: "Schüler/Schülerin",
-                article: "der/die",
-                plural: "Schüler/Schülerinnen",
-                english: "student (male/female)",
+                german: "Schüler",
+                article: "der",
+                plural: "Schüler",
+                english: "student",
                 exampleGerman: [
                     {
     id: createWordId("pers-nliche-beziehun-in-der-schule-019"), text: "Die Schüler", case: "nominativ" } as CaseElement,
@@ -726,10 +726,10 @@ export const vokabularPersoenlicheBeziehungen: VocabularyStructure = createVocab
         "In der Klasse": [
             {id: createWordId("persoenliche-beziehungen-klasse-001"),
                 wordType: "noun",
-                german: "Mitschüler/Mitschülerin",
-                article: "der/die",
-                plural: "Mitschüler/Mitschülerinnen",
-                english: "classmate (male/female)",
+                german: "Mitschüler",
+                article: "der",
+                plural: "Mitschüler",
+                english: "classmate",
                 exampleGerman: [
                     {
     id: createWordId("pers-nliche-beziehun-in-der-klasse-001"), text: "Meine Mitschülerin", case: "nominativ" } as CaseElement,

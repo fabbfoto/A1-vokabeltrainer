@@ -672,10 +672,10 @@ export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabula
             {
                 id: createWordId("freizeit-unterhaltung-kino-013"),
                 wordType: 'noun',
-                german: "Sänger/Sängerin",
-                article: "der/die",
-                plural: "Sänger/Sängerinnen",
-                english: "singer (male/female)",
+                german: "Sänger",
+                article: "der",
+                plural: "Sänger",
+                english: "singer",
                 exampleGerman: [
                     { text: "Die Sängerin", case: "nominativ" },
                     { text: " ", case: "none" },
@@ -1011,10 +1011,10 @@ export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabula
             {
                 id: createWordId("freizeit-unterhaltung-sport-008"),
                 wordType: 'noun',
-                german: "Spieler/Spielerin",
-                article: "der/die",
-                plural: "Spieler/Spielerinnen",
-                english: "player (male/female)",
+                german: "Spieler",
+                article: "der",
+                plural: "Spieler",
+                english: "player",
                 exampleGerman: [
                     { text: "Die Spieler", case: "nominativ" },
                     { text: " ", case: "none" },

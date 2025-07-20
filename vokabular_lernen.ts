@@ -54,10 +54,10 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("lernen-schuleunterricht-003"),
                 wordType: "noun",
-                german: "Lehrer/Lehrerin",
-                article: "der/die",
-                plural: "Lehrer/Lehrerinnen",
-                english: "teacher (male/female)",
+                german: "Lehrer",
+                article: "der",
+                plural: "Lehrer",
+                english: "teacher",
                 exampleGerman: [
                     { text: "Der Lehrer", case: "nominativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
@@ -73,10 +73,10 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("lernen-schuleunterricht-004"),
                 wordType: "noun",
-                german: "Schüler/Schülerin",
-                article: "der/die",
-                plural: "Schüler/Schülerinnen",
-                english: "student (male/female)",
+                german: "Schüler",
+                article: "der",
+                plural: "Schüler",
+                english: "student",
                 exampleGerman: [
                     { text: "Die Schüler", case: "nominativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,

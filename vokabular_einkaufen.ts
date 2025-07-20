@@ -1185,10 +1185,10 @@ export const vokabularEinkaufen: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("einkaufen-spiele-007"),
                 wordType: "noun",
-                german: "Spieler/Spielerin",
-                article: "der/die",
-                plural: "Spieler/Spielerinnen",
-                english: "player (male/female)",
+                german: "Spieler",
+                article: "der",
+                plural: "Spieler",
+                english: "player",
                 exampleGerman: [
                     { text: "Die Spieler", case: "nominativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,

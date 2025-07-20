@@ -1258,10 +1258,10 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({"Ess
             } as Noun,
             {id: createWordId("essen-trinken-mahlzeitenlokale-021"),
                 wordType: "noun",
-                german: "Kellner/Kellnerin",
-                article: "der/die",
-                plural: "Kellner/Kellnerinnen",
-                english: "waiter/waitress",
+                german: "Kellner",
+                article: "der",
+                plural: "Kellner",
+                english: "waiter",
                 exampleGerman: [
                     {
     id: createWordId("essen-und-trinken-mahlzeiten---restaur-155"), text: "Die Kellnerin", case: "nominativ" } as CaseElement,

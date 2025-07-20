@@ -242,14 +242,14 @@ export function setupMultipleChoiceMode(
         dom.exampleSentenceDisplayEl.textContent = '[Fehler beim Anzeigen des Beispielsatzes]';
     }
 
-    // Sichtbarkeit des gesamten Wort+Satz-Blocks abhängig vom Beispielsatz
+    // Sichtbarkeit des Satz-Containers abhängig vom Beispielsatz
     if (
         (exampleSentence && isExampleSentencePartArray(exampleSentence) && exampleSentence.length > 0 && exampleSentence.some(part => part.text && part.text.trim() !== '')) ||
         (exampleSentence && isExampleSentenceString(exampleSentence) && exampleSentence.trim() !== '')
     ) {
-        dom.wordSentenceBlockEl.style.display = 'block';
+        dom.sentenceLineContainerEl.style.display = 'flex';
     } else {
-        dom.wordSentenceBlockEl.style.display = 'none';
+        dom.sentenceLineContainerEl.style.display = 'none';
     }
 
     // Audio-Buttons setup mit besserem Layout

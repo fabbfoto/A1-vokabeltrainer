@@ -835,10 +835,10 @@ export const vokabularReisenVerkehr: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("reisen-verkehr-ferienziele-016"),
                 wordType: "noun",
-                german: "Tourist/Touristin",
-                article: "der/die",
-                plural: "Touristen/Touristinnen",
-                english: "tourist (male/female)",
+                german: "Tourist",
+                article: "der",
+                plural: "Touristen",
+                english: "tourist",
                 exampleGerman: [
                     { text: "Viele Touristen", case: "nominativ" } as CaseElement,
                     { text: " ", case: "none" } as CaseElement,
