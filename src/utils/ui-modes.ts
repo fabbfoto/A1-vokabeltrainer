@@ -625,13 +625,13 @@ export function setupSpellingMode(
             
             // Korrekturmodus nur aktivieren wenn NICHT im Test
             if (!state.test.isTestModeActive) {
-                state.isCorrectionMode = !isCorrect;
+                state.training.isCorrectionMode = !isCorrect;
             }
             
             // Weiter-Button Handler (nur bei falscher Antwort relevant)
             const handleSingleContinueButtonClick = () => {
                 // Korrekturmodus beenden
-                state.isCorrectionMode = false;
+                state.training.isCorrectionMode = false;
                 
                 // UI zurücksetzen
                 dom.correctionSolutionEl.classList.add('hidden');
