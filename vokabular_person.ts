@@ -898,9 +898,9 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-familie-015"),
                 wordType: 'noun',
-                german: "Partner/Partnerin",
-                article: "der/die",
-                plural: "Partner/Partnerinnen",
+                german: "Partner",
+                article: "der",
+                plural: "Partner",
                 english: "partner",
                 exampleGerman: [
                     { text: "Mein Partner", case: "nominativ" },
@@ -1053,9 +1053,9 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-herkunft-008"),
                 wordType: 'noun',
-                german: "Italiener/Italienerin",
-                article: "der/die",
-                plural: "Italiener/Italienerinnen",
+                german: "Italiener",
+                article: "der",
+                plural: "Italiener",
                 english: "Italian (person)",
                 exampleGerman: [
                     { text: "Er", case: "nominativ" },
@@ -1108,10 +1108,10 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-herkunft-011"),
                 wordType: 'noun',
-                german: "Türke/Türkin",
-                article: "der/die",
-                plural: "Türken/Türkinnen",
-                english: "Turk (person)",
+                german: "Türke",
+                article: "der",
+                plural: "Türken",
+                english: "Turk",
                 exampleGerman: [
                     { text: "Er", case: "nominativ" },
                     { text: " ", case: "none" },
@@ -1205,10 +1205,10 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-schule-002"),
                 wordType: 'noun',
-                german: "Schüler/Schülerin",
-                article: "der/die",
-                plural: "Schüler/Schülerinnen",
-                english: "student (male/female)",
+                german: "Schüler",
+                article: "der",
+                plural: "Schüler",
+                english: "student",
                 exampleGerman: [
                     { text: "Die Schüler", case: "nominativ" },
                     { text: " ", case: "none" },
@@ -1224,10 +1224,10 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-schule-003"),
                 wordType: 'noun',
-                german: "Lehrer/Lehrerin",
-                article: "der/die",
-                plural: "Lehrer/Lehrerinnen",
-                english: "teacher (male/female)",
+                german: "Lehrer",
+                article: "der",
+                plural: "Lehrer",
+                english: "teacher",
                 exampleGerman: [
                     { text: "Der Lehrer", case: "nominativ" },
                     { text: " ", case: "none" },
@@ -1404,7 +1404,7 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
                 wordType: 'noun',
                 german: "Arbeit",
                 article: "die",
-                plural: null,
+                plural: "Arbeiten",
                 english: "work",
                 exampleGerman: [
                     { text: "Die Arbeit", case: "nominativ" },
@@ -1421,9 +1421,9 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-beruf-003"),
                 wordType: 'noun',
-                german: "Polizist/Polizistin",
-                article: "der/die",
-                plural: "Polizisten/Polizistinnen",
+                german: "Polizist",
+                article: "der",
+                plural: "Polizisten",
                 english: "police officer",
                 exampleGerman: [
                     { text: "Der Polizist", case: "nominativ" },
@@ -1440,12 +1440,12 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-beruf-004"),
                 wordType: 'noun',
-                german: "Angestellter/Angestellte",
-                article: "der/die",
+                german: "Angestellter",
+                article: "der",
                 plural: "Angestellten",
                 english: "employee",
                 exampleGerman: [
-                    { text: "Die Angestellte", case: "nominativ" },
+                    { text: "Der Angestellte", case: "nominativ" },
                     { text: " ", case: "none" },
                     { text: "arbeitet", case: "verb" },
                     { text: " ", case: "none" },
@@ -1453,15 +1453,15 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
                     { text: ".", case: "none" }
                 ],
                 exampleEnglish: "The employee works in the office.",
-                clozeParts: ["Die ", " arbeitet im Büro."],
+                clozeParts: ["Der ", " arbeitet im Büro."],
                 clozeAnswers: ["Angestellte"]
             } as Noun,
             {
                 id: createWordId("person-beruf-005"),
                 wordType: 'noun',
-                german: "Arbeiter/Arbeiterin",
-                article: "der/die",
-                plural: "Arbeiter/Arbeiterinnen",
+                german: "Arbeiter",
+                article: "der",
+                plural: "Arbeiter",
                 english: "worker",
                 exampleGerman: [
                     { text: "Der Arbeiter", case: "nominativ" },
@@ -1495,9 +1495,9 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-beruf-007"),
                 wordType: 'noun',
-                german: "Arzt/Ärztin",
-                article: "der/die",
-                plural: "Ärzte/Ärztinnen",
+                german: "Arzt",
+                article: "der",
+                plural: "Ärzte",
                 english: "doctor",
                 exampleGerman: [
                     { text: "Mein Onkel", case: "nominativ" },
