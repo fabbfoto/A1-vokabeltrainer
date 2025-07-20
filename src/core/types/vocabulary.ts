@@ -75,7 +75,7 @@ export function getExampleSentenceText(exampleSentence: ExampleSentencePart[] | 
   }
   
   if (isExampleSentencePartArray(exampleSentence)) {
-    const result = exampleSentence.map(part => part.text).join('');
+    const result = exampleSentence.map(part => part.text).join(' ');
     console.log('[DEBUG] isExampleSentencePartArray true, result:', result);
     return result;
   }
