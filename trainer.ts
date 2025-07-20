@@ -533,16 +533,15 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 break;
                 
             case 'testing':
-                // Im Test-Modus: Keine visuellen Hinweise, aber kurze Pause
+                // Im Test-Modus: IMMER zur nächsten Frage weitergehen
                 if (isCorrect) {
                     state.training.correctInCurrentRound++;
                 }
                 // Statistiken aktualisieren
                 updateStatistics();
-                // Kurze Pause vor der nächsten Aufgabe
-                setTimeout(() => {
-                    loadNextTask();
-                }, 500); // 500ms Pause für bessere UX
+                // IMMER zur nächsten Frage weitergehen im Test-Modus!
+                console.log('✅ Test-Modus: Lade nächste Aufgabe...');
+                loadNextTask();
                 break;
                 
             case 'repeating':

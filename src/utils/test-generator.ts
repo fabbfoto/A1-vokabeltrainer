@@ -142,6 +142,8 @@ export function generateTestQuestions(
   };
 }
 
+
+
 // NEU: Spezielle Funktion für globale Ranglisten-Tests
 function generateGlobalRankingTest(
   vokabular: VocabularyStructure,

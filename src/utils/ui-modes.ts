@@ -401,6 +401,13 @@ export function setupSpellingMode(
     dom.continueButton.classList.add('hidden');
     dom.correctionSolutionEl.classList.add('hidden');
     
+    // Test-Modus: Button von Anfang an "Weiter" nennen
+    if (state.test.isTestModeActive) {
+        dom.checkSpellingButton.textContent = 'Weiter';
+    } else {
+        dom.checkSpellingButton.textContent = 'Auswerten';
+    }
+    
     if (dom.umlautButtonsContainer) {
         dom.umlautButtonsContainer.style.display = 'flex';
     }
@@ -475,7 +482,7 @@ export function setupSpellingMode(
         
         // Enter-Key Handler NUR für das Pluralfeld
         const handlePluralEnterKey = (event: KeyboardEvent) => {
-            if (event.key === 'Enter' && !state.training.isCorrectionMode) {
+            if (event.key === 'Enter' && !state.training.isCorrectionMode && !state.test.isTestModeActive) {
                 event.preventDefault();
                 handleCheckButtonClick();
             }
@@ -540,33 +547,39 @@ export function setupSpellingMode(
             const correctAnswerText = needsArticleForWord ? 
                 `${correctArticle} ${correctSingular} / ${correctPlural}` : 
                 `${correctSingular} / ${correctPlural}`;
-            if (isArticleCorrect && isSingularCorrect && isPluralCorrect) {
-                // RICHTIGE ANTWORT: Keine Korrekturlösung, kein Weiter-Button, direkt nächste Aufgabe
-                dom.correctionSolutionEl.classList.add('hidden');
-                dom.correctionSolutionEl.textContent = '';
-                dom.continueButton.classList.add('hidden');
+            // Test-Modus: Antwort sofort auswerten und Button zu "Weiter" ändern
+            if (state.test.isTestModeActive) {
+                const isFullyCorrect = isArticleCorrect && isSingularCorrect && isPluralCorrect;
+                console.log('🔍 Test-Modus (Plural): Antwort auswerten und Button zu "Weiter" ändern');
                 
-                // Kurze Verzögerung für grünes Feedback, dann nächste Aufgabe
+                // Antwort sofort auswerten (ohne visuelles Feedback)
+                processAnswer(isFullyCorrect, correctAnswerText, undefined, userAnswer);
+                
+                // Button zu "Weiter" ändern für nächste Frage
+                dom.checkSpellingButton.textContent = 'Weiter';
+                dom.checkSpellingButton.disabled = false;
+                
+                console.log('✅ Test-Modus (Plural): Antwort ausgewertet, Button zu "Weiter" geändert');
+                return; // Beende hier - keine weiteren Aktionen im Test-Modus
+            }
+            
+            // Lern-Modus: Normale Logik
+            if (isArticleCorrect && isSingularCorrect && isPluralCorrect) {
+                // RICHTIGE ANTWORT: Kurze Verzögerung für grünes Feedback, dann nächste Aufgabe
                 setTimeout(() => {
                     processAnswer(true, correctAnswerText, undefined, userAnswer);
                 }, 1200);
             } else {
-                // Im Test-Modus: Keine Korrektur anzeigen
-                if (state.test.isTestModeActive) {
-                    // Test-Modus: Kein visuelles Feedback, direkt weiter
-                    setTimeout(() => {
-                        processAnswer(false, correctAnswerText, undefined, userAnswer);
-                    }, 100);
-                } else {
-                    // Normaler Modus: Korrektur anzeigen
-                    dom.correctionSolutionEl.textContent = correctAnswerText;
-                    dom.correctionSolutionEl.classList.remove('hidden');
-                    dom.continueButton.classList.remove('hidden');
-                }
+                // FALSCHE ANTWORT: Korrektur anzeigen
+                dom.correctionSolutionEl.textContent = correctAnswerText;
+                dom.correctionSolutionEl.classList.remove('hidden');
+                dom.continueButton.classList.remove('hidden');
             }
             
-            // Auswerten-Button deaktivieren
-            dom.checkSpellingButton.disabled = true;
+            // Auswerten-Button nur im Lern-Modus deaktivieren
+            if (!state.test.isTestModeActive) {
+                dom.checkSpellingButton.disabled = true;
+            }
             
             // NOTFALL-FIX: Stelle sicher, dass Korrektur angezeigt wird (Nomen-Modus)
             if (!(isArticleCorrect && isSingularCorrect && isPluralCorrect) && !state.test.isTestModeActive) {
@@ -652,7 +665,7 @@ export function setupSpellingMode(
         
         // Enter-Key Handler für Single-Input
         const handleSingleEnterKey = (event: KeyboardEvent) => {
-            if (event.key === 'Enter' && !state.training.isCorrectionMode) {
+            if (event.key === 'Enter' && !state.training.isCorrectionMode && !state.test.isTestModeActive) {
                 event.preventDefault();
                 handleSingleCheckButtonClick();
             }
@@ -684,67 +697,54 @@ export function setupSpellingMode(
                 }
             }
             
-            // 4.4a Rotes Kreuz im Schreibweise-Modus (Einzelfeld) entfernen
-            if (state.test.isTestModeActive) {
-                // Direkt weiter ohne visuelles Feedback
-                processAnswer(false, correctAnswer, undefined, userInput);
-            }
-            
             // Feld sperren
             dom.spellingInputSingleEl.disabled = true;
             
-            // Richtige Lösung anzeigen (groß und rot)
-            if (isCorrect) {
-                // RICHTIGE ANTWORT: Keine Korrekturlösung, kein Weiter-Button, direkt nächste Aufgabe
-                dom.correctionSolutionEl.classList.add('hidden');
-                dom.correctionSolutionEl.textContent = '';
-                dom.continueButton.classList.add('hidden');
+            // Test-Modus: Antwort sofort auswerten und Button zu "Weiter" ändern
+            if (state.test.isTestModeActive) {
+                console.log('🔍 Test-Modus: Antwort auswerten und Button zu "Weiter" ändern');
                 
-                // Kurze Verzögerung für grünes Feedback, dann nächste Aufgabe
+                // Antwort sofort auswerten (ohne visuelles Feedback)
+                processAnswer(isCorrect, correctAnswer, undefined, userInput);
+                
+                // Button zu "Weiter" ändern für nächste Frage
+                dom.checkSpellingButton.textContent = 'Weiter';
+                dom.checkSpellingButton.disabled = false;
+                
+                console.log('✅ Test-Modus: Antwort ausgewertet, Button zu "Weiter" geändert');
+                return; // Beende hier - keine weiteren Aktionen im Test-Modus
+            }
+            
+            // Lern-Modus: Normale Logik
+            if (isCorrect) {
+                // RICHTIGE ANTWORT: Kurze Verzögerung für grünes Feedback, dann nächste Aufgabe
                 setTimeout(() => {
                     processAnswer(true, correctAnswer, undefined, userInput);
                 }, 1200);
             } else {
-                // FALSCHE ANTWORT
+                // FALSCHE ANTWORT: Korrektur anzeigen
                 console.log('🔍 Schreibweise-Modus: Falsche Antwort');
-                console.log('- Test-Modus aktiv?', state.test.isTestModeActive);
                 console.log('- Korrekte Antwort:', correctAnswer);
-                console.log('- DOM Elemente verfügbar?', {
-                    correctionSolutionEl: !!dom.correctionSolutionEl,
-                    continueButton: !!dom.continueButton
-                });
                 
-                // Im Test-Modus: Keine Korrektur anzeigen
-                if (state.test.isTestModeActive) {
-                    console.log('→ Test-Modus: Keine Korrektur');
-                    // Test-Modus: Kein visuelles Feedback, direkt weiter
-                    setTimeout(() => {
-                        processAnswer(false, correctAnswer, undefined, userInput);
-                    }, 100);
-                } else {
-                    console.log('→ Lern-Modus: Zeige Korrektur');
-                    // Normaler Modus: Korrektur anzeigen
-                    dom.correctionSolutionEl.textContent = correctAnswer;
-                    dom.correctionSolutionEl.classList.remove('hidden');
-                    dom.continueButton.classList.remove('hidden');
-                    
-                    // WICHTIG: Stelle sicher, dass die Elemente wirklich sichtbar sind
-                    dom.correctionSolutionEl.style.display = 'block';
-                    dom.continueButton.style.display = 'block';
-                    
-                    console.log('- Korrektur Element sichtbar?', !dom.correctionSolutionEl.classList.contains('hidden'));
-                    console.log('- Weiter-Button sichtbar?', !dom.continueButton.classList.contains('hidden'));
-                    console.log('- Korrektur Text gesetzt:', dom.correctionSolutionEl.textContent);
-                    
-                    // Focus auf den Weiter-Button
-                    setTimeout(() => {
-                        dom.continueButton.focus();
-                    }, 100);
-                }
+                // Korrektur anzeigen
+                dom.correctionSolutionEl.textContent = correctAnswer;
+                dom.correctionSolutionEl.classList.remove('hidden');
+                dom.continueButton.classList.remove('hidden');
+                
+                // WICHTIG: Stelle sicher, dass die Elemente wirklich sichtbar sind
+                dom.correctionSolutionEl.style.display = 'block';
+                dom.continueButton.style.display = 'block';
+                
+                // Focus auf den Weiter-Button
+                setTimeout(() => {
+                    dom.continueButton.focus();
+                }, 100);
             }
             
-            // Auswerten-Button deaktivieren
-            dom.checkSpellingButton.disabled = true;
+            // Auswerten-Button nur im Lern-Modus deaktivieren
+            if (!state.test.isTestModeActive) {
+                dom.checkSpellingButton.disabled = true;
+            }
             
             // NOTFALL-FIX: Stelle sicher, dass Korrektur angezeigt wird (Einzelwort-Modus)
             if (!isCorrect && !state.test.isTestModeActive) {
@@ -971,6 +971,13 @@ export function setupSentenceTranslationEnDeMode(
     
     dom.checkSentenceButton.disabled = false;
     
+    // Test-Modus: Button von Anfang an "Weiter" nennen
+    if (state.test.isTestModeActive) {
+        dom.checkSentenceButton.textContent = 'Weiter';
+    } else {
+        dom.checkSentenceButton.textContent = 'Auswerten';
+    }
+    
     if (dom.umlautButtonsContainer) {
         dom.umlautButtonsContainer.style.display = 'flex';
 
@@ -1060,9 +1067,9 @@ function generateSentenceInputs(
             state.training.activeTextInput = input;
         });
         
-        // Enter-Taste für schnelle Antwort
+        // Enter-Taste für schnelle Antwort (nur im Lern-Modus)
         input.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter') {
+            if (event.key === 'Enter' && !state.test.isTestModeActive) {
                 event.preventDefault();
                 dom.checkSentenceButton.click();
             }
@@ -1089,8 +1096,10 @@ function generateSentenceInputs(
         
         const isCorrect = vergleicheAntwort(userSentence, fullGermanSentence, { caseSensitive: true });
         
-        // Button deaktivieren um mehrfache Klicks zu verhindern
-        dom.checkSentenceButton.disabled = true;
+        // Button nur im Lern-Modus deaktivieren um mehrfache Klicks zu verhindern
+        if (!state.test.isTestModeActive) {
+            dom.checkSentenceButton.disabled = true;
+        }
         
         inputs.forEach((input, index) => {
             const userWord = input.value.trim();
@@ -1104,39 +1113,53 @@ function generateSentenceInputs(
             input.disabled = true;
         });
         
-        // Kurze Verzögerung vor processAnswer um UI-Updates zu ermöglichen
-        setTimeout(() => {
+        // Test-Modus: Antwort sofort auswerten und Button zu "Weiter" ändern
+        if (state.test.isTestModeActive) {
+            console.log('🔍 Test-Modus (Satzübersetzung): Antwort auswerten und Button zu "Weiter" ändern');
+            
+            // Antwort sofort auswerten (ohne visuelles Feedback)
             processAnswer(isCorrect, fullGermanSentence, undefined, userSentence);
             
-            // NEU: Weiter-Button-Handler für falsche Antworten setzen
-            if (!isCorrect && !state.test.isTestModeActive) {
-                // Weiter-Button-Handler setzen
-                const handleContinueButtonClick = () => {
-                    // Korrekturmodus beenden
-                    state.training.isCorrectionMode = false;
-                    
-                    // UI zurücksetzen
-                    dom.correctionSolutionEl.classList.add('hidden');
-                    dom.continueButton.classList.add('hidden');
-                    dom.checkSentenceButton.disabled = false;
-                    
-                    // Alle Input-Felder zurücksetzen
-                    const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
-                    inputs.forEach(input => {
-                        input.disabled = false;
-                        input.value = '';
-                        input.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
-                        input.classList.add('bg-gradient-to-br', 'from-white', 'to-[#F2AE2E]/[0.03]', 'border-gray-300');
-                    });
-                    
-                    // Nächstes Wort laden - verwende processAnswer mit einem speziellen Flag
-                    processAnswer(true, '', undefined, 'continue');
-                };
+            // Button zu "Weiter" ändern für nächste Frage
+            dom.checkSentenceButton.textContent = 'Weiter';
+            dom.checkSentenceButton.disabled = false;
+            
+            console.log('✅ Test-Modus (Satzübersetzung): Antwort ausgewertet, Button zu "Weiter" geändert');
+        } else {
+            // Nur im Lern-Modus: Kurze Verzögerung vor processAnswer um UI-Updates zu ermöglichen
+            setTimeout(() => {
+                processAnswer(isCorrect, fullGermanSentence, undefined, userSentence);
                 
-                // Event-Handler für Weiter-Button setzen
-                dom.continueButton.onclick = handleContinueButtonClick;
-            }
-        }, 100);
+                // NEU: Weiter-Button-Handler für falsche Antworten setzen
+                if (!isCorrect) {
+                    // Weiter-Button-Handler setzen
+                    const handleContinueButtonClick = () => {
+                        // Korrekturmodus beenden
+                        state.training.isCorrectionMode = false;
+                        
+                        // UI zurücksetzen
+                        dom.correctionSolutionEl.classList.add('hidden');
+                        dom.continueButton.classList.add('hidden');
+                        dom.checkSentenceButton.disabled = false;
+                        
+                        // Alle Input-Felder zurücksetzen
+                        const inputs = dom.sentenceWordInputContainerEl.querySelectorAll('input[type="text"]') as NodeListOf<HTMLInputElement>;
+                        inputs.forEach(input => {
+                            input.disabled = false;
+                            input.value = '';
+                            input.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
+                            input.classList.add('bg-gradient-to-br', 'from-white', 'to-[#F2AE2E]/[0.03]', 'border-gray-300');
+                        });
+                        
+                        // Nächstes Wort laden - verwende processAnswer mit einem speziellen Flag
+                        processAnswer(true, '', undefined, 'continue');
+                    };
+                    
+                    // Event-Handler für Weiter-Button setzen
+                    dom.continueButton.onclick = handleContinueButtonClick;
+                }
+            }, 100);
+        }
     };
     setTimeout(() => {
         const firstInput = dom.sentenceWordInputContainerEl.querySelector('input[type="text"]') as HTMLInputElement;
