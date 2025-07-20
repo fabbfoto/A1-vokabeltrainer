@@ -315,14 +315,14 @@ export function setupSpellingMode(
     processAnswer: ProcessAnswerFunction
 ): void {
     // Sicherheitsnetz: Im normalen Lernmodus darf isTestModeActive false sein
-    if (!state.test.currentTestWords && state.test.isTestModeActive) {
+    if (!state.test.currentTest && state.test.isTestModeActive) {
         console.warn('⚠️ Test-Modus war fälschlicherweise aktiv, korrigiere...');
         state.test.isTestModeActive = false;
     }
     
     console.log('🔍 setupSpellingMode aufgerufen:', {
         isTestModeActive: state.test.isTestModeActive,
-        currentTestWords: state.test.currentTestWords,
+        currentTest: state.test.currentTest,
         currentWord: state.training.currentWord?.german
     });
     
