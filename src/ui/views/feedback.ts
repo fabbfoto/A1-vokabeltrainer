@@ -61,7 +61,7 @@ export function showSuccessMessageWithButton(
     dom.messageBoxEl.innerHTML = `
         <div class="text-center">
             <div class="mb-3">${message}</div>
-            <button id="repeat-exercise-button" class="px-4 py-2 bg-white text-green-500 rounded shadow hover:bg-gray-100 transition font-semibold cursor-pointer">
+            <button id="repeat-exercise-button" class="px-4 py-2 bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] text-green-500 rounded shadow hover:bg-gradient-to-br hover:from-white hover:to-[#F2AE2E]/[0.08] transition font-semibold cursor-pointer">
                 ${buttonText}
             </button>
         </div>

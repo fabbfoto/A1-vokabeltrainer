@@ -114,7 +114,7 @@ export class RankingUI {
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
     
     modal.innerHTML = `
-      <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div class="bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
           <div>
             <h2 class="text-3xl font-bold text-gray-800">${title}</h2>
@@ -182,7 +182,7 @@ export class RankingUI {
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
     
     modal.innerHTML = `
-      <div class="bg-white rounded-lg p-6 max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div class="bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] rounded-lg p-6 max-w-5xl w-full mx-4 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
           <div>
             <h2 class="text-3xl font-bold text-gray-800">${title}</h2>
@@ -275,7 +275,7 @@ export class RankingUI {
     modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
     
     modal.innerHTML = `
-      <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+              <div class="bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] rounded-lg p-6 max-w-2xl w-full mx-4">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-3xl font-bold text-gray-800">📊 Deine Statistiken</h2>
           <button class="text-gray-500 hover:text-gray-700 text-2xl" onclick="this.parentElement.parentElement.remove()">
@@ -365,7 +365,7 @@ export class RankingUI {
     if (!this.container) return;
     
     this.container.innerHTML = `
-      <div class="bg-white rounded-lg p-6 shadow-de-gray-300/50">
+              <div class="bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] rounded-lg p-6 shadow-de-gray-300/50">
         <h3 class="text-xl font-bold mb-4">🏆 Ranglisten</h3>
         <div class="grid grid-cols-2 gap-3">
           <button class="p-3 bg-de-gold/10 text-de-gold rounded-lg hover:bg-de-gold/20 transition-colors" 

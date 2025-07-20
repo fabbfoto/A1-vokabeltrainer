@@ -2,7 +2,7 @@
 
 export function createTopicButton(text: string, percentage: number, progressColorClass: string): HTMLButtonElement {
     const button = document.createElement('button');
-    button.className = 'relative flex flex-col items-center justify-center p-5 text-center cursor-pointer font-semibold transition-all duration-300 rounded-2xl whitespace-normal break-words bg-white border-2 border-gray-300 shadow-md hover:shadow-lg hover:-translate-y-1 min-h-[80px] hover:border-gray-400';
+    button.className = 'relative flex flex-col items-center justify-center p-5 text-center cursor-pointer font-semibold transition-all duration-300 rounded-2xl whitespace-normal break-words bg-gradient-to-br from-white via-[#F2AE2E]/[0.02] to-[#F2AE2E]/[0.04] border-2 border-gray-300 shadow-md hover:shadow-lg hover:-translate-y-1 min-h-[80px] hover:border-gray-400';
     
     // Progress-Container (grauer Hintergrund)
     const progressContainer = document.createElement('div');

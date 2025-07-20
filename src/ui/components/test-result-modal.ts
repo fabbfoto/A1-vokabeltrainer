@@ -45,7 +45,7 @@ export function showTestResultModal(testResult: TestResult, testConfig?: Record<
   const isGlobalChaosTest = testConfig?.variant === 'chaos' && testConfig?.testType === 'global';
 
   modal.innerHTML = `
-      <div class="bg-white rounded-2xl shadow-de-gray-400/50 p-6 max-w-4xl w-full mx-4 my-8 max-h-[90vh] overflow-y-auto">
+              <div class="bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] rounded-2xl shadow-de-gray-400/50 p-6 max-w-4xl w-full mx-4 my-8 max-h-[90vh] overflow-y-auto">
           <!-- Header -->
           <div class="text-center mb-6">
               <h2 class="text-3xl font-bold text-blue-700 mb-2">Test-Auswertung</h2>

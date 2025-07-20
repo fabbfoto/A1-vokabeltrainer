@@ -78,7 +78,7 @@ function createCategoryModal(): HTMLElement {
     modal.setAttribute('aria-labelledby', 'category-modal-title');
     
     modal.innerHTML = `
-        <div class="bg-white rounded-lg shadow-de-gray-400/50 p-6 max-w-md w-full transform transition-all duration-300">
+        <div class="bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] rounded-lg shadow-de-gray-400/50 p-6 max-w-md w-full transform transition-all duration-300">
             <div class="flex justify-between items-center mb-6">
                 <h2 id="category-modal-title" class="text-xl font-bold text-gray-700">Kategorie wählen</h2>
                 <button id="close-category-modal" class="text-gray-500 hover:text-gray-700 p-1 rounded-lg hover:bg-gray-100 transition-colors" aria-label="Modal schließen">
@@ -89,22 +89,22 @@ function createCategoryModal(): HTMLElement {
             </div>
             
             <div class="space-y-3">
-                <button data-category="bedeutung" class="category-button w-full py-4 px-6 rounded-lg font-medium text-white bg-de-blue hover:bg-de-blue/90 transform hover:scale-105 transition-all duration-200 shadow-de-gray-200/50 hover:shadow-de-gray-300/50 flex flex-col items-start">
+                <button data-category="bedeutung" class="category-button w-full py-4 px-6 rounded-lg font-medium text-white bg-[#6089BF] hover:bg-[#6089BF]/90 transform hover:scale-105 transition-all duration-200 shadow-de-gray-200/50 hover:shadow-de-gray-300/50 flex flex-col items-start">
                     <span class="font-semibold text-lg">Bedeutung</span>
                     <span class="text-sm opacity-90 mt-1">Multiple Choice - Deutsch → Englisch</span>
                 </button>
                 
-                <button data-category="schreibweise" class="category-button w-full py-4 px-6 rounded-lg font-medium text-white bg-de-green hover:bg-de-green/90 transform hover:scale-105 transition-all duration-200 shadow-de-gray-200/50 hover:shadow-de-gray-300/50 flex flex-col items-start">
+                <button data-category="schreibweise" class="category-button w-full py-4 px-6 rounded-lg font-medium text-white bg-[#89B3D9] hover:bg-[#89B3D9]/90 transform hover:scale-105 transition-all duration-200 shadow-de-gray-200/50 hover:shadow-de-gray-300/50 flex flex-col items-start">
                     <span class="font-semibold text-lg">Schreibweise</span>
                     <span class="text-sm opacity-90 mt-1">Rechtschreibung mit Artikel</span>
                 </button>
                 
-                <button data-category="luecke" class="category-button w-full py-4 px-6 rounded-lg font-medium text-white bg-purple-500 hover:bg-purple-600 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg flex flex-col items-start">
+                <button data-category="luecke" class="category-button w-full py-4 px-6 rounded-lg font-medium text-white bg-[#F2AE2E] hover:bg-[#F2AE2E]/90 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg flex flex-col items-start">
                     <span class="font-semibold text-lg">Lückentext</span>
                     <span class="text-sm opacity-90 mt-1">Sätze vervollständigen</span>
                 </button>
                 
-                <button data-category="satz" class="category-button w-full py-4 px-6 rounded-lg font-medium text-white bg-orange-500 hover:bg-orange-600 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg flex flex-col items-start">
+                <button data-category="satz" class="category-button w-full py-4 px-6 rounded-lg font-medium text-white bg-[#D98B2B] hover:bg-[#D98B2B]/90 transform hover:scale-105 transition-all duration-200 shadow-md hover:shadow-lg flex flex-col items-start">
                     <span class="font-semibold text-lg">Satzübersetzung</span>
                     <span class="text-sm opacity-90 mt-1">Englisch → Deutsch übersetzen</span>
                 </button>

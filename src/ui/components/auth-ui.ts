@@ -166,7 +166,7 @@ export class AuthUI {
         modal.className = 'fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50';
         
         modal.innerHTML = `
-            <div class="bg-white rounded-2xl shadow-de-gray-400/50 p-6 max-w-md w-full mx-4">
+            <div class="bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] rounded-2xl shadow-de-gray-400/50 p-6 max-w-md w-full mx-4">
                 <div class="text-center mb-6">
                     <h2 class="text-2xl font-bold text-blue-700 mb-2">🏆 Globales Ranking</h2>
                     <p class="text-gray-600">
@@ -260,7 +260,7 @@ export class AuthUI {
             const suggestionModal = document.createElement('div');
             suggestionModal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
             suggestionModal.innerHTML = `
-                <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                <div class="bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] rounded-lg p-6 max-w-md w-full mx-4">
                     <h3 class="text-lg font-semibold mb-4">💡 Anonyme Benutzernamen vorschlagen</h3>
                     <div class="grid grid-cols-2 gap-2 mb-4">
                         ${suggestions.map(name => `

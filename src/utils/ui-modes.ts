@@ -265,7 +265,7 @@ function generateMultipleChoiceAnswers(
     
     allAnswers.forEach(answer => {
         const button = document.createElement('button');
-        button.className = 'mc-answer-button px-4 py-3 bg-white text-gray-800 rounded-xl border-2 border-gray-300 shadow-sm hover:shadow-md hover:bg-gray-100 transition-all duration-200 font-medium';
+        button.className = 'mc-answer-button px-4 py-3 bg-gradient-to-br from-white via-white to-[#F2AE2E]/[0.05] text-gray-800 rounded-xl border-2 border-gray-300 shadow-sm hover:shadow-md hover:bg-gradient-to-br hover:from-white hover:via-white hover:to-[#F2AE2E]/[0.1] transition-all duration-200 font-medium';
         button.textContent = answer;
         button.onclick = () => {
             // Alle Buttons deaktivieren
@@ -371,7 +371,7 @@ export function setupSpellingMode(
     [dom.spellingInputSingleEl, dom.spellingInputNoun1El, dom.spellingInputNoun2El].forEach(input => {
         if(input) {
             input.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
-            input.classList.add('bg-white', 'border-gray-300');
+            input.classList.add('bg-gradient-to-br', 'from-white', 'to-[#F2AE2E]/[0.03]', 'border-gray-300');
         }
     });
     
@@ -509,7 +509,7 @@ export function setupSpellingMode(
                     input.disabled = false;
                     input.value = '';
                     input.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
-                    input.classList.add('bg-white', 'border-gray-300');
+                    input.classList.add('bg-gradient-to-br', 'from-white', 'to-[#F2AE2E]/[0.03]', 'border-gray-300');
                 });
                 
                 // ✅ FOKUSSIERUNG: Mittleres Feld (Singular) fokussieren
@@ -632,7 +632,7 @@ export function setupSpellingMode(
                 dom.spellingInputSingleEl.disabled = false;
                 dom.spellingInputSingleEl.value = '';
                 dom.spellingInputSingleEl.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
-                dom.spellingInputSingleEl.classList.add('bg-white', 'border-gray-300');
+                dom.spellingInputSingleEl.classList.add('bg-gradient-to-br', 'from-white', 'to-[#F2AE2E]/[0.03]', 'border-gray-300');
                 
                 // ✅ FOKUSSIERUNG: Einzelfeld fokussieren
                 dom.spellingInputSingleEl.focus();
@@ -919,7 +919,7 @@ function generateSentenceInputs(
     inputs.forEach(input => {
         input.disabled = false;
         input.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
-        input.classList.add('bg-white', 'border-gray-300');
+        input.classList.add('bg-gradient-to-br', 'from-white', 'to-[#F2AE2E]/[0.03]', 'border-gray-300');
     });
     
     dom.checkSentenceButton.onclick = () => {
@@ -971,7 +971,7 @@ function generateSentenceInputs(
                         input.disabled = false;
                         input.value = '';
                         input.classList.remove('border-de-red', 'bg-de-red/10', 'border-de-green', 'bg-de-green/10', 'border-green-500', 'bg-green-50', 'border-red-500', 'bg-red-50', 'bg-green-100', 'bg-red-100');
-                        input.classList.add('bg-white', 'border-gray-300');
+                        input.classList.add('bg-gradient-to-br', 'from-white', 'to-[#F2AE2E]/[0.03]', 'border-gray-300');
                     });
                     
                     // Nächstes Wort laden - verwende processAnswer mit einem speziellen Flag
