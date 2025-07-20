@@ -204,22 +204,22 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // ErrorManager initialisieren
     const errorManager = new ErrorCounterManager(state);
 
-    // UI-Update Callback registrieren
+    // Registriere UI-Update Callback
     errorManager.onUpdate(() => {
         try {
-            // Sicherheitscheck: learningModes ist verfügbar
-            if (typeof learningModes !== 'undefined' && learningModes) {
-                ui.updateErrorCounts(dom, state, learningModes);
-            } else {
-                console.warn('[ErrorManager] learningModes noch nicht verfügbar, überspringe UI-Update');
-            }
+            console.log('[ErrorManager] UI Update triggered');
+            updateRepeatButtons();
         } catch (error) {
-            console.error('[ErrorManager] UI update failed:', error);
+            console.error('[ErrorManager] UI Update failed:', error);
         }
     });
 
-    // Fehler aus Storage laden
-    errorManager.loadFromStorage();
+    // Lade gespeicherte Fehler
+    try {
+        errorManager.loadFromStorage();
+    } catch (error) {
+        console.error('[ErrorManager] Failed to load from storage:', error);
+    }
 
     function loadProgress(): void {
         // Versuche zuerst trainer-progress
@@ -364,9 +364,44 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
 
 
-    function updateRepeatButtons() {
-        // Wird jetzt automatisch durch errorManager.onUpdate() aufgerufen
-        ui.updateErrorCounts(dom, state, learningModes);
+    function updateRepeatButtons(): void {
+        console.log('[updateRepeatButtons] Called');
+        
+        // Robuste Implementierung
+        Object.keys(learningModes).forEach((modeId) => {
+            try {
+                const button = document.getElementById(`mode-repeat-${modeId}`);
+                if (!button) {
+                    console.warn(`Button nicht gefunden: mode-repeat-${modeId}`);
+                    return;
+                }
+                
+                const countSpan = button.querySelector('.count-display');
+                if (!countSpan) {
+                    console.warn(`Count-Display nicht gefunden für ${modeId}`);
+                    return;
+                }
+                
+                // Fehleranzahl abrufen
+                const errorCount = errorManager.getErrorCount(modeId as ModeId);
+                
+                // UI direkt aktualisieren
+                countSpan.textContent = errorCount.toString();
+                
+                // Button-Status
+                if (errorCount === 0) {
+                    button.classList.add('opacity-50', 'cursor-not-allowed');
+                    button.setAttribute('disabled', 'true');
+                } else {
+                    button.classList.remove('opacity-50', 'cursor-not-allowed');
+                    button.removeAttribute('disabled');
+                }
+                
+                console.log(`[updateRepeatButtons] ${modeId}: ${errorCount} Fehler`);
+            } catch (error) {
+                console.error(`[updateRepeatButtons] Fehler bei ${modeId}:`, error);
+            }
+        });
     }
 
     loadProgress();
@@ -415,6 +450,15 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             
             // Korrekturmodus aktivieren
             state.training.isCorrectionMode = true;
+            
+            // WICHTIG: Fehler zur Liste hinzufügen
+            try {
+                addToErrorList();
+                // UI sofort aktualisieren
+                updateRepeatButtons();
+            } catch (error) {
+                console.error('Fehler beim Hinzufügen zur Fehlerliste:', error);
+            }
             
             // Verhindere weiteres Processing
             return;
@@ -1433,33 +1477,17 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // Debug-Funktionen für Browser-Konsole
     (window as any).debugErrorCounts = () => {
-        console.group('Current Error Counts');
-        Object.keys(state.progress.wordsToRepeatByMode).forEach(mode => {
-            const count = state.progress.wordsToRepeatByMode[mode as ModeId]?.size || 0;
-            console.log(`${mode}: ${count} errors`);
+        console.group('🔍 Aktuelle Fehlerzähler');
+        Object.keys(learningModes).forEach(mode => {
+            const count = errorManager.getErrorCount(mode as ModeId);
+            console.log(`${mode}: ${count} Fehler`);
         });
         console.groupEnd();
     };
 
     (window as any).forceUpdateErrorUI = () => {
-        console.log('Forcing UI update...');
-        // Aktualisiere alle Buttons direkt
-        Object.keys(learningModes).forEach(mode => {
-            const button = document.getElementById(`mode-repeat-${mode}`);
-            if (button) {
-                const span = button.querySelector('.count-display');
-                if (span) {
-                    const count = state.progress.wordsToRepeatByMode[mode as ModeId]?.size || 0;
-                    span.textContent = count.toString();
-                    
-                    // Force repaint
-                    button.style.display = 'none';
-                    button.offsetHeight;
-                    button.style.display = '';
-                }
-            }
-        });
-        // Rufe auch die normale Update-Funktion auf
+        console.log('🔄 Erzwinge UI-Update...');
+        updateRepeatButtons();
         ui.updateErrorCounts(dom, state, learningModes);
     };
 
