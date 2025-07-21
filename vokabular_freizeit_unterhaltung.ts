@@ -249,8 +249,8 @@ export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabula
                     { text: ".", case: "none" }
                 ],
                 exampleEnglish: "I am reading a book.",
-                clozeParts: ["Ich ", " ein Buch."],
-                clozeAnswers: ["lese"]
+                clozeParts: ["Ich lese ein ", "."],
+                clozeAnswers: ["Buch"]
             } as Verb,
             {
                 id: createWordId("freizeit-unterhaltung-hobbys-011"),
@@ -1354,12 +1354,12 @@ export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabula
             {
                 id: createWordId("freizeit-unterhaltung-ausgehen-001"),
                 wordType: 'noun',
-                german: "Disco/Diskothek",
-                article: "die",
-                plural: "Discos/Diskotheken",
-                english: "disco / discotheque",
+                german: "Club",
+                article: "der",
+                plural: "Clubs",
+                english: "club",
                 exampleGerman: [
-                    { text: "Sie", case: "nominativ" },
+                    { text: "Er", case: "nominativ" },
                     { text: " ", case: "none" },
                     { text: "geht", case: "verb" },
                     { text: " ", case: "none" },
@@ -1367,14 +1367,14 @@ export const vokabularFreizeitUnterhaltung: VocabularyStructure = createVocabula
                     { text: " ", case: "none" },
                     { text: "in", case: "none" },
                     { text: " ", case: "none" },
-                    { text: "die", case: "none" },
+                    { text: "den", case: "akkusativ" },
                     { text: " ", case: "none" },
-                    { text: "Diskothek", case: "akkusativ" },
+                    { text: "Club", case: "akkusativ" },
                     { text: ".", case: "none" }
                 ],
-                exampleEnglish: "She likes to go to the discotheque.",
-                clozeParts: ["Sie geht gern in die ", "."],
-                clozeAnswers: ["Diskothek"]
+                exampleEnglish: "He likes to go to the club.",
+                clozeParts: ["Er geht gern in den ", "."],
+                clozeAnswers: ["Club"]
             } as Noun,
             {
                 id: createWordId("freizeit-unterhaltung-ausgehen-002"),
