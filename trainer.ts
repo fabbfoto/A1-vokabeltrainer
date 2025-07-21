@@ -421,10 +421,31 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
         
         state.training.attemptedInCurrentRound++;
-        
+
+        // BUGFIX: Bei der letzten Aufgabe sicherstellen, dass die Statistik aktualisiert wird
+        const isLastQuestion = state.training.currentWordIndex === state.training.shuffledWordsForMode.length - 1;
+        if (isLastQuestion) {
+            console.log('[BUGFIX] Letzte Aufgabe - Force Update der Statistik');
+        }
+
         // WICHTIG: updateStatistics in Try-Catch wrappen
         try {
             updateStatistics();
+            
+            // BUGFIX: Bei der letzten Aufgabe nochmal verzögert aktualisieren
+            if (isLastQuestion) {
+                setTimeout(() => {
+                    console.log('[BUGFIX] Verzögertes Update für letzte Aufgabe');
+                    updateStatistics();
+                    // Stelle sicher, dass die Anzeige wirklich 12/12 zeigt
+                    if (dom.attemptedInRoundPracticeEl) {
+                        dom.attemptedInRoundPracticeEl.textContent = state.training.shuffledWordsForMode.length.toString();
+                    }
+                    if (dom.correctInRoundPracticeEl && isCorrect) {
+                        dom.correctInRoundPracticeEl.textContent = state.training.correctInCurrentRound.toString();
+                    }
+                }, 100);
+            }
         } catch (error) {
             console.error('❌ Statistik-Update fehlgeschlagen:', error);
         }

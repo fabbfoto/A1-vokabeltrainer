@@ -205,7 +205,18 @@ export function updatePracticeStats(dom: DOMElements, state: TrainerState, learn
         dom.correctInRoundPracticeEl.textContent = state.training.correctInCurrentRound.toString();
     }
     if (dom.attemptedInRoundPracticeEl) {
-        dom.attemptedInRoundPracticeEl.textContent = state.training.attemptedInCurrentRound.toString();
+        // BUGFIX: Korrigiere die Anzeige für die letzte Aufgabe
+        const attempted = state.training.attemptedInCurrentRound;
+        const total = state.training.shuffledWordsForMode.length;
+        const currentIndex = state.training.currentWordIndex;
+        
+        // Wenn wir bei der letzten Aufgabe sind (Index = total-1) 
+        // und sie wurde beantwortet, zeige die volle Anzahl
+        if (currentIndex >= total - 1 && attempted === total) {
+            dom.attemptedInRoundPracticeEl.textContent = total.toString();
+        } else {
+            dom.attemptedInRoundPracticeEl.textContent = attempted.toString();
+        }
     }
     
     const accuracy = state.training.attemptedInCurrentRound > 0 
