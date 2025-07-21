@@ -1440,7 +1440,7 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("person-beruf-004"),
                 wordType: 'noun',
-                german: "Angestellter",
+                german: "Angestellte",
                 article: "der",
                 plural: "Angestellten",
                 english: "employee",
