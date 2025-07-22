@@ -1160,10 +1160,10 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("wohnen-garten-004"),
                 wordType: "noun",
-                german: "Gras",
-                article: "das",
-                plural: "Gräser",
-                english: "grass",
+                german: "Wiese",
+                article: "die",
+                plural: "Wiesen",
+                english: "meadow / field",
                 exampleGerman: [
                     { text: "Die", case: "nominativ" },
                     { text: " ", case: "none" },
@@ -1173,14 +1173,14 @@ export const vokabularWohnen: VocabularyStructure = createVocabulary({
                     { text: " ", case: "none" },
                     { text: "auf", case: "dativ" },
                     { text: " ", case: "none" },
-                    { text: "dem", case: "dativ" },
+                    { text: "der", case: "dativ" },
                     { text: " ", case: "none" },
-                    { text: "Gras", case: "dativ" },
+                    { text: "Wiese", case: "dativ" },
                     { text: ".", case: "none" }
                 ],
-                exampleEnglish: "The children are playing on the grass.",
-                clozeParts: ["Die Kinder spielen auf dem ", "."],
-                clozeAnswers: ["Gras"]
+                exampleEnglish: "The children are playing in the meadow.",
+                clozeParts: ["Die Kinder spielen auf der ", "."],
+                clozeAnswers: ["Wiese"]
             } as Noun,
             {
                 id: createWordId("wohnen-garten-005"),
