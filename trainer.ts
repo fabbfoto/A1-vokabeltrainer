@@ -293,6 +293,13 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         } catch (e) {
             console.warn('⚠️ Fehler beim Speichern:', e);
         }
+        // Synchronisiere mit Firebase wenn angemeldet
+        if (window.authService?.isLoggedIn() && window.firebaseSyncService) {
+            console.log('💾 Speichere Fortschritt in Firebase...');
+            window.firebaseSyncService.saveProgress(state.progress.globalProgress).catch(error => {
+                console.error('❌ Firebase-Speicherung fehlgeschlagen:', error);
+            });
+        }
     }
 
     function loadMasteredWords(): void {

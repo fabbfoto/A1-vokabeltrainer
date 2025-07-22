@@ -2,7 +2,7 @@
 
 // Firebase-Imports aus der Konfiguration
 import { app, db } from '../infrastructure/auth/firebase-config';
-import { doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
 import type { Firestore, Unsubscribe, DocumentSnapshot, FirestoreError } from 'firebase/firestore';
 import type { AuthService } from './auth-service';
 import type { TrainerState, Progress, UserData } from '../core/types/trainer';
@@ -121,6 +121,25 @@ export class SyncService {
                 });
             }
         );
+
+        // Initiale Synchronisation beim Start
+        console.log('🔄 Starte initiale Synchronisation...');
+        (async () => {
+            const initialDoc = await getDoc(docRef);
+            if (initialDoc.exists()) {
+                const data = initialDoc.data() as ProgressData;
+                console.log('📥 Firebase-Daten gefunden, aktualisiere lokal...');
+                // Speichere Firebase-Daten lokal
+                if (data) {
+                    localStorage.setItem('trainer-progress', JSON.stringify(data));
+                    if (data.wordsToRepeatByMode) {
+                        localStorage.setItem('trainer-words-to-repeat', JSON.stringify(data.wordsToRepeatByMode));
+                    }
+                }
+            } else {
+                console.log('📤 Keine Firebase-Daten gefunden, lade lokale Daten hoch...');
+            }
+        })();
     }
 
     /**
