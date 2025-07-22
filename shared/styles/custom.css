@@ -162,3 +162,34 @@ input[type="text"]:focus {
 [class*="text-gray-"] {
   white-space: pre !important;
 }
+
+/* Fix für Audio-Button Position */
+#sentence-line-container {
+  position: relative;
+  overflow: visible;
+}
+
+#example-sentence-display {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+}
+
+#audio-sentence-button {
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+/* Stelle sicher, dass der Button immer sichtbar bleibt */
+@media (max-width: 768px) {
+  #sentence-line-container {
+    flex-wrap: nowrap;
+  }
+  
+  #example-sentence-display {
+    max-width: calc(100% - 4rem);
+  }
+}
