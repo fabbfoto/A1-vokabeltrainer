@@ -75,9 +75,21 @@ export function getExampleSentenceText(exampleSentence: ExampleSentencePart[] | 
   }
   
   if (isExampleSentencePartArray(exampleSentence)) {
-    const result = exampleSentence.map(part => part.text).join(' ');
-    console.log('[DEBUG] isExampleSentencePartArray true, result:', result);
-    return result;
+    // ÄNDERUNG: Verwende join('') statt join(' ') um keine zusätzlichen Leerzeichen einzufügen
+    let result = exampleSentence.map(part => part.text).join('');
+    
+    // NEU: Normalisiere mehrfache Leerzeichen zu einem einzelnen Leerzeichen
+    result = result.replace(/\s{2,}/g, ' ');
+    
+    // NEU: Entferne Leerzeichen vor Satzzeichen
+    result = result.replace(/\s+([.,;:!?]+)/g, '$1');
+    
+    // NEU: Stelle sicher, dass nach Satzzeichen ein Leerzeichen ist (außer am Ende)
+    result = result.replace(/([.,;:!?]+)(?=\S)/g, '$1 ');
+    
+    // ÄNDERUNG: Füge trim() hinzu um führende/nachfolgende Leerzeichen zu entfernen
+    console.log('[DEBUG] isExampleSentencePartArray true, result:', result.trim());
+    return result.trim();
   }
   
   if (isExampleSentenceString(exampleSentence)) {
