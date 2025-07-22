@@ -139,7 +139,7 @@ export class RankingUI {
                 <div>
                   <div class="font-semibold text-lg">${entry.userName}</div>
                   <div class="text-sm text-gray-600">
-                    ${entry.topic} • ${entry.testType === 'chaos' ? 'Chaos' : 'Strukturiert'} • 
+                    ${entry.topic} • Chaos-Test • 
                     ${new Date(entry.timestamp).toLocaleDateString('de-DE')}
                   </div>
                 </div>

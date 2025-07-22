@@ -235,6 +235,9 @@ export class RankingService {
       throw new Error('User nicht angemeldet');
     }
 
+    console.log('📊 Submitting test result for user:', this.authService.getUserEmail());
+    console.log('📊 Test details:', { testType: testVariant, score: testResult.score, accuracy: testResult.score?.accuracy });
+
     // NEU: Spezielle Behandlung für globale Ranglisten
     let finalScore = testResult.score.finalScore;
     let timeFactor: number | undefined;
@@ -303,7 +306,8 @@ export class RankingService {
     try {
       const q = query(
         collection(db, 'testResults'),
-        where('testType', '==', 'global-ranking'),
+        where('testType', '==', 'chaos'),
+        where('scope', '==', 'global'),
         orderBy('finalScore', 'desc'),
         limit(limitCount)
       );
