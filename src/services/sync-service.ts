@@ -73,7 +73,7 @@ export class SyncService {
      * Startet die Echtzeit-Synchronisation für den Fortschritt eines Benutzers.
      * @param userId - Die ID des angemeldeten Benutzers.
      */
-    public startRealtimeSync(userId: string): void {
+    public async startRealtimeSync(userId: string): Promise<void> {
         // Beende eine eventuell noch laufende, alte Synchronisation
         this.stopRealtimeSync(); 
         
@@ -124,7 +124,7 @@ export class SyncService {
 
         // Initiale Synchronisation beim Start
         console.log('🔄 Starte initiale Synchronisation...');
-        (async () => {
+        try {
             const initialDoc = await getDoc(docRef);
             if (initialDoc.exists()) {
                 const data = initialDoc.data() as ProgressData;
@@ -132,14 +132,13 @@ export class SyncService {
                 // Speichere Firebase-Daten lokal
                 if (data) {
                     localStorage.setItem('trainer-progress', JSON.stringify(data));
-                    if (data.wordsToRepeatByMode) {
-                        localStorage.setItem('trainer-words-to-repeat', JSON.stringify(data.wordsToRepeatByMode));
-                    }
                 }
             } else {
-                console.log('📤 Keine Firebase-Daten gefunden, lade lokale Daten hoch...');
+                console.log('📤 Keine Firebase-Daten gefunden');
             }
-        })();
+        } catch (error) {
+            console.error('❌ Fehler bei initialer Synchronisation:', error);
+        }
     }
 
     /**

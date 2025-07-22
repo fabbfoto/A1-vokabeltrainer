@@ -294,9 +294,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             console.warn('⚠️ Fehler beim Speichern:', e);
         }
         // Synchronisiere mit Firebase wenn angemeldet
-        if (window.authService?.isLoggedIn() && window.firebaseSyncService) {
+        if ((window as any).authService?.isLoggedIn() && (window as any).firebaseSyncService) {
             console.log('💾 Speichere Fortschritt in Firebase...');
-            window.firebaseSyncService.saveProgress(state.progress.globalProgress).catch(error => {
+            (window as any).firebaseSyncService.saveProgress(state.progress.globalProgress).catch((error: any) => {
                 console.error('❌ Firebase-Speicherung fehlgeschlagen:', error);
             });
         }
