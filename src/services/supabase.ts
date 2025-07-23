@@ -1,8 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // ERSETZE mit deinen Werten aus Supabase Dashboard
-const SUPABASE_URL = 'https://xxxxx.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIs...';
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://xxxxx.supabase.co';
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIs...';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -36,56 +36,60 @@ export const supabaseAuth = {
   }
 };
 
-// Progress-Funktionen
+// Progress-Funktionen mit robustem Error Handling
 export const supabaseProgress = {
   async save(progressData: any) {
-    const user = await supabaseAuth.getUser();
-    if (!user) {
-      console.warn('Nicht angemeldet, speichere nur lokal');
-      return;
-    }
+    try {
+      const user = await supabaseAuth.getUser();
+      if (!user) {
+        console.warn('Nicht angemeldet, speichere nur lokal');
+        return;
+      }
 
-    const { error } = await supabase
-      .from('progress')
-      .upsert({
-        user_id: user.id,
-        trainer_type: 'basis',
-        progress_data: progressData
-      })
-      .select();
+      const { error } = await supabase
+        .from('progress')
+        .upsert({
+          user_id: user.id,
+          trainer_type: 'basis',
+          progress_data: progressData
+        })
+        .select();
 
-    if (error) {
+      if (error) throw error;
+      console.log('✅ Progress in Supabase gespeichert');
+    } catch (error) {
       console.error('Fehler beim Speichern:', error);
-      throw error;
     }
-    console.log('✅ Progress in Supabase gespeichert');
   },
 
-  async load() {
-    const user = await supabaseAuth.getUser();
-    if (!user) return null;
+  async load(): Promise<any> {
+    try {
+      const user = await supabaseAuth.getUser();
+      if (!user) return null;
 
-    const { data, error } = await supabase
-      .from('progress')
-      .select('progress_data')
-      .eq('user_id', user.id)
-      .eq('trainer_type', 'basis')
-      .single();
+      const { data, error } = await supabase
+        .from('progress')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('trainer_type', 'basis')
+        .maybeSingle(); // Verwende maybeSingle statt single
 
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
+      if (error) {
+        console.error('Fehler beim Laden:', error);
+        return null;
+      }
+
+      // Type-sicherer Zugriff
+      const result = data as Record<string, any> | null;
+      return result?.progress_data || null;
+    } catch (error) {
       console.error('Fehler beim Laden:', error);
-      throw error;
+      return null;
     }
-
-    // TypeScript Fix: Explizite Prüfung und Type Assertion
-    if (!data) return null;
-    const progressData = (data as Record<string, any>).progress_data;
-    return progressData || null;
   },
 
-  // Realtime Updates (optional)
   subscribeToChanges(callback: (data: any) => void) {
-    supabase
+    const channel = supabase
       .channel('progress-changes')
       .on('postgres_changes', 
         { 
@@ -95,9 +99,16 @@ export const supabaseProgress = {
         }, 
         (payload) => {
           console.log('Progress Update:', payload);
-          callback(payload.new?.progress_data);
+          const newData = payload.new as Record<string, any>;
+          if (newData?.progress_data) {
+            callback(newData.progress_data);
+          }
         }
       )
       .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }
 }; 
