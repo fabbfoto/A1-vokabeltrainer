@@ -39,10 +39,7 @@ let currentUser: any = null;
 
 // ========== SUPABASE AUTH BUTTON ==========
 function createAuthButton() {
-  // Prüfe ob Container existiert
   let authContainer = document.getElementById('auth-button');
-  
-  // Falls nicht, erstelle einen
   if (!authContainer) {
     authContainer = document.createElement('div');
     authContainer.id = 'auth-button';
@@ -52,11 +49,84 @@ function createAuthButton() {
 
   const button = document.createElement('button');
   button.className = 'px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-lg';
-  
+  button.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"/></svg><span>Anmelden</span>`;
+
+  // Dropdown-Menü
+  const dropdown = document.createElement('div');
+  dropdown.className = 'hidden absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2';
+  dropdown.style.minWidth = '220px';
+
+  // Google-Login-Option
+  const googleBtn = document.createElement('button');
+  googleBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors';
+  googleBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M16.318 13.084A7.963 7.963 0 0018 10c0-.638-.07-1.257-.2-1.852H10v3.504h4.318z"/><path d="M10 18c2.16 0 3.97-.72 5.293-1.963l-2.56-2.09C11.97 14.633 11.05 15 10 15c-2.07 0-3.82-1.4-4.44-3.29H2.86v2.07A7.997 7.997 0 0010 18z"/><path d="M5.56 11.71A4.978 4.978 0 015 10c0-.34.03-.67.09-.99V6.94H2.86A7.997 7.997 0 002 10c0 1.26.29 2.45.8 3.5l2.76-1.79z"/><path d="M10 5c1.13 0 2.14.39 2.94 1.15l2.2-2.2C13.97 2.72 12.16 2 10 2 6.48 2 3.44 4.24 2.86 6.94l2.7 2.09C6.18 7.4 7.93 6 10 6z"/></svg><span>Mit Google anmelden</span>`;
+  googleBtn.onclick = () => {
+    supabaseAuth.signInWithGoogle().catch(error => {
+      console.error('Login-Fehler:', error);
+      alert('Login fehlgeschlagen. Bitte versuche es später erneut.');
+    });
+  };
+
+  // E-Mail-Login-Option
+  const emailBtn = document.createElement('button');
+  emailBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors';
+  emailBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm8 0a8 8 0 11-16 0 8 8 0 0116 0z"/></svg><span>Mit E-Mail anmelden</span>`;
+
+  // E-Mail-Login-Formular (wird beim Klick auf emailBtn angezeigt)
+  const emailForm = document.createElement('form');
+  emailForm.className = 'flex flex-col gap-2 mt-2';
+  emailForm.innerHTML = `
+    <input type="email" name="email" placeholder="E-Mail" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
+    <input type="password" name="password" placeholder="Passwort" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
+    <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1">Login</button>
+    <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-email-login">Abbrechen</button>
+  `;
+  emailForm.style.display = 'none';
+
+  emailForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(emailForm);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      alert('Login fehlgeschlagen: ' + error.message);
+    } else {
+      dropdown.classList.add('hidden');
+      emailForm.reset();
+    }
+  };
+  emailForm.querySelector('#cancel-email-login')!.addEventListener('click', () => {
+    emailForm.style.display = 'none';
+    emailBtn.style.display = '';
+  });
+
+  emailBtn.onclick = () => {
+    emailBtn.style.display = 'none';
+    emailForm.style.display = '';
+  };
+
+  dropdown.appendChild(googleBtn);
+  dropdown.appendChild(emailBtn);
+  dropdown.appendChild(emailForm);
+
+  // Dropdown-Logik
+  let dropdownOpen = false;
+  button.onclick = (e) => {
+    e.stopPropagation();
+    dropdownOpen = !dropdownOpen;
+    dropdown.className = dropdownOpen
+      ? 'absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2'
+      : 'hidden absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2';
+  };
+  document.addEventListener('click', () => {
+    dropdownOpen = false;
+    dropdown.className = 'hidden absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2';
+  });
+
   async function updateButton() {
     try {
       const user = await supabaseAuth.getUser();
-      
       if (user) {
         button.innerHTML = `
           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -68,35 +138,24 @@ function createAuthButton() {
         button.onclick = async () => {
           if (confirm('Wirklich abmelden?')) {
             await supabaseAuth.signOut();
-            location.reload(); // Seite neu laden nach Logout
+            location.reload();
           }
         };
+        dropdown.className = 'hidden';
       } else {
-        button.innerHTML = `
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"/>
-          </svg>
-          <span>Mit Google anmelden</span>
-        `;
-        button.onclick = () => {
-          supabaseAuth.signInWithGoogle().catch(error => {
-            console.error('Login-Fehler:', error);
-            alert('Login fehlgeschlagen. Bitte versuche es später erneut.');
-          });
-        };
+        button.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"/></svg><span>Anmelden</span>`;
       }
     } catch (error) {
       console.error('Auth-Button Update Fehler:', error);
       button.innerHTML = '<span>Login nicht verfügbar</span>';
     }
   }
-
-  // Initial und bei Auth-Änderungen updaten
   updateButton();
   supabaseAuth.onAuthStateChange(() => updateButton());
 
-  authContainer.innerHTML = ''; // Clear existing content
+  authContainer.innerHTML = '';
   authContainer.appendChild(button);
+  authContainer.appendChild(dropdown);
 }
 // ========== ENDE AUTH BUTTON ==========
 
