@@ -80,20 +80,14 @@ supabaseAuth.onAuthStateChange(async (user) => {
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // NEU: Firebase Auth initialisieren
-    let authService: AuthService;
     let authUI: AuthUI;
     let syncService: SyncService;
     let rankingService: RankingService;
 
     try {
         // Firebase Auth initialisieren
-        const { initializeAuth } = await import('./src/infrastructure/auth/index.js');
-        const services = initializeAuth('a1-vokabeltrainer', {
-            buttonContainerId: 'auth-button-container',
-            rankingContainerId: 'ranking-container'
-        });
+        const services = await import('./src/infrastructure/auth/index.js');
         
-        authService = services.authService;
         authUI = services.authUI;
         syncService = services.syncService;
         rankingService = services.rankingService;
@@ -105,24 +99,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         console.warn('⚠️ Firebase Auth nicht verfügbar, verwende Fallback:', error);
         
         // Fallback-Services mit Mock-Implementierungen
-        authService = {
-            auth: null,
-            currentUser: null,
-            firebaseUser: null,
-            convertFirebaseUser: () => null,
-            isLoggedIn: () => false,
-            login: async () => { throw new Error('Auth not available'); },
-            logout: async () => { throw new Error('Auth not available'); },
-            onAuthStateChanged: () => () => {},
-            getCurrentUser: () => null,
-            getUserId: () => null,
-            getUserEmail: () => null,
-            getDisplayName: () => null,
-            isEmailVerified: () => false,
-            loginWithGoogle: async () => { throw new Error('Auth not available'); },
-            getFirebaseUser: () => null
-        } as unknown as AuthService;
-        
         authUI = {
             show: () => { },
             hide: () => { },
