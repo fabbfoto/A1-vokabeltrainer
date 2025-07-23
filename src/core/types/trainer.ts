@@ -258,7 +258,7 @@ export interface TrainingState {
 // ========== PROGRESS STATE ==========
 export interface ProgressState {
     // Lernfortschritt
-    globalProgress: Record<string, Record<ModeId, Set<WordId>>>;
+    globalProgress: Record<string, Record<string, Set<WordId>>>;
     masteredWordsByMode: Record<ModeId, Set<WordId>>;
     wordsToRepeatByMode: Record<ModeId, Set<WordId>>;
     perfectRunsByMode: Record<ModeId, number>;
