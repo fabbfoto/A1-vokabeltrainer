@@ -1,13 +1,6 @@
 // shared/types/api.ts
 // Professional API and Firebase integration types
 
-import type { 
-  DocumentReference,
-  CollectionReference,
-  QuerySnapshot,
-  DocumentSnapshot
-} from 'firebase/firestore';
-
 import type { WordId, TopicId, SubTopicId } from './vocabulary';
 import type { Progress, TestScore, SessionStats, ModeId } from './trainer';
 
