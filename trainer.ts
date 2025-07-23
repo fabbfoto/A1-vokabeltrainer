@@ -323,8 +323,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             console.log('✅ Cloud-Progress gemerged und gespeichert');
             
             // UI aktualisieren um die geladenen Daten anzuzeigen
-            if (typeof ui?.showTrainingModes === 'function') {
-              ui.showTrainingModes(dom, state);
+            // Nur wenn bereits in Trainings-Ansicht
+            if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
+              if (typeof ui?.showTrainingModes === 'function') {
+                ui.showTrainingModes(dom, state);
+              }
             }
           }
         } catch (error) {
@@ -337,8 +340,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         saveProgress();
         
         // UI aktualisieren um den aktuellen lokalen Stand anzuzeigen
-        if (typeof ui?.showTrainingModes === 'function') {
-          ui.showTrainingModes(dom, state);
+        // Nur wenn bereits in Trainings-Ansicht
+        if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
+          if (typeof ui?.showTrainingModes === 'function') {
+            ui.showTrainingModes(dom, state);
+          }
         }
       }
     });
@@ -1716,7 +1722,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     window.addEventListener('firebase-auth-success', () => {
         console.log('🔐 Firebase-Auth erfolgreich, lade Progress neu...');
-        reloadProgressFromFirebase();
+        // Nur laden wenn bereits in Trainings-Ansicht
+        if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
+            reloadProgressFromFirebase();
+        }
     });
 
     console.log('🎉 Trainer erfolgreich initialisiert!');
