@@ -20,12 +20,9 @@ Die Anmeldung mit Google funktioniert nicht, obwohl die Supabase-Verbindung OK i
    - **Authorized redirect URIs hinzufügen:**
      ```
      https://ezjihsafleestqanpgdc.supabase.co/auth/v1/callback
-     http://localhost:5177/auth/v1/callback
-     http://localhost:5176/auth/v1/callback
-     http://localhost:5175/auth/v1/callback
-     http://localhost:5174/auth/v1/callback
-     http://localhost:5173/auth/v1/callback
+     https://deine-netlify-app.netlify.app/auth/v1/callback
      ```
+     **Wichtig:** Ersetze `deine-netlify-app` mit deiner tatsächlichen Netlify-Domain
 
 5. **Notiere dir:**
    - Client ID
@@ -66,16 +63,17 @@ Die Anmeldung mit Google funktioniert nicht, obwohl die Supabase-Verbindung OK i
 **Problem: "access_denied"**
 - **Lösung:** Stelle sicher, dass die Google+ API aktiviert ist
 
-### 5. Alternative: Lokale Entwicklung
+### 5. Netlify Domain finden
 
-Für lokale Entwicklung kannst du auch diese Redirect URIs hinzufügen:
+Um deine Netlify-Domain zu finden:
+1. Gehe zu deinem [Netlify Dashboard](https://app.netlify.com/)
+2. Wähle dein Projekt aus
+3. Schaue nach der Domain (z.B. `https://a1-vokabeltrainer.netlify.app`)
+4. Verwende diese Domain in den Redirect URIs
+
+**Beispiel:**
 ```
-http://localhost:3000/auth/v1/callback
-http://localhost:5173/auth/v1/callback
-http://localhost:5174/auth/v1/callback
-http://localhost:5175/auth/v1/callback
-http://localhost:5176/auth/v1/callback
-http://localhost:5177/auth/v1/callback
+https://a1-vokabeltrainer.netlify.app/auth/v1/callback
 ```
 
 ### 6. Verifikation
