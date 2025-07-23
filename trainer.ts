@@ -82,19 +82,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     try {
         // Firebase Auth initialisieren
-        const services = await import('./src/infrastructure/auth/index.js');
         
-        authUI = services.authUI;
-        syncService = services.syncService;
-        rankingService = services.rankingService;
-        
-        // Ranking-Service global verfügbar machen
-        (window as any).rankingService = rankingService;
-        
-    } catch (error) {
-        console.warn('⚠️ Firebase Auth nicht verfügbar, verwende Fallback:', error);
-        
-        // Fallback-Services mit Mock-Implementierungen
         authUI = {
             show: () => { },
             hide: () => { },
