@@ -127,6 +127,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             getTopUsers: async () => [],
             getWeeklyTopUsers: async () => []
         } as unknown as any; // RankingService wurde entfernt
+    } catch (error) {
+        console.error('Initialisierung von syncService/rankingService fehlgeschlagen:', error);
     }
 
     NavigationEvents.dispatchRoot();
@@ -897,7 +899,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 } else {
                     // Noch Fehler da - shuffle Fehlerliste
                     const errorWords = state.training.currentVocabularySet.filter(word => 
-                        state.training.currentMode && state.progress.wordsToRepeatByMode[state.training.currentMode]?.has(word.id)
+                        state.training.currentMode && state.progress.wordsToRepeatByMode[state.training.currentMode]?.has(word.id as WordId)
                     );
                     state.training.shuffledWordsForMode = shuffleArray(errorWords);
                 }
