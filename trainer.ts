@@ -462,8 +462,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     // Speichere gemergten Progress
                     saveProgress();
                     console.log('✅ Firebase-Progress erfolgreich gemerged');
-                    // UI aktualisieren
-                    ui.showTrainingModes(dom, state);
+                    // UI aktualisieren - aber nur wenn bereits in Trainings-Ansicht
+                    if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
+                        ui.showTrainingModes(dom, state);
+                    }
                 } catch (e) {
                     console.error('❌ Fehler beim Mergen des Firebase-Progress:', e);
                 }
@@ -1705,8 +1707,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     }
                 });
             });
-            // UI aktualisieren
-            ui.showTrainingModes(dom, state);
+            // UI aktualisieren - aber nur wenn bereits in Trainings-Ansicht
+            if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
+                ui.showTrainingModes(dom, state);
+            }
         }
     });
 
