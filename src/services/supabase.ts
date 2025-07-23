@@ -64,20 +64,17 @@ export const supabaseProgress = {
   async load() {
     const user = await supabaseAuth.getUser();
     if (!user) return null;
-
     const { data, error } = await supabase
       .from('progress')
       .select('progress_data')
       .eq('user_id', user.id)
       .eq('trainer_type', 'basis')
       .single();
-
-    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
+    if (error && error.code !== 'PGRST116') {
       console.error('Fehler beim Laden:', error);
       throw error;
     }
-
-    return data?.progress_data || null;
+    return (data && typeof data === 'object' && 'progress_data' in data) ? data.progress_data : null;
   },
 
   // Realtime Updates (optional)

@@ -1,11 +1,7 @@
 // shared/ui/ranking-ui.ts
 // UI-Komponenten für Ranking-System
 
-// Firebase-Imports für Runtime
-import { collection, addDoc, query, orderBy, limit, getDocs, where, Timestamp } from 'firebase/firestore';
-import type { QueryDocumentSnapshot, QuerySnapshot } from 'firebase/firestore';
-import type { RankingEntry, UserStats } from '../../services/ranking-service';
-import type { RankingService } from '../../services/ranking-service';
+// Entferne alle Importe und Verwendungen von firebase/firestore und RankingService
 
 export interface RankingUIConfig {
   containerId: string;
@@ -17,10 +13,10 @@ export interface RankingUIConfig {
 
 export class RankingUI {
   private container: HTMLElement | null = null;
-  private rankingService: RankingService;
+  private rankingService: any; // Removed RankingService import
   private config: RankingUIConfig;
 
-  constructor(rankingService: RankingService, config: RankingUIConfig) {
+  constructor(rankingService: any, config: RankingUIConfig) { // Removed RankingService import
     this.rankingService = rankingService;
     this.config = config;
     this.container = document.getElementById(config.containerId);
@@ -31,8 +27,10 @@ export class RankingUI {
     
     this.showLoading('Lade globale Rangliste...');
     try {
-      const response = await this.rankingService.getGlobalRankings(20);
-      this.renderRankings(response.entries, '🌍 Globale Rangliste', 'Alle Themen');
+      // Removed firebase imports and calls
+      // const response = await this.rankingService.getGlobalRankings(20);
+      // this.renderRankings(response.entries, '🌍 Globale Rangliste', 'Alle Themen');
+      this.showError('Globale Ranglisten-Funktion ist nicht mehr verfügbar.');
     } catch (error) {
       this.showError('Fehler beim Laden der globalen Rangliste');
     }
@@ -44,8 +42,10 @@ export class RankingUI {
     
     this.showLoading('🏆 Lade globale Ranglisten-Liste...');
     try {
-      const response = await this.rankingService.getGlobalRankingList(50);
-      this.renderGlobalRankings(response.entries, '🏆 Globale Ranglisten-Liste', 'Ausgewogene 20-Fragen-Tests');
+      // Removed firebase imports and calls
+      // const response = await this.rankingService.getGlobalRankingList(50);
+      // this.renderGlobalRankings(response.entries, '🏆 Globale Ranglisten-Liste', 'Ausgewogene 20-Fragen-Tests');
+      this.showError('Globale Ranglisten-Liste-Funktion ist nicht mehr verfügbar.');
     } catch (error) {
       this.showError('Fehler beim Laden der globalen Ranglisten-Liste');
     }
@@ -56,8 +56,10 @@ export class RankingUI {
     
     this.showLoading(`Lade Rangliste für ${topic}...`);
     try {
-      const response = await this.rankingService.getTopicRankings(topic, 20);
-      this.renderRankings(response.entries, `📚 Rangliste: ${topic}`, topic);
+      // Removed firebase imports and calls
+      // const response = await this.rankingService.getTopicRankings(topic, 20);
+      // this.renderRankings(response.entries, `📚 Rangliste: ${topic}`, topic);
+      this.showError(`Rangliste für ${topic} ist nicht mehr verfügbar.`);
     } catch (error) {
       this.showError(`Fehler beim Laden der Rangliste für ${topic}`);
     }
@@ -69,8 +71,10 @@ export class RankingUI {
     const typeName = testType === 'chaos' ? 'Chaos-Test' : 'Strukturierter Test';
     this.showLoading(`Lade Rangliste für ${typeName}...`);
     try {
-      const response = await this.rankingService.getTestTypeRankings(testType, 20);
-      this.renderRankings(response.entries, `🎯 Rangliste: ${typeName}`, testType);
+      // Removed firebase imports and calls
+      // const response = await this.rankingService.getTestTypeRankings(testType, 20);
+      // this.renderRankings(response.entries, `🎯 Rangliste: ${typeName}`, testType);
+      this.showError(`Rangliste für ${typeName} ist nicht mehr verfügbar.`);
     } catch (error) {
       this.showError(`Fehler beim Laden der Rangliste für ${typeName}`);
     }
@@ -81,8 +85,10 @@ export class RankingUI {
     
     this.showLoading('Lade wöchentliche Rangliste...');
     try {
-      const response = await this.rankingService.getWeeklyRankings();
-      this.renderRankings(response.entries, '📅 Wöchentliche Rangliste', 'Diese Woche');
+      // Removed firebase imports and calls
+      // const response = await this.rankingService.getWeeklyRankings();
+      // this.renderRankings(response.entries, '📅 Wöchentliche Rangliste', 'Diese Woche');
+      this.showError('Wöchentliche Rangliste ist nicht mehr verfügbar.');
     } catch (error) {
       this.showError('Fehler beim Laden der wöchentlichen Rangliste');
     }
@@ -92,22 +98,24 @@ export class RankingUI {
     if (!this.container) return;
     
     this.showLoading('Lade deine Statistiken...');
-    const user = this.rankingService['authService'].currentUser;
+    const user = this.rankingService['authService'].currentUser; // Assuming authService is part of rankingService
     if (!user) {
       this.showError('Du musst angemeldet sein, um deine Statistiken zu sehen.');
       return;
     }
     
-    const stats = await this.rankingService.getUserStats(user.uid);
-    if (!stats) {
-      this.showError('Keine Statistiken gefunden.');
-      return;
-    }
+    // Removed firebase imports and calls
+    // const stats = await this.rankingService.getUserStats(user.uid);
+    // if (!stats) {
+    //   this.showError('Keine Statistiken gefunden.');
+    //   return;
+    // }
     
-    this.renderUserStats(stats);
+    // this.renderUserStats(stats);
+    this.showError('Statistiken-Funktion ist nicht mehr verfügbar.');
   }
 
-  private renderRankings(rankings: RankingEntry[], title: string, subtitle: string): void {
+  private renderRankings(rankings: any[], title: string, subtitle: string): void { // Changed type to any[]
     if (!this.container) return;
 
     const modal = document.createElement('div');
@@ -175,7 +183,7 @@ export class RankingUI {
   }
 
   // NEU: Spezielle Render-Methode für globale Ranglisten
-  private renderGlobalRankings(rankings: RankingEntry[], title: string, subtitle: string): void {
+  private renderGlobalRankings(rankings: any[], title: string, subtitle: string): void { // Changed type to any[]
     if (!this.container) return;
 
     const modal = document.createElement('div');
@@ -268,7 +276,7 @@ export class RankingUI {
     document.body.appendChild(modal);
   }
 
-  private renderUserStats(stats: UserStats): void {
+  private renderUserStats(stats: any): void { // Changed type to any
     if (!this.container) return;
 
     const modal = document.createElement('div');

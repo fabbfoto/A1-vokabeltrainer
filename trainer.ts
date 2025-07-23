@@ -33,10 +33,6 @@ import { showTestResultModal } from './src/ui/components/test-result-modal';
 import { ModeManager } from './src/services/mode-manager';
 import { ErrorCounterManager } from './src/services/error-counter-manager';
 // import { validateVocabulary } from './validate-vocabulary'; // TEMPORÄR DEAKTIVIERT
-import type { AuthService } from './src/services/auth-service';
-import type { SyncService } from './src/services/sync-service';
-import type { RankingService } from './src/services/ranking-service';
-import { convertProgressToFirestore } from './src/core/types/api';
 import { supabase, supabaseAuth, supabaseProgress } from './src/services/supabase';
 import { createAuthButton } from './src/ui/components/supabase-auth-button';
 
@@ -81,8 +77,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // NEU: Firebase Auth initialisieren
     let authUI: AuthUI;
-    let syncService: SyncService;
-    let rankingService: RankingService;
+    let syncService: any; // SyncService wurde entfernt
+    let rankingService: any; // RankingService wurde entfernt
 
     try {
         // Firebase Auth initialisieren
@@ -126,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             getSyncStatus: () => 'disconnected',
             isConnected: () => false,
             getLastSyncTime: () => null
-        } as unknown as SyncService;
+        } as unknown as any; // SyncService wurde entfernt
         
         rankingService = {
             authService: null,
@@ -142,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             getCurrentUserRanking: async () => null,
             getTopUsers: async () => [],
             getWeeklyTopUsers: async () => []
-        } as unknown as RankingService;
+        } as unknown as any; // RankingService wurde entfernt
     }
 
     NavigationEvents.dispatchRoot();

@@ -1,7 +1,6 @@
 // shared/types/api.ts
 // Professional API and Firebase integration types
 
-import { Timestamp } from 'firebase/firestore';
 import type { 
   DocumentReference,
   CollectionReference,
@@ -142,8 +141,8 @@ export interface FirestoreUser {
   email: string;
   displayName?: string;
   photoURL?: string;
-  createdAt: Timestamp;
-  lastLogin: Timestamp;
+  createdAt: Date;
+  lastLogin: Date;
   preferences: UserPreferences;
   subscription: UserSubscription;
 }
@@ -155,7 +154,7 @@ export interface FirestoreProgress {
       [modeId: string]: string[]; // WordId arrays for Firestore
     };
   };
-  lastUpdated: Timestamp;
+  lastUpdated: Date;
 }
 
 export interface FirestoreTestScore {
@@ -164,7 +163,7 @@ export interface FirestoreTestScore {
   correct: number;
   total: number;
   accuracy: number;
-  timestamp: Timestamp;
+  timestamp: Date;
   testType: string;
   topicId?: string;
   subTopicId?: string;
@@ -175,8 +174,8 @@ export interface FirestoreTestScore {
 export interface FirestoreSessionStats {
   userId: string;
   sessionId: string;
-  startTime: Timestamp;
-  endTime?: Timestamp;
+  startTime: Date;
+  endTime?: Date;
   mode: string;
   topicId?: string;
   subTopicId?: string;
@@ -312,12 +311,12 @@ export function createDocumentId(id: string): DocumentId {
   return id as DocumentId;
 }
 
-export function toFirestoreTimestamp(date: Date): Timestamp {
-  return Timestamp.fromDate(date);
+export function toFirestoreTimestamp(date: Date): Date {
+  return date;
 }
 
-export function fromFirestoreTimestamp(timestamp: Timestamp): Date {
-  return timestamp.toDate();
+export function fromFirestoreTimestamp(timestamp: Date): Date {
+  return timestamp;
 }
 
 // Hilfsfunktionen für Set/Array-Konvertierung
