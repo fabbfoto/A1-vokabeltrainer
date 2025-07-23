@@ -225,7 +225,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     function loadProgress(): void {
         // Versuche zuerst trainer-progress
         let saved = localStorage.getItem('trainer-progress');
-        
         // Falls nicht vorhanden, versuche Firebase-Key
         if (!saved) {
             const firebaseSaved = localStorage.getItem('a1ThemenProgress');
@@ -233,43 +232,33 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 try {
                     const firebaseData = JSON.parse(firebaseSaved);
                     const converted: Record<string, Record<string, string[]>> = {};
-                    
-                    // Konvertiere Firebase 3-Ebenen zu lokalem 2-Ebenen Format
                     for (const hauptthema in firebaseData) {
                         for (const unterthema in firebaseData[hauptthema]) {
                             const key = `${hauptthema}|${unterthema}`;
                             converted[key] = firebaseData[hauptthema][unterthema];
                         }
                     }
-                    
                     saved = JSON.stringify(converted);
                 } catch (e) {
                     console.error('❌ Fehler bei Firebase-Konvertierung:', e);
                 }
             }
         }
-        
         // Lade Progress und stelle SICHER dass es Sets sind
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
                 state.progress.globalProgress = {};
-                
-                // WICHTIG: Konvertiere IMMER zu Sets
                 Object.keys(parsed).forEach(topicKey => {
                     state.progress.globalProgress[topicKey] = {};
-                    
                     if (typeof parsed[topicKey] === 'object' && parsed[topicKey] !== null) {
                         Object.keys(parsed[topicKey]).forEach(mode => {
                             const data = parsed[topicKey][mode];
-                            
-                            // Stelle sicher, dass es ein Set wird
                             if (Array.isArray(data)) {
                                 state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
                             } else if (data instanceof Set) {
                                 state.progress.globalProgress[topicKey][mode as ModeId] = data;
                             } else {
-                                // Warnung entfernt: Unerwarteter Datentyp
                                 state.progress.globalProgress[topicKey][mode as ModeId] = new Set();
                             }
                         });
@@ -277,7 +266,31 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         console.warn(`⚠️ Ungültige Daten für ${topicKey}`);
                     }
                 });
-                
+                // Danach: Falls firebaseData existiert, mergen
+                const firebaseSaved = localStorage.getItem('a1ThemenProgress');
+                if (firebaseSaved) {
+                    try {
+                        const firebaseData = JSON.parse(firebaseSaved);
+                        // Merge firebaseData in state.progress.globalProgress
+                        for (const hauptthema in firebaseData) {
+                            for (const unterthema in firebaseData[hauptthema]) {
+                                const key = `${hauptthema}|${unterthema}`;
+                                if (!state.progress.globalProgress[key]) {
+                                    state.progress.globalProgress[key] = {};
+                                }
+                                const modes = firebaseData[hauptthema][unterthema];
+                                Object.keys(modes).forEach(mode => {
+                                    const data = modes[mode];
+                                    if (Array.isArray(data)) {
+                                        state.progress.globalProgress[key][mode as ModeId] = new Set(data);
+                                    }
+                                });
+                            }
+                        }
+                    } catch (e) {
+                        console.error('❌ Fehler beim Mergen von Firebase-Progress:', e);
+                    }
+                }
             } catch (e) {
                 console.error('❌ Fehler beim Laden des Progress:', e);
                 state.progress.globalProgress = {};

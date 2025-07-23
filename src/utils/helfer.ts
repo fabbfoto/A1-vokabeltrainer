@@ -1,9 +1,11 @@
 //import { Word } from '../core/types/index';
+import { saveProgress } from '../../trainer';
 
 // Window-Erweiterung für currentAudio
 declare global {
   interface Window {
     currentAudio?: HTMLAudioElement;
+    saveProgress: () => void;
   }
 }
 
@@ -83,6 +85,9 @@ export function shuffleArray<T>(array: T[]): T[] {
 }
 
 export function setUIMode(modeId: string): void {
+  if (typeof window.saveProgress === 'function') {
+    window.saveProgress(); // Deine Save-Funktion
+  }
   
   const uiModes = document.querySelectorAll<HTMLElement>('.ui-mode');
 

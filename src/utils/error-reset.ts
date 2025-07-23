@@ -12,36 +12,31 @@ import type { ModeId } from '../core/types/trainer';
  * @param saveWordsToRepeat - Funktion zum Speichern der Words-to-Repeat
  */
 export function resetErrorCountsForNewExercise(
-    state: { training: { correctInCurrentRound: number; attemptedInCurrentRound: number }; progress: { wordsToRepeatByMode: Record<string, Set<string>> } }, 
+    state: { training: { correctInCurrentRound: number; attemptedInCurrentRound: number; isTestModeActive?: boolean }; progress: { wordsToRepeatByMode: Record<string, Set<string>> } }, 
     modeId: ModeId, 
     saveWordsToRepeat: () => void
 ): void {
-
-    
-    // 1. Aktuelle Übungszähler zurücksetzen
-    state.training.correctInCurrentRound = 0;
-    state.training.attemptedInCurrentRound = 0;
-    
-    // 2. Fehlerzähler für diesen Modus zurücksetzen
-    if (state.progress.wordsToRepeatByMode[modeId]) {
-        state.progress.wordsToRepeatByMode[modeId] = new Set();
-        saveWordsToRepeat();
-
-    }
-    
-    // 3. localStorage direkt löschen (da Firebase-Services keine saveWordsToRepeat haben)
-    localStorage.removeItem('trainer-words-to-repeat');
-
-    
-    // 4. Firebase Progress zurücksetzen (falls verfügbar)
-    if (window.firebaseSyncService) {
-        try {
-            // Leeren Progress an Firebase senden
-            const emptyProgress = {};
-            window.firebaseSyncService.saveProgress(emptyProgress);
-    
-        } catch (error) {
-            console.warn('⚠️ Fehler beim Firebase-Reset:', error);
+    // Nur für Tests resetten
+    if (state.training.isTestModeActive) {
+        // 1. Aktuelle Übungszähler zurücksetzen
+        state.training.correctInCurrentRound = 0;
+        state.training.attemptedInCurrentRound = 0;
+        // 2. Fehlerzähler für diesen Modus zurücksetzen
+        if (state.progress.wordsToRepeatByMode[modeId]) {
+            state.progress.wordsToRepeatByMode[modeId] = new Set();
+            saveWordsToRepeat();
+        }
+        // 3. localStorage direkt löschen (da Firebase-Services keine saveWordsToRepeat haben)
+        localStorage.removeItem('trainer-words-to-repeat');
+        // 4. Firebase Progress zurücksetzen (falls verfügbar)
+        if (window.firebaseSyncService) {
+            try {
+                // Leeren Progress an Firebase senden
+                const emptyProgress = {};
+                window.firebaseSyncService.saveProgress(emptyProgress);
+            } catch (error) {
+                console.warn('⚠️ Fehler beim Firebase-Reset:', error);
+            }
         }
     }
 }
