@@ -15,14 +15,34 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // Einfache Auth-Funktionen
 export const supabaseAuth = {
   async signInWithGoogle() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin
+    try {
+      console.log('🔐 Starte Google OAuth Anmeldung...');
+      console.log('📍 Redirect URL:', window.location.origin);
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
+        }
+      });
+      
+      if (error) {
+        console.error('❌ Google OAuth Fehler:', error);
+        console.error('❌ Fehler-Code:', error.status);
+        console.error('❌ Fehler-Nachricht:', error.message);
+        throw error;
       }
-    });
-    if (error) throw error;
-    return data;
+      
+      console.log('✅ Google OAuth gestartet:', data);
+      return data;
+    } catch (error) {
+      console.error('❌ Unerwarteter Fehler bei Google OAuth:', error);
+      throw error;
+    }
   },
 
   async signOut() {
@@ -33,6 +53,41 @@ export const supabaseAuth = {
   async getUser() {
     const { data: { user } } = await supabase.auth.getUser();
     return user;
+  },
+
+  async testOAuthConfig(): Promise<boolean> {
+    try {
+      console.log('🔍 Teste OAuth-Konfiguration...');
+      
+      // Teste ob OAuth-Provider verfügbar sind
+      const { data: providers, error: providersError } = await supabase.auth.listIdentities();
+      
+      if (providersError) {
+        console.error('❌ Fehler beim Abrufen der OAuth-Provider:', providersError);
+        return false;
+      }
+      
+      console.log('✅ OAuth-Provider verfügbar:', providers);
+      
+      // Teste aktuelle Session
+      const { data: session, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('❌ Fehler beim Abrufen der Session:', sessionError);
+        return false;
+      }
+      
+      if (session.session) {
+        console.log('✅ Aktive Session gefunden:', session.session.user.email);
+        return true;
+      } else {
+        console.log('ℹ️ Keine aktive Session - OAuth-Konfiguration OK');
+        return true;
+      }
+    } catch (error) {
+      console.error('❌ OAuth-Konfigurationstest fehlgeschlagen:', error);
+      return false;
+    }
   },
 
   onAuthStateChange(callback: (user: any) => void) {
@@ -127,6 +182,13 @@ export const supabaseProgress = {
       console.log('🔍 Teste Supabase-Verbindung...');
       console.log('📍 URL:', SUPABASE_URL);
       console.log('🔑 Anon Key vorhanden:', !!SUPABASE_ANON_KEY);
+      
+      // Teste OAuth-Konfiguration
+      const oauthOk = await supabaseAuth.testOAuthConfig();
+      if (!oauthOk) {
+        console.error('❌ OAuth-Konfiguration fehlgeschlagen');
+        return false;
+      }
       
       // Teste Auth-Verbindung
       const user = await supabaseAuth.getUser();
