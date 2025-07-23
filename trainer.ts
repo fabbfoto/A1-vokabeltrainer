@@ -224,7 +224,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     function loadProgress(): void {
-        // Versuche zuerst trainer-progress
+        console.log('📂 Lade Progress...');
+        // Versuche zuerst trainer-progress aus localStorage
         let saved = localStorage.getItem('trainer-progress');
         // Falls nicht vorhanden, versuche Firebase-Key
         if (!saved) {
@@ -267,31 +268,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         console.warn(`⚠️ Ungültige Daten für ${topicKey}`);
                     }
                 });
-                // Danach: Falls firebaseData existiert, mergen
-                const firebaseSaved = localStorage.getItem('a1ThemenProgress');
-                if (firebaseSaved) {
-                    try {
-                        const firebaseData = JSON.parse(firebaseSaved);
-                        // Merge firebaseData in state.progress.globalProgress
-                        for (const hauptthema in firebaseData) {
-                            for (const unterthema in firebaseData[hauptthema]) {
-                                const key = `${hauptthema}|${unterthema}`;
-                                if (!state.progress.globalProgress[key]) {
-                                    state.progress.globalProgress[key] = {};
-                                }
-                                const modes = firebaseData[hauptthema][unterthema];
-                                Object.keys(modes).forEach(mode => {
-                                    const data = modes[mode];
-                                    if (Array.isArray(data)) {
-                                        state.progress.globalProgress[key][mode as ModeId] = new Set(data);
-                                    }
-                                });
-                            }
-                        }
-                    } catch (e) {
-                        console.error('❌ Fehler beim Mergen von Firebase-Progress:', e);
-                    }
-                }
+                console.log('✅ Progress geladen:', Object.keys(state.progress.globalProgress).length, 'Themen');
             } catch (e) {
                 console.error('❌ Fehler beim Laden des Progress:', e);
                 state.progress.globalProgress = {};
@@ -299,6 +276,44 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         } else {
             state.progress.globalProgress = {};
         }
+    }
+
+    function reloadProgressFromFirebase(): void {
+        console.log('🔄 Versuche Progress von Firebase neu zu laden...');
+        // Warte kurz, bis Firebase bereit ist
+        setTimeout(() => {
+            const firebaseSaved = localStorage.getItem('trainer-progress-firebase');
+            if (firebaseSaved) {
+                try {
+                    const parsed = JSON.parse(firebaseSaved);
+                    console.log('📥 Firebase-Progress gefunden, merge mit lokalem State...');
+                    // Merge Firebase-Daten mit existierendem State
+                    Object.keys(parsed).forEach(topicKey => {
+                        if (!state.progress.globalProgress[topicKey]) {
+                            state.progress.globalProgress[topicKey] = {};
+                        }
+                        if (typeof parsed[topicKey] === 'object' && parsed[topicKey] !== null) {
+                            Object.keys(parsed[topicKey]).forEach(mode => {
+                                const data = parsed[topicKey][mode];
+                                if (Array.isArray(data) && data.length > 0) {
+                                    // Merge Arrays - behalte alle einzigartigen Werte
+                                    const existingSet = state.progress.globalProgress[topicKey][mode as ModeId] || new Set();
+                                    const newSet = new Set([...existingSet, ...data]);
+                                    state.progress.globalProgress[topicKey][mode as ModeId] = newSet;
+                                }
+                            });
+                        }
+                    });
+                    // Speichere gemergten Progress
+                    saveProgress();
+                    console.log('✅ Firebase-Progress erfolgreich gemerged');
+                    // UI aktualisieren
+                    updateUI();
+                } catch (e) {
+                    console.error('❌ Fehler beim Mergen des Firebase-Progress:', e);
+                }
+            }
+        }, 2000); // 2 Sekunden warten
     }
 
     function saveProgress(): void {
@@ -1490,6 +1505,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             // UI aktualisieren
             ui.showTrainingModes(dom, state);
         }
+    });
+
+    window.addEventListener('firebase-auth-success', () => {
+        console.log('🔐 Firebase-Auth erfolgreich, lade Progress neu...');
+        reloadProgressFromFirebase();
     });
 
     console.log('🎉 Trainer erfolgreich initialisiert!');

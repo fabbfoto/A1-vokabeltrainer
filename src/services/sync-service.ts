@@ -87,10 +87,8 @@ export class SyncService {
                     const data = doc.data() as ProgressData;
                     if (data.globalProgress) {
                         console.log('📥 Synchronisiere Firebase-Daten zu localStorage...');
-                        localStorage.setItem('trainer-progress', JSON.stringify(data.globalProgress));
-                        window.dispatchEvent(new CustomEvent('firebase-progress-updated', { 
-                            detail: { progress: data.globalProgress } 
-                        }));
+                        localStorage.setItem('trainer-progress-firebase', JSON.stringify(data.globalProgress));
+                        window.dispatchEvent(new Event('firebase-auth-success'));
                     }
                     // Baue ein UserData-kompatibles Objekt für das Event
                     this.notifyListeners({
@@ -134,7 +132,8 @@ export class SyncService {
                 console.log('📥 Firebase-Daten gefunden, aktualisiere lokal...');
                 // Speichere Firebase-Daten lokal
                 if (data) {
-                    localStorage.setItem('trainer-progress', JSON.stringify(data));
+                    localStorage.setItem('trainer-progress-firebase', JSON.stringify(data.globalProgress || data));
+                    window.dispatchEvent(new Event('firebase-auth-success'));
                 }
             } else {
                 console.log('📤 Keine Firebase-Daten gefunden');
@@ -171,11 +170,24 @@ export class SyncService {
         const docRef = doc(this.db, docPath);
         
         // progressData ist jetzt ein Set-basiertes Objekt, muss für Firestore konvertiert werden
+        // Konvertiere Sets zu Arrays für Firebase
+        const convertedProgress: any = {};
+        Object.keys(progressData).forEach(topicKey => {
+            convertedProgress[topicKey] = {};
+            Object.keys(progressData[topicKey]).forEach(mode => {
+                const data = progressData[topicKey][mode];
+                if (data instanceof Set) {
+                    convertedProgress[topicKey][mode] = Array.from(data);
+                } else if (Array.isArray(data)) {
+                    convertedProgress[topicKey][mode] = data;
+                }
+            });
+        });
+
         const dataToSave: ProgressData = {
-            globalProgress: convertProgressToFirestore(progressData),
+            globalProgress: convertedProgress,
             lastSync: new Date(),
-            version: '1.0',
-            trainerId: this.trainerType
+            version: '1.0'
         };
         
         try {
