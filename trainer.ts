@@ -34,7 +34,6 @@ import { ModeManager } from './src/services/mode-manager';
 import { ErrorCounterManager } from './src/services/error-counter-manager';
 // import { validateVocabulary } from './validate-vocabulary'; // TEMPORÄR DEAKTIVIERT
 import { supabase, supabaseAuth, supabaseProgress } from './src/services/supabase';
-import { createAuthButton } from './src/ui/components/supabase-auth-button';
 
 let currentUser: any = null;
 
