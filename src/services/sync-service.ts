@@ -88,6 +88,13 @@ export class SyncService {
                 
                 if (doc.exists()) {
                     const data = doc.data() as ProgressData;
+                    if (data.globalProgress) {
+                        console.log('📥 Synchronisiere Firebase-Daten zu localStorage...');
+                        localStorage.setItem('trainer-progress', JSON.stringify(data.globalProgress));
+                        window.dispatchEvent(new CustomEvent('firebase-progress-updated', { 
+                            detail: { progress: data.globalProgress } 
+                        }));
+                    }
                     const remoteUpdate: RemoteUpdateData = {
                         progress: data as UserData,
                         lastModified: data.lastSync ? new Date(data.lastSync) : new Date(),
@@ -168,9 +175,10 @@ export class SyncService {
         const docRef = doc(this.db, docPath);
         
         const dataToSave: ProgressData = {
-            ...progressData,
+            globalProgress: progressData,
             lastSync: new Date(),
-            version: '1.0'
+            version: '1.0',
+            trainerId: this.trainerType
         };
         
         try {

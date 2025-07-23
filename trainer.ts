@@ -309,7 +309,20 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Synchronisiere mit Firebase wenn angemeldet
         if ((window as any).authService?.isLoggedIn() && (window as any).firebaseSyncService) {
             console.log('💾 Speichere Fortschritt in Firebase...');
-            (window as any).firebaseSyncService.saveProgress(state.progress.globalProgress).catch((error: any) => {
+            // Konvertiere Sets zu Arrays für Firebase
+            const progressToSave: any = {};
+            Object.keys(state.progress.globalProgress).forEach(topicKey => {
+                progressToSave[topicKey] = {};
+                Object.keys(state.progress.globalProgress[topicKey]).forEach(mode => {
+                    const data = state.progress.globalProgress[topicKey][mode];
+                    if (data instanceof Set) {
+                        progressToSave[topicKey][mode] = Array.from(data);
+                    } else if (Array.isArray(data)) {
+                        progressToSave[topicKey][mode] = data;
+                    }
+                });
+            });
+            (window as any).firebaseSyncService.saveProgress(progressToSave).catch((error: any) => {
                 console.error('❌ Firebase-Speicherung fehlgeschlagen:', error);
             });
         }
@@ -1468,6 +1481,28 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     (window as unknown as { initUmlautButtons: () => void }).initUmlautButtons = function() {
         // Die TypeScript-Implementierung in ui/umlaut-buttons.ts übernimmt jetzt alles
     };
+
+    // Firebase Progress Event Listener
+    window.addEventListener('firebase-progress-updated', (event: any) => {
+        console.log('🔄 Firebase-Progress-Update empfangen');
+        if (event.detail && event.detail.progress) {
+            // Merge Firebase-Daten mit lokalem State
+            const firebaseProgress = event.detail.progress;
+            Object.keys(firebaseProgress).forEach(topicKey => {
+                if (!state.progress.globalProgress[topicKey]) {
+                    state.progress.globalProgress[topicKey] = {};
+                }
+                Object.keys(firebaseProgress[topicKey]).forEach(mode => {
+                    const data = firebaseProgress[topicKey][mode];
+                    if (Array.isArray(data)) {
+                        state.progress.globalProgress[topicKey][mode] = new Set(data);
+                    }
+                });
+            });
+            // UI aktualisieren
+            updateUI();
+        }
+    });
 
     console.log('🎉 Trainer erfolgreich initialisiert!');
     console.log('📊 Verfügbare Themen:', Object.keys(vokabular));

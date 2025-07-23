@@ -345,3 +345,11 @@ export function convertProgressFromFirestore(firestoreProgress: FirestoreProgres
   
   return progress;
 }
+
+// Ergänzung für Fortschritt-Synchronisation mit Firebase
+export interface ProgressData extends Partial<UserData> {
+    lastSync?: Date;
+    version?: string;
+    globalProgress?: Record<string, Record<string, string[]>>;
+    trainerId?: string;
+}

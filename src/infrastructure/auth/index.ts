@@ -3,6 +3,8 @@
 import { getAuth, onIdTokenChanged } from 'firebase/auth';
 import type { User } from 'firebase/auth';
 import { app } from './firebase-config';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from './firebase-config';
 
 // KORRIGIERTE PFADE: Die Imports zeigen jetzt auf die Ordner 'services' und 'ui'.
 import { AuthService } from '../../services/auth-service';
@@ -45,32 +47,45 @@ export function initializeAuth(trainerId: string, uiConfig: UIConfig): AuthServi
     onIdTokenChanged(auth, async (user: User | null) => {
         if (user) {
             console.log('🔐 Benutzer angemeldet:', user.email);
-            
             // 1. Starte Echtzeit-Synchronisation
             syncService.startRealtimeSync(user.uid);
-            
             // 2. Lade lokale Daten und synchronisiere sie mit Firebase
             try {
-                // Warte kurz, damit Firebase bereit ist
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Hole alle lokalen Fortschrittsdaten
-                const localProgress = localStorage.getItem('trainer-progress');
-                
-                if (localProgress) {
-                    console.log('📤 Synchronisiere lokalen Fortschritt nach Firebase...');
-                    const progressData = JSON.parse(localProgress);
-                    await syncService.saveProgress(progressData);
-                    console.log('✅ Fortschritt synchronisiert');
+                // Warte, bis Firebase bereit ist
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                // Lade zuerst Firebase-Daten
+                console.log('📥 Lade Fortschritt von Firebase...');
+                try {
+                    const docPath = `users/${user.uid}/progress/${trainerId}`;
+                    const docRef = doc(db, docPath);
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        const firebaseData = docSnap.data();
+                        if (firebaseData.globalProgress) {
+                            console.log('✅ Firebase-Daten gefunden, synchronisiere lokal...');
+                            localStorage.setItem('trainer-progress', JSON.stringify(firebaseData.globalProgress));
+                            // Trigger UI-Update
+                            window.dispatchEvent(new CustomEvent('firebase-progress-updated', { 
+                                detail: { progress: firebaseData.globalProgress } 
+                            }));
+                        }
+                    } else {
+                        // Keine Firebase-Daten, lade lokale Daten hoch
+                        const localProgress = localStorage.getItem('trainer-progress');
+                        if (localProgress) {
+                            console.log('📤 Keine Firebase-Daten gefunden, lade lokale Daten hoch...');
+                            const progressData = JSON.parse(localProgress);
+                            await syncService.saveProgress(progressData);
+                        }
+                    }
+                } catch (error) {
+                    console.error('❌ Fehler beim Laden der Firebase-Daten:', error);
                 }
-                
             } catch (error) {
                 console.error('❌ Fehler bei der Synchronisation:', error);
             }
-            
             // 3. UI aktualisieren
             authUI.updateUIAfterLogin({ uid: user.uid, email: user.email, displayName: user.displayName });
-            
         } else {
             console.log('🔓 Benutzer abgemeldet');
             syncService.stopRealtimeSync();
