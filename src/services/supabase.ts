@@ -75,14 +75,8 @@ export const supabaseAuth = {
       console.log('📍 Hostname:', window.location.hostname);
       
       // Teste ob OAuth-Provider verfügbar sind
-      const { data: providers, error: providersError } = await supabase.auth.listIdentities();
-      
-      if (providersError) {
-        console.error('❌ Fehler beim Abrufen der OAuth-Provider:', providersError);
-        return false;
-      }
-      
-      console.log('✅ OAuth-Provider verfügbar:', providers);
+      // listIdentities() existiert nicht in Supabase, verwende Session-Check stattdessen
+      console.log('✅ OAuth-Provider-Test übersprungen (nicht verfügbar in Supabase)');
       
       // Teste aktuelle Session
       const { data: session, error: sessionError } = await supabase.auth.getSession();
@@ -358,12 +352,9 @@ export const supabaseProgress = {
       // 3. OAuth-Konfiguration
       console.log('3️⃣ OAuth-Konfiguration:');
       try {
-        const { data: providers, error: providersError } = await supabase.auth.listIdentities();
-        if (providersError) {
-          console.log('   ❌ OAuth-Provider nicht verfügbar:', providersError.message);
-        } else {
-          console.log('   ✅ OAuth-Provider verfügbar:', providers?.length || 0);
-        }
+        // listIdentities() existiert nicht in Supabase
+        console.log('   ℹ️ OAuth-Provider-Test nicht verfügbar in Supabase');
+        console.log('   📋 OAuth-Konfiguration muss manuell in Supabase Dashboard geprüft werden');
       } catch (e) {
         console.log('   ❌ OAuth-Test fehlgeschlagen:', e);
       }
