@@ -25,7 +25,6 @@ import { vokabular } from './vokabular';
 import { shuffleArray } from './src/utils/helfer';
 import * as uiModes from './src/utils/ui-modes';
 import * as ui from './src/ui/views/index';
-import { initializeAuth } from './src/infrastructure/auth/index';
 import { NavigationEvents } from './src/core/events/navigation-events';
 import { updateErrorCounts } from './src/ui/views/statistics';
 import { generateTestQuestions, TestGenerationResult } from './src/utils/test-generator';
@@ -38,8 +37,45 @@ import type { AuthService } from './src/services/auth-service';
 import type { SyncService } from './src/services/sync-service';
 import type { RankingService } from './src/services/ranking-service';
 import { convertProgressToFirestore } from './src/core/types/api';
+import { supabase, supabaseAuth, supabaseProgress } from './src/services/supabase';
+import { createAuthButton } from './src/ui/components/supabase-auth-button';
 
 let globalAuthUI: AuthUI | null = null;
+let currentUser: any = null;
+
+// Auth State überwachen
+supabaseAuth.onAuthStateChange(async (user) => {
+  currentUser = user;
+  if (user) {
+    console.log('✅ Angemeldet als:', user.email);
+    // Progress von Supabase laden
+    try {
+      const cloudProgress = await supabaseProgress.load();
+      if (cloudProgress) {
+        console.log('☁️ Lade Progress aus der Cloud...');
+        // Konvertiere Arrays zurück zu Sets
+        Object.keys(cloudProgress).forEach(topicKey => {
+          if (!state.progress.globalProgress[topicKey]) {
+            state.progress.globalProgress[topicKey] = {};
+          }
+          Object.keys(cloudProgress[topicKey]).forEach(mode => {
+            const data = cloudProgress[topicKey][mode];
+            if (Array.isArray(data)) {
+              state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
+            }
+          });
+        });
+        // UI updaten
+        ui.showTrainingModes(dom, state);
+        console.log('✅ Cloud-Progress geladen');
+      }
+    } catch (error) {
+      console.error('Fehler beim Laden:', error);
+    }
+  } else {
+    console.log('🚪 Ausgeloggt');
+  }
+});
 
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
@@ -318,16 +354,30 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     function saveProgress(): void {
         try {
+            // Immer lokal speichern
             localStorage.setItem('trainer-progress', JSON.stringify(state.progress.globalProgress));
+            // Wenn angemeldet, auch in Supabase speichern
+            if (currentUser) {
+                // Konvertiere Sets zu Arrays für JSON
+                const progressToSave: any = {};
+                Object.keys(state.progress.globalProgress).forEach(topicKey => {
+                    progressToSave[topicKey] = {};
+                    Object.keys(state.progress.globalProgress[topicKey]).forEach(mode => {
+                        const data = state.progress.globalProgress[topicKey][mode];
+                        if (data instanceof Set) {
+                            progressToSave[topicKey][mode] = Array.from(data);
+                        } else {
+                            progressToSave[topicKey][mode] = data;
+                        }
+                    });
+                });
+                // Async speichern (blockiert nicht)
+                supabaseProgress.save(progressToSave).catch(error => {
+                    console.error('Cloud-Speichern fehlgeschlagen:', error);
+                });
+            }
         } catch (e) {
-            console.warn('⚠️ Fehler beim Speichern:', e);
-        }
-        // Synchronisiere mit Firebase wenn angemeldet
-        if ((window as any).authService?.isLoggedIn() && (window as any).firebaseSyncService) {
-            console.log('💾 Speichere Fortschritt in Firebase...');
-            (window as any).firebaseSyncService.saveProgress(state.progress.globalProgress).catch((error: any) => {
-                console.error('❌ Firebase-Speicherung fehlgeschlagen:', error);
-            });
+            console.warn('Fehler beim Speichern:', e);
         }
     }
 
@@ -1557,5 +1607,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         updateRepeatButtons();
         ui.updateErrorCounts(dom, state, learningModes);
     };
+
+    createAuthButton('auth-button');
 
 });

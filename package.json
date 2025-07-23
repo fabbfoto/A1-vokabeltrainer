@@ -51,7 +51,7 @@
   },
   "dependencies": {
     "@google-cloud/text-to-speech": "^6.2.0",
-    "firebase": "^11.10.0",
+    "@supabase/supabase-js": "^2.52.0",
     "glob": "^11.0.3"
   },
   "engines": {
