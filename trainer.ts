@@ -321,21 +321,22 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             // Speichere den gemergten Progress lokal
             saveProgress();
             console.log('✅ Cloud-Progress gemerged und gespeichert');
+            
+            // UI aktualisieren um die geladenen Daten anzuzeigen
+            if (typeof ui?.showTrainingModes === 'function') {
+              ui.showTrainingModes(dom, state);
+            }
           }
         } catch (error) {
           console.error('Fehler beim Laden aus Cloud:', error);
         }
       } else {
         console.log('🚪 Ausgeloggt');
-        // Progress-State sauber zurücksetzen
-        if (state && state.progress) {
-          state.progress.globalProgress = {};
-          state.progress.masteredWordsByMode = {};
-          state.progress.wordsToRepeatByMode = {};
-          state.progress.perfectRunsByMode = {};
-          state.progress.lastTestScores = {};
-        }
-        // UI updaten, damit keine alten Daten angezeigt werden
+        // Progress-State NICHT zurücksetzen - nur lokal speichern
+        // Der lokale Progress bleibt erhalten für den Fall einer Wiederanmeldung
+        saveProgress();
+        
+        // UI aktualisieren um den aktuellen lokalen Stand anzuzeigen
         if (typeof ui?.showTrainingModes === 'function') {
           ui.showTrainingModes(dom, state);
         }
@@ -418,6 +419,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     }
                 });
                 console.log('✅ Progress geladen:', Object.keys(state.progress.globalProgress).length, 'Themen');
+                
+                // UI aktualisieren um den geladenen Progress anzuzeigen
+                if (typeof ui?.showTrainingModes === 'function') {
+                    ui.showTrainingModes(dom, state);
+                }
             } catch (e) {
                 console.error('❌ Fehler beim Laden des Progress:', e);
                 state.progress.globalProgress = {};
@@ -469,6 +475,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         try {
             // Immer lokal speichern
             localStorage.setItem('trainer-progress', JSON.stringify(state.progress.globalProgress));
+            console.log('💾 Lokaler Progress gespeichert');
+            
             // Wenn angemeldet, auch in Supabase speichern
             if (currentUser) {
                 // Konvertiere Sets zu Arrays für JSON
@@ -484,10 +492,23 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         }
                     });
                 });
-                // Async speichern (blockiert nicht)
-                supabaseProgress.save(progressToSave).catch(error => {
-                    console.error('Cloud-Speichern fehlgeschlagen:', error);
+                
+                // Async speichern mit Rückgabewert-Verarbeitung
+                supabaseProgress.save(progressToSave).then(result => {
+                    if (result.success) {
+                        console.log('✅ Cloud-Speicherung erfolgreich:', result);
+                    } else {
+                        console.error('❌ Cloud-Speicherung fehlgeschlagen:', result);
+                        // Zeige Benutzer-Feedback
+                        if (typeof ui?.showMessage === 'function') {
+                            ui.showMessage(dom, 'Cloud-Speicherung fehlgeschlagen - Daten nur lokal gespeichert', 'warning');
+                        }
+                    }
+                }).catch(error => {
+                    console.error('❌ Unerwarteter Cloud-Speicherfehler:', error);
                 });
+            } else {
+                console.log('ℹ️ Nicht angemeldet - nur lokal gespeichert');
             }
         } catch (e) {
             console.warn('Fehler beim Speichern:', e);
@@ -612,6 +633,29 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             }
         });
     }
+
+    // Test-Funktion für Supabase-Verbindung
+    async function testSupabaseConnection() {
+        console.log('🧪 Teste Supabase-Verbindung...');
+        const isConnected = await supabaseProgress.testConnection();
+        
+        if (isConnected) {
+            console.log('✅ Supabase-Verbindung funktioniert');
+            if (typeof ui?.showMessage === 'function') {
+                ui.showMessage(dom, 'Supabase-Verbindung: OK', 'success');
+            }
+        } else {
+            console.error('❌ Supabase-Verbindung fehlgeschlagen');
+            if (typeof ui?.showMessage === 'function') {
+                ui.showMessage(dom, 'Supabase-Verbindung: FEHLER - Daten nur lokal gespeichert', 'error');
+            }
+        }
+        
+        return isConnected;
+    }
+
+    // Teste Verbindung beim Start
+    testSupabaseConnection();
 
     loadProgress();
     loadMasteredWords();

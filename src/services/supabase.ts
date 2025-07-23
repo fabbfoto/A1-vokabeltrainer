@@ -49,48 +49,103 @@ export const supabaseProgress = {
       const user = await supabaseAuth.getUser();
       if (!user) {
         console.warn('Nicht angemeldet, speichere nur lokal');
-        return;
+        return { success: false, reason: 'not_authenticated' };
       }
 
-      const { error } = await supabase
+      console.log('🔄 Speichere Progress für User:', user.id);
+      console.log('📊 Progress-Daten:', progressData);
+
+      const { data, error } = await supabase
         .from('progress')
         .upsert({
           user_id: user.id,
           trainer_type: 'basis',
-          progress_data: progressData
+          progress_data: progressData,
+          updated_at: new Date().toISOString()
         })
         .select();
 
-      if (error) throw error;
-      console.log('✅ Progress in Supabase gespeichert');
+      if (error) {
+        console.error('❌ Supabase Speicherfehler:', error);
+        return { success: false, error: error.message };
+      }
+
+      console.log('✅ Progress in Supabase gespeichert:', data);
+      
+      // Verifiziere das Speichern durch erneutes Laden
+      const verification = await this.load();
+      if (verification) {
+        console.log('✅ Speicherung verifiziert - Daten können geladen werden');
+        return { success: true, data: verification };
+      } else {
+        console.warn('⚠️ Speicherung nicht verifiziert - Daten können nicht geladen werden');
+        return { success: false, reason: 'verification_failed' };
+      }
     } catch (error) {
-      console.error('Fehler beim Speichern:', error);
+      console.error('❌ Unerwarteter Fehler beim Speichern:', error);
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     }
   },
 
   async load(): Promise<any> {
     try {
       const user = await supabaseAuth.getUser();
-      if (!user) return null;
+      if (!user) {
+        console.log('Nicht angemeldet, kann keine Cloud-Daten laden');
+        return null;
+      }
+
+      console.log('🔄 Lade Progress für User:', user.id);
 
       const { data, error } = await supabase
         .from('progress')
         .select('*')
         .eq('user_id', user.id)
         .eq('trainer_type', 'basis')
-        .maybeSingle(); // Verwende maybeSingle statt single
+        .maybeSingle();
 
       if (error) {
-        console.error('Fehler beim Laden:', error);
+        console.error('❌ Supabase Ladefehler:', error);
         return null;
       }
 
-      // Type-sicherer Zugriff
-      const result = data as Record<string, any> | null;
-      return result?.progress_data || null;
+      if (!data) {
+        console.log('ℹ️ Keine Progress-Daten in Supabase gefunden');
+        return null;
+      }
+
+      console.log('✅ Progress aus Supabase geladen:', data);
+      return data.progress_data || null;
     } catch (error) {
-      console.error('Fehler beim Laden:', error);
+      console.error('❌ Unerwarteter Fehler beim Laden:', error);
       return null;
+    }
+  },
+
+  async testConnection(): Promise<boolean> {
+    try {
+      console.log('🔍 Teste Supabase-Verbindung...');
+      
+      // Teste Auth-Verbindung
+      const user = await supabaseAuth.getUser();
+      console.log('✅ Auth-Verbindung funktioniert, User:', user?.email || 'nicht angemeldet');
+      
+      // Teste Datenbank-Verbindung durch einfache Abfrage
+      const { data, error } = await supabase
+        .from('progress')
+        .select('count')
+        .limit(1);
+      
+      if (error) {
+        console.error('❌ Datenbank-Verbindung fehlgeschlagen:', error);
+        return false;
+      }
+      
+      console.log('✅ Datenbank-Verbindung funktioniert');
+      return true;
+    } catch (error) {
+      console.error('❌ Verbindungstest fehlgeschlagen:', error);
+      return false;
     }
   },
 
