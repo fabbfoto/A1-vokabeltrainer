@@ -41,7 +41,7 @@
     
     <link rel="manifest" href="manifest.json"> 
     <meta name="theme-color" content="#3b82f6">
-    <link rel="stylesheet" href="./shared/styles/minimal-legacy.css">
+    <!-- CSS-Link entfernt wegen MIME-Type Problemen -->
     
     <!-- Firebase wird über TypeScript-Module geladen -->
 </head>
@@ -211,10 +211,20 @@
                 </div>
             </div>
 
-            <!-- Message Box -->
-            <div id="message-box" class="fixed bottom-6 right-6 bg-red-500 text-white p-4 rounded-2xl shadow-2xl hidden animate-pulse"></div>
-        </div>
+                <!-- Message Box -->
+    <div id="message-box" class="fixed bottom-6 right-6 bg-red-500 text-white p-4 rounded-2xl shadow-2xl hidden animate-pulse"></div>
+    
+    <!-- Fehlende DOM-Elemente für TypeScript-Validierung -->
+    <div id="options-container" style="display:none"></div>
+    <div id="word-display" style="display:none"></div>
+    <div id="example-display" style="display:none"></div>
+    <div id="success-popup" style="display:none"></div>
+    <div id="word-sentence-block" style="display:none"></div>
+    <div id="loading-indicator" style="display:none">
+      <span class="animate-spin">⏳</span> Wird geladen...
     </div>
+</div>
+</div>
 
     <!-- REWARD POPUP -->
     <div id="reward-popup" class="fixed inset-0 flex justify-center items-center hidden z-50 pointer-events-none">
