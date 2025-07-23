@@ -308,7 +308,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     saveProgress();
                     console.log('✅ Firebase-Progress erfolgreich gemerged');
                     // UI aktualisieren
-                    updateUI();
+                    ui.showTrainingModes(dom, state);
                 } catch (e) {
                     console.error('❌ Fehler beim Mergen des Firebase-Progress:', e);
                 }
