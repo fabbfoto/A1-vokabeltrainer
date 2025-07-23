@@ -61,20 +61,26 @@ export const supabaseProgress = {
     console.log('✅ Progress in Supabase gespeichert');
   },
 
-  async load(): Promise<any | null> {
+  async load() {
     const user = await supabaseAuth.getUser();
     if (!user) return null;
+
     const { data, error } = await supabase
       .from('progress')
       .select('progress_data')
       .eq('user_id', user.id)
       .eq('trainer_type', 'basis')
-      .single() as any;
-    if (error && error.code !== 'PGRST116') {
+      .single();
+
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no rows
       console.error('Fehler beim Laden:', error);
       throw error;
     }
-    return (data as any)?.progress_data || null;
+
+    // TypeScript Fix: Explizite Prüfung und Type Assertion
+    if (!data) return null;
+    const progressData = (data as Record<string, any>).progress_data;
+    return progressData || null;
   },
 
   // Realtime Updates (optional)
