@@ -17,12 +17,12 @@ Die Anmeldung mit Google funktioniert nicht, obwohl die Supabase-Verbindung OK i
    - Gehe zu "APIs & Services" → "Credentials"
    - Klicke "Create Credentials" → "OAuth 2.0 Client IDs"
    - Wähle "Web application"
-   - **Authorized redirect URIs hinzufügen:**
+   - **Authorized redirect URIs hinzufügen (NUR Netlify):**
      ```
      https://ezjihsafleestqanpgdc.supabase.co/auth/v1/callback
-     https://deine-netlify-app.netlify.app/auth/v1/callback
+     https://a1-all-topics.netlify.app/auth/v1/callback
      ```
-     **Wichtig:** Ersetze `deine-netlify-app` mit deiner tatsächlichen Netlify-Domain
+     **Wichtig:** Nur die Netlify-Domain verwenden, localhost ist nicht nötig!
 
 5. **Notiere dir:**
    - Client ID
@@ -41,7 +41,7 @@ Die Anmeldung mit Google funktioniert nicht, obwohl die Supabase-Verbindung OK i
 
 ### 3. Teste die Konfiguration
 
-1. **Lade die Anwendung neu**
+1. **Gehe zu https://a1-all-topics.netlify.app/**
 2. **Schaue in die Browser-Konsole (F12)**
 3. **Klicke auf "Anmelden"**
 4. **Erwarte diese Logs:**
@@ -56,6 +56,7 @@ Die Anmeldung mit Google funktioniert nicht, obwohl die Supabase-Verbindung OK i
 
 **Problem: "redirect_uri_mismatch"**
 - **Lösung:** Stelle sicher, dass die Redirect URI in Google Cloud Console exakt mit der in Supabase übereinstimmt
+- **Wichtig:** Nur Netlify-Domain verwenden, localhost nicht nötig!
 
 **Problem: "invalid_client"**
 - **Lösung:** Überprüfe Client ID und Client Secret
@@ -63,17 +64,16 @@ Die Anmeldung mit Google funktioniert nicht, obwohl die Supabase-Verbindung OK i
 **Problem: "access_denied"**
 - **Lösung:** Stelle sicher, dass die Google+ API aktiviert ist
 
-### 5. Netlify Domain finden
+### 5. Netlify Domain
 
-Um deine Netlify-Domain zu finden:
-1. Gehe zu deinem [Netlify Dashboard](https://app.netlify.com/)
-2. Wähle dein Projekt aus
-3. Schaue nach der Domain (z.B. `https://a1-vokabeltrainer.netlify.app`)
-4. Verwende diese Domain in den Redirect URIs
-
-**Beispiel:**
+Deine Netlify-Domain ist bereits bekannt:
 ```
-https://a1-vokabeltrainer.netlify.app/auth/v1/callback
+https://a1-all-topics.netlify.app
+```
+
+**Verwende diese Domain in den Redirect URIs:**
+```
+https://a1-all-topics.netlify.app/auth/v1/callback
 ```
 
 ### 6. Verifikation
@@ -82,4 +82,10 @@ Nach erfolgreicher Konfiguration solltest du:
 - ✅ Dich mit Google anmelden können
 - ✅ "✅ Angemeldet als: [email]" in der Konsole sehen
 - ✅ Progress-Daten in Supabase gespeichert werden
-- ✅ Nach Ab-/Anmeldung deine Daten wiederfinden 
+- ✅ Nach Ab-/Anmeldung deine Daten wiederfinden
+
+### 7. Wichtige Hinweise
+
+- **Nur Netlify:** Die App wird nur auf Netlify verwendet, localhost ist nicht nötig
+- **Redirect URIs:** Nur die Netlify-Domain in Google Cloud Console eintragen
+- **Testing:** Immer auf https://a1-all-topics.netlify.app/ testen 

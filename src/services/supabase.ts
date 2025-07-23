@@ -24,7 +24,7 @@ export const supabaseAuth = {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin,
+          redirectTo: 'https://a1-all-topics.netlify.app', // Nur Netlify-Domain
           queryParams: {
             access_type: 'offline',
             prompt: 'consent'
@@ -42,7 +42,8 @@ export const supabaseAuth = {
         if (error.message?.includes('redirect_uri_mismatch')) {
           console.error('🔧 LÖSUNG: Redirect URI in Google Cloud Console anpassen');
           console.error('🔧 Erwartete Redirect URI:', `${SUPABASE_URL}/auth/v1/callback`);
-          console.error('🔧 Netlify Redirect URI:', `${window.location.origin}/auth/v1/callback`);
+          console.error('🔧 Netlify Redirect URI:', 'https://a1-all-topics.netlify.app/auth/v1/callback');
+          console.error('🔧 WICHTIG: Nur Netlify-Domain verwenden, nicht localhost!');
         }
         
         throw error;
@@ -124,22 +125,44 @@ export const supabaseProgress = {
       console.log('🔄 Speichere Progress für User:', user.id);
       console.log('📊 Progress-Daten:', progressData);
 
+      // Verwende die neue Upsert-Funktion statt upsert()
       const { data, error } = await supabase
-        .from('progress')
-        .upsert({
-          user_id: user.id,
-          trainer_type: 'basis',
-          progress_data: progressData,
-          updated_at: new Date().toISOString()
-        })
-        .select();
+        .rpc('upsert_progress', {
+          p_user_id: user.id,
+          p_trainer_type: 'basis',
+          p_progress_data: progressData
+        });
 
       if (error) {
         console.error('❌ Supabase Speicherfehler:', error);
-        return { success: false, error: error.message };
+        console.error('❌ Fehler-Code:', error.code);
+        console.error('❌ Fehler-Nachricht:', error.message);
+        console.error('❌ Fehler-Details:', error.details);
+        
+        // Fallback: Versuche normalen Upsert
+        console.log('🔄 Fallback: Versuche normalen Upsert...');
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('progress')
+          .upsert({
+            user_id: user.id,
+            trainer_type: 'basis',
+            progress_data: progressData,
+            updated_at: new Date().toISOString()
+          }, {
+            onConflict: 'user_id,trainer_type'
+          })
+          .select();
+
+        if (fallbackError) {
+          console.error('❌ Fallback-Upsert fehlgeschlagen:', fallbackError);
+          return { success: false, error: fallbackError.message };
+        }
+
+        console.log('✅ Fallback-Upsert erfolgreich:', fallbackData);
+        return { success: true, data: fallbackData };
       }
 
-      console.log('✅ Progress in Supabase gespeichert:', data);
+      console.log('✅ Progress in Supabase gespeichert (Upsert-Funktion)');
       
       // Verifiziere das Speichern durch erneutes Laden
       const verification = await this.load();
@@ -236,12 +259,70 @@ export const supabaseProgress = {
       
       console.log('✅ Datenbank-Verbindung funktioniert');
       console.log('✅ Tabelle "progress" existiert');
+      
+      // Teste Policies (falls User angemeldet)
+      if (user) {
+        await this.testPolicies(user.id);
+      }
+      
       return true;
     } catch (error) {
       console.error('❌ Verbindungstest fehlgeschlagen:', error);
       console.error('❌ Fehler-Typ:', typeof error);
       console.error('❌ Fehler-Stack:', error instanceof Error ? error.stack : 'Kein Stack verfügbar');
       return false;
+    }
+  },
+
+  async testPolicies(userId: string): Promise<void> {
+    try {
+      console.log('🔍 Teste Datenbank-Policies für User:', userId);
+      
+      // Test 1: Versuche INSERT
+      const testData = { test: 'policy_test', timestamp: Date.now() };
+      const { data: insertData, error: insertError } = await supabase
+        .from('progress')
+        .insert({
+          user_id: userId,
+          trainer_type: 'policy_test',
+          progress_data: testData
+        })
+        .select();
+      
+      if (insertError) {
+        console.error('❌ INSERT Policy Test fehlgeschlagen:', insertError);
+      } else {
+        console.log('✅ INSERT Policy Test erfolgreich:', insertData);
+        
+        // Test 2: Versuche UPDATE
+        const { data: updateData, error: updateError } = await supabase
+          .from('progress')
+          .update({ progress_data: { ...testData, updated: true } })
+          .eq('user_id', userId)
+          .eq('trainer_type', 'policy_test')
+          .select();
+        
+        if (updateError) {
+          console.error('❌ UPDATE Policy Test fehlgeschlagen:', updateError);
+        } else {
+          console.log('✅ UPDATE Policy Test erfolgreich:', updateData);
+        }
+        
+        // Test 3: Versuche DELETE
+        const { error: deleteError } = await supabase
+          .from('progress')
+          .delete()
+          .eq('user_id', userId)
+          .eq('trainer_type', 'policy_test');
+        
+        if (deleteError) {
+          console.error('❌ DELETE Policy Test fehlgeschlagen:', deleteError);
+        } else {
+          console.log('✅ DELETE Policy Test erfolgreich');
+        }
+      }
+    } catch (error) {
+      console.error('❌ Policy-Test fehlgeschlagen:', error);
     }
   },
 
@@ -305,11 +386,12 @@ export const supabaseProgress = {
       // 5. Empfohlene Aktionen
       console.log('5️⃣ Empfohlene Aktionen:');
       console.log('   📋 1. Google Cloud Console OAuth konfigurieren');
-      console.log('   📋 2. Redirect URIs hinzufügen:');
+      console.log('   📋 2. Redirect URIs hinzufügen (NUR Netlify):');
       console.log('      -', `${SUPABASE_URL}/auth/v1/callback`);
-      console.log('      -', `${window.location.origin}/auth/v1/callback`);
+      console.log('      -', 'https://a1-all-topics.netlify.app/auth/v1/callback');
       console.log('   📋 3. Supabase Dashboard → Auth → Providers → Google aktivieren');
       console.log('   📋 4. Client ID und Secret in Supabase eintragen');
+      console.log('   📋 5. WICHTIG: Nur Netlify-Domain verwenden, localhost nicht nötig!');
       
     } catch (error) {
       console.error('❌ Diagnose fehlgeschlagen:', error);
