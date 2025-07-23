@@ -1,5 +1,4 @@
 //import { Word } from '../core/types/index';
-import { saveProgress } from '../../trainer';
 
 // Window-Erweiterung für currentAudio
 declare global {
