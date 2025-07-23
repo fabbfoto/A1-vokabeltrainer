@@ -228,6 +228,10 @@ export function showMainTopicNavigation(dom: DOMElements, state: TrainerState, v
     dom.trainerMainViewEl.classList.add('hidden');
     dom.navigationTitleEl.textContent = 'Themen';
     dom.backToMainTopicsButton.classList.add('hidden');
+    
+    // Standard-Titel für Trainings-Ansicht setzen
+    dom.currentTrainingTitleEl.textContent = 'Thema auswählen';
+    
     // KORREKTUR: Ruft die Anzeigefunktion mit allen nötigen Parametern auf.
     displayMainTopics(dom, state, vokabular, learningModes);
 }
@@ -252,7 +256,13 @@ export function showSubTopicNavigation(dom: DOMElements, state: TrainerState, vo
 export function showTrainingModes(dom: DOMElements, state: TrainerState): void {
     dom.navigationViewEl.classList.add('hidden');
     dom.trainerMainViewEl.classList.remove('hidden');
-    dom.currentTrainingTitleEl.textContent = `${state.navigation.currentMainTopic} > ${state.navigation.currentSubTopic}`;
+    
+    // Standard-Anzeige wenn keine Themen ausgewählt sind
+    if (!state.navigation.currentMainTopic || !state.navigation.currentSubTopic) {
+        dom.currentTrainingTitleEl.textContent = 'Thema auswählen';
+    } else {
+        dom.currentTrainingTitleEl.textContent = `${state.navigation.currentMainTopic} > ${state.navigation.currentSubTopic}`;
+    }
 }
 
 /**
