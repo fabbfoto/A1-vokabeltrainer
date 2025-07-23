@@ -122,6 +122,9 @@ interface BaseWord {
   id: WordId;
   german: string;
   english: string;
+  deutsch?: string; // Legacy-Kompatibilität
+  beispiel?: string; // Legacy-Kompatibilität
+  artikel?: string; // Für Artikel-Training
   exampleGerman?: ExampleSentencePart[];
   exampleEnglish?: string;
   clozeParts?: string[];

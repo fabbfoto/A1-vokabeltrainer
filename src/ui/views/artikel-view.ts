@@ -1,6 +1,7 @@
 import type { Word } from '@core/types/vocabulary';
 import type { TrainerState } from '@core/types/trainer';
 import type { DOMElements } from '@core/types/ui';
+import { getExampleSentenceText } from '@core/types/vocabulary';
 
 export function renderArtikelUI(
     dom: DOMElements, 
@@ -14,11 +15,11 @@ export function renderArtikelUI(
     if (!dom.optionsContainer || !dom.wordDisplay || !dom.exampleDisplay) return;
 
     // Zeige Wort und Beispielsatz
-    dom.wordDisplay.textContent = word.deutsch;
+    dom.wordDisplay.textContent = word.deutsch || word.german;
     dom.wordDisplay.className = 'text-2xl md:text-4xl font-bold text-center mb-4';
     
-    if (dom.exampleDisplay && word.beispiel) {
-        dom.exampleDisplay.textContent = word.beispiel;
+    if (dom.exampleDisplay && (word.beispiel || word.exampleGerman)) {
+        dom.exampleDisplay.textContent = word.beispiel || getExampleSentenceText(word.exampleGerman);
         dom.exampleDisplay.className = 'text-lg md:text-xl text-gray-600 italic text-center mb-8';
     }
 
@@ -48,7 +49,7 @@ export function renderArtikelUI(
             const target = e.currentTarget as HTMLButtonElement;
             const artikel = target.dataset.artikel;
             if (artikel) {
-                handleArtikelSelection(artikel, word.artikel, callbacks.onAnswer);
+                handleArtikelSelection(artikel, word.artikel || '', callbacks.onAnswer);
             }
         });
     });

@@ -85,6 +85,14 @@ export interface DOMElements {
 
     // Loading Indicator
     loadingIndicatorEl: HTMLElement;
+    
+    // Artikel View Elements
+    optionsContainer: HTMLElement;
+    wordDisplay: HTMLElement;
+    exampleDisplay: HTMLElement;
+    
+    // Success Popup
+    successPopup: HTMLElement;
 }
 
 // ========== UI CALLBACK INTERFACES ==========

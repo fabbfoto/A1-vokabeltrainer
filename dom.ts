@@ -210,7 +210,15 @@ function initializeDOM(): DOMElements {
         umlautButtonsContainer: getElement<HTMLElement>('umlaut-buttons-container'),
         
         // SVG Icons
-        SVG_SPEAKER_ICON: SVG_SPEAKER_ICON
+        SVG_SPEAKER_ICON: SVG_SPEAKER_ICON,
+        
+        // Artikel View Elements
+        optionsContainer: getElement<HTMLElement>('options-container'),
+        wordDisplay: getElement<HTMLElement>('word-display'),
+        exampleDisplay: getElement<HTMLElement>('example-display'),
+        
+        // Success Popup
+        successPopup: getElement<HTMLElement>('success-popup')
     };
 }
 

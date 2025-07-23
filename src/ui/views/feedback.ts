@@ -2,6 +2,7 @@
 // Feedback-Funktionen für UI
 
 import type { DOMElements } from '../../core/types/ui';
+import type { TrainerState } from '../../core/types/trainer';
 
 // SVG Icons als Konstanten
 const SVG_SPEAKER_ICON = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -90,6 +91,56 @@ export function closeSuccessPopup(dom: DOMElements): void {
     if (dom.messageBoxEl) {
         dom.messageBoxEl.classList.add('hidden');
         dom.messageBoxEl.innerHTML = '';
+    }
+}
+
+/**
+ * Zeigt eine Erfolgsmeldung mit Button an.
+ */
+export function showSuccessMessageWithButton(
+    dom: DOMElements,
+    message: string,
+    buttonText: string,
+    onButtonClick: () => void
+): void {
+    if (!dom.successPopup) return;
+    
+    dom.successPopup.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center transform scale-100 transition-all duration-300">
+            <div class="mb-6">
+                <div class="w-24 h-24 bg-de-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-12 h-12 text-de-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-de-green mb-2">Perfekt!</h2>
+                <p class="text-gray-600">${message}</p>
+            </div>
+            
+            <div class="space-y-3">
+                <button 
+                    id="success-action-button"
+                    class="w-full px-6 py-3 bg-de-green text-white rounded-lg hover:bg-de-green-dark transition-colors font-medium">
+                    ${buttonText}
+                </button>
+                <button 
+                    onclick="document.getElementById('success-popup').style.display='none'" 
+                    class="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
+                    Andere Übung wählen
+                </button>
+            </div>
+        </div>
+    `;
+    
+    dom.successPopup.style.display = 'flex';
+    
+    // Event Listener für den Action Button
+    const actionButton = document.getElementById('success-action-button');
+    if (actionButton) {
+        actionButton.addEventListener('click', () => {
+            dom.successPopup.style.display = 'none';
+            onButtonClick();
+        });
     }
 }
 
