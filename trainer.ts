@@ -547,9 +547,18 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if (saved) {
             try {
                 const parsed = JSON.parse(saved);
-                state.progress.perfectRunsByMode = parsed;
+                // Stelle sicher, dass die Werte Zahlen sind
+                Object.keys(parsed).forEach(mode => {
+                    const value = parsed[mode];
+                    if (typeof value === 'number' && value >= 0) {
+                        state.progress.perfectRunsByMode[mode as ModeId] = value;
+                    } else {
+                        state.progress.perfectRunsByMode[mode as ModeId] = 0;
+                    }
+                });
             } catch (e) {
                 console.warn('⚠️ Fehler beim Laden der perfect runs:', e);
+                state.progress.perfectRunsByMode = {};
             }
         }
     }
@@ -1070,7 +1079,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     // Alle Wörter wurden richtig beantwortet
                     // Erhöhe Perfect Run Counter
                     if (state.training.currentMode) {
-                        if (!state.progress.perfectRunsByMode[state.training.currentMode]) {
+                        // Initialisiere mit 0 falls undefined
+                        if (state.progress.perfectRunsByMode[state.training.currentMode] === undefined) {
                             state.progress.perfectRunsByMode[state.training.currentMode] = 0;
                         }
                         state.progress.perfectRunsByMode[state.training.currentMode]++;
@@ -1078,21 +1088,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         
                         const runCount = state.progress.perfectRunsByMode[state.training.currentMode];
                         const runText = runCount === 1 ? '1. Durchlauf' : `${runCount}. Durchlauf`;
-                        ui.showSuccessMessageWithButton(
-                            dom, 
-                            `Perfekt! (${runText})`, 
-                            'Übung wiederholen',
-                            () => {
-                                const progressKey = getTopicKey(state.navigation.currentMainTopic, state.navigation.currentSubTopic);
-                                if (progressKey && state.progress.globalProgress[progressKey] && state.training.currentMode) {
-                                    state.progress.globalProgress[progressKey][state.training.currentMode] = new Set();
-                                    saveProgress();
-                                }
-                                if (state.training.currentMode !== null) {
-                                    setMode(state.training.currentMode, false);
-                                }
-                            }
-                        );
+                        ui.showSuccessPopup(dom, state);
                     } else {
                         ui.showMessage(dom, 'Perfekt! Alle Vokabeln in diesem Modus wurden richtig beantwortet.', 'success');
                     }

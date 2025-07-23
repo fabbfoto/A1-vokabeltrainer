@@ -38,7 +38,7 @@ export {
 // Feedback exports
 export {
     showMessage,
-    showSuccessMessageWithButton,
+    showSuccessPopup,
     closeSuccessPopup,
     hideAllUIs,
     showCorrectFeedback,

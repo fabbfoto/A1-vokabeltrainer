@@ -46,75 +46,41 @@ export function showMessage(
 /**
  * Zeigt eine Erfolgsmeldung mit "Übung wiederholen" Button an.
  */
-export function showSuccessMessageWithButton(
-    dom: DOMElements,
-    message: string,
-    buttonText: string = 'Übung wiederholen',
-    onButtonClick: () => void
-): void {
-    if (!dom.messageBoxEl) {
-        console.error('Message box element not found');
-        return;
-    }
+export function showSuccessPopup(dom: DOMElements, state: TrainerState): void {
+    if (!dom.successPopup) return;
     
-    // Erstelle HTML-Inhalt mit Nachricht und Button
-    dom.messageBoxEl.innerHTML = `
-        <div class="text-center">
-            <div class="mb-3">${message}</div>
-            <button id="repeat-exercise-button" class="px-4 py-2 bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] text-green-500 rounded shadow hover:bg-gradient-to-br hover:from-white hover:to-[#F2AE2E]/[0.08] transition font-semibold cursor-pointer">
-                ${buttonText}
-            </button>
+    const mode = state.training.currentMode;
+    const perfectCount = mode ? (state.progress.perfectRunsByMode[mode] || 0) : 0;
+    
+    // Entferne den unsinnigen Zähler
+    dom.successPopup.innerHTML = `
+        <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center transform scale-100 transition-all duration-300">
+            <div class="mb-6">
+                <div class="w-24 h-24 bg-de-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-12 h-12 text-de-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                </div>
+                <h2 class="text-3xl md:text-4xl font-bold text-de-green mb-2">Perfekt!</h2>
+                <p class="text-gray-600">Alle Wörter richtig beantwortet!</p>
+            </div>
+            
+            <div class="space-y-3">
+                <button 
+                    onclick="window.location.reload()" 
+                    class="w-full px-6 py-3 bg-de-green text-white rounded-lg hover:bg-de-green-dark transition-colors font-medium">
+                    Übung wiederholen
+                </button>
+                <button 
+                    onclick="document.getElementById('success-popup').style.display='none'" 
+                    class="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium">
+                    Andere Übung wählen
+                </button>
+            </div>
         </div>
     `;
     
-    // CSS-Klassen für Erfolgsmeldung
-    dom.messageBoxEl.className = 'fixed bottom-5 right-5 bg-de-green text-white p-4 rounded-lg shadow-de-gray-400/50 z-50';
-    dom.messageBoxEl.classList.remove('hidden');
-    
-    // Event Listener für den Button - mit Verzögerung für bessere Stabilität
-    setTimeout(() => {
-        const button = dom.messageBoxEl?.querySelector('#repeat-exercise-button') as HTMLButtonElement;
-        if (button) {
-            console.log('🔧 Button gefunden, Event Listener hinzugefügt');
-            
-            // Entferne alte Event Listener
-            button.replaceWith(button.cloneNode(true));
-            const newButton = dom.messageBoxEl?.querySelector('#repeat-exercise-button') as HTMLButtonElement;
-            
-            if (newButton) {
-                newButton.addEventListener('click', (e: Event) => {
-                    console.log('🔧 Button geklickt!');
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Verstecke die Nachricht sofort
-                    dom.messageBoxEl?.classList.add('hidden');
-                    
-                    // Führe die Callback-Funktion aus
-                    try {
-                        onButtonClick();
-                    } catch (error) {
-                        console.error('Fehler beim Ausführen der Callback-Funktion:', error);
-                    }
-                });
-                
-                // Zusätzlich: Klick außerhalb schließt auch die Nachricht
-                const handleOutsideClick = (e: Event) => {
-                    if (e.target !== newButton && !newButton.contains(e.target as Node)) {
-                        dom.messageBoxEl?.classList.add('hidden');
-                        document.removeEventListener('click', handleOutsideClick);
-                    }
-                };
-                
-                // Verzögerung für Outside-Click-Handler
-                setTimeout(() => {
-                    document.addEventListener('click', handleOutsideClick);
-                }, 100);
-            }
-        } else {
-            console.error('❌ Button nicht gefunden!');
-        }
-    }, 50);
+    dom.successPopup.style.display = 'flex';
 }
 
 /**
