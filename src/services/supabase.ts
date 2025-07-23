@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // ERSETZE mit deinen Werten aus Supabase Dashboard
 const SUPABASE_URL = 'https://ezjihsafleestqanpgdc.supabase.co';
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIs...'; // <-- Hier echten Anon-Key eintragen
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6amloc2FmbGVlc3RxYW5wZ2RjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzIxNDIsImV4cCI6MjA2ODg0ODE0Mn0.6q6K2PyQ0nnVNTIMwD0B1NnkoXx5rsayJJ_Ovd79JCE';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
