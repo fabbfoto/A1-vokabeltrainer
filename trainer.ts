@@ -288,29 +288,42 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         try {
           const cloudProgress = await supabaseProgress.load();
           if (cloudProgress) {
-            console.log('☁️ Lade Progress aus der Cloud...');
-            // Konvertiere Arrays zurück zu Sets
+            console.log('☁️ Cloud-Progress erhalten:', cloudProgress);
+            
+            // Merge Cloud-Progress mit lokalem Progress
             Object.keys(cloudProgress).forEach(topicKey => {
               if (!state.progress.globalProgress[topicKey]) {
                 state.progress.globalProgress[topicKey] = {};
               }
+              
               Object.keys(cloudProgress[topicKey]).forEach(mode => {
-                const data = cloudProgress[topicKey][mode];
-                if (Array.isArray(data)) {
-                  state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
-                } else if (data instanceof Set) {
-                  state.progress.globalProgress[topicKey][mode as ModeId] = data;
-                } else {
-                  state.progress.globalProgress[topicKey][mode as ModeId] = new Set();
+                const cloudData = cloudProgress[topicKey][mode];
+                const localData = state.progress.globalProgress[topicKey][mode as ModeId];
+                
+                if (Array.isArray(cloudData)) {
+                  // Merge Cloud und lokale Daten
+                  const mergedSet = new Set<WordId>();
+                  
+                  // Füge lokale Daten hinzu (falls vorhanden)
+                  if (localData instanceof Set) {
+                    localData.forEach(id => mergedSet.add(id));
+                  }
+                  
+                  // Füge Cloud-Daten hinzu
+                  cloudData.forEach(id => mergedSet.add(id as WordId));
+                  
+                  state.progress.globalProgress[topicKey][mode as ModeId] = mergedSet;
+                  console.log(`Merged ${topicKey}/${mode}: ${mergedSet.size} Wörter`);
                 }
               });
             });
-            // UI updaten
-            ui.showTrainingModes(dom, state);
-            console.log('✅ Cloud-Progress geladen');
+            
+            // Speichere den gemergten Progress lokal
+            saveProgress();
+            console.log('✅ Cloud-Progress gemerged und gespeichert');
           }
         } catch (error) {
-          console.error('Fehler beim Laden:', error);
+          console.error('Fehler beim Laden aus Cloud:', error);
         }
       } else {
         console.log('🚪 Ausgeloggt');
