@@ -298,6 +298,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 const data = cloudProgress[topicKey][mode];
                 if (Array.isArray(data)) {
                   state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
+                } else if (data instanceof Set) {
+                  state.progress.globalProgress[topicKey][mode as ModeId] = data;
+                } else {
+                  state.progress.globalProgress[topicKey][mode as ModeId] = new Set();
                 }
               });
             });
@@ -310,6 +314,18 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
       } else {
         console.log('🚪 Ausgeloggt');
+        // Progress-State sauber zurücksetzen
+        if (state && state.progress) {
+          state.progress.globalProgress = {};
+          state.progress.masteredWordsByMode = {};
+          state.progress.wordsToRepeatByMode = {};
+          state.progress.perfectRunsByMode = {};
+          state.progress.lastTestScores = {};
+        }
+        // UI updaten, damit keine alten Daten angezeigt werden
+        if (typeof ui?.showTrainingModes === 'function') {
+          ui.showTrainingModes(dom, state);
+        }
       }
     });
 
