@@ -74,7 +74,7 @@ export const supabaseProgress = {
       console.error('Fehler beim Laden:', error);
       throw error;
     }
-    return (data && typeof data === 'object' && 'progress_data' in data) ? (data as any).progress_data : null;
+    return (data && typeof data === 'object' && data !== null && 'progress_data' in data && (data as any).progress_data) ? (data as any).progress_data : null;
   },
 
   // Realtime Updates (optional)
