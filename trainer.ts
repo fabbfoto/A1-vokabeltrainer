@@ -39,40 +39,6 @@ import { createAuthButton } from './src/ui/components/supabase-auth-button';
 let globalAuthUI: AuthUI | null = null;
 let currentUser: any = null;
 
-// Auth State überwachen
-supabaseAuth.onAuthStateChange(async (user) => {
-  currentUser = user;
-  if (user) {
-    console.log('✅ Angemeldet als:', user.email);
-    // Progress von Supabase laden
-    try {
-      const cloudProgress = await supabaseProgress.load();
-      if (cloudProgress) {
-        console.log('☁️ Lade Progress aus der Cloud...');
-        // Konvertiere Arrays zurück zu Sets
-        Object.keys(cloudProgress).forEach(topicKey => {
-          if (!state.progress.globalProgress[topicKey]) {
-            state.progress.globalProgress[topicKey] = {};
-          }
-          Object.keys(cloudProgress[topicKey]).forEach(mode => {
-            const data = cloudProgress[topicKey][mode];
-            if (Array.isArray(data)) {
-              state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
-            }
-          });
-        });
-        // UI updaten
-        ui.showTrainingModes(dom, state);
-        console.log('✅ Cloud-Progress geladen');
-      }
-    } catch (error) {
-      console.error('Fehler beim Laden:', error);
-    }
-  } else {
-    console.log('🚪 Ausgeloggt');
-  }
-});
-
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // NEU: Firebase Auth initialisieren
@@ -190,6 +156,39 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // UI-bezogene Properties
         isCorrectionMode: false,
     };
+
+    supabaseAuth.onAuthStateChange(async (user) => {
+      currentUser = user;
+      if (user) {
+        console.log('✅ Angemeldet als:', user.email);
+        // Progress von Supabase laden
+        try {
+          const cloudProgress = await supabaseProgress.load();
+          if (cloudProgress) {
+            console.log('☁️ Lade Progress aus der Cloud...');
+            // Konvertiere Arrays zurück zu Sets
+            Object.keys(cloudProgress).forEach(topicKey => {
+              if (!state.progress.globalProgress[topicKey]) {
+                state.progress.globalProgress[topicKey] = {};
+              }
+              Object.keys(cloudProgress[topicKey]).forEach(mode => {
+                const data = cloudProgress[topicKey][mode];
+                if (Array.isArray(data)) {
+                  state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
+                }
+              });
+            });
+            // UI updaten
+            ui.showTrainingModes(dom, state);
+            console.log('✅ Cloud-Progress geladen');
+          }
+        } catch (error) {
+          console.error('Fehler beim Laden:', error);
+        }
+      } else {
+        console.log('🚪 Ausgeloggt');
+      }
+    });
 
     // Test-Tracking für detaillierte Auswertung
     const testAnswerLog: Array<{
