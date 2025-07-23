@@ -501,7 +501,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         console.error('❌ Cloud-Speicherung fehlgeschlagen:', result);
                         // Zeige Benutzer-Feedback
                         if (typeof ui?.showMessage === 'function') {
-                            ui.showMessage(dom, 'Cloud-Speicherung fehlgeschlagen - Daten nur lokal gespeichert', 'warning');
+                            ui.showMessage(dom, 'Cloud-Speicherung fehlgeschlagen - Daten nur lokal gespeichert', 'error');
                         }
                     }
                 }).catch(error => {
