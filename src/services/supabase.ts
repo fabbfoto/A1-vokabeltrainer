@@ -1,8 +1,15 @@
 import { createClient } from '@supabase/supabase-js';
 
-// ERSETZE mit deinen Werten aus Supabase Dashboard
-const SUPABASE_URL = 'https://ezjihsafleestqanpgdc.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6amloc2FmbGVlc3RxYW5wZ2RjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzIxNDIsImV4cCI6MjA2ODg0ODE0Mn0.6q6K2PyQ0nnVNTIMwD0B1NnkoXx5rsayJJ_Ovd79JCE';
+// Automatische Umgebungs-Erkennung für Supabase
+const isLocalhost = typeof window !== 'undefined' && window.location.hostname.startsWith('localhost');
+
+const SUPABASE_URL = isLocalhost
+  ? 'http://localhost:54321' // Lokale Supabase-Instanz (optional, falls du lokal Supabase laufen hast)
+  : 'https://ezjihsafleestqanpgdc.supabase.co';
+
+const SUPABASE_ANON_KEY = isLocalhost
+  ? 'local-anon-key' // Falls du lokal Supabase verwendest, hier den lokalen Key eintragen
+  : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6amloc2FmbGVlc3RxYW5wZ2RjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzIxNDIsImV4cCI6MjA2ODg0ODE0Mn0.6q6K2PyQ0nnVNTIMwD0B1NnkoXx5rsayJJ_Ovd79JCE';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
