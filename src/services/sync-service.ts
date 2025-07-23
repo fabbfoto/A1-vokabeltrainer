@@ -6,6 +6,7 @@ import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
 import type { Firestore, Unsubscribe, DocumentSnapshot, FirestoreError } from 'firebase/firestore';
 import type { AuthService } from './auth-service';
 import type { TrainerState, Progress, UserData } from '../core/types/trainer';
+import type { ProgressData } from '../core/types/api';
 
 // ========== TYPED INTERFACES ==========
 export type SyncEventType = 'remoteUpdate' | 'localUpdate' | 'error';
@@ -35,11 +36,6 @@ export interface ErrorData {
 
 export interface SyncListener {
     (event: SyncEvent): void;
-}
-
-export interface ProgressData extends Partial<UserData> {
-    lastSync?: Date;
-    version?: string;
 }
 
 export interface SyncStatus {
@@ -96,7 +92,7 @@ export class SyncService {
                         }));
                     }
                     const remoteUpdate: RemoteUpdateData = {
-                        progress: data as UserData,
+                        progress: (data as unknown) as UserData,
                         lastModified: data.lastSync ? new Date(data.lastSync) : new Date(),
                         userId: userId
                     };
@@ -175,7 +171,7 @@ export class SyncService {
         const docRef = doc(this.db, docPath);
         
         const dataToSave: ProgressData = {
-            globalProgress: progressData,
+            globalProgress: progressData as Record<string, Record<string, string[]>>,
             lastSync: new Date(),
             version: '1.0',
             trainerId: this.trainerType

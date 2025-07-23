@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             currentError: null,
         },
         progress: {
-            globalProgress: {},
+            globalProgress: {} as Record<string, Record<string, Set<WordId>>>,
             masteredWordsByMode: {},
             wordsToRepeatByMode: {},
             perfectRunsByMode: {},
@@ -1500,7 +1500,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 });
             });
             // UI aktualisieren
-            updateUI();
+            ui.showTrainingModes(dom, state);
         }
     });
 
