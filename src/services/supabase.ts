@@ -61,7 +61,7 @@ export const supabaseProgress = {
     console.log('✅ Progress in Supabase gespeichert');
   },
 
-  async load() {
+  async load(): Promise<any | null> {
     const user = await supabaseAuth.getUser();
     if (!user) return null;
     const { data, error } = await supabase
@@ -69,12 +69,12 @@ export const supabaseProgress = {
       .select('progress_data')
       .eq('user_id', user.id)
       .eq('trainer_type', 'basis')
-      .single<ProgressRow>();
+      .single() as any;
     if (error && error.code !== 'PGRST116') {
       console.error('Fehler beim Laden:', error);
       throw error;
     }
-    return data?.progress_data ?? null;
+    return (data as any)?.progress_data || null;
   },
 
   // Realtime Updates (optional)
