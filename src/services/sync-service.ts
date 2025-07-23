@@ -7,6 +7,7 @@ import type { Firestore, Unsubscribe, DocumentSnapshot, FirestoreError } from 'f
 import type { AuthService } from './auth-service';
 import type { TrainerState, Progress, UserData } from '../core/types/trainer';
 import type { ProgressData } from '../core/types/api';
+import { convertProgressToFirestore, convertProgressFromFirestore } from '../core/types/api';
 
 // ========== TYPED INTERFACES ==========
 export type SyncEventType = 'remoteUpdate' | 'localUpdate' | 'error';
@@ -91,15 +92,14 @@ export class SyncService {
                             detail: { progress: data.globalProgress } 
                         }));
                     }
-                    const remoteUpdate: RemoteUpdateData = {
-                        progress: (data as unknown) as UserData,
-                        lastModified: data.lastSync ? new Date(data.lastSync) : new Date(),
-                        userId: userId
-                    };
-                    
+                    // KEIN Cast zu UserData mehr nötig
                     this.notifyListeners({
                         type: 'remoteUpdate',
-                        data: remoteUpdate,
+                        data: {
+                            progress: data.globalProgress,
+                            lastModified: data.lastSync ? new Date(data.lastSync) : new Date(),
+                            userId: userId
+                        },
                         timestamp: new Date()
                     });
                 }
@@ -170,8 +170,9 @@ export class SyncService {
         const docPath = `users/${userId}/progress/${this.trainerType}`;
         const docRef = doc(this.db, docPath);
         
+        // progressData ist jetzt ein Set-basiertes Objekt, muss für Firestore konvertiert werden
         const dataToSave: ProgressData = {
-            globalProgress: progressData as Record<string, Record<string, string[]>>,
+            globalProgress: convertProgressToFirestore(progressData as Record<string, Record<string, Set<string>>>),
             lastSync: new Date(),
             version: '1.0',
             trainerId: this.trainerType

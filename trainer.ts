@@ -37,6 +37,7 @@ import { ErrorCounterManager } from './src/services/error-counter-manager';
 import type { AuthService } from './src/services/auth-service';
 import type { SyncService } from './src/services/sync-service';
 import type { RankingService } from './src/services/ranking-service';
+import { convertProgressToFirestore } from './src/core/types/api';
 
 let globalAuthUI: AuthUI | null = null;
 
@@ -310,18 +311,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         if ((window as any).authService?.isLoggedIn() && (window as any).firebaseSyncService) {
             console.log('💾 Speichere Fortschritt in Firebase...');
             // Konvertiere Sets zu Arrays für Firebase
-            const progressToSave: any = {};
-            Object.keys(state.progress.globalProgress).forEach(topicKey => {
-                progressToSave[topicKey] = {};
-                Object.keys(state.progress.globalProgress[topicKey]).forEach(mode => {
-                    const data = state.progress.globalProgress[topicKey][mode];
-                    if (data instanceof Set) {
-                        progressToSave[topicKey][mode] = Array.from(data);
-                    } else if (Array.isArray(data)) {
-                        progressToSave[topicKey][mode] = data;
-                    }
-                });
-            });
+            const progressToSave = convertProgressToFirestore(state.progress.globalProgress as Record<string, Record<string, Set<string>>>);
             (window as any).firebaseSyncService.saveProgress(progressToSave).catch((error: any) => {
                 console.error('❌ Firebase-Speicherung fehlgeschlagen:', error);
             });

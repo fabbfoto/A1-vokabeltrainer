@@ -320,36 +320,39 @@ export function fromFirestoreTimestamp(timestamp: Timestamp): Date {
   return timestamp.toDate();
 }
 
-export function convertProgressToFirestore(progress: Progress): FirestoreProgress['topicProgress'] {
-  const firestoreProgress: FirestoreProgress['topicProgress'] = {};
-  
-  for (const [topicId, topicData] of Object.entries(progress)) {
-    firestoreProgress[topicId] = {};
-    for (const [modeId, wordIds] of Object.entries(topicData)) {
-      firestoreProgress[topicId][modeId] = Array.from(wordIds);
-    }
-  }
-  
-  return firestoreProgress;
+// Hilfsfunktionen für Set/Array-Konvertierung
+export function convertProgressToFirestore(progress: Record<string, Record<string, Set<string>>>): Record<string, Record<string, string[]>> {
+    const result: Record<string, Record<string, string[]>> = {};
+    Object.keys(progress).forEach(topicKey => {
+        result[topicKey] = {};
+        Object.keys(progress[topicKey]).forEach(mode => {
+            result[topicKey][mode] = Array.from(progress[topicKey][mode]);
+        });
+    });
+    return result;
 }
 
-export function convertProgressFromFirestore(firestoreProgress: FirestoreProgress['topicProgress']): Progress {
-  const progress: Progress = {};
-  
-  for (const [topicId, topicData] of Object.entries(firestoreProgress)) {
-    progress[topicId] = {};
-    for (const [modeId, wordIdArray] of Object.entries(topicData)) {
-      progress[topicId][modeId] = new Set(wordIdArray.map(id => id as WordId));
-    }
-  }
-  
-  return progress;
+export function convertProgressFromFirestore(progress: Record<string, Record<string, string[]>>): Record<string, Record<string, Set<string>>> {
+    const result: Record<string, Record<string, Set<string>>> = {};
+    Object.keys(progress).forEach(topicKey => {
+        result[topicKey] = {};
+        Object.keys(progress[topicKey]).forEach(mode => {
+            result[topicKey][mode] = new Set(progress[topicKey][mode]);
+        });
+    });
+    return result;
 }
 
-// Ergänzung für Fortschritt-Synchronisation mit Firebase
-export interface ProgressData extends Partial<UserData> {
+export interface ProgressData {
+    globalProgress: Record<string, Record<string, string[]>>;
     lastSync?: Date;
     version?: string;
-    globalProgress?: Record<string, Record<string, string[]>>;
     trainerId?: string;
+}
+
+export interface FirestoreProgressData {
+    globalProgress: Record<string, Record<string, string[]>>;
+    lastSync: Date;
+    version: string;
+    trainerId: string;
 }
