@@ -69,12 +69,12 @@ export const supabaseProgress = {
       .select('progress_data')
       .eq('user_id', user.id)
       .eq('trainer_type', 'basis')
-      .single();
+      .single<ProgressRow>();
     if (error && error.code !== 'PGRST116') {
       console.error('Fehler beim Laden:', error);
       throw error;
     }
-    return (data && typeof data === 'object' && data !== null && 'progress_data' in data && (data as any).progress_data) ? (data as any).progress_data : null;
+    return data?.progress_data ?? null;
   },
 
   // Realtime Updates (optional)

@@ -36,13 +36,16 @@ import { ErrorCounterManager } from './src/services/error-counter-manager';
 import { supabase, supabaseAuth, supabaseProgress } from './src/services/supabase';
 import { createAuthButton } from './src/ui/components/supabase-auth-button';
 
-let globalAuthUI: AuthUI | null = null;
 let currentUser: any = null;
 
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // NEU: Firebase Auth initialisieren
-    let authUI: AuthUI;
+    let authUI: AuthUI = {
+        show: () => {},
+        hide: () => {},
+        container: null
+    };
     let syncService: any; // SyncService wurde entfernt
     let rankingService: any; // RankingService wurde entfernt
 
@@ -98,7 +101,6 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     NavigationEvents.dispatchRoot();
-    globalAuthUI = authUI;
     
     // NEU: Tastenkombination zum Schließen des "Perfekt!"-Popups
     document.addEventListener('keydown', (e) => {
@@ -1196,7 +1198,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     }
 
     function startTestUI(testTitle: string, modus: ModeId): void {
-        if (globalAuthUI) globalAuthUI.hide();
+        if (authUI) authUI.hide();
         ui.hideAllUIs(dom);
         dom.trainerMainViewEl.classList.remove('hidden');
         dom.navigationViewEl.classList.add('hidden');
