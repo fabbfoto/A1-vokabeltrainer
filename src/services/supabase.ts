@@ -18,6 +18,8 @@ export const supabaseAuth = {
     try {
       console.log('🔐 Starte Google OAuth Anmeldung...');
       console.log('📍 Redirect URL:', window.location.origin);
+      console.log('📍 Supabase URL:', SUPABASE_URL);
+      console.log('📍 Anon Key vorhanden:', !!SUPABASE_ANON_KEY);
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -34,6 +36,15 @@ export const supabaseAuth = {
         console.error('❌ Google OAuth Fehler:', error);
         console.error('❌ Fehler-Code:', error.status);
         console.error('❌ Fehler-Nachricht:', error.message);
+        console.error('❌ Fehler-Details:', error);
+        
+        // Spezifische Fehlerbehandlung
+        if (error.message?.includes('redirect_uri_mismatch')) {
+          console.error('🔧 LÖSUNG: Redirect URI in Google Cloud Console anpassen');
+          console.error('🔧 Erwartete Redirect URI:', `${SUPABASE_URL}/auth/v1/callback`);
+          console.error('🔧 Netlify Redirect URI:', `${window.location.origin}/auth/v1/callback`);
+        }
+        
         throw error;
       }
       
@@ -58,6 +69,9 @@ export const supabaseAuth = {
   async testOAuthConfig(): Promise<boolean> {
     try {
       console.log('🔍 Teste OAuth-Konfiguration...');
+      console.log('📍 Aktuelle URL:', window.location.href);
+      console.log('📍 Origin:', window.location.origin);
+      console.log('📍 Hostname:', window.location.hostname);
       
       // Teste ob OAuth-Provider verfügbar sind
       const { data: providers, error: providersError } = await supabase.auth.listIdentities();
@@ -182,6 +196,8 @@ export const supabaseProgress = {
       console.log('🔍 Teste Supabase-Verbindung...');
       console.log('📍 URL:', SUPABASE_URL);
       console.log('🔑 Anon Key vorhanden:', !!SUPABASE_ANON_KEY);
+      console.log('🌐 Aktuelle Domain:', window.location.hostname);
+      console.log('🔗 Aktuelle URL:', window.location.href);
       
       // Teste OAuth-Konfiguration
       const oauthOk = await supabaseAuth.testOAuthConfig();
@@ -227,6 +243,79 @@ export const supabaseProgress = {
       console.error('❌ Fehler-Stack:', error instanceof Error ? error.stack : 'Kein Stack verfügbar');
       return false;
     }
+  },
+
+  // NEUE FUNKTION: Umfassende Diagnose
+  async runDiagnostics(): Promise<void> {
+    console.group('🔍 SUPABASE DIAGNOSE');
+    
+    try {
+      // 1. Grundkonfiguration
+      console.log('1️⃣ Grundkonfiguration:');
+      console.log('   URL:', SUPABASE_URL);
+      console.log('   Anon Key:', SUPABASE_ANON_KEY ? '✅ Vorhanden' : '❌ Fehlt');
+      console.log('   Domain:', window.location.hostname);
+      console.log('   Origin:', window.location.origin);
+      
+      // 2. Client-Verbindung
+      console.log('2️⃣ Client-Verbindung:');
+      try {
+        const { data: testData, error: testError } = await supabase
+          .from('progress')
+          .select('count')
+          .limit(1);
+        
+        if (testError) {
+          console.log('   ❌ Verbindung fehlgeschlagen:', testError.message);
+        } else {
+          console.log('   ✅ Verbindung erfolgreich');
+        }
+      } catch (e) {
+        console.log('   ❌ Verbindungstest fehlgeschlagen:', e);
+      }
+      
+      // 3. OAuth-Konfiguration
+      console.log('3️⃣ OAuth-Konfiguration:');
+      try {
+        const { data: providers, error: providersError } = await supabase.auth.listIdentities();
+        if (providersError) {
+          console.log('   ❌ OAuth-Provider nicht verfügbar:', providersError.message);
+        } else {
+          console.log('   ✅ OAuth-Provider verfügbar:', providers?.length || 0);
+        }
+      } catch (e) {
+        console.log('   ❌ OAuth-Test fehlgeschlagen:', e);
+      }
+      
+      // 4. Aktuelle Session
+      console.log('4️⃣ Aktuelle Session:');
+      try {
+        const { data: session, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) {
+          console.log('   ❌ Session-Fehler:', sessionError.message);
+        } else if (session.session) {
+          console.log('   ✅ Angemeldet als:', session.session.user.email);
+        } else {
+          console.log('   ℹ️ Nicht angemeldet');
+        }
+      } catch (e) {
+        console.log('   ❌ Session-Test fehlgeschlagen:', e);
+      }
+      
+      // 5. Empfohlene Aktionen
+      console.log('5️⃣ Empfohlene Aktionen:');
+      console.log('   📋 1. Google Cloud Console OAuth konfigurieren');
+      console.log('   📋 2. Redirect URIs hinzufügen:');
+      console.log('      -', `${SUPABASE_URL}/auth/v1/callback`);
+      console.log('      -', `${window.location.origin}/auth/v1/callback`);
+      console.log('   📋 3. Supabase Dashboard → Auth → Providers → Google aktivieren');
+      console.log('   📋 4. Client ID und Secret in Supabase eintragen');
+      
+    } catch (error) {
+      console.error('❌ Diagnose fehlgeschlagen:', error);
+    }
+    
+    console.groupEnd();
   },
 
   async createProgressTable(): Promise<void> {

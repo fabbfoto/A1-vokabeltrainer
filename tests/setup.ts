@@ -1,45 +1,5 @@
 import { vi } from 'vitest';
 
-// Mock Firebase
-vi.mock('firebase/auth', () => ({
-  getAuth: vi.fn(() => ({
-    currentUser: null,
-    onIdTokenChanged: vi.fn(),
-    signInWithPopup: vi.fn(),
-    signOut: vi.fn()
-  })),
-  onIdTokenChanged: vi.fn(),
-  signInWithPopup: vi.fn(),
-  signOut: vi.fn(),
-  GoogleAuthProvider: vi.fn(() => ({
-    addScope: vi.fn()
-  }))
-}));
-
-// Mock Firebase Firestore
-vi.mock('firebase/firestore', () => ({
-  getFirestore: vi.fn(),
-  doc: vi.fn(),
-  setDoc: vi.fn(),
-  getDoc: vi.fn(),
-  onSnapshot: vi.fn(),
-  collection: vi.fn(),
-  query: vi.fn(),
-  orderBy: vi.fn(),
-  limit: vi.fn(),
-  where: vi.fn(),
-  addDoc: vi.fn(),
-  updateDoc: vi.fn(),
-  deleteDoc: vi.fn()
-}));
-
-// Mock Firebase App
-vi.mock('firebase/app', () => ({
-  initializeApp: vi.fn(() => ({})),
-  getApp: vi.fn(() => ({})),
-  getApps: vi.fn(() => [])
-}));
-
 // Mock localStorage
 Object.defineProperty(window, 'localStorage', {
   value: {

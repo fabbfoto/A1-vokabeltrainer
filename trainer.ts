@@ -1761,6 +1761,28 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         ui.updateErrorCounts(dom, state, learningModes);
     };
 
+    // NEUE DIAGNOSE-FUNKTIONEN
+    (window as any).testSupabase = () => {
+        console.log('🧪 Starte Supabase-Test...');
+        supabaseProgress.testConnection().then(result => {
+            console.log('✅ Supabase-Test Ergebnis:', result);
+        });
+    };
+
+    (window as any).runSupabaseDiagnostics = () => {
+        console.log('🔍 Starte Supabase-Diagnose...');
+        supabaseProgress.runDiagnostics();
+    };
+
+    (window as any).testGoogleOAuth = async () => {
+        console.log('🔐 Teste Google OAuth...');
+        try {
+            await supabaseAuth.signInWithGoogle();
+        } catch (error) {
+            console.error('❌ Google OAuth Test fehlgeschlagen:', error);
+        }
+    };
+
     createAuthButton();
 
 });
