@@ -310,9 +310,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Synchronisiere mit Firebase wenn angemeldet
         if ((window as any).authService?.isLoggedIn() && (window as any).firebaseSyncService) {
             console.log('💾 Speichere Fortschritt in Firebase...');
-            // Konvertiere Sets zu Arrays für Firebase
-            const progressToSave = convertProgressToFirestore(state.progress.globalProgress as Record<string, Record<string, Set<string>>>);
-            (window as any).firebaseSyncService.saveProgress(progressToSave).catch((error: any) => {
+            (window as any).firebaseSyncService.saveProgress(state.progress.globalProgress).catch((error: any) => {
                 console.error('❌ Firebase-Speicherung fehlgeschlagen:', error);
             });
         }

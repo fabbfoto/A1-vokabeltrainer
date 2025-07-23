@@ -92,11 +92,11 @@ export class SyncService {
                             detail: { progress: data.globalProgress } 
                         }));
                     }
-                    // KEIN Cast zu UserData mehr nötig
+                    // Baue ein UserData-kompatibles Objekt für das Event
                     this.notifyListeners({
                         type: 'remoteUpdate',
                         data: {
-                            progress: data.globalProgress,
+                            progress: { progress: data.globalProgress },
                             lastModified: data.lastSync ? new Date(data.lastSync) : new Date(),
                             userId: userId
                         },
@@ -158,9 +158,9 @@ export class SyncService {
 
     /**
      * Speichert den gesamten Lernfortschritt in Firestore.
-     * @param progressData - Das Fortschritts-Objekt.
+     * @param progressData - Das Fortschritts-Objekt (Set-basiert).
      */
-    public async saveProgress(progressData: ProgressData): Promise<void> {
+    public async saveProgress(progressData: Record<string, Record<string, Set<string>>>): Promise<void> {
         const userId = this.authService?.getUserId();
         if (!userId) {
             console.warn('⚠️ Nicht speichern, da kein User angemeldet ist');
@@ -172,7 +172,7 @@ export class SyncService {
         
         // progressData ist jetzt ein Set-basiertes Objekt, muss für Firestore konvertiert werden
         const dataToSave: ProgressData = {
-            globalProgress: convertProgressToFirestore(progressData as Record<string, Record<string, Set<string>>>),
+            globalProgress: convertProgressToFirestore(progressData),
             lastSync: new Date(),
             version: '1.0',
             trainerId: this.trainerType
@@ -185,7 +185,7 @@ export class SyncService {
             this.notifyListeners({
                 type: 'localUpdate',
                 data: {
-                    progress: progressData,
+                    progress: { progress: convertProgressToFirestore(progressData) },
                     userId: userId
                 },
                 timestamp: new Date()
