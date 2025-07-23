@@ -125,12 +125,15 @@ export const supabaseProgress = {
   async testConnection(): Promise<boolean> {
     try {
       console.log('🔍 Teste Supabase-Verbindung...');
+      console.log('📍 URL:', SUPABASE_URL);
+      console.log('🔑 Anon Key vorhanden:', !!SUPABASE_ANON_KEY);
       
       // Teste Auth-Verbindung
       const user = await supabaseAuth.getUser();
       console.log('✅ Auth-Verbindung funktioniert, User:', user?.email || 'nicht angemeldet');
       
       // Teste Datenbank-Verbindung durch einfache Abfrage
+      console.log('🔄 Teste Datenbank-Verbindung...');
       const { data, error } = await supabase
         .from('progress')
         .select('count')
@@ -138,14 +141,73 @@ export const supabaseProgress = {
       
       if (error) {
         console.error('❌ Datenbank-Verbindung fehlgeschlagen:', error);
+        console.error('❌ Fehler-Code:', error.code);
+        console.error('❌ Fehler-Nachricht:', error.message);
+        console.error('❌ Fehler-Details:', error.details);
+        
+        // Spezifische Behandlung für fehlende Tabelle
+        if (error.code === 'PGRST116') {
+          console.error('❌ Tabelle "progress" existiert nicht!');
+          console.log('💡 Erstelle Tabelle automatisch...');
+          await this.createProgressTable();
+          return true;
+        }
+        
         return false;
       }
       
       console.log('✅ Datenbank-Verbindung funktioniert');
+      console.log('✅ Tabelle "progress" existiert');
       return true;
     } catch (error) {
       console.error('❌ Verbindungstest fehlgeschlagen:', error);
+      console.error('❌ Fehler-Typ:', typeof error);
+      console.error('❌ Fehler-Stack:', error instanceof Error ? error.stack : 'Kein Stack verfügbar');
       return false;
+    }
+  },
+
+  async createProgressTable(): Promise<void> {
+    try {
+      console.log('🔨 Erstelle progress Tabelle...');
+      
+      // SQL zum Erstellen der Tabelle
+      const createTableSQL = `
+        CREATE TABLE IF NOT EXISTS progress (
+          id SERIAL PRIMARY KEY,
+          user_id UUID NOT NULL,
+          trainer_type TEXT NOT NULL DEFAULT 'basis',
+          progress_data JSONB NOT NULL,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+          updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+        
+        -- Erstelle Index für bessere Performance
+        CREATE INDEX IF NOT EXISTS idx_progress_user_id ON progress(user_id);
+        CREATE INDEX IF NOT EXISTS idx_progress_trainer_type ON progress(trainer_type);
+        
+        -- Erstelle RLS Policy für sicheren Zugriff
+        ALTER TABLE progress ENABLE ROW LEVEL SECURITY;
+        
+        -- Policy: Benutzer können nur ihre eigenen Daten sehen/bearbeiten
+        DROP POLICY IF EXISTS "Users can manage their own progress" ON progress;
+        CREATE POLICY "Users can manage their own progress" ON progress
+          FOR ALL USING (auth.uid() = user_id);
+      `;
+      
+      const { error } = await supabase.rpc('exec_sql', { sql: createTableSQL });
+      
+      if (error) {
+        console.error('❌ Fehler beim Erstellen der Tabelle:', error);
+        console.log('💡 Tabelle muss manuell in Supabase erstellt werden');
+        console.log('📋 SQL zum manuellen Erstellen:');
+        console.log(createTableSQL);
+      } else {
+        console.log('✅ Progress Tabelle erfolgreich erstellt');
+      }
+    } catch (error) {
+      console.error('❌ Fehler beim Erstellen der Tabelle:', error);
+      console.log('💡 Tabelle muss manuell in Supabase erstellt werden');
     }
   },
 
