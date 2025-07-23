@@ -1785,4 +1785,59 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     createAuthButton();
 
+    // ========== SUPABASE TEST-FUNKTIONEN ==========
+    // Test-Button erstellen
+    function createSupabaseTestButton() {
+      const testButton = document.createElement('button');
+      testButton.className = 'fixed bottom-4 right-4 z-50 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 shadow-lg';
+      testButton.innerHTML = '🧪 Test Supabase';
+      testButton.onclick = async () => {
+        console.log('=== SUPABASE TEST START ===');
+        
+        // Test 1: Verbindung
+        try {
+          const { error } = await supabase.from('progress').select('count').limit(1);
+          console.log('✅ Connection test:', error ? error.message : 'SUCCESS');
+        } catch (e) {
+          console.log('❌ Connection failed:', e);
+        }
+        
+        // Test 2: Auth Status
+        try {
+          const user = await supabaseAuth.getUser();
+          console.log(user ? `✅ Logged in as: ${user.email}` : '⚠️ Not logged in');
+        } catch (e) {
+          console.log('❌ Auth check failed:', e);
+        }
+        
+        // Test 3: Save
+        try {
+          const user = await supabaseAuth.getUser();
+          if (user) {
+            await supabaseProgress.save({ test: true, timestamp: new Date().toISOString() });
+            console.log('✅ Save test completed');
+          }
+        } catch (e) {
+          console.log('❌ Save failed:', e);
+        }
+        
+        // Test 4: Load
+        try {
+          const data = await supabaseProgress.load();
+          console.log('✅ Load test:', data ? 'Data found' : 'No data');
+          if (data) console.log('Loaded data:', data);
+        } catch (e) {
+          console.log('❌ Load failed:', e);
+        }
+        
+        console.log('=== SUPABASE TEST END ===');
+        alert('Test abgeschlossen! Siehe Browser-Konsole (F12)');
+      };
+      
+      document.body.appendChild(testButton);
+    }
+
+    // Nach 2 Sekunden laden
+    setTimeout(createSupabaseTestButton, 2000);
+
 });
