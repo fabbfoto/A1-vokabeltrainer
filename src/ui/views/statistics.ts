@@ -201,36 +201,7 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
  * Aktualisiert die Haupt-Statistiken in der Übungsrunde.
  */
 export function updatePracticeStats(dom: DOMElements, state: TrainerState, learningModes: LearningModes): void {
-    if (dom.correctInRoundPracticeEl) {
-        dom.correctInRoundPracticeEl.textContent = state.training.correctInCurrentRound.toString();
-    }
-    if (dom.attemptedInRoundPracticeEl) {
-        // BUGFIX: Korrigiere die Anzeige für die letzte Aufgabe
-        const attempted = state.training.attemptedInCurrentRound;
-        const total = state.training.shuffledWordsForMode.length;
-        const currentIndex = state.training.currentWordIndex;
-        
-        // Wenn wir bei der letzten Aufgabe sind (Index = total-1) 
-        // und sie wurde beantwortet, zeige die volle Anzahl
-        if (currentIndex >= total - 1 && attempted === total) {
-            dom.attemptedInRoundPracticeEl.textContent = total.toString();
-        } else {
-            dom.attemptedInRoundPracticeEl.textContent = attempted.toString();
-        }
-    }
-    
-    const accuracy = state.training.attemptedInCurrentRound > 0 
-        ? (state.training.correctInCurrentRound / state.training.attemptedInCurrentRound) * 100 
-        : 0;
-    
-    if (dom.accuracyInRoundPracticeEl) {
-        // Stelle sicher, dass alle Tailwind-Klassen gesetzt sind
-        if (!dom.accuracyInRoundPracticeEl.classList.contains('transition-all')) {
-            dom.accuracyInRoundPracticeEl.className = 'h-full transition-all duration-500 ease-in-out';
-        }
-        setProgressBarWidth(dom.accuracyInRoundPracticeEl, accuracy);
-        setProgressBarColor(dom.accuracyInRoundPracticeEl, accuracy, 'standard');
-    }
+    // Hauptfortschrittsbalken wurde entfernt - nur noch Category Stats aktualisieren
     updateCategoryStats(dom, state, learningModes);
 }
 

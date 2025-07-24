@@ -45,7 +45,6 @@ function validateDOMElements(): DOMValidationResult {
         'example-sentence-display',
         'word-line-container',
         'sentence-line-container',
-        'word-sentence-block',
         'audio-word-button',
         'audio-sentence-button',
         'mc-de-en-ui',
@@ -58,21 +57,22 @@ function validateDOMElements(): DOMValidationResult {
         'spelling-input-noun-1',
         'spelling-input-noun-2',
         'check-spelling-button',
+        'umlaut-buttons-container',
         'cloze-adj-de-ui',
         'cloze-hint-container',
         'cloze-sentence-container',
         'check-cloze-button',
+        'umlaut-buttons-container-cloze',
         'sentence-translation-en-de-ui',
         'sentence-word-input-container',
         'check-sentence-translation-button',
+        'umlaut-buttons-container-sentence',
         'feedback-container',
         'correction-solution',
         'continue-button',
         'message-box',
         'practice-stats-view',
-        'correct-in-round-practice',
-        'attempted-in-round-practice',
-        'accuracy-bar',
+        // Entfernte Elemente: 'correct-in-round-practice', 'attempted-in-round-practice', 'accuracy-bar'
         'category-stats-container',
         'test-stats-view',
         'test-progress-bar',
@@ -187,9 +187,7 @@ function initializeDOM(): DOMElements {
         
         // Practice Statistics
         practiceStatsViewEl: getElement<HTMLElement>('practice-stats-view'),
-        correctInRoundPracticeEl: getElement<HTMLElement>('correct-in-round-practice'),
-        attemptedInRoundPracticeEl: getElement<HTMLElement>('attempted-in-round-practice'),
-        accuracyInRoundPracticeEl: getElement<HTMLElement>('accuracy-bar'),
+        // Entfernte DOM-Elemente: correctInRoundPracticeEl, attemptedInRoundPracticeEl, accuracyInRoundPracticeEl
         categoryStatsContainerEl: getElement<HTMLElement>('category-stats-container'),
         
         // Test Statistics
