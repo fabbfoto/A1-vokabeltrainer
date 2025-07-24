@@ -696,13 +696,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 setTimeout(() => {
                     console.log('[BUGFIX] Verzögertes Update für letzte Aufgabe');
                     updateStatistics();
-                    // Stelle sicher, dass die Anzeige wirklich 12/12 zeigt
-                    if (dom.attemptedInRoundPracticeEl) {
-                        dom.attemptedInRoundPracticeEl.textContent = state.training.shuffledWordsForMode.length.toString();
-                    }
-                    if (dom.correctInRoundPracticeEl && isCorrect) {
-                        dom.correctInRoundPracticeEl.textContent = state.training.correctInCurrentRound.toString();
-                    }
+                    // Hauptfortschrittsbalken wurde entfernt - keine DOM-Manipulation mehr nötig
                 }, 100);
             }
         } catch (error) {
