@@ -68,7 +68,7 @@ export function showSuccessPopup(dom: DOMElements, state: TrainerState): void {
             
             <div class="space-y-3">
                 <button 
-                    onclick="window.location.reload()" 
+                    id="success-repeat-button"
                     class="w-full px-6 py-3 bg-de-green text-white rounded-lg hover:bg-de-green-dark transition-colors font-medium">
                     Übung wiederholen
                 </button>
@@ -82,6 +82,30 @@ export function showSuccessPopup(dom: DOMElements, state: TrainerState): void {
     `;
     
     dom.successPopup.style.display = 'flex';
+    
+    // Event Listener für den "Übung wiederholen" Button
+    const repeatButton = document.getElementById('success-repeat-button');
+    if (repeatButton) {
+        repeatButton.addEventListener('click', () => {
+            dom.successPopup.style.display = 'none';
+            
+            // Progress zurücksetzen und Modus neu starten (wie in showSuccessMessageWithButton)
+            const progressKey = `${state.navigation.currentMainTopic}|${state.navigation.currentSubTopic}`;
+            if (progressKey && state.progress.globalProgress[progressKey] && state.training.currentMode) {
+                state.progress.globalProgress[progressKey][state.training.currentMode] = new Set();
+                // Progress speichern (falls eine saveProgress Funktion verfügbar ist)
+                if (typeof (window as any).saveProgress === 'function') {
+                    (window as any).saveProgress();
+                }
+            }
+            if (state.training.currentMode !== null) {
+                // Modus neu starten (falls eine setMode Funktion verfügbar ist)
+                if (typeof (window as any).setMode === 'function') {
+                    (window as any).setMode(state.training.currentMode, false);
+                }
+            }
+        });
+    }
 }
 
 /**
