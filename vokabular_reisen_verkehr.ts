@@ -644,8 +644,8 @@ export const vokabularReisenVerkehr: VocabularyStructure = createVocabulary({
             {
                 id: createWordId("reisen-verkehr-ferienziele-007"),
                 wordType: "noun",
-                german: "Berge",
-                article: "die",
+                german: "Berg",
+                article: "der",
                 plural: "Berge",
                 english: "mountains",
                 exampleGerman: [
