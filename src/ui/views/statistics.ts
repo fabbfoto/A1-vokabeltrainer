@@ -151,12 +151,12 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
     if (totalItemsInSet === 0) return;
 
     const title = document.createElement('p');
-    title.className = 'text-xs text-gray-500 text-center mb-1';
+    title.className = 'text-base font-semibold text-gray-700 text-center mb-4';
     title.textContent = 'Fortschritt pro Übungsmodus:';
     dom.categoryStatsContainerEl.appendChild(title);
 
     const itemsContainer = document.createElement('div');
-    itemsContainer.className = 'text-xs text-gray-600 space-y-1';
+    itemsContainer.className = 'text-sm text-gray-600 space-y-3';
     
     Object.keys(learningModes).forEach(modeId => {
         const modeInfo = learningModes[modeId];
@@ -167,20 +167,20 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
 
         // Container für eine Zeile
         const item = document.createElement('div');
-        item.className = 'flex justify-between items-center gap-2';
+        item.className = 'flex justify-between items-center gap-4';
         
         // Text-Label
         const label = document.createElement('span');
-        label.className = 'text-xs text-gray-600';
+        label.className = 'text-base font-medium text-gray-700 min-w-[120px]';
         label.textContent = `${modeInfo.name}: ${masteredCount} / ${totalItemsInSet}`;
         
-        // Balken-Container (grauer Hintergrund)
+        // Balken-Container (grauer Hintergrund) - größer gemacht
         const barContainer = document.createElement('div');
-        barContainer.className = 'bg-gray-200 rounded-lg overflow-hidden h-3 w-24';
+        barContainer.className = 'bg-gray-200/50 rounded-xl overflow-hidden h-4 w-32 backdrop-blur-sm';
         
-        // Innerer Balken
+        // Innerer Balken - prominenter
         const bar = document.createElement('div');
-        bar.className = 'h-full transition-all duration-300 ease-in-out';
+        bar.className = 'h-full transition-all duration-500 ease-in-out rounded-xl';
         
         // Setze Breite und Farbe
         setProgressBarWidth(bar, percentage);
