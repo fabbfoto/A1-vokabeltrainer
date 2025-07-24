@@ -148,7 +148,7 @@ function initializeDOM(): DOMElements {
         exampleSentenceDisplayEl: getElement<HTMLElement>('example-sentence-display'),
         wordLineContainerEl: getElement<HTMLElement>('word-line-container'),
         sentenceLineContainerEl: getElement<HTMLElement>('sentence-line-container'),
-        wordSentenceBlockEl: getElement<HTMLElement>('word-sentence-block'),
+        // wordSentenceBlockEl entfernt - nicht mehr benötigt
         
         // Audio Buttons
         audioWordButtonEl: getElement<HTMLButtonElement>('audio-word-button'),

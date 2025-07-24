@@ -22,7 +22,6 @@ export interface DOMElements {
     exampleSentenceDisplayEl: HTMLElement;
     wordLineContainerEl: HTMLElement;
     sentenceLineContainerEl: HTMLElement;
-    wordSentenceBlockEl: HTMLElement;
     
     // Audio Buttons
     audioWordButtonEl: HTMLButtonElement;
@@ -61,9 +60,6 @@ export interface DOMElements {
     
     // Practice Statistics
     practiceStatsViewEl: HTMLElement;
-    correctInRoundPracticeEl: HTMLElement;
-    attemptedInRoundPracticeEl: HTMLElement;
-    accuracyInRoundPracticeEl: HTMLElement;
     categoryStatsContainerEl: HTMLElement;
     
     // Test Statistics
