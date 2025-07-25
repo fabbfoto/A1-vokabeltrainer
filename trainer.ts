@@ -55,10 +55,75 @@ function createAuthButton() {
   dropdown.className = 'hidden absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2';
   dropdown.style.minWidth = '220px';
 
-  // Google-Login-Option
+  // DSGVO-konforme Optionen zuerst anzeigen
+  const dsgvoHeader = document.createElement('div');
+  dsgvoHeader.className = 'text-xs text-blue-200 font-semibold mb-2 border-b border-blue-700 pb-2';
+  dsgvoHeader.textContent = 'DSGVO-konform & anonym';
+
+  // Magic Link Option (Empfohlen)
+  const magicLinkBtn = document.createElement('button');
+  magicLinkBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors text-left';
+  magicLinkBtn.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><div><div class="font-semibold">Magic Link</div><div class="text-xs text-blue-300">E-Mail-Link ohne Passwort</div></div>`;
+
+  // Magic Link Formular
+  const magicLinkForm = document.createElement('form');
+  magicLinkForm.className = 'flex flex-col gap-2 mt-2';
+  magicLinkForm.innerHTML = `
+    <input type="email" name="email" placeholder="E-Mail-Adresse" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
+    <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Link senden</button>
+    <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-magic-link">Abbrechen</button>
+  `;
+  magicLinkForm.style.display = 'none';
+
+  magicLinkForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(magicLinkForm);
+    const email = formData.get('email') as string;
+    
+    try {
+      const result = await supabaseAuth.signInWithMagicLink(email);
+      alert(result.message);
+      dropdown.classList.add('hidden');
+      magicLinkForm.reset();
+    } catch (error) {
+      alert('Fehler beim Senden des Magic Links: ' + (error as Error).message);
+    }
+  };
+
+  magicLinkBtn.onclick = () => {
+    magicLinkBtn.style.display = 'none';
+    magicLinkForm.style.display = '';
+  };
+
+  magicLinkForm.querySelector('#cancel-magic-link')!.addEventListener('click', () => {
+    magicLinkForm.style.display = 'none';
+    magicLinkBtn.style.display = '';
+  });
+
+  // Anonyme Session Option
+  const anonymousBtn = document.createElement('button');
+  anonymousBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors text-left';
+  anonymousBtn.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><div><div class="font-semibold">Anonym lernen</div><div class="text-xs text-blue-300">Ohne E-Mail-Adresse</div></div>`;
+
+  anonymousBtn.onclick = async () => {
+    try {
+      const result = await supabaseAuth.createAnonymousSession();
+      alert('Anonyme Session erstellt! Du kannst jetzt lernen, ohne persönliche Daten zu hinterlassen.');
+      dropdown.classList.add('hidden');
+    } catch (error) {
+      alert('Fehler bei der anonymen Anmeldung: ' + (error as Error).message);
+    }
+  };
+
+  // Trennlinie
+  const divider = document.createElement('div');
+  divider.className = 'text-xs text-blue-300 text-center my-2 border-t border-blue-700 pt-2';
+  divider.textContent = 'oder';
+
+  // Google-Login-Option (nur für Kompatibilität)
   const googleBtn = document.createElement('button');
-  googleBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors';
-  googleBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M16.318 13.084A7.963 7.963 0 0018 10c0-.638-.07-1.257-.2-1.852H10v3.504h4.318z"/><path d="M10 18c2.16 0 3.97-.72 5.293-1.963l-2.56-2.09C11.97 14.633 11.05 15 10 15c-2.07 0-3.82-1.4-4.44-3.29H2.86v2.07A7.997 7.997 0 0010 18z"/><path d="M5.56 11.71A4.978 4.978 0 015 10c0-.34.03-.67.09-.99V6.94H2.86A7.997 7.997 0 002 10c0 1.26.29 2.45.8 3.5l2.76-1.79z"/><path d="M10 5c1.13 0 2.14.39 2.94 1.15l2.2-2.2C13.97 2.72 12.16 2 10 2 6.48 2 3.44 4.24 2.86 6.94l2.7 2.09C6.18 7.4 7.93 6 10 6z"/></svg><span>Mit Google anmelden</span>`;
+  googleBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors text-left';
+  googleBtn.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M16.318 13.084A7.963 7.963 0 0018 10c0-.638-.07-1.257-.2-1.852H10v3.504h4.318z"/><path d="M10 18c2.16 0 3.97-.72 5.293-1.963l-2.56-2.09C11.97 14.633 11.05 15 10 15c-2.07 0-3.82-1.4-4.44-3.29H2.86v2.07A7.997 7.997 0 0010 18z"/><path d="M5.56 11.71A4.978 4.978 0 015 10c0-.34.03-.67.09-.99V6.94H2.86A7.997 7.997 0 002 10c0 1.26.29 2.45.8 3.5l2.76-1.79z"/><path d="M10 5c1.13 0 2.14.39 2.94 1.15l2.2-2.2C13.97 2.72 12.16 2 10 2 6.48 2 3.44 4.24 2.86 6.94l2.7 2.09C6.18 7.4 7.93 6 10 6z"/></svg><div><div class="font-semibold">Mit Google anmelden</div><div class="text-xs text-blue-300">Nicht DSGVO-konform</div></div>`;
   googleBtn.onclick = () => {
     supabaseAuth.signInWithGoogle().catch(error => {
       console.error('Login-Fehler:', error);
@@ -66,10 +131,10 @@ function createAuthButton() {
     });
   };
 
-  // E-Mail-Login-Option
+  // E-Mail-Login-Option (nur für Kompatibilität)
   const emailBtn = document.createElement('button');
-  emailBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors';
-  emailBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm8 0a8 8 0 11-16 0 8 8 0 0116 0z"/></svg><span>Mit E-Mail anmelden</span>`;
+  emailBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors text-left';
+  emailBtn.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm8 0a8 8 0 11-16 0 8 8 0 0116 0z"/></svg><div><div class="font-semibold">Mit E-Mail anmelden</div><div class="text-xs text-blue-300">Passwort erforderlich</div></div>`;
 
   // E-Mail-Login-Formular (wird beim Klick auf emailBtn angezeigt)
   const emailForm = document.createElement('form');
@@ -105,54 +170,43 @@ function createAuthButton() {
     emailForm.style.display = '';
   };
 
+  // DSGVO-Hinweis
+  const dsgvoInfo = document.createElement('div');
+  dsgvoInfo.className = 'text-xs text-blue-200 mt-2 p-2 bg-blue-900/50 rounded';
+  dsgvoInfo.innerHTML = `
+    <div class="font-semibold mb-1">🔒 DSGVO-konform</div>
+    <div>• Magic Link: Nur E-Mail, kein Passwort</div>
+    <div>• Anonym: Keine persönlichen Daten</div>
+    <div>• Datenlöschung jederzeit möglich</div>
+  `;
+
+  // Elemente zum Dropdown hinzufügen
+  dropdown.appendChild(dsgvoHeader);
+  dropdown.appendChild(magicLinkBtn);
+  dropdown.appendChild(magicLinkForm);
+  dropdown.appendChild(anonymousBtn);
+  dropdown.appendChild(divider);
   dropdown.appendChild(googleBtn);
   dropdown.appendChild(emailBtn);
   dropdown.appendChild(emailForm);
+  dropdown.appendChild(dsgvoInfo);
 
   // Dropdown-Logik
   let dropdownOpen = false;
   button.onclick = (e) => {
     e.stopPropagation();
     dropdownOpen = !dropdownOpen;
-    dropdown.className = dropdownOpen
-      ? 'absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2'
-      : 'hidden absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2';
+    dropdown.classList.toggle('hidden', !dropdownOpen);
   };
+
+  // Dropdown schließen beim Klick außerhalb
   document.addEventListener('click', () => {
-    dropdownOpen = false;
-    dropdown.className = 'hidden absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2';
+    if (dropdownOpen) {
+      dropdownOpen = false;
+      dropdown.classList.add('hidden');
+    }
   });
 
-  async function updateButton() {
-    try {
-      const user = await supabaseAuth.getUser();
-      if (user) {
-        button.innerHTML = `
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
-          </svg>
-          <span>${user.email?.split('@')[0] || 'User'}</span>
-          <span class="text-sm opacity-75">(Abmelden)</span>
-        `;
-        button.onclick = async () => {
-          if (confirm('Wirklich abmelden?')) {
-            await supabaseAuth.signOut();
-            location.reload();
-          }
-        };
-        dropdown.className = 'hidden';
-      } else {
-        button.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"/></svg><span>Anmelden</span>`;
-      }
-    } catch (error) {
-      console.error('Auth-Button Update Fehler:', error);
-      button.innerHTML = '<span>Login nicht verfügbar</span>';
-    }
-  }
-  updateButton();
-  supabaseAuth.onAuthStateChange(() => updateButton());
-
-  // Button in den Container einfügen
   authContainer.appendChild(button);
   authContainer.appendChild(dropdown);
 }
@@ -1768,5 +1822,52 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     };
 
     createAuthButton();
+
+    // DSGVO-Modal Funktionen
+    function showDSGVOModal() {
+      const modal = document.getElementById('dsgvo-modal-overlay');
+      if (modal) {
+        modal.classList.remove('hidden');
+      }
+    }
+
+    function hideDSGVOModal() {
+      const modal = document.getElementById('dsgvo-modal-overlay');
+      if (modal) {
+        modal.classList.add('hidden');
+      }
+    }
+
+    // Datenlöschung Funktion
+    async function deleteUserData() {
+      if (!confirm('⚠️ WARNUNG: Diese Aktion löscht ALLE deine Daten unwiderruflich!\n\nBist du sicher, dass du fortfahren möchtest?')) {
+        return;
+      }
+
+      try {
+        const result = await supabaseAuth.deleteUserData();
+              if (result.success) {
+        alert('✅ Alle deine Daten wurden erfolgreich gelöscht.\n\nDu wirst jetzt abgemeldet und zur Startseite weitergeleitet.');
+        window.location.href = '/';
+      } else {
+        alert('❌ Fehler beim Löschen der Daten');
+      }
+      } catch (error) {
+        alert('❌ Fehler beim Löschen der Daten: ' + (error as Error).message);
+      }
+    }
+
+    // Event Listener für Datenlöschung
+    document.addEventListener('DOMContentLoaded', () => {
+      const deleteBtn = document.getElementById('delete-data-btn');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', deleteUserData);
+      }
+    });
+
+    // Globale Funktionen für HTML onclick
+    (window as any).showDSGVOModal = showDSGVOModal;
+    (window as any).hideDSGVOModal = hideDSGVOModal;
+    (window as any).deleteUserData = deleteUserData;
 
 });

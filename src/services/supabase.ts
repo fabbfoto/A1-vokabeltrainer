@@ -57,6 +57,117 @@ export const supabaseAuth = {
     }
   },
 
+  // NEUE FUNKTION: Magic Link Anmeldung (DSGVO-konform)
+  async signInWithMagicLink(email: string) {
+    try {
+      console.log('🔐 Starte Magic Link Anmeldung...');
+      console.log('📧 E-Mail:', email);
+      
+      const { data, error } = await supabase.auth.signInWithOtp({
+        email: email,
+        options: {
+          emailRedirectTo: 'https://a1-all-topics.netlify.app',
+          data: {
+            // Zusätzliche anonyme Metadaten (optional)
+            login_type: 'magic_link',
+            timestamp: new Date().toISOString()
+          }
+        }
+      });
+      
+      if (error) {
+        console.error('❌ Magic Link Fehler:', error);
+        throw error;
+      }
+      
+      console.log('✅ Magic Link gesendet:', data);
+      return {
+        success: true,
+        message: 'Magic Link wurde an deine E-Mail gesendet. Bitte prüfe dein Postfach.',
+        data: data
+      };
+    } catch (error) {
+      console.error('❌ Unerwarteter Fehler bei Magic Link:', error);
+      throw error;
+    }
+  },
+
+  // NEUE FUNKTION: Anonyme Session (ohne E-Mail)
+  async createAnonymousSession() {
+    try {
+      console.log('🔐 Erstelle anonyme Session...');
+      
+      // Generiere eine anonyme ID
+      const anonymousId = `anon_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Erstelle eine temporäre Session ohne E-Mail
+      const { data, error } = await supabase.auth.signUp({
+        email: `${anonymousId}@anonymous.local`,
+        password: Math.random().toString(36).substr(2, 15),
+        options: {
+          data: {
+            is_anonymous: true,
+            anonymous_id: anonymousId,
+            created_at: new Date().toISOString()
+          }
+        }
+      });
+      
+      if (error) {
+        console.error('❌ Anonyme Session Fehler:', error);
+        throw error;
+      }
+      
+      console.log('✅ Anonyme Session erstellt:', data);
+      return {
+        success: true,
+        anonymousId: anonymousId,
+        data: data
+      };
+    } catch (error) {
+      console.error('❌ Unerwarteter Fehler bei anonymer Session:', error);
+      throw error;
+    }
+  },
+
+  // NEUE FUNKTION: DSGVO-konforme Datenlöschung
+  async deleteUserData() {
+    try {
+      console.log('🗑️ Lösche Benutzerdaten (DSGVO)...');
+      
+      const user = await this.getUser();
+      if (!user) {
+        throw new Error('Kein Benutzer angemeldet');
+      }
+      
+      // Lösche alle Progress-Daten
+      const { error: progressError } = await supabase
+        .from('progress')
+        .delete()
+        .eq('user_id', user.id);
+      
+      if (progressError) {
+        console.error('❌ Fehler beim Löschen der Progress-Daten:', progressError);
+      } else {
+        console.log('✅ Progress-Daten gelöscht');
+      }
+      
+      // Lösche den Benutzer selbst
+      const { error: deleteError } = await supabase.auth.admin.deleteUser(user.id);
+      
+      if (deleteError) {
+        console.error('❌ Fehler beim Löschen des Benutzers:', deleteError);
+        throw deleteError;
+      }
+      
+      console.log('✅ Benutzerdaten vollständig gelöscht');
+      return { success: true };
+    } catch (error) {
+      console.error('❌ Fehler bei der Datenlöschung:', error);
+      throw error;
+    }
+  },
+
   async signOut() {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;

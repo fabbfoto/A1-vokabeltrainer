@@ -287,20 +287,94 @@
             <p class="auth-info">Kostenlos & sicher. Deine Daten gehören nur dir.</p>
             
             <!-- Debug Info -->
-            <div id="debug-info" class="debug-info" style="margin-top: 1rem; padding: 1rem; background: var(--de-gray-100); border-radius: 8px; font-size: 0.875rem;">
-                <p><strong>Status:</strong> <span id="auth-status-text">Prüfe...</span></p>
-                <p><strong>User ID:</strong> <span id="user-id-text">-</span></p>
-                <p><strong>Angemeldet:</strong> <span id="is-signed-in">-</span></p>
+            <div id="debug-info" class="debug-info hidden">
+                <h3>Debug-Informationen</h3>
+                <div id="debug-content"></div>
             </div>
         </div>
     </div>
-<!-- Deploy Test: 2025-06-27 -->
 
-<!-- Fehlende DOM-Elemente für TypeScript-Validierung -->
-<div id="word-sentence-block" style="display:none"></div>
-<div id="loading-indicator" style="display:none">
-  <span class="animate-spin">⏳</span> Wird geladen...
-</div>
+    <!-- DSGVO Datenschutz-Modal -->
+    <div id="dsgvo-modal-overlay" class="modal-overlay hidden">
+        <div id="dsgvo-modal" class="modal-content max-w-4xl max-h-[90vh] overflow-y-auto">
+            <button class="modal-close" onclick="hideDSGVOModal()">×</button>
+            <h2 class="text-2xl font-bold mb-6">🔒 DSGVO-konformer Datenschutz</h2>
+            
+            <div class="space-y-6">
+                <!-- Anonyme Optionen -->
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-green-800 mb-3">✅ Empfohlene anonyme Optionen</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <div class="font-semibold text-green-700">Magic Link Anmeldung</div>
+                                <div class="text-sm text-green-600">Nur E-Mail-Adresse, kein Passwort. Automatisch ablaufende Links.</div>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
+                            <div>
+                                <div class="font-semibold text-green-700">Vollständig anonyme Session</div>
+                                <div class="text-sm text-green-600">Lernen ohne jegliche persönliche Daten. Keine E-Mail erforderlich.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Datenspeicherung -->
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-blue-800 mb-3">📊 Was wird gespeichert?</h3>
+                    <div class="space-y-2 text-sm text-blue-700">
+                        <div>• <strong>Anonyme Sessions:</strong> Nur eine zufällige ID, keine persönlichen Daten</div>
+                        <div>• <strong>Magic Link:</strong> E-Mail-Adresse (nur für Login), Lernfortschritt</div>
+                        <div>• <strong>Lernfortschritt:</strong> Welche Wörter bereits gelernt wurden</div>
+                        <div>• <strong>Keine Cookies:</strong> Keine Tracking-Cookies oder Analytics</div>
+                    </div>
+                </div>
+
+                <!-- Datenlöschung -->
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-orange-800 mb-3">🗑️ Datenlöschung</h3>
+                    <div class="space-y-3">
+                        <div class="text-sm text-orange-700">
+                            <strong>Jederzeit möglich:</strong> Du kannst deine Daten jederzeit vollständig löschen.
+                        </div>
+                        <button id="delete-data-btn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                            🗑️ Alle meine Daten löschen
+                        </button>
+                        <div class="text-xs text-orange-600">
+                            ⚠️ Diese Aktion kann nicht rückgängig gemacht werden!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DSGVO-Rechte -->
+                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-purple-800 mb-3">⚖️ Deine DSGVO-Rechte</h3>
+                    <div class="space-y-2 text-sm text-purple-700">
+                        <div>• <strong>Auskunftsrecht:</strong> Du kannst erfahren, welche Daten gespeichert werden</div>
+                        <div>• <strong>Löschungsrecht:</strong> Du kannst alle Daten jederzeit löschen</div>
+                        <div>• <strong>Widerspruchsrecht:</strong> Du kannst der Datenverarbeitung widersprechen</div>
+                        <div>• <strong>Portabilität:</strong> Du kannst deine Daten exportieren</div>
+                    </div>
+                </div>
+
+                <!-- Kontakt -->
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">📧 Kontakt bei Fragen</h3>
+                    <div class="text-sm text-gray-700">
+                        Bei Fragen zum Datenschutz oder zur DSGVO-Konformität kannst du uns gerne kontaktieren.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DSGVO-Button (klein, unauffällig) -->
+    <button id="dsgvo-button" class="fixed bottom-4 right-4 bg-gray-800 hover:bg-gray-700 text-white text-xs px-3 py-2 rounded-full opacity-75 hover:opacity-100 transition-all duration-200 z-50" onclick="showDSGVOModal()">
+        🔒 DSGVO
+    </button>
 
 </body>
 </html>
