@@ -57,6 +57,106 @@ export const supabaseAuth = {
     }
   },
 
+  // NEUE FUNKTION: Anonymer Benutzername Anmeldung
+  async signInWithAnonymousUsername(username: string) {
+    try {
+      console.log('🔐 Starte anonyme Benutzername-Anmeldung...');
+      console.log('👤 Benutzername:', username);
+      
+      // Prüfe ob Benutzername mindestens 8 Zeichen hat
+      if (username.length < 8) {
+        throw new Error('Benutzername muss mindestens 8 Zeichen lang sein');
+      }
+      
+      // Prüfe ob Benutzername bereits existiert
+      const { data: existingUser, error: checkError } = await supabase
+        .from('anonymous_users')
+        .select('username')
+        .eq('username', username)
+        .single();
+      
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('❌ Fehler beim Prüfen des Benutzernamens:', checkError);
+        throw checkError;
+      }
+      
+      if (existingUser) {
+        throw new Error('Benutzername bereits vergeben');
+      }
+      
+      // Erstelle neuen anonymen Benutzer
+      const { data, error } = await supabase.auth.signUp({
+        email: `${username}@anonymous.local`,
+        password: Math.random().toString(36).substr(2, 15),
+        options: {
+          data: {
+            is_anonymous: true,
+            anonymous_username: username,
+            created_at: new Date().toISOString()
+          }
+        }
+      });
+      
+      if (error) {
+        console.error('❌ Anonymer Benutzername Fehler:', error);
+        throw error;
+      }
+      
+      console.log('✅ Anonymer Benutzername erstellt:', data);
+      return {
+        success: true,
+        message: 'Anonymer Benutzername erfolgreich erstellt! Du kannst jetzt lernen.',
+        data: data
+      };
+    } catch (error) {
+      console.error('❌ Unerwarteter Fehler bei anonymem Benutzername:', error);
+      throw error;
+    }
+  },
+
+  // NEUE FUNKTION: Anonymer Benutzername Login
+  async loginWithAnonymousUsername(username: string) {
+    try {
+      console.log('🔐 Starte anonymen Benutzername-Login...');
+      console.log('👤 Benutzername:', username);
+      
+      // Suche nach existierendem anonymen Benutzer
+      const { data: user, error: findError } = await supabase
+        .from('anonymous_users')
+        .select('*')
+        .eq('username', username)
+        .single();
+      
+      if (findError) {
+        if (findError.code === 'PGRST116') {
+          throw new Error('Benutzername nicht gefunden');
+        }
+        throw findError;
+      }
+      
+      // Anmelden mit der gespeicherten E-Mail
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: `${username}@anonymous.local`,
+        password: user.password_hash // Das Passwort ist in der Datenbank gespeichert
+      });
+      
+      if (error) {
+        console.error('❌ Login Fehler:', error);
+        throw error;
+      }
+      
+      console.log('✅ Anonymer Login erfolgreich:', data);
+      return {
+        success: true,
+        message: 'Willkommen zurück!',
+        data: data
+      };
+    } catch (error) {
+      console.error('❌ Unerwarteter Fehler beim anonymen Login:', error);
+      throw error;
+    }
+  },
+
   async signOut() {
     const { error } = await supabase.auth.signOut();
     if (error) throw error;

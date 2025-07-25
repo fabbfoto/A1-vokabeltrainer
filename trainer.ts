@@ -55,10 +55,60 @@ function createAuthButton() {
   dropdown.className = 'hidden absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2';
   dropdown.style.minWidth = '220px';
 
+  // DSGVO-konforme Optionen zuerst anzeigen
+  const dsgvoHeader = document.createElement('div');
+  dsgvoHeader.className = 'text-xs text-blue-200 font-semibold mb-2 border-b border-blue-700 pb-2';
+  dsgvoHeader.textContent = 'DSGVO-konform & anonym';
+
+  // Anonymer Benutzername Option (Empfohlen)
+  const anonymousBtn = document.createElement('button');
+  anonymousBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors text-left';
+  anonymousBtn.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><div><div class="font-semibold">Anonym lernen</div><div class="text-xs text-blue-300">Benutzername wählen (min. 8 Zeichen)</div></div>`;
+
+  // Anonymer Benutzername Formular
+  const anonymousForm = document.createElement('form');
+  anonymousForm.className = 'flex flex-col gap-2 mt-2';
+  anonymousForm.innerHTML = `
+    <input type="text" name="username" placeholder="Dein anonymer Benutzername" required minlength="8" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
+    <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Anmelden</button>
+    <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-anonymous">Abbrechen</button>
+  `;
+  anonymousForm.style.display = 'none';
+
+  anonymousForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const formData = new FormData(anonymousForm);
+    const username = formData.get('username') as string;
+    
+    try {
+      const result = await supabaseAuth.signInWithAnonymousUsername(username);
+      alert(result.message);
+      dropdown.classList.add('hidden');
+      anonymousForm.reset();
+    } catch (error) {
+      alert('Fehler bei der anonymen Anmeldung: ' + (error as Error).message);
+    }
+  };
+
+  anonymousBtn.onclick = () => {
+    anonymousBtn.style.display = 'none';
+    anonymousForm.style.display = '';
+  };
+
+  anonymousForm.querySelector('#cancel-anonymous')!.addEventListener('click', () => {
+    anonymousForm.style.display = 'none';
+    anonymousBtn.style.display = '';
+  });
+
+  // Trennlinie
+  const divider = document.createElement('div');
+  divider.className = 'text-xs text-blue-300 text-center my-2 border-t border-blue-700 pt-2';
+  divider.textContent = 'oder';
+
   // Google-Login-Option
   const googleBtn = document.createElement('button');
   googleBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors';
-  googleBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M16.318 13.084A7.963 7.963 0 0018 10c0-.638-.07-1.257-.2-1.852H10v3.504h4.318z"/><path d="M10 18c2.16 0 3.97-.72 5.293-1.963l-2.56-2.09C11.97 14.633 11.05 15 10 15c-2.07 0-3.82-1.4-4.44-3.29H2.86v2.07A7.997 7.997 0 0010 18z"/><path d="M5.56 11.71A4.978 4.978 0 015 10c0-.34.03-.67.09-.99V6.94H2.86A7.997 7.997 0 002 10c0 1.26.29 2.45.8 3.5l2.76-1.79z"/><path d="M10 5c1.13 0 2.14.39 2.94 1.15l2.2-2.2C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg><span>Mit Google anmelden</span>`;
+  googleBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M16.318 13.084A7.963 7.963 0 0018 10c0-.638-.07-1.257-.2-1.852H10v3.504h4.318z"/><path d="M10 18c2.16 0 3.97-.72 5.293-1.963l-2.56-2.09C11.97 14.633 11.05 15 10 15c-2.07 0-3.82-1.4-4.44-3.29H2.86v2.07A7.997 7.997 0 0010 18z"/><path d="M5.56 11.71A4.978 4.978 0 015 10c0-.34.03-.67.09-.99V6.94H2.86A7.997 7.997 0 002 10c0 1.26.29 2.45.8 3.5l2.76-1.79z"/><path d="M10 5c1.13 0 2.14.39 2.94 1.15l2.2-2.2C17.45 2.09 14.97 1 12 1 7.7 1 3.44 4.24 2.86 6.94l2.7 2.09C6.18 7.4 7.93 6 10 6z"/></svg><span>Mit Google anmelden</span>`;
   googleBtn.onclick = () => {
     supabaseAuth.signInWithGoogle().catch(error => {
       console.error('Login-Fehler:', error);
@@ -105,9 +155,25 @@ function createAuthButton() {
     emailForm.style.display = '';
   };
 
+  // DSGVO-Hinweis
+  const dsgvoInfo = document.createElement('div');
+  dsgvoInfo.className = 'text-xs text-blue-200 mt-2 p-2 bg-blue-900/50 rounded';
+  dsgvoInfo.innerHTML = `
+    <div class="font-semibold mb-1">🔒 DSGVO-konform</div>
+    <div>• Anonymer Benutzername: Keine E-Mail, keine persönlichen Daten</div>
+    <div>• Fortschritt wird gespeichert</div>
+    <div>• Du kannst dich immer wieder anmelden</div>
+  `;
+
+  // Elemente zum Dropdown hinzufügen
+  dropdown.appendChild(dsgvoHeader);
+  dropdown.appendChild(anonymousBtn);
+  dropdown.appendChild(anonymousForm);
+  dropdown.appendChild(divider);
   dropdown.appendChild(googleBtn);
   dropdown.appendChild(emailBtn);
   dropdown.appendChild(emailForm);
+  dropdown.appendChild(dsgvoInfo);
 
   // Dropdown-Logik
   let dropdownOpen = false;
