@@ -1879,6 +1879,23 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     ui.initNavigationListeners(dom, state, callbacks, learningModes, vokabular);
     ui.initializeModeButtons(callbacks, learningModes);
     ui.initializeRepeatButtons(callbacks, learningModes);
+    
+    // Zusätzliche direkte Event-Listener für Navigation (Fallback)
+    dom.navigationContainerEl.addEventListener('click', (e: Event) => {
+        const target = e.target as HTMLElement;
+        const mainTopicButton = target.closest('[data-main-topic]') as HTMLElement;
+        const subTopicButton = target.closest('[data-sub-topic]') as HTMLElement;
+        
+        if (mainTopicButton) {
+            const mainTopic = mainTopicButton.dataset.mainTopic! as TopicId;
+            console.log('🎯 Hauptthema geklickt:', mainTopic);
+            ui.showSubTopicNavigation(dom, state, vokabular, mainTopic, learningModes);
+        } else if (subTopicButton) {
+            const subTopic = subTopicButton.dataset.subTopic! as SubTopicId;
+            console.log('🎯 Unterthema geklickt:', subTopic);
+            callbacks.handleTopicSelection(state.navigation.currentMainTopic!, subTopic);
+        }
+    });
 
     // KORREKTUR: Event Listener für den "Zurück"-Button im Trainer explizit hinzufügen
     dom.backToSubtopicsButton.addEventListener('click', () => {
