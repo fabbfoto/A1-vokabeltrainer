@@ -1953,6 +1953,79 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     };
 
+    // Debug-Funktion für Supabase-Diagnose
+    (window as any).diagnoseSupabase = async () => {
+        console.log('🔍 Starte Supabase-Diagnose...');
+        
+        try {
+            // 1. Teste Verbindung
+            console.log('1️⃣ Teste Supabase-Verbindung...');
+            const { data: connectionTest, error: connectionError } = await supabase
+                .from('progress')
+                .select('count')
+                .limit(1);
+            
+            if (connectionError) {
+                console.error('❌ Verbindungsfehler:', connectionError);
+                alert('Supabase-Verbindung fehlgeschlagen: ' + connectionError.message);
+                return;
+            }
+            console.log('✅ Verbindung erfolgreich');
+            
+            // 2. Teste Auth-Status
+            console.log('2️⃣ Teste Auth-Status...');
+            const user = await supabaseAuth.getUser();
+            if (!user) {
+                console.error('❌ Kein Benutzer angemeldet');
+                alert('Kein Benutzer angemeldet! Bitte melde dich zuerst an.');
+                return;
+            }
+            console.log('✅ Benutzer angemeldet:', user.id);
+            
+            // 3. Teste Progress-Tabelle
+            console.log('3️⃣ Teste Progress-Tabelle...');
+            const { data: progressData, error: progressError } = await supabase
+                .from('progress')
+                .select('*')
+                .eq('user_id', user.id)
+                .limit(1);
+            
+            if (progressError) {
+                console.error('❌ Progress-Tabellen-Fehler:', progressError);
+                alert('Progress-Tabelle nicht erreichbar: ' + progressError.message);
+                return;
+            }
+            console.log('✅ Progress-Tabelle erreichbar');
+            
+            // 4. Teste Speichern
+            console.log('4️⃣ Teste Speichern...');
+            const testData = { test: 'diagnose', timestamp: new Date().toISOString() };
+            const saveResult = await supabaseProgress.save(testData);
+            
+            if (!saveResult.success) {
+                console.error('❌ Speicherfehler:', saveResult);
+                alert('Speichern fehlgeschlagen: ' + (saveResult.error || saveResult.reason));
+                return;
+            }
+            console.log('✅ Speichern erfolgreich');
+            
+            // 5. Teste Laden
+            console.log('5️⃣ Teste Laden...');
+            const loadResult = await supabaseProgress.load();
+            if (loadResult) {
+                console.log('✅ Laden erfolgreich:', loadResult);
+            } else {
+                console.warn('⚠️ Laden fehlgeschlagen oder keine Daten');
+            }
+            
+            alert('Supabase-Diagnose abgeschlossen! Siehe Konsole für Details.');
+            
+        } catch (error) {
+            console.error('❌ Diagnose-Fehler:', error);
+            alert('Diagnose fehlgeschlagen: ' + (error as Error).message);
+        }
+    };
+
     // Auth-State-Listener für automatische Button-Updates
     supabaseAuth.onAuthStateChange((user) => {
         console.log('🔐 Auth-State geändert:', user ? 'Angemeldet' : 'Abgemeldet');
