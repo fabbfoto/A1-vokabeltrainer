@@ -1841,7 +1841,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             alert('FrankBest Account wurde gelöscht. Du kannst dich jetzt neu registrieren.');
         } catch (error) {
             console.error('❌ Fehler beim Löschen:', error);
-            alert('Fehler beim Löschen: ' + (error as Error).message);
+            const errorMessage = error instanceof Error ? error.message : 'Unbekannter Fehler';
+            alert('Fehler beim Löschen: ' + errorMessage);
         }
     };
 
