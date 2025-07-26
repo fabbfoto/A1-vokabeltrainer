@@ -2135,8 +2135,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         createAuthButton(); // Button bei jeder Auth-Änderung aktualisieren (einziger verbleibender Aufruf)
     });
 
-    // Initial Auth-Button erstellen - ENTFERNT!
-    // createAuthButton(); // Nicht mehr nötig, da onAuthStateChange beim Start automatisch ausgelöst wird
+    // Initial Auth-Button erstellen
+    createAuthButton(); // Initialer Aufruf beim App-Start
 
     // Debug: UI-Objekt global verfügbar machen
     (window as any).ui = ui;
