@@ -2109,4 +2109,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Initial Auth-Button erstellen
     createAuthButton();
 
+    // Debug: UI-Objekt global verfügbar machen
+    (window as any).ui = ui;
+
 });
