@@ -84,6 +84,9 @@ function createTestButton(
  * Wird von showMainTopicNavigation aufgerufen.
  */
 export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, learningModes: LearningModes): void {
+    console.log('🎯 Zeige Hauptthemen an');
+    console.log('📚 Verfügbare Themen:', Object.keys(vokabular));
+    
     dom.navigationContainerEl.innerHTML = '';
     dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max';
     const numberOfModes = Object.keys(learningModes).length;
@@ -110,6 +113,7 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
         const progressColorClass = getProgressColorClass(totalMastered, totalWords);
         const button = createTopicButton(mainTopicName, percentage, progressColorClass);
         button.dataset.mainTopic = mainTopicName;
+        console.log(`🔘 Button erstellt für: ${mainTopicName}`, button);
         dom.navigationContainerEl.appendChild(button);
     });
 
@@ -166,6 +170,9 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
  * Wird von showSubTopicNavigation aufgerufen.
  */
 export function displaySubTopics(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, mainTopicName: TopicId, learningModes: LearningModes): void {
+    console.log('🎯 Zeige Unterthemen an für:', mainTopicName);
+    console.log('📚 Verfügbare Unterthemen:', Object.keys(vokabular[mainTopicName]));
+    
     dom.navigationContainerEl.innerHTML = '';
     dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max';
     const subTopics = Object.keys(vokabular[mainTopicName]);
@@ -184,6 +191,7 @@ export function displaySubTopics(dom: DOMElements, state: TrainerState, vokabula
         const progressColorClass = getProgressColorClass(completedTasks, totalPossibleTasks);
         const button = createTopicButton(subTopicName.replace(/\//g, '/<br>'), percentage, progressColorClass);
         button.dataset.subTopic = subTopicName;
+        console.log(`🔘 Unterthema-Button erstellt für: ${subTopicName}`, button);
         dom.navigationContainerEl.appendChild(button);
     });
     
@@ -303,16 +311,27 @@ export function initializeRepeatButtons(callbacks: UICallbacks, learningModes: L
  * Initialisiert die Navigation-Event-Listener.
  */
 export function initNavigationListeners(dom: DOMElements, state: TrainerState, callbacks: UICallbacks, learningModes: LearningModes, vokabular: VocabularyStructure): void {
+    console.log('🔧 Initialisiere Navigation-Listener');
+    console.log('🎯 Navigation-Container:', dom.navigationContainerEl);
+    
     dom.navigationContainerEl.addEventListener('click', (e: Event) => {
+        console.log('🖱️ Navigation-Container geklickt:', e.target);
+        
         const target = e.target as HTMLElement;
         const mainTopicButton = target.closest('[data-main-topic]') as HTMLElement;
         const subTopicButton = target.closest('[data-sub-topic]') as HTMLElement;
         // Test-Button Handler
         const testButton = target.closest('[data-test-variant]') as HTMLElement;
+        
+        console.log('📌 MainTopic Button:', mainTopicButton);
+        console.log('📌 SubTopic Button:', subTopicButton);
+        console.log('📌 Test Button:', testButton);
         if (mainTopicButton) {
             const mainTopic = mainTopicButton.dataset.mainTopic! as TopicId;
+            console.log('✅ Hauptthema ausgewählt:', mainTopic);
             showSubTopicNavigation(dom, state, vokabular, mainTopic, learningModes);
         } else if (subTopicButton) {
+            console.log('✅ Unterthema ausgewählt:', subTopicButton.dataset.subTopic);
             callbacks.handleTopicSelection(state.navigation.currentMainTopic!, subTopicButton.dataset.subTopic! as SubTopicId);
         } else if (testButton) {
             const variant = testButton.dataset.testVariant as 'chaos' | 'structured';
