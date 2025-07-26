@@ -879,16 +879,39 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Lade Progress und starte automatisch das Training
     loadProgress().then(() => {
         console.log('✅ Progress geladen, starte automatisch Training...');
-        // Automatisch zum Training navigieren
-        if (typeof ui?.showTrainingModes === 'function') {
-            ui.showTrainingModes(dom, state);
-        }
+        // Automatisch zum Training navigieren - direkte DOM-Manipulation
+        setTimeout(() => {
+            const topicSelectionScreen = document.querySelector('[data-screen="topic-selection"]');
+            const trainingScreen = document.querySelector('[data-screen="training"]');
+            
+            if (topicSelectionScreen) {
+                topicSelectionScreen.classList.add('hidden');
+            }
+            if (trainingScreen) {
+                trainingScreen.classList.remove('hidden');
+            }
+            
+            // Alternative: Direkt ein Thema auswählen
+            const firstTopicButton = document.querySelector('[data-topic]');
+            if (firstTopicButton) {
+                console.log('🎯 Klicke automatisch auf erstes Thema...');
+                (firstTopicButton as HTMLElement).click();
+            }
+        }, 100);
     }).catch(error => {
         console.error('❌ Fehler beim Laden des Progress:', error);
         // Trotzdem Training starten
-        if (typeof ui?.showTrainingModes === 'function') {
-            ui.showTrainingModes(dom, state);
-        }
+        setTimeout(() => {
+            const topicSelectionScreen = document.querySelector('[data-screen="topic-selection"]');
+            const trainingScreen = document.querySelector('[data-screen="training"]');
+            
+            if (topicSelectionScreen) {
+                topicSelectionScreen.classList.add('hidden');
+            }
+            if (trainingScreen) {
+                trainingScreen.classList.remove('hidden');
+            }
+        }, 100);
     });
     
     loadMasteredWords();
@@ -2099,15 +2122,23 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 await loadProgress();
                 console.log('✅ Progress nach Anmeldung geladen');
                 // Automatisch zum Training navigieren nach Anmeldung
-                if (typeof ui?.showTrainingModes === 'function') {
-                    ui.showTrainingModes(dom, state);
-                }
+                setTimeout(() => {
+                    const firstTopicButton = document.querySelector('[data-topic]');
+                    if (firstTopicButton) {
+                        console.log('🎯 Klicke automatisch auf erstes Thema nach Anmeldung...');
+                        (firstTopicButton as HTMLElement).click();
+                    }
+                }, 200);
             } catch (error) {
                 console.error('❌ Fehler beim Laden des Progress nach Anmeldung:', error);
                 // Trotzdem zum Training navigieren
-                if (typeof ui?.showTrainingModes === 'function') {
-                    ui.showTrainingModes(dom, state);
-                }
+                setTimeout(() => {
+                    const firstTopicButton = document.querySelector('[data-topic]');
+                    if (firstTopicButton) {
+                        console.log('🎯 Klicke automatisch auf erstes Thema nach Anmeldung...');
+                        (firstTopicButton as HTMLElement).click();
+                    }
+                }, 200);
             }
         }
         createAuthButton(); // Button bei jeder Auth-Änderung aktualisieren
