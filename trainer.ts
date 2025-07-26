@@ -74,7 +74,7 @@ async function createAuthButton() {
         try {
           await supabaseAuth.signOut();
           alert('Erfolgreich abgemeldet!');
-          // createAuthButton(); // ENTFERNT: Auth-State-Listener übernimmt das automatisch
+          createAuthButton(); // Auth-Button nach Abmeldung aktualisieren
         } catch (error) {
           console.error('Fehler beim Abmelden:', error);
           alert('Fehler beim Abmelden: ' + (error as Error).message);
@@ -160,7 +160,7 @@ async function createAuthButton() {
           alert('Willkommen zurück, ' + username + '!');
           dropdown.classList.add('hidden');
           anonymousForm.reset();
-          // createAuthButton(); // ENTFERNT: Auth-State-Listener übernimmt das automatisch
+          createAuthButton(); // Auth-Button nach erfolgreichem Login aktualisieren
           return; // Wichtig: Hier beenden wenn Login erfolgreich
         } catch (loginError) {
           const loginErrorMessage = (loginError as Error).message;
@@ -180,7 +180,7 @@ async function createAuthButton() {
                 alert('Willkommen, ' + username + '! Dein Account wurde erstellt.');
                 dropdown.classList.add('hidden');
                 anonymousForm.reset();
-                // createAuthButton(); // ENTFERNT: Auth-State-Listener übernimmt das automatisch
+                createAuthButton(); // Auth-Button nach erfolgreicher Registrierung aktualisieren
               } else {
                 // E-Mail-Bestätigung erforderlich
                 alert(result.message);
@@ -2140,5 +2140,12 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // Debug: UI-Objekt global verfügbar machen
     (window as any).ui = ui;
+    
+    // Debug: Navigation-Event-Listener Status prüfen
+    console.log('🔧 Navigation-Event-Listener Status:');
+    console.log('🎯 Navigation-Container:', dom.navigationContainerEl);
+    console.log('🎯 Navigation-Container Event-Listener:', dom.navigationContainerEl?.onclick);
+    console.log('🎯 Verfügbare Buttons mit data-main-topic:', document.querySelectorAll('[data-main-topic]').length);
+    console.log('🎯 Verfügbare Buttons mit data-sub-topic:', document.querySelectorAll('[data-sub-topic]').length);
 
 });
