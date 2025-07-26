@@ -1933,6 +1933,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     };
 
-        createAuthButton();
+    // Auth-State-Listener für automatische Button-Updates
+    supabaseAuth.onAuthStateChange((user) => {
+        console.log('🔐 Auth-State geändert:', user ? 'Angemeldet' : 'Abgemeldet');
+        if (user) {
+            console.log('👤 Benutzer:', user.user_metadata?.anonymous_username || user.email);
+        }
+        createAuthButton(); // Button bei jeder Auth-Änderung aktualisieren
+    });
+
+    // Initial Auth-Button erstellen
+    createAuthButton();
 
 });
