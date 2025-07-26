@@ -876,42 +876,56 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Teste Verbindung beim Start
     testSupabaseConnection();
 
-    // Lade Progress und starte automatisch das Training
+    // Lade Progress und starte automatisch mit einem Thema
     loadProgress().then(() => {
-        console.log('✅ Progress geladen, starte automatisch Training...');
-        // Automatisch zum Training navigieren - direkte DOM-Manipulation
+        console.log('✅ Progress geladen, starte automatisch mit erstem Thema...');
+        // Direkt das erste Thema auswählen und Training starten
         setTimeout(() => {
-            const topicSelectionScreen = document.querySelector('[data-screen="topic-selection"]');
-            const trainingScreen = document.querySelector('[data-screen="training"]');
+            // Wähle das erste verfügbare Thema aus
+            const firstMainTopic = Object.keys(vokabular)[0];
+            const firstSubTopic = Object.keys(vokabular[firstMainTopic])[0];
             
-            if (topicSelectionScreen) {
-                topicSelectionScreen.classList.add('hidden');
+            if (firstMainTopic && firstSubTopic) {
+                console.log('🎯 Starte automatisch mit Thema:', firstMainTopic, '>', firstSubTopic);
+                
+                // Setze die Navigation-State
+                state.navigation.currentMainTopic = firstMainTopic as TopicId;
+                state.navigation.currentSubTopic = firstSubTopic as SubTopicId;
+                
+                // Zeige Training-Modi
+                if (typeof ui?.showTrainingModes === 'function') {
+                    ui.showTrainingModes(dom, state);
+                }
+                
+                // Starte automatisch den ersten Modus
+                const firstMode = Object.keys(learningModes)[0] as ModeId;
+                if (firstMode) {
+                    console.log('🎯 Starte automatisch Modus:', firstMode);
+                    setMode(firstMode, false);
+                }
             }
-            if (trainingScreen) {
-                trainingScreen.classList.remove('hidden');
-            }
-            
-            // Alternative: Direkt ein Thema auswählen
-            const firstTopicButton = document.querySelector('[data-topic]');
-            if (firstTopicButton) {
-                console.log('🎯 Klicke automatisch auf erstes Thema...');
-                (firstTopicButton as HTMLElement).click();
-            }
-        }, 100);
+        }, 200);
     }).catch(error => {
         console.error('❌ Fehler beim Laden des Progress:', error);
         // Trotzdem Training starten
         setTimeout(() => {
-            const topicSelectionScreen = document.querySelector('[data-screen="topic-selection"]');
-            const trainingScreen = document.querySelector('[data-screen="training"]');
+            const firstMainTopic = Object.keys(vokabular)[0];
+            const firstSubTopic = Object.keys(vokabular[firstMainTopic])[0];
             
-            if (topicSelectionScreen) {
-                topicSelectionScreen.classList.add('hidden');
+            if (firstMainTopic && firstSubTopic) {
+                state.navigation.currentMainTopic = firstMainTopic as TopicId;
+                state.navigation.currentSubTopic = firstSubTopic as SubTopicId;
+                
+                if (typeof ui?.showTrainingModes === 'function') {
+                    ui.showTrainingModes(dom, state);
+                }
+                
+                const firstMode = Object.keys(learningModes)[0] as ModeId;
+                if (firstMode) {
+                    setMode(firstMode, false);
+                }
             }
-            if (trainingScreen) {
-                trainingScreen.classList.remove('hidden');
-            }
-        }, 100);
+        }, 200);
     });
     
     loadMasteredWords();
@@ -2121,24 +2135,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             try {
                 await loadProgress();
                 console.log('✅ Progress nach Anmeldung geladen');
-                // Automatisch zum Training navigieren nach Anmeldung
-                setTimeout(() => {
-                    const firstTopicButton = document.querySelector('[data-topic]');
-                    if (firstTopicButton) {
-                        console.log('🎯 Klicke automatisch auf erstes Thema nach Anmeldung...');
-                        (firstTopicButton as HTMLElement).click();
-                    }
-                }, 200);
+                // KEINE automatische Navigation - lass den Benutzer selbst entscheiden
             } catch (error) {
                 console.error('❌ Fehler beim Laden des Progress nach Anmeldung:', error);
-                // Trotzdem zum Training navigieren
-                setTimeout(() => {
-                    const firstTopicButton = document.querySelector('[data-topic]');
-                    if (firstTopicButton) {
-                        console.log('🎯 Klicke automatisch auf erstes Thema nach Anmeldung...');
-                        (firstTopicButton as HTMLElement).click();
-                    }
-                }, 200);
             }
         }
         createAuthButton(); // Button bei jeder Auth-Änderung aktualisieren
