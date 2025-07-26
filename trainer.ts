@@ -95,7 +95,7 @@ async function createAuthButton() {
     anonymousForm.innerHTML = `
       <input type="text" name="username" placeholder="Dein anonymer Benutzername" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
       <input type="password" name="password" placeholder="Passwort (min. 6 Zeichen)" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
-      <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Registrieren</button>
+      <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Anmelden / Registrieren</button>
       <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-anonymous">Abbrechen</button>
     `;
     anonymousForm.style.display = 'none';
@@ -131,42 +131,53 @@ async function createAuthButton() {
       const submitButton = anonymousForm.querySelector('button[type="submit"]') as HTMLButtonElement;
       const originalText = submitButton.textContent;
       submitButton.disabled = true;
-      submitButton.textContent = 'Anmeldung läuft...';
       
       try {
-        // Versuche zuerst eine Registrierung
-        const result = await supabaseAuth.signInWithAnonymousUsername(username, password);
-        console.log('✅ Registrierung erfolgreich:', result);
-        alert(result.message);
-        // Nur bei erfolgreicher Anmeldung das Modal schließen
-        dropdown.classList.add('hidden');
-        anonymousForm.reset();
-        // Auth-Button aktualisieren
-        createAuthButton();
-      } catch (error) {
-        const errorMessage = (error as Error).message;
-        console.error('❌ Registrierung fehlgeschlagen:', errorMessage);
+        // Versuche zuerst Login (da Benutzer wahrscheinlich bereits registriert ist)
+        console.log('🔄 Versuche Login...');
+        submitButton.textContent = 'Login läuft...';
         
-        // Wenn Benutzername bereits vergeben, versuche Login
-        if (errorMessage.includes('Benutzername bereits vergeben')) {
-          console.log('🔄 Versuche Login mit vorhandenem Account...');
-          submitButton.textContent = 'Login läuft...';
-          try {
-            const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
-            console.log('✅ Login erfolgreich:', loginResult);
-            alert(loginResult.message);
-            // Nur bei erfolgreicher Anmeldung das Modal schließen
-            dropdown.classList.add('hidden');
-            anonymousForm.reset();
-            // Auth-Button aktualisieren
-            createAuthButton();
-          } catch (loginError) {
-            const loginErrorMessage = (loginError as Error).message;
-            console.error('❌ Login fehlgeschlagen:', loginErrorMessage);
+        try {
+          const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
+          console.log('✅ Login erfolgreich:', loginResult);
+          alert('Willkommen zurück!');
+          // Nur bei erfolgreicher Anmeldung das Modal schließen
+          dropdown.classList.add('hidden');
+          anonymousForm.reset();
+          // Auth-Button aktualisieren
+          createAuthButton();
+          return;
+        } catch (loginError) {
+          const loginErrorMessage = (loginError as Error).message;
+          console.log('ℹ️ Login fehlgeschlagen, versuche Registrierung:', loginErrorMessage);
+          
+          // Wenn Login fehlschlägt, versuche Registrierung
+          if (loginErrorMessage.includes('Benutzername oder Passwort falsch')) {
+            console.log('🔄 Versuche Registrierung...');
+            submitButton.textContent = 'Registrierung läuft...';
+            
+            try {
+              const result = await supabaseAuth.signInWithAnonymousUsername(username, password);
+              console.log('✅ Registrierung erfolgreich:', result);
+              alert('Account erfolgreich erstellt! Willkommen!');
+              // Nur bei erfolgreicher Anmeldung das Modal schließen
+              dropdown.classList.add('hidden');
+              anonymousForm.reset();
+              // Auth-Button aktualisieren
+              createAuthButton();
+            } catch (registerError) {
+              const registerErrorMessage = (registerError as Error).message;
+              console.error('❌ Registrierung fehlgeschlagen:', registerErrorMessage);
+              
+              if (registerErrorMessage.includes('Benutzername bereits vergeben')) {
+                alert('Benutzername bereits vergeben. Bitte verwende ein anderes Passwort oder einen anderen Benutzernamen.');
+              } else {
+                alert('Fehler bei der Registrierung: ' + registerErrorMessage);
+              }
+            }
+          } else {
             alert('Login fehlgeschlagen: ' + loginErrorMessage);
           }
-        } else {
-          alert('Fehler bei der anonymen Anmeldung: ' + errorMessage);
         }
       } finally {
         // Button wieder aktivieren
