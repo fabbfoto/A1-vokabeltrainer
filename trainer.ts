@@ -65,7 +65,7 @@ async function createAuthButton() {
         try {
           await supabaseAuth.signOut();
           alert('Erfolgreich abgemeldet!');
-          createAuthButton();
+          // createAuthButton(); // ENTFERNT: Auth-State-Listener übernimmt das automatisch
         } catch (error) {
           console.error('Fehler beim Abmelden:', error);
           alert('Fehler beim Abmelden: ' + (error as Error).message);
@@ -151,7 +151,7 @@ async function createAuthButton() {
           alert('Willkommen zurück, ' + username + '!');
           dropdown.classList.add('hidden');
           anonymousForm.reset();
-          createAuthButton();
+          // createAuthButton(); // ENTFERNT: Auth-State-Listener übernimmt das automatisch
           return; // Wichtig: Hier beenden wenn Login erfolgreich
         } catch (loginError) {
           const loginErrorMessage = (loginError as Error).message;
@@ -171,7 +171,7 @@ async function createAuthButton() {
                 alert('Willkommen, ' + username + '! Dein Account wurde erstellt.');
                 dropdown.classList.add('hidden');
                 anonymousForm.reset();
-                createAuthButton();
+                // createAuthButton(); // ENTFERNT: Auth-State-Listener übernimmt das automatisch
               } else {
                 // E-Mail-Bestätigung erforderlich
                 alert(result.message);
@@ -1999,7 +1999,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const user = await supabaseAuth.getUser();
         console.log('👤 Benutzer:', user);
         console.log('📦 localStorage anonymous_session:', localStorage.getItem('anonymous_session'));
-        createAuthButton();
+        // createAuthButton(); // ENTFERNT: Auth-State-Listener übernimmt das automatisch
     };
     
     // Debug-Funktion zum Löschen des FrankBest Accounts
@@ -2103,11 +2103,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 console.error('❌ Fehler beim Laden des Progress nach Anmeldung:', error);
             }
         }
-        createAuthButton(); // Button bei jeder Auth-Änderung aktualisieren
+        createAuthButton(); // Button bei jeder Auth-Änderung aktualisieren (einziger verbleibender Aufruf)
     });
 
     // Initial Auth-Button erstellen
-    createAuthButton();
+    createAuthButton(); // Initialer Aufruf beim App-Start
 
     // Debug: UI-Objekt global verfügbar machen
     (window as any).ui = ui;
