@@ -548,10 +548,51 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         console.error('[ErrorManager] Failed to load from storage:', error);
     }
 
-    function loadProgress(): void {
+    async function loadProgress(): Promise<void> {
         console.log('📂 Lade Progress...');
-        // Versuche zuerst trainer-progress aus localStorage
+        
+        // Wenn angemeldet, versuche zuerst aus der Cloud zu laden
+        if (currentUser) {
+            try {
+                console.log('☁️ Versuche Progress aus Cloud zu laden...');
+                const cloudProgress = await supabaseProgress.load();
+                
+                if (cloudProgress) {
+                    console.log('✅ Cloud-Progress geladen:', cloudProgress);
+                    // Konvertiere Arrays zurück zu Sets
+                    state.progress.globalProgress = {};
+                    Object.keys(cloudProgress).forEach(topicKey => {
+                        state.progress.globalProgress[topicKey] = {};
+                        if (typeof cloudProgress[topicKey] === 'object' && cloudProgress[topicKey] !== null) {
+                            Object.keys(cloudProgress[topicKey]).forEach(mode => {
+                                const data = cloudProgress[topicKey][mode];
+                                if (Array.isArray(data)) {
+                                    state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
+                                } else if (data instanceof Set) {
+                                    state.progress.globalProgress[topicKey][mode as ModeId] = data;
+                                } else {
+                                    state.progress.globalProgress[topicKey][mode as ModeId] = new Set();
+                                }
+                            });
+                        }
+                    });
+                    
+                    // UI aktualisieren
+                    if (typeof ui?.showTrainingModes === 'function') {
+                        ui.showTrainingModes(dom, state);
+                    }
+                    return; // Cloud-Daten erfolgreich geladen
+                }
+            } catch (error) {
+                console.error('❌ Fehler beim Laden aus Cloud:', error);
+                // Fallback zu lokalem Laden
+            }
+        }
+        
+        // Fallback: Lade aus localStorage
+        console.log('💾 Lade Progress aus localStorage...');
         let saved = localStorage.getItem('trainer-progress');
+        
         // Falls nicht vorhanden, versuche Firebase-Key
         if (!saved) {
             const firebaseSaved = localStorage.getItem('a1ThemenProgress');
@@ -571,6 +612,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 }
             }
         }
+        
         // Lade Progress und stelle SICHER dass es Sets sind
         if (saved) {
             try {
@@ -593,7 +635,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         console.warn(`⚠️ Ungültige Daten für ${topicKey}`);
                     }
                 });
-                console.log('✅ Progress geladen:', Object.keys(state.progress.globalProgress).length, 'Themen');
+                console.log('✅ Lokaler Progress geladen:', Object.keys(state.progress.globalProgress).length, 'Themen');
                 
                 // UI aktualisieren um den geladenen Progress anzuzeigen
                 if (typeof ui?.showTrainingModes === 'function') {
@@ -834,7 +876,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Teste Verbindung beim Start
     testSupabaseConnection();
 
-    loadProgress();
+            loadProgress().catch(error => {
+            console.error('❌ Fehler beim Laden des Progress:', error);
+        });
     loadMasteredWords();
     // loadWordsToRepeat() wird jetzt durch errorManager.loadFromStorage() ersetzt
     loadLastTestScores();
@@ -2034,10 +2078,17 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     };
 
     // Auth-State-Listener für automatische Button-Updates
-    supabaseAuth.onAuthStateChange((user) => {
+    supabaseAuth.onAuthStateChange(async (user) => {
         console.log('🔐 Auth-State geändert:', user ? 'Angemeldet' : 'Abgemeldet');
         if (user) {
             console.log('👤 Benutzer:', user.user_metadata?.anonymous_username || user.email);
+            // Lade Progress aus der Cloud, wenn sich jemand anmeldet
+            try {
+                await loadProgress();
+                console.log('✅ Progress nach Anmeldung geladen');
+            } catch (error) {
+                console.error('❌ Fehler beim Laden des Progress nach Anmeldung:', error);
+            }
         }
         createAuthButton(); // Button bei jeder Auth-Änderung aktualisieren
     });
