@@ -91,7 +91,7 @@ export const supabaseAuth = {
       
       // Erstelle neuen anonymen Benutzer
       const { data, error } = await supabase.auth.signUp({
-        email: `${username}@example.com`,
+        email: `${username}@gmail.com`,
         password: password,
         options: {
           data: {
@@ -127,7 +127,7 @@ export const supabaseAuth = {
       
       // Anmelden mit der E-Mail und Passwort
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: `${username}@example.com`,
+        email: `${username}@gmail.com`,
         password: password
       });
       
