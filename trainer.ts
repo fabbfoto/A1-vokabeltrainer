@@ -1829,7 +1829,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const user = await supabaseAuth.getUser();
         console.log('👤 Benutzer:', user);
         console.log('📦 localStorage anonymous_session:', localStorage.getItem('anonymous_session'));
-        updateAuthButton();
+        createAuthButton();
     };
     
     // Debug-Funktion zum Löschen des FrankBest Accounts
