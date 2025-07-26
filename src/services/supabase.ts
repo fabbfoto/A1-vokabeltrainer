@@ -272,13 +272,18 @@ export const supabaseProgress = {
       console.log('🔄 Speichere Progress für User:', user.id);
       console.log('📊 Progress-Daten:', progressData);
 
-      // Verwende die neue Upsert-Funktion statt upsert()
+      // Vereinfachte Speicherung - direkt mit upsert()
       const { data, error } = await supabase
-        .rpc('upsert_progress', {
-          p_user_id: user.id,
-          p_trainer_type: 'basis',
-          p_progress_data: progressData
-        });
+        .from('progress')
+        .upsert({
+          user_id: user.id,
+          trainer_type: 'basis',
+          progress_data: progressData,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id,trainer_type'
+        })
+        .select();
 
       if (error) {
         console.error('❌ Supabase Speicherfehler:', error);
@@ -286,40 +291,49 @@ export const supabaseProgress = {
         console.error('❌ Fehler-Nachricht:', error.message);
         console.error('❌ Fehler-Details:', error.details);
         
-        // Fallback: Versuche normalen Upsert
-        console.log('🔄 Fallback: Versuche normalen Upsert...');
-        const { data: fallbackData, error: fallbackError } = await supabase
+        // Versuche es mit einfachem INSERT
+        console.log('🔄 Fallback: Versuche einfachen INSERT...');
+        const { data: insertData, error: insertError } = await supabase
           .from('progress')
-          .upsert({
+          .insert({
             user_id: user.id,
             trainer_type: 'basis',
             progress_data: progressData,
             updated_at: new Date().toISOString()
-          }, {
-            onConflict: 'user_id,trainer_type'
           })
           .select();
 
-        if (fallbackError) {
-          console.error('❌ Fallback-Upsert fehlgeschlagen:', fallbackError);
-          return { success: false, error: fallbackError.message };
+        if (insertError) {
+          console.error('❌ INSERT fehlgeschlagen:', insertError);
+          
+          // Letzter Fallback: Versuche UPDATE
+          console.log('🔄 Letzter Fallback: Versuche UPDATE...');
+          const { data: updateData, error: updateError } = await supabase
+            .from('progress')
+            .update({
+              progress_data: progressData,
+              updated_at: new Date().toISOString()
+            })
+            .eq('user_id', user.id)
+            .eq('trainer_type', 'basis')
+            .select();
+
+          if (updateError) {
+            console.error('❌ UPDATE fehlgeschlagen:', updateError);
+            return { success: false, error: updateError.message };
+          }
+
+          console.log('✅ UPDATE erfolgreich:', updateData);
+          return { success: true, data: updateData };
         }
 
-        console.log('✅ Fallback-Upsert erfolgreich:', fallbackData);
-        return { success: true, data: fallbackData };
+        console.log('✅ INSERT erfolgreich:', insertData);
+        return { success: true, data: insertData };
       }
 
-      console.log('✅ Progress in Supabase gespeichert (Upsert-Funktion)');
+      console.log('✅ Progress in Supabase gespeichert (Upsert)');
+      return { success: true, data: data };
       
-      // Verifiziere das Speichern durch erneutes Laden
-      const verification = await this.load();
-      if (verification) {
-        console.log('✅ Speicherung verifiziert - Daten können geladen werden');
-        return { success: true, data: verification };
-      } else {
-        console.warn('⚠️ Speicherung nicht verifiziert - Daten können nicht geladen werden');
-        return { success: false, reason: 'verification_failed' };
-      }
     } catch (error) {
       console.error('❌ Unerwarteter Fehler beim Speichern:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
