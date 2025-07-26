@@ -79,6 +79,7 @@ function createAuthButton() {
   anonymousForm.onsubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation();
+    e.stopImmediatePropagation();
     
     // Manuelle Validierung statt HTML5-Validierung
     const usernameInput = anonymousForm.querySelector('input[name="username"]') as HTMLInputElement;
@@ -102,11 +103,18 @@ function createAuthButton() {
     
     console.log('🔄 Starte Anmeldung für:', username);
     
+    // Button deaktivieren während der Anmeldung
+    const submitButton = anonymousForm.querySelector('button[type="submit"]') as HTMLButtonElement;
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Anmeldung läuft...';
+    
     try {
       // Versuche zuerst eine Registrierung
       const result = await supabaseAuth.signInWithAnonymousUsername(username, password);
       console.log('✅ Registrierung erfolgreich:', result);
       alert(result.message);
+      // Nur bei erfolgreicher Anmeldung das Modal schließen
       dropdown.classList.add('hidden');
       anonymousForm.reset();
     } catch (error) {
@@ -116,10 +124,12 @@ function createAuthButton() {
       // Wenn Benutzername bereits vergeben, versuche Login
       if (errorMessage.includes('Benutzername bereits vergeben')) {
         console.log('🔄 Versuche Login mit vorhandenem Account...');
+        submitButton.textContent = 'Login läuft...';
         try {
           const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
           console.log('✅ Login erfolgreich:', loginResult);
           alert(loginResult.message);
+          // Nur bei erfolgreicher Anmeldung das Modal schließen
           dropdown.classList.add('hidden');
           anonymousForm.reset();
         } catch (loginError) {
@@ -130,6 +140,10 @@ function createAuthButton() {
       } else {
         alert('Fehler bei der anonymen Anmeldung: ' + errorMessage);
       }
+    } finally {
+      // Button wieder aktivieren
+      submitButton.disabled = false;
+      submitButton.textContent = originalText;
     }
   };
 
@@ -221,6 +235,16 @@ function createAuthButton() {
 
   // Dropdown-Logik
   let dropdownOpen = false;
+  
+  // Verhindere das Schließen des Dropdowns bei Klicks innerhalb
+  dropdown.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+  
+  // Verhindere das Schließen bei Formular-Submission
+  dropdown.addEventListener('submit', (e) => {
+    e.stopPropagation();
+  });
   button.onclick = (e) => {
     e.stopPropagation();
     dropdownOpen = !dropdownOpen;
