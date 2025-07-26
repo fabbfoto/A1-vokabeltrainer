@@ -60,7 +60,7 @@ export const supabaseAuth = {
   // NEUE FUNKTION: Anonymer Benutzername Anmeldung
   async signInWithAnonymousUsername(username: string, password: string) {
     try {
-      console.log('🔐 Starte anonyme Benutzername-Anmeldung...');
+      console.log('🔐 Erstelle neuen anonymen Account...');
       console.log('👤 Benutzername:', username);
       
       // Prüfe ob Benutzername mindestens 6 Zeichen hat
@@ -107,14 +107,14 @@ export const supabaseAuth = {
         throw error;
       }
       
-      console.log('✅ Anonymer Benutzername erstellt:', data);
+      console.log('✅ Account erstellt:', data);
       return {
         success: true,
-        message: 'Anonymer Benutzername erfolgreich erstellt! Du kannst jetzt lernen.',
+        message: `Account "${username}" wurde erfolgreich erstellt! Du bist jetzt angemeldet.`,
         data: data
       };
     } catch (error) {
-      console.error('❌ Unerwarteter Fehler bei anonymem Benutzername:', error);
+      console.error('❌ Fehler bei Account-Erstellung:', error);
       throw error;
     }
   },
@@ -122,7 +122,7 @@ export const supabaseAuth = {
   // NEUE FUNKTION: Anonymer Benutzername Login
   async loginWithAnonymousUsername(username: string, password: string) {
     try {
-      console.log('🔐 Starte anonymen Benutzername-Login...');
+      console.log('🔐 Melde an mit anonymem Account...');
       console.log('👤 Benutzername:', username);
       
       // Anmelden mit der E-Mail und Passwort
@@ -134,19 +134,19 @@ export const supabaseAuth = {
       if (error) {
         console.error('❌ Login Fehler:', error);
         if (error.message.includes('Invalid login credentials')) {
-          throw new Error('Benutzername oder Passwort falsch');
+          throw new Error('Benutzername oder Passwort falsch. Bitte überprüfe deine Eingaben.');
         }
         throw error;
       }
       
-      console.log('✅ Anonymer Login erfolgreich:', data);
+      console.log('✅ Login erfolgreich:', data);
       return {
         success: true,
-        message: 'Willkommen zurück!',
+        message: `Willkommen zurück, ${username}!`,
         data: data
       };
     } catch (error) {
-      console.error('❌ Unerwarteter Fehler beim anonymen Login:', error);
+      console.error('❌ Login fehlgeschlagen:', error);
       throw error;
     }
   },

@@ -137,16 +137,16 @@ async function createAuthButton() {
         console.log('🔄 Versuche Login...');
         submitButton.textContent = 'Login läuft...';
         
-        try {
-          const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
-          console.log('✅ Login erfolgreich:', loginResult);
-          alert('Willkommen zurück!');
-          // Nur bei erfolgreicher Anmeldung das Modal schließen
-          dropdown.classList.add('hidden');
-          anonymousForm.reset();
-          // Auth-Button aktualisieren
-          createAuthButton();
-          return;
+                  try {
+            const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
+            console.log('✅ Login erfolgreich:', loginResult);
+            alert(loginResult.message);
+            // Nur bei erfolgreicher Anmeldung das Modal schließen
+            dropdown.classList.add('hidden');
+            anonymousForm.reset();
+            // Auth-Button aktualisieren
+            createAuthButton();
+            return;
         } catch (loginError) {
           const loginErrorMessage = (loginError as Error).message;
           console.log('ℹ️ Login fehlgeschlagen, versuche Registrierung:', loginErrorMessage);
@@ -159,7 +159,7 @@ async function createAuthButton() {
             try {
               const result = await supabaseAuth.signInWithAnonymousUsername(username, password);
               console.log('✅ Registrierung erfolgreich:', result);
-              alert('Account erfolgreich erstellt! Willkommen!');
+              alert(result.message);
               // Nur bei erfolgreicher Anmeldung das Modal schließen
               dropdown.classList.add('hidden');
               anonymousForm.reset();
