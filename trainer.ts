@@ -117,6 +117,8 @@ function createAuthButton() {
       // Nur bei erfolgreicher Anmeldung das Modal schließen
       dropdown.classList.add('hidden');
       anonymousForm.reset();
+      // Auth-Button aktualisieren
+      createAuthButton();
     } catch (error) {
       const errorMessage = (error as Error).message;
       console.error('❌ Registrierung fehlgeschlagen:', errorMessage);
@@ -132,6 +134,8 @@ function createAuthButton() {
           // Nur bei erfolgreicher Anmeldung das Modal schließen
           dropdown.classList.add('hidden');
           anonymousForm.reset();
+          // Auth-Button aktualisieren
+          createAuthButton();
         } catch (loginError) {
           const loginErrorMessage = (loginError as Error).message;
           console.error('❌ Login fehlgeschlagen:', loginErrorMessage);
