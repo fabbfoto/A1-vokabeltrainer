@@ -224,8 +224,13 @@ export function showMainTopicNavigation(dom: DOMElements, state: TrainerState, v
     NavigationEvents.dispatchRoot();
     state.navigation.currentMainTopic = null;
     state.navigation.currentSubTopic = null;
+    
+    // Wichtig: navigation-view zeigen, trainer-main-view verstecken
     dom.navigationViewEl.classList.remove('hidden');
+    dom.navigationViewEl.style.display = 'block'; // Explizit setzen
     dom.trainerMainViewEl.classList.add('hidden');
+    dom.trainerMainViewEl.style.display = 'none'; // Explizit verstecken
+    
     dom.navigationTitleEl.textContent = 'Themen';
     dom.backToMainTopicsButton.classList.add('hidden');
     

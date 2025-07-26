@@ -51,29 +51,29 @@ DROP POLICY IF EXISTS "Users can delete their own anonymous data" ON anonymous_u
 
 -- 6. Neue Policies für Progress Tabelle
 CREATE POLICY "Users can view their own progress" ON progress
-    FOR SELECT USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid()::uuid = user_id);
 
 CREATE POLICY "Users can insert their own progress" ON progress
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK (auth.uid()::uuid = user_id);
 
 CREATE POLICY "Users can update their own progress" ON progress
-    FOR UPDATE USING (auth.uid() = user_id);
+    FOR UPDATE USING (auth.uid()::uuid = user_id);
 
 CREATE POLICY "Users can delete their own progress" ON progress
-    FOR DELETE USING (auth.uid() = user_id);
+    FOR DELETE USING (auth.uid()::uuid = user_id);
 
 -- 7. Neue Policies für Anonymous Users Tabelle
 CREATE POLICY "Users can view their own anonymous data" ON anonymous_users
-    FOR SELECT USING (auth.uid() = user_id);
+    FOR SELECT USING (auth.uid()::uuid = user_id);
 
 CREATE POLICY "Users can insert their own anonymous data" ON anonymous_users
-    FOR INSERT WITH CHECK (auth.uid() = user_id);
+    FOR INSERT WITH CHECK (auth.uid()::uuid = user_id);
 
 CREATE POLICY "Users can update their own anonymous data" ON anonymous_users
-    FOR UPDATE USING (auth.uid() = user_id);
+    FOR UPDATE USING (auth.uid()::uuid = user_id);
 
 CREATE POLICY "Users can delete their own anonymous data" ON anonymous_users
-    FOR DELETE USING (auth.uid() = user_id);
+    FOR DELETE USING (auth.uid()::uuid = user_id);
 
 -- 8. Trigger für updated_at automatisch setzen
 CREATE OR REPLACE FUNCTION update_updated_at_column()
