@@ -876,9 +876,21 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Teste Verbindung beim Start
     testSupabaseConnection();
 
-            loadProgress().catch(error => {
-            console.error('❌ Fehler beim Laden des Progress:', error);
-        });
+    // Lade Progress und starte automatisch das Training
+    loadProgress().then(() => {
+        console.log('✅ Progress geladen, starte automatisch Training...');
+        // Automatisch zum Training navigieren
+        if (typeof ui?.showTrainingModes === 'function') {
+            ui.showTrainingModes(dom, state);
+        }
+    }).catch(error => {
+        console.error('❌ Fehler beim Laden des Progress:', error);
+        // Trotzdem Training starten
+        if (typeof ui?.showTrainingModes === 'function') {
+            ui.showTrainingModes(dom, state);
+        }
+    });
+    
     loadMasteredWords();
     // loadWordsToRepeat() wird jetzt durch errorManager.loadFromStorage() ersetzt
     loadLastTestScores();
@@ -2086,8 +2098,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             try {
                 await loadProgress();
                 console.log('✅ Progress nach Anmeldung geladen');
+                // Automatisch zum Training navigieren nach Anmeldung
+                if (typeof ui?.showTrainingModes === 'function') {
+                    ui.showTrainingModes(dom, state);
+                }
             } catch (error) {
                 console.error('❌ Fehler beim Laden des Progress nach Anmeldung:', error);
+                // Trotzdem zum Training navigieren
+                if (typeof ui?.showTrainingModes === 'function') {
+                    ui.showTrainingModes(dom, state);
+                }
             }
         }
         createAuthButton(); // Button bei jeder Auth-Änderung aktualisieren
