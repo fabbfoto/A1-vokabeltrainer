@@ -69,8 +69,8 @@ function createAuthButton() {
   const anonymousForm = document.createElement('form');
   anonymousForm.className = 'flex flex-col gap-2 mt-2';
   anonymousForm.innerHTML = `
-    <input type="text" name="username" placeholder="Dein anonymer Benutzername" required minlength="6" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
-    <input type="password" name="password" placeholder="Passwort (min. 6 Zeichen)" required minlength="6" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
+    <input type="text" name="username" placeholder="Dein anonymer Benutzername" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
+    <input type="password" name="password" placeholder="Passwort (min. 6 Zeichen)" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
     <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Registrieren</button>
     <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-anonymous">Abbrechen</button>
   `;
@@ -78,9 +78,27 @@ function createAuthButton() {
 
   anonymousForm.onsubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData(anonymousForm);
-    const username = formData.get('username') as string;
-    const password = formData.get('password') as string;
+    e.stopPropagation();
+    
+    // Manuelle Validierung statt HTML5-Validierung
+    const usernameInput = anonymousForm.querySelector('input[name="username"]') as HTMLInputElement;
+    const passwordInput = anonymousForm.querySelector('input[name="password"]') as HTMLInputElement;
+    
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+    
+    // Manuelle Validierung
+    if (username.length < 6) {
+      alert('Benutzername muss mindestens 6 Zeichen lang sein');
+      usernameInput.focus();
+      return;
+    }
+    
+    if (password.length < 6) {
+      alert('Passwort muss mindestens 6 Zeichen lang sein');
+      passwordInput.focus();
+      return;
+    }
     
     console.log('🔄 Starte Anmeldung für:', username);
     
