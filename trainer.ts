@@ -876,56 +876,19 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Teste Verbindung beim Start
     testSupabaseConnection();
 
-    // Lade Progress und starte automatisch mit einem Thema
+    // Lade Progress und zeige normale Themenauswahl
     loadProgress().then(() => {
-        console.log('✅ Progress geladen, starte automatisch mit erstem Thema...');
-        // Direkt das erste Thema auswählen und Training starten
-        setTimeout(() => {
-            // Wähle das erste verfügbare Thema aus
-            const firstMainTopic = Object.keys(vokabular)[0];
-            const firstSubTopic = Object.keys(vokabular[firstMainTopic])[0];
-            
-            if (firstMainTopic && firstSubTopic) {
-                console.log('🎯 Starte automatisch mit Thema:', firstMainTopic, '>', firstSubTopic);
-                
-                // Setze die Navigation-State
-                state.navigation.currentMainTopic = firstMainTopic as TopicId;
-                state.navigation.currentSubTopic = firstSubTopic as SubTopicId;
-                
-                // Zeige Training-Modi
-                if (typeof ui?.showTrainingModes === 'function') {
-                    ui.showTrainingModes(dom, state);
-                }
-                
-                // Starte automatisch den ersten Modus
-                const firstMode = Object.keys(learningModes)[0] as ModeId;
-                if (firstMode) {
-                    console.log('🎯 Starte automatisch Modus:', firstMode);
-                    setMode(firstMode, false);
-                }
-            }
-        }, 200);
+        console.log('✅ Progress geladen, zeige normale Themenauswahl...');
+        // Zeige die normale Navigation - lass den Benutzer selbst wählen
+        if (typeof ui?.showMainTopicNavigation === 'function') {
+            ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
+        }
     }).catch(error => {
         console.error('❌ Fehler beim Laden des Progress:', error);
-        // Trotzdem Training starten
-        setTimeout(() => {
-            const firstMainTopic = Object.keys(vokabular)[0];
-            const firstSubTopic = Object.keys(vokabular[firstMainTopic])[0];
-            
-            if (firstMainTopic && firstSubTopic) {
-                state.navigation.currentMainTopic = firstMainTopic as TopicId;
-                state.navigation.currentSubTopic = firstSubTopic as SubTopicId;
-                
-                if (typeof ui?.showTrainingModes === 'function') {
-                    ui.showTrainingModes(dom, state);
-                }
-                
-                const firstMode = Object.keys(learningModes)[0] as ModeId;
-                if (firstMode) {
-                    setMode(firstMode, false);
-                }
-            }
-        }, 200);
+        // Trotzdem normale Navigation zeigen
+        if (typeof ui?.showMainTopicNavigation === 'function') {
+            ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
+        }
     });
     
     loadMasteredWords();
