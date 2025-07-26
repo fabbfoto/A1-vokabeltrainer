@@ -58,7 +58,7 @@ export const supabaseAuth = {
   },
 
   // NEUE FUNKTION: Anonymer Benutzername Anmeldung
-  async signInWithAnonymousUsername(username: string) {
+  async signInWithAnonymousUsername(username: string, password: string) {
     try {
       console.log('🔐 Starte anonyme Benutzername-Anmeldung...');
       console.log('👤 Benutzername:', username);
@@ -66,6 +66,11 @@ export const supabaseAuth = {
       // Prüfe ob Benutzername mindestens 8 Zeichen hat
       if (username.length < 8) {
         throw new Error('Benutzername muss mindestens 8 Zeichen lang sein');
+      }
+      
+      // Prüfe ob Passwort mindestens 6 Zeichen hat
+      if (password.length < 6) {
+        throw new Error('Passwort muss mindestens 6 Zeichen lang sein');
       }
       
       // Prüfe ob Benutzername bereits existiert
@@ -87,7 +92,7 @@ export const supabaseAuth = {
       // Erstelle neuen anonymen Benutzer
       const { data, error } = await supabase.auth.signUp({
         email: `${username}@anonymous.local`,
-        password: Math.random().toString(36).substr(2, 15),
+        password: password,
         options: {
           data: {
             is_anonymous: true,
@@ -115,33 +120,22 @@ export const supabaseAuth = {
   },
 
   // NEUE FUNKTION: Anonymer Benutzername Login
-  async loginWithAnonymousUsername(username: string) {
+  async loginWithAnonymousUsername(username: string, password: string) {
     try {
       console.log('🔐 Starte anonymen Benutzername-Login...');
       console.log('👤 Benutzername:', username);
       
-      // Suche nach existierendem anonymen Benutzer
-      const { data: user, error: findError } = await supabase
-        .from('anonymous_users')
-        .select('*')
-        .eq('username', username)
-        .single();
-      
-      if (findError) {
-        if (findError.code === 'PGRST116') {
-          throw new Error('Benutzername nicht gefunden');
-        }
-        throw findError;
-      }
-      
-      // Anmelden mit der gespeicherten E-Mail
+      // Anmelden mit der E-Mail und Passwort
       const { data, error } = await supabase.auth.signInWithPassword({
         email: `${username}@anonymous.local`,
-        password: user.password_hash // Das Passwort ist in der Datenbank gespeichert
+        password: password
       });
       
       if (error) {
         console.error('❌ Login Fehler:', error);
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Benutzername oder Passwort falsch');
+        }
         throw error;
       }
       
@@ -153,6 +147,47 @@ export const supabaseAuth = {
       };
     } catch (error) {
       console.error('❌ Unerwarteter Fehler beim anonymen Login:', error);
+      throw error;
+    }
+  },
+
+  // NEUE FUNKTION: Account löschen
+  async deleteAnonymousAccount(username: string) {
+    try {
+      console.log('🗑️ Lösche anonymen Account:', username);
+      
+      // Suche nach dem Account
+      const { data: user, error: findError } = await supabase
+        .from('anonymous_users')
+        .select('*')
+        .eq('username', username)
+        .single();
+      
+      if (findError) {
+        if (findError.code === 'PGRST116') {
+          throw new Error('Account nicht gefunden');
+        }
+        throw findError;
+      }
+      
+      // Lösche den Account aus der anonymous_users Tabelle
+      const { error: deleteError } = await supabase
+        .from('anonymous_users')
+        .delete()
+        .eq('username', username);
+      
+      if (deleteError) {
+        console.error('❌ Fehler beim Löschen des Accounts:', deleteError);
+        throw deleteError;
+      }
+      
+      console.log('✅ Account erfolgreich gelöscht:', username);
+      return {
+        success: true,
+        message: 'Account erfolgreich gelöscht'
+      };
+    } catch (error) {
+      console.error('❌ Fehler beim Löschen des Accounts:', error);
       throw error;
     }
   },

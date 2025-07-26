@@ -70,7 +70,8 @@ function createAuthButton() {
   anonymousForm.className = 'flex flex-col gap-2 mt-2';
   anonymousForm.innerHTML = `
     <input type="text" name="username" placeholder="Dein anonymer Benutzername" required minlength="8" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
-    <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Anmelden</button>
+    <input type="password" name="password" placeholder="Passwort (min. 6 Zeichen)" required minlength="6" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
+    <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Registrieren</button>
     <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-anonymous">Abbrechen</button>
   `;
   anonymousForm.style.display = 'none';
@@ -79,14 +80,30 @@ function createAuthButton() {
     e.preventDefault();
     const formData = new FormData(anonymousForm);
     const username = formData.get('username') as string;
+    const password = formData.get('password') as string;
     
     try {
-      const result = await supabaseAuth.signInWithAnonymousUsername(username);
+      // Versuche zuerst eine Registrierung
+      const result = await supabaseAuth.signInWithAnonymousUsername(username, password);
       alert(result.message);
       dropdown.classList.add('hidden');
       anonymousForm.reset();
     } catch (error) {
-      alert('Fehler bei der anonymen Anmeldung: ' + (error as Error).message);
+      const errorMessage = (error as Error).message;
+      
+      // Wenn Benutzername bereits vergeben, versuche Login
+      if (errorMessage.includes('Benutzername bereits vergeben')) {
+        try {
+          const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
+          alert(loginResult.message);
+          dropdown.classList.add('hidden');
+          anonymousForm.reset();
+        } catch (loginError) {
+          alert('Login fehlgeschlagen: ' + (loginError as Error).message);
+        }
+      } else {
+        alert('Fehler bei der anonymen Anmeldung: ' + errorMessage);
+      }
     }
   };
 
@@ -161,6 +178,7 @@ function createAuthButton() {
   dsgvoInfo.innerHTML = `
     <div class="font-semibold mb-1">🔒 DSGVO-konform</div>
     <div>• Anonymer Benutzername: Keine E-Mail, keine persönlichen Daten</div>
+    <div>• Passwort wird für Sicherheit benötigt</div>
     <div>• Fortschritt wird gespeichert</div>
     <div>• Du kannst dich immer wieder anmelden</div>
   `;
@@ -1803,6 +1821,28 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         console.log('🔄 Erzwinge UI-Update...');
         updateRepeatButtons();
         ui.updateErrorCounts(dom, state, learningModes);
+    };
+
+    // Debug-Funktionen für Auth
+    (window as any).checkAuthStatus = async () => {
+        console.log('🔍 Prüfe Auth-Status...');
+        const user = await supabaseAuth.getUser();
+        console.log('👤 Benutzer:', user);
+        console.log('📦 localStorage anonymous_session:', localStorage.getItem('anonymous_session'));
+        updateAuthButton();
+    };
+    
+    // Debug-Funktion zum Löschen des FrankBest Accounts
+    (window as any).deleteFrankBestAccount = async () => {
+        console.log('🗑️ Lösche FrankBest Account...');
+        try {
+            const result = await supabaseAuth.deleteAnonymousAccount('FrankBest');
+            console.log('✅ Account gelöscht:', result);
+            alert('FrankBest Account wurde gelöscht. Du kannst dich jetzt neu registrieren.');
+        } catch (error) {
+            console.error('❌ Fehler beim Löschen:', error);
+            alert('Fehler beim Löschen: ' + (error as Error).message);
+        }
     };
 
         createAuthButton();
