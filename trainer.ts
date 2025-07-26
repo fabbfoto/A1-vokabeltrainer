@@ -69,7 +69,7 @@ function createAuthButton() {
   const anonymousForm = document.createElement('form');
   anonymousForm.className = 'flex flex-col gap-2 mt-2';
   anonymousForm.innerHTML = `
-    <input type="text" name="username" placeholder="Dein anonymer Benutzername" required minlength="8" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
+    <input type="text" name="username" placeholder="Dein anonymer Benutzername" required minlength="6" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
     <input type="password" name="password" placeholder="Passwort (min. 6 Zeichen)" required minlength="6" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
     <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Registrieren</button>
     <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-anonymous">Abbrechen</button>
@@ -82,24 +82,32 @@ function createAuthButton() {
     const username = formData.get('username') as string;
     const password = formData.get('password') as string;
     
+    console.log('🔄 Starte Anmeldung für:', username);
+    
     try {
       // Versuche zuerst eine Registrierung
       const result = await supabaseAuth.signInWithAnonymousUsername(username, password);
+      console.log('✅ Registrierung erfolgreich:', result);
       alert(result.message);
       dropdown.classList.add('hidden');
       anonymousForm.reset();
     } catch (error) {
       const errorMessage = (error as Error).message;
+      console.error('❌ Registrierung fehlgeschlagen:', errorMessage);
       
       // Wenn Benutzername bereits vergeben, versuche Login
       if (errorMessage.includes('Benutzername bereits vergeben')) {
+        console.log('🔄 Versuche Login mit vorhandenem Account...');
         try {
           const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
+          console.log('✅ Login erfolgreich:', loginResult);
           alert(loginResult.message);
           dropdown.classList.add('hidden');
           anonymousForm.reset();
         } catch (loginError) {
-          alert('Login fehlgeschlagen: ' + (loginError as Error).message);
+          const loginErrorMessage = (loginError as Error).message;
+          console.error('❌ Login fehlgeschlagen:', loginErrorMessage);
+          alert('Login fehlgeschlagen: ' + loginErrorMessage);
         }
       } else {
         alert('Fehler bei der anonymen Anmeldung: ' + errorMessage);

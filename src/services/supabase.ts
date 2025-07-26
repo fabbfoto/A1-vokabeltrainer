@@ -63,9 +63,9 @@ export const supabaseAuth = {
       console.log('🔐 Starte anonyme Benutzername-Anmeldung...');
       console.log('👤 Benutzername:', username);
       
-      // Prüfe ob Benutzername mindestens 8 Zeichen hat
-      if (username.length < 8) {
-        throw new Error('Benutzername muss mindestens 8 Zeichen lang sein');
+      // Prüfe ob Benutzername mindestens 6 Zeichen hat
+      if (username.length < 6) {
+        throw new Error('Benutzername muss mindestens 6 Zeichen lang sein');
       }
       
       // Prüfe ob Passwort mindestens 6 Zeichen hat
