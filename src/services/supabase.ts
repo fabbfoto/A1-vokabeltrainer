@@ -94,6 +94,7 @@ export const supabaseAuth = {
         email: `${username}@gmail.com`,
         password: password,
         options: {
+          emailRedirectTo: window.location.origin,
           data: {
             is_anonymous: true,
             anonymous_username: username,
@@ -104,15 +105,32 @@ export const supabaseAuth = {
       
       if (error) {
         console.error('❌ Anonymer Benutzername Fehler:', error);
+        
+        // Spezielle Behandlung für E-Mail-Bestätigung
+        if (error.message.includes('Email not confirmed') || error.message.includes('email not confirmed')) {
+          throw new Error('Account erstellt, aber E-Mail-Bestätigung erforderlich. Bitte überprüfe deine E-Mails oder verwende einen anderen Benutzernamen.');
+        }
+        
         throw error;
       }
       
       console.log('✅ Account erstellt:', data);
-      return {
-        success: true,
-        message: `Account "${username}" wurde erfolgreich erstellt! Du bist jetzt angemeldet.`,
-        data: data
-      };
+      
+      // Prüfe ob der Benutzer sofort angemeldet ist
+      if (data.user && data.session) {
+        return {
+          success: true,
+          message: `Account "${username}" wurde erfolgreich erstellt! Du bist jetzt angemeldet.`,
+          data: data
+        };
+      } else {
+        // Falls E-Mail-Bestätigung erforderlich ist
+        return {
+          success: false,
+          message: `Account "${username}" wurde erstellt, aber E-Mail-Bestätigung ist erforderlich. Bitte überprüfe deine E-Mails.`,
+          data: data
+        };
+      }
     } catch (error) {
       console.error('❌ Fehler bei Account-Erstellung:', error);
       throw error;

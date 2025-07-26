@@ -166,10 +166,17 @@ async function createAuthButton() {
             try {
               const result = await supabaseAuth.signInWithAnonymousUsername(username, password);
               console.log('✅ Registrierung erfolgreich:', result);
-              alert('Willkommen, ' + username + '! Dein Account wurde erstellt.');
-              dropdown.classList.add('hidden');
-              anonymousForm.reset();
-              createAuthButton();
+              
+              if (result.success) {
+                alert('Willkommen, ' + username + '! Dein Account wurde erstellt.');
+                dropdown.classList.add('hidden');
+                anonymousForm.reset();
+                createAuthButton();
+              } else {
+                // E-Mail-Bestätigung erforderlich
+                alert(result.message);
+                // Formular nicht schließen, damit der Benutzer es nochmal versuchen kann
+              }
             } catch (registerError) {
               const registerErrorMessage = (registerError as Error).message;
               console.error('❌ Registrierung fehlgeschlagen:', registerErrorMessage);
