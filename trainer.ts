@@ -23,6 +23,10 @@ import { dom } from './dom';
 import type { DOMElements } from './src/core/types/ui';
 import { vokabular } from './vokabular';
 import { shuffleArray } from './src/utils/helfer';
+
+// Debug: Vokabular-Import überprüfen
+console.log('📚 Vokabular importiert:', vokabular);
+console.log('📚 Vokabular-Themen:', Object.keys(vokabular || {}));
 import * as uiModes from './src/utils/ui-modes';
 import * as ui from './src/ui/views/index';
 import { NavigationEvents } from './src/core/events/navigation-events';
@@ -2147,5 +2151,42 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     console.log('🎯 Navigation-Container Event-Listener:', dom.navigationContainerEl?.onclick);
     console.log('🎯 Verfügbare Buttons mit data-main-topic:', document.querySelectorAll('[data-main-topic]').length);
     console.log('🎯 Verfügbare Buttons mit data-sub-topic:', document.querySelectorAll('[data-sub-topic]').length);
+
+    // KRITISCH: TrainerJS und Vokabular global verfügbar machen
+    if (typeof window !== 'undefined') {
+        console.log('🔧 Mache TrainerJS und Vokabular global verfügbar...');
+        
+        // Vokabular global verfügbar machen
+        (window as any).vokabular = vokabular;
+        console.log('✅ Vokabular global verfügbar gemacht:', Object.keys(vokabular || {}));
+        
+        // TrainerJS Objekt erstellen
+        (window as any).trainerJS = {
+            displayMainTopics: () => {
+                console.log('📱 displayMainTopics aufgerufen');
+                if (ui && ui.displayMainTopics) {
+                    ui.displayMainTopics(dom, state, vokabular, learningModes);
+                } else {
+                    console.error('❌ ui.displayMainTopics nicht verfügbar');
+                }
+            },
+            displaySubTopics: (mainTopic: TopicId) => {
+                console.log('📱 displaySubTopics aufgerufen für:', mainTopic);
+                if (ui && ui.displaySubTopics) {
+                    ui.displaySubTopics(dom, state, vokabular, mainTopic, learningModes);
+                } else {
+                    console.error('❌ ui.displaySubTopics nicht verfügbar');
+                }
+            },
+            vokabular: vokabular,
+            state: state,
+            dom: dom,
+            ui: ui,
+            learningModes: learningModes
+        };
+        
+        console.log('✅ TrainerJS initialisiert');
+        console.log('✅ TrainerJS verfügbar:', Object.keys((window as any).trainerJS));
+    }
 
 });
