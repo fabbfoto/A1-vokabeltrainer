@@ -593,9 +593,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         }
                     });
                     
-                    // UI aktualisieren
-                    if (typeof ui?.showTrainingModes === 'function') {
-                        ui.showTrainingModes(dom, state);
+                    // UI aktualisieren - nur wenn bereits in Trainings-Ansicht
+                    if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
+                        if (typeof ui?.showTrainingModes === 'function') {
+                            ui.showTrainingModes(dom, state);
+                        }
                     }
                     return; // Cloud-Daten erfolgreich geladen
                 }
