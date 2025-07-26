@@ -38,7 +38,7 @@ import { supabase, supabaseAuth, supabaseProgress } from './src/services/supabas
 let currentUser: any = null;
 
 // ========== SUPABASE AUTH BUTTON ==========
-function createAuthButton() {
+async function createAuthButton() {
   // Füge den Button nur ein, wenn der Container existiert (Root-Seite)
   const authContainer = document.getElementById('auth-button-container');
   if (!authContainer) return;
@@ -46,225 +46,258 @@ function createAuthButton() {
   // Vorherige Buttons entfernen, falls vorhanden
   authContainer.innerHTML = '';
 
-  const button = document.createElement('button');
-  button.className = 'w-full px-4 py-2 bg-gradient-to-r from-black via-[#F23054] to-[#F2AE2E] text-white rounded-lg hover:brightness-110 transition-colors flex items-center gap-2 shadow-lg font-semibold justify-center';
-  button.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"/></svg><span>Anmelden</span>`;
-
-  // Dropdown-Menü (wie gehabt)
-  const dropdown = document.createElement('div');
-  dropdown.className = 'hidden absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2';
-  dropdown.style.minWidth = '220px';
-
-  // DSGVO-konforme Optionen zuerst anzeigen
-  const dsgvoHeader = document.createElement('div');
-  dsgvoHeader.className = 'text-xs text-blue-200 font-semibold mb-2 border-b border-blue-700 pb-2';
-  dsgvoHeader.textContent = 'DSGVO-konform & anonym';
-
-  // Anonymer Benutzername Option (Empfohlen)
-  const anonymousBtn = document.createElement('button');
-  anonymousBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors text-left';
-  anonymousBtn.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><div><div class="font-semibold">Anonym lernen</div><div class="text-xs text-blue-300">Benutzername wählen (min. 8 Zeichen)</div></div>`;
-
-  // Anonymer Benutzername Formular
-  const anonymousForm = document.createElement('form');
-  anonymousForm.className = 'flex flex-col gap-2 mt-2';
-  anonymousForm.innerHTML = `
-    <input type="text" name="username" placeholder="Dein anonymer Benutzername" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
-    <input type="password" name="password" placeholder="Passwort (min. 6 Zeichen)" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
-    <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Registrieren</button>
-    <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-anonymous">Abbrechen</button>
-  `;
-  anonymousForm.style.display = 'none';
-
-  anonymousForm.onsubmit = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.stopImmediatePropagation();
+  // Prüfe den aktuellen Anmeldestatus
+  const user = await supabaseAuth.getUser();
+  
+  if (user) {
+    // Benutzer ist angemeldet - zeige Abmelde-Button
+    const button = document.createElement('button');
+    button.className = 'w-full px-4 py-2 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg hover:brightness-110 transition-colors flex items-center gap-2 shadow-lg font-semibold justify-center';
+    button.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"/></svg><span>${user.user_metadata?.anonymous_username || user.email} (Abmelden)</span>`;
     
-    // Manuelle Validierung statt HTML5-Validierung
-    const usernameInput = anonymousForm.querySelector('input[name="username"]') as HTMLInputElement;
-    const passwordInput = anonymousForm.querySelector('input[name="password"]') as HTMLInputElement;
-    
-    const username = usernameInput.value.trim();
-    const password = passwordInput.value.trim();
-    
-    // Manuelle Validierung
-    if (username.length < 6) {
-      alert('Benutzername muss mindestens 6 Zeichen lang sein');
-      usernameInput.focus();
-      return;
-    }
-    
-    if (password.length < 6) {
-      alert('Passwort muss mindestens 6 Zeichen lang sein');
-      passwordInput.focus();
-      return;
-    }
-    
-    console.log('🔄 Starte Anmeldung für:', username);
-    
-    // Button deaktivieren während der Anmeldung
-    const submitButton = anonymousForm.querySelector('button[type="submit"]') as HTMLButtonElement;
-    const originalText = submitButton.textContent;
-    submitButton.disabled = true;
-    submitButton.textContent = 'Anmeldung läuft...';
-    
-    try {
-      // Versuche zuerst eine Registrierung
-      const result = await supabaseAuth.signInWithAnonymousUsername(username, password);
-      console.log('✅ Registrierung erfolgreich:', result);
-      alert(result.message);
-      // Nur bei erfolgreicher Anmeldung das Modal schließen
-      dropdown.classList.add('hidden');
-      anonymousForm.reset();
-      // Auth-Button aktualisieren
-      createAuthButton();
-    } catch (error) {
-      const errorMessage = (error as Error).message;
-      console.error('❌ Registrierung fehlgeschlagen:', errorMessage);
-      
-      // Wenn Benutzername bereits vergeben, versuche Login
-      if (errorMessage.includes('Benutzername bereits vergeben')) {
-        console.log('🔄 Versuche Login mit vorhandenem Account...');
-        submitButton.textContent = 'Login läuft...';
-        try {
-          const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
-          console.log('✅ Login erfolgreich:', loginResult);
-          alert(loginResult.message);
-          // Nur bei erfolgreicher Anmeldung das Modal schließen
-          dropdown.classList.add('hidden');
-          anonymousForm.reset();
-          // Auth-Button aktualisieren
-          createAuthButton();
-        } catch (loginError) {
-          const loginErrorMessage = (loginError as Error).message;
-          console.error('❌ Login fehlgeschlagen:', loginErrorMessage);
-          alert('Login fehlgeschlagen: ' + loginErrorMessage);
-        }
-      } else {
-        alert('Fehler bei der anonymen Anmeldung: ' + errorMessage);
+    // Abmelde-Button Event Listener
+    button.addEventListener('click', async () => {
+      try {
+        await supabaseAuth.signOut();
+        alert('Erfolgreich abgemeldet!');
+        createAuthButton(); // Button neu rendern
+      } catch (error) {
+        console.error('Fehler beim Abmelden:', error);
+        alert('Fehler beim Abmelden: ' + (error as Error).message);
       }
-    } finally {
-      // Button wieder aktivieren
-      submitButton.disabled = false;
-      submitButton.textContent = originalText;
-    }
-  };
-
-  anonymousBtn.onclick = () => {
-    anonymousBtn.style.display = 'none';
-    anonymousForm.style.display = '';
-  };
-
-  anonymousForm.querySelector('#cancel-anonymous')!.addEventListener('click', () => {
-    anonymousForm.style.display = 'none';
-    anonymousBtn.style.display = '';
-  });
-
-  // Trennlinie
-  const divider = document.createElement('div');
-  divider.className = 'text-xs text-blue-300 text-center my-2 border-t border-blue-700 pt-2';
-  divider.textContent = 'oder';
-
-  // Google-Login-Option
-  const googleBtn = document.createElement('button');
-  googleBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors';
-  googleBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M16.318 13.084A7.963 7.963 0 0018 10c0-.638-.07-1.257-.2-1.852H10v3.504h4.318z"/><path d="M10 18c2.16 0 3.97-.72 5.293-1.963l-2.56-2.09C11.97 14.633 11.05 15 10 15c-2.07 0-3.82-1.4-4.44-3.29H2.86v2.07A7.997 7.997 0 0010 18z"/><path d="M5.56 11.71A4.978 4.978 0 015 10c0-.34.03-.67.09-.99V6.94H2.86A7.997 7.997 0 002 10c0 1.26.29 2.45.8 3.5l2.76-1.79z"/><path d="M10 5c1.13 0 2.14.39 2.94 1.15l2.2-2.2C17.45 2.09 14.97 1 12 1 7.7 1 3.44 4.24 2.86 6.94l2.7 2.09C6.18 7.4 7.93 6 10 6z"/></svg><span>Mit Google anmelden</span>`;
-  googleBtn.onclick = () => {
-    supabaseAuth.signInWithGoogle().catch(error => {
-      console.error('Login-Fehler:', error);
-      alert('Login fehlgeschlagen. Bitte versuche es später erneut.');
     });
-  };
+    
+    authContainer.appendChild(button);
+  } else {
+    // Benutzer ist nicht angemeldet - zeige Anmelde-Button
+    const button = document.createElement('button');
+    button.className = 'w-full px-4 py-2 bg-gradient-to-r from-black via-[#F23054] to-[#F2AE2E] text-white rounded-lg hover:brightness-110 transition-colors flex items-center gap-2 shadow-lg font-semibold justify-center';
+    button.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"/></svg><span>Anmelden</span>`;
 
-  // E-Mail-Login-Option
-  const emailBtn = document.createElement('button');
-  emailBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors';
-  emailBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm8 0a8 8 0 11-16 0 8 8 0 0116 0z"/></svg><span>Mit E-Mail anmelden</span>`;
+    // Dropdown-Menü (wie gehabt)
+    const dropdown = document.createElement('div');
+    dropdown.className = 'hidden absolute right-0 mt-2 w-64 bg-gradient-to-br from-blue-800 to-blue-600 text-white rounded-lg shadow-xl p-4 flex flex-col gap-2';
+    dropdown.style.minWidth = '220px';
 
-  // E-Mail-Login-Formular (wird beim Klick auf emailBtn angezeigt)
-  const emailForm = document.createElement('form');
-  emailForm.className = 'flex flex-col gap-2 mt-2';
-  emailForm.innerHTML = `
-    <input type="email" name="email" placeholder="E-Mail" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
-    <input type="password" name="password" placeholder="Passwort" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
-    <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1">Login</button>
-    <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-email-login">Abbrechen</button>
-  `;
-  emailForm.style.display = 'none';
+    // DSGVO-konforme Optionen zuerst anzeigen
+    const dsgvoHeader = document.createElement('div');
+    dsgvoHeader.className = 'text-xs text-blue-200 font-semibold mb-2 border-b border-blue-700 pb-2';
+    dsgvoHeader.textContent = 'DSGVO-konform & anonym';
 
-  emailForm.onsubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData(emailForm);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      alert('Login fehlgeschlagen: ' + error.message);
-    } else {
-      dropdown.classList.add('hidden');
-      emailForm.reset();
-    }
-  };
-  emailForm.querySelector('#cancel-email-login')!.addEventListener('click', () => {
+    // Anonymer Benutzername Option (Empfohlen)
+    const anonymousBtn = document.createElement('button');
+    anonymousBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors text-left';
+    anonymousBtn.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><div><div class="font-semibold">Anonym lernen</div><div class="text-xs text-blue-300">Benutzername wählen (min. 6 Zeichen)</div></div>`;
+
+    // Anonymer Benutzername Formular
+    const anonymousForm = document.createElement('form');
+    anonymousForm.className = 'flex flex-col gap-2 mt-2';
+    anonymousForm.innerHTML = `
+      <input type="text" name="username" placeholder="Dein anonymer Benutzername" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
+      <input type="password" name="password" placeholder="Passwort (min. 6 Zeichen)" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
+      <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Registrieren</button>
+      <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-anonymous">Abbrechen</button>
+    `;
+    anonymousForm.style.display = 'none';
+
+    anonymousForm.onsubmit = async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      
+      // Manuelle Validierung statt HTML5-Validierung
+      const usernameInput = anonymousForm.querySelector('input[name="username"]') as HTMLInputElement;
+      const passwordInput = anonymousForm.querySelector('input[name="password"]') as HTMLInputElement;
+      
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value.trim();
+      
+      // Manuelle Validierung
+      if (username.length < 6) {
+        alert('Benutzername muss mindestens 6 Zeichen lang sein');
+        usernameInput.focus();
+        return;
+      }
+      
+      if (password.length < 6) {
+        alert('Passwort muss mindestens 6 Zeichen lang sein');
+        passwordInput.focus();
+        return;
+      }
+      
+      console.log('🔄 Starte Anmeldung für:', username);
+      
+      // Button deaktivieren während der Anmeldung
+      const submitButton = anonymousForm.querySelector('button[type="submit"]') as HTMLButtonElement;
+      const originalText = submitButton.textContent;
+      submitButton.disabled = true;
+      submitButton.textContent = 'Anmeldung läuft...';
+      
+      try {
+        // Versuche zuerst eine Registrierung
+        const result = await supabaseAuth.signInWithAnonymousUsername(username, password);
+        console.log('✅ Registrierung erfolgreich:', result);
+        alert(result.message);
+        // Nur bei erfolgreicher Anmeldung das Modal schließen
+        dropdown.classList.add('hidden');
+        anonymousForm.reset();
+        // Auth-Button aktualisieren
+        createAuthButton();
+      } catch (error) {
+        const errorMessage = (error as Error).message;
+        console.error('❌ Registrierung fehlgeschlagen:', errorMessage);
+        
+        // Wenn Benutzername bereits vergeben, versuche Login
+        if (errorMessage.includes('Benutzername bereits vergeben')) {
+          console.log('🔄 Versuche Login mit vorhandenem Account...');
+          submitButton.textContent = 'Login läuft...';
+          try {
+            const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
+            console.log('✅ Login erfolgreich:', loginResult);
+            alert(loginResult.message);
+            // Nur bei erfolgreicher Anmeldung das Modal schließen
+            dropdown.classList.add('hidden');
+            anonymousForm.reset();
+            // Auth-Button aktualisieren
+            createAuthButton();
+          } catch (loginError) {
+            const loginErrorMessage = (loginError as Error).message;
+            console.error('❌ Login fehlgeschlagen:', loginErrorMessage);
+            alert('Login fehlgeschlagen: ' + loginErrorMessage);
+          }
+        } else {
+          alert('Fehler bei der anonymen Anmeldung: ' + errorMessage);
+        }
+      } finally {
+        // Button wieder aktivieren
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
+      }
+    };
+
+    anonymousBtn.onclick = () => {
+      anonymousBtn.style.display = 'none';
+      anonymousForm.style.display = '';
+    };
+
+    anonymousForm.querySelector('#cancel-anonymous')!.addEventListener('click', () => {
+      anonymousForm.style.display = 'none';
+      anonymousBtn.style.display = '';
+    });
+
+    // Trennlinie
+    const divider = document.createElement('div');
+    divider.className = 'text-xs text-blue-300 text-center my-2 border-t border-blue-700 pt-2';
+    divider.textContent = 'oder';
+
+    // Google-Login-Option
+    const googleBtn = document.createElement('button');
+    googleBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors';
+    googleBtn.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M16.318 13.084A7.963 7.963 0 0018 10c0-.638-.07-1.257-.2-1.852H10v3.504h4.318z"/><path d="M10 18c2.16 0 3.97-.72 5.293-1.963l-2.56-2.09C11.97 14.633 11.05 15 10 15c-2.07 0-3.82-1.4-4.44-3.29H2.86v2.07A7.997 7.997 0 0010 18z"/><path d="M5.56 11.71A4.978 4.978 0 015 10c0-.34.03-.67.09-.99V6.94H2.86A7.997 7.997 0 002 10c0 1.26.29 2.45.8 3.5l2.76-1.79z"/><path d="M10 5c1.13 0 2.14.39 2.94 1.15l2.2-2.2C17.45 2.09 14.97 1 12 1 7.7 1 3.44 4.24 2.86 6.94l2.7 2.09C6.18 7.4 7.93 6 10 6z"/></svg><span>Mit Google anmelden</span>`;
+    googleBtn.onclick = () => {
+      supabaseAuth.signInWithGoogle().catch(error => {
+        console.error('Login-Fehler:', error);
+        alert('Login fehlgeschlagen. Bitte versuche es später erneut.');
+      });
+    };
+
+    // E-Mail-Login-Option
+    const emailBtn = document.createElement('button');
+    emailBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors';
+    emailBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm8 0a8 8 0 11-16 0 8 8 0 0116 0z"/></svg><span>Mit E-Mail anmelden</span>`;
+
+    // E-Mail-Login-Formular (wird beim Klick auf emailBtn angezeigt)
+    const emailForm = document.createElement('form');
+    emailForm.className = 'flex flex-col gap-2 mt-2';
+    emailForm.innerHTML = `
+      <input type="email" name="email" placeholder="E-Mail" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
+      <input type="password" name="password" placeholder="Passwort" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
+      <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1">Login</button>
+      <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-email-login">Abbrechen</button>
+    `;
     emailForm.style.display = 'none';
-    emailBtn.style.display = '';
-  });
 
-  emailBtn.onclick = () => {
-    emailBtn.style.display = 'none';
-    emailForm.style.display = '';
-  };
+    emailForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(emailForm);
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        alert('Login fehlgeschlagen: ' + error.message);
+      } else {
+        dropdown.classList.add('hidden');
+        emailForm.reset();
+        createAuthButton();
+      }
+    };
+    emailForm.querySelector('#cancel-email-login')!.addEventListener('click', () => {
+      emailForm.style.display = 'none';
+      emailBtn.style.display = '';
+    });
 
-  // DSGVO-Hinweis
-  const dsgvoInfo = document.createElement('div');
-  dsgvoInfo.className = 'text-xs text-blue-200 mt-2 p-2 bg-blue-900/50 rounded';
-  dsgvoInfo.innerHTML = `
-    <div class="font-semibold mb-1">🔒 DSGVO-konform</div>
-    <div>• Anonymer Benutzername: Keine E-Mail, keine persönlichen Daten</div>
-    <div>• Passwort wird für Sicherheit benötigt</div>
-    <div>• Fortschritt wird gespeichert</div>
-    <div>• Du kannst dich immer wieder anmelden</div>
-  `;
+    emailBtn.onclick = () => {
+      emailBtn.style.display = 'none';
+      emailForm.style.display = '';
+    };
 
-  // Elemente zum Dropdown hinzufügen
-  dropdown.appendChild(dsgvoHeader);
-  dropdown.appendChild(anonymousBtn);
-  dropdown.appendChild(anonymousForm);
-  dropdown.appendChild(divider);
-  dropdown.appendChild(googleBtn);
-  dropdown.appendChild(emailBtn);
-  dropdown.appendChild(emailForm);
-  dropdown.appendChild(dsgvoInfo);
+    // DSGVO-Hinweis
+    const dsgvoInfo = document.createElement('div');
+    dsgvoInfo.className = 'text-xs text-blue-200 mt-2 p-2 bg-blue-900/50 rounded';
+    dsgvoInfo.innerHTML = `
+      <div class="font-semibold mb-1">🔒 DSGVO-konform</div>
+      <div>• Anonymer Benutzername: Keine E-Mail, keine persönlichen Daten</div>
+      <div>• Passwort wird für Sicherheit benötigt</div>
+      <div>• Fortschritt wird gespeichert</div>
+      <div>• Du kannst dich immer wieder anmelden</div>
+    `;
 
-  // Dropdown-Logik
-  let dropdownOpen = false;
-  
-  // Verhindere das Schließen des Dropdowns bei Klicks innerhalb
-  dropdown.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-  
-  // Verhindere das Schließen bei Formular-Submission
-  dropdown.addEventListener('submit', (e) => {
-    e.stopPropagation();
-  });
-  button.onclick = (e) => {
-    e.stopPropagation();
-    dropdownOpen = !dropdownOpen;
-    dropdown.classList.toggle('hidden', !dropdownOpen);
-  };
+    // Elemente zum Dropdown hinzufügen
+    dropdown.appendChild(dsgvoHeader);
+    dropdown.appendChild(anonymousBtn);
+    dropdown.appendChild(anonymousForm);
+    dropdown.appendChild(divider);
+    dropdown.appendChild(googleBtn);
+    dropdown.appendChild(emailBtn);
+    dropdown.appendChild(emailForm);
+    dropdown.appendChild(dsgvoInfo);
 
-  // Dropdown schließen beim Klick außerhalb
-  document.addEventListener('click', () => {
-    if (dropdownOpen) {
+    // Dropdown-Logik
+    let dropdownOpen = false;
+    
+    // Verhindere das Schließen des Dropdowns bei Klicks innerhalb
+    dropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+    
+    // Verhindere das Schließen bei Formular-Submission
+    dropdown.addEventListener('submit', (e) => {
+      e.stopPropagation();
+    });
+    
+    button.onclick = (e) => {
+      e.stopPropagation();
+      dropdownOpen = !dropdownOpen;
+      if (dropdownOpen) {
+        dropdown.classList.remove('hidden');
+      } else {
+        dropdown.classList.add('hidden');
+      }
+    };
+
+    // Schließe Dropdown bei Klick außerhalb
+    document.addEventListener('click', () => {
       dropdownOpen = false;
       dropdown.classList.add('hidden');
-    }
-  });
+    });
 
-  authContainer.appendChild(button);
-  authContainer.appendChild(dropdown);
+    // Container für Button und Dropdown
+    const container = document.createElement('div');
+    container.className = 'relative';
+    container.appendChild(button);
+    container.appendChild(dropdown);
+    authContainer.appendChild(container);
+  }
 }
 // ========== ENDE AUTH BUTTON ==========
 
