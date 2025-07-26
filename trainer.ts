@@ -36,11 +36,20 @@ import { ErrorCounterManager } from './src/services/error-counter-manager';
 import { supabase, supabaseAuth, supabaseProgress } from './src/services/supabase';
 
 let currentUser: any = null;
+let isCreatingAuthButton = false;
 
 // ========== SUPABASE AUTH BUTTON ==========
 async function createAuthButton() {
-  const authContainer = document.getElementById('auth-button-container');
-  if (!authContainer) return;
+  if (isCreatingAuthButton) {
+    console.log('⚠️ createAuthButton bereits in Ausführung, überspringe...');
+    return; // Verhindere parallele Ausführung
+  }
+  
+  isCreatingAuthButton = true;
+  
+  try {
+    const authContainer = document.getElementById('auth-button-container');
+    if (!authContainer) return;
   
   // WICHTIG: Warte kurz, damit Supabase den State aktualisieren kann
   await new Promise(resolve => setTimeout(resolve, 100));
@@ -324,6 +333,9 @@ async function createAuthButton() {
     container.appendChild(button);
     container.appendChild(dropdown);
     authContainer.appendChild(container);
+  }
+  } finally {
+    isCreatingAuthButton = false;
   }
 }
 // ========== ENDE AUTH BUTTON ==========
@@ -2106,8 +2118,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         createAuthButton(); // Button bei jeder Auth-Änderung aktualisieren (einziger verbleibender Aufruf)
     });
 
-    // Initial Auth-Button erstellen
-    createAuthButton(); // Initialer Aufruf beim App-Start
+    // Initial Auth-Button erstellen - ENTFERNT!
+    // createAuthButton(); // Nicht mehr nötig, da onAuthStateChange beim Start automatisch ausgelöst wird
 
     // Debug: UI-Objekt global verfügbar machen
     (window as any).ui = ui;
