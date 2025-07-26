@@ -39,11 +39,13 @@ let currentUser: any = null;
 
 // ========== SUPABASE AUTH BUTTON ==========
 async function createAuthButton() {
-  // Füge den Button nur ein, wenn der Container existiert (Root-Seite)
   const authContainer = document.getElementById('auth-button-container');
   if (!authContainer) return;
   
-  // Vorherige Buttons entfernen, falls vorhanden
+  // WICHTIG: Warte kurz, damit Supabase den State aktualisieren kann
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
+  // Vorherige Buttons entfernen
   authContainer.innerHTML = '';
 
   // Prüfe den aktuellen Anmeldestatus
@@ -53,17 +55,21 @@ async function createAuthButton() {
     // Benutzer ist angemeldet - zeige Abmelde-Button
     const button = document.createElement('button');
     button.className = 'w-full px-4 py-2 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg hover:brightness-110 transition-colors flex items-center gap-2 shadow-lg font-semibold justify-center';
-    button.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"/></svg><span>${user.user_metadata?.anonymous_username || user.email} (Abmelden)</span>`;
     
-    // Abmelde-Button Event Listener
+    // Zeige den richtigen Namen
+    const displayName = user.user_metadata?.anonymous_username || user.email || 'Angemeldet';
+    button.innerHTML = `<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z"/></svg><span>Abmelden (${displayName})</span>`;
+    
     button.addEventListener('click', async () => {
-      try {
-        await supabaseAuth.signOut();
-        alert('Erfolgreich abgemeldet!');
-        createAuthButton(); // Button neu rendern
-      } catch (error) {
-        console.error('Fehler beim Abmelden:', error);
-        alert('Fehler beim Abmelden: ' + (error as Error).message);
+      if (confirm('Möchtest du dich wirklich abmelden?')) {
+        try {
+          await supabaseAuth.signOut();
+          alert('Erfolgreich abgemeldet!');
+          createAuthButton();
+        } catch (error) {
+          console.error('Fehler beim Abmelden:', error);
+          alert('Fehler beim Abmelden: ' + (error as Error).message);
+        }
       }
     });
     
@@ -87,15 +93,19 @@ async function createAuthButton() {
     // Anonymer Benutzername Option (Empfohlen)
     const anonymousBtn = document.createElement('button');
     anonymousBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors text-left';
-    anonymousBtn.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><div><div class="font-semibold">Anonym lernen</div><div class="text-xs text-blue-300">Benutzername wählen (min. 6 Zeichen)</div></div>`;
+    anonymousBtn.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg><div><div class="font-semibold">Anonym lernen</div><div class="text-xs text-blue-300">Mit Benutzername anmelden/registrieren</div></div>`;
 
     // Anonymer Benutzername Formular
     const anonymousForm = document.createElement('form');
     anonymousForm.className = 'flex flex-col gap-2 mt-2';
     anonymousForm.innerHTML = `
-      <input type="text" name="username" placeholder="Dein anonymer Benutzername" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
+      <input type="text" name="username" placeholder="Dein Benutzername (min. 6 Zeichen)" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
       <input type="password" name="password" placeholder="Passwort (min. 6 Zeichen)" class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none text-sm" />
       <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1 text-sm">Anmelden / Registrieren</button>
+      <div class="text-xs text-blue-300 mt-1">
+        • Existiert dein Account? → Du wirst angemeldet<br>
+        • Neu hier? → Account wird erstellt
+      </div>
       <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-anonymous">Abbrechen</button>
     `;
     anonymousForm.style.display = 'none';
@@ -105,14 +115,13 @@ async function createAuthButton() {
       e.stopPropagation();
       e.stopImmediatePropagation();
       
-      // Manuelle Validierung statt HTML5-Validierung
       const usernameInput = anonymousForm.querySelector('input[name="username"]') as HTMLInputElement;
       const passwordInput = anonymousForm.querySelector('input[name="password"]') as HTMLInputElement;
       
       const username = usernameInput.value.trim();
       const password = passwordInput.value.trim();
       
-      // Manuelle Validierung
+      // Validierung
       if (username.length < 6) {
         alert('Benutzername muss mindestens 6 Zeichen lang sein');
         usernameInput.focus();
@@ -127,62 +136,62 @@ async function createAuthButton() {
       
       console.log('🔄 Starte Anmeldung für:', username);
       
-      // Button deaktivieren während der Anmeldung
       const submitButton = anonymousForm.querySelector('button[type="submit"]') as HTMLButtonElement;
       const originalText = submitButton.textContent;
       submitButton.disabled = true;
+      submitButton.textContent = 'Prüfe...';
       
       try {
-        // Versuche zuerst Login (da Benutzer wahrscheinlich bereits registriert ist)
-        console.log('🔄 Versuche Login...');
-        submitButton.textContent = 'Login läuft...';
-        
-                  try {
-            const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
-            console.log('✅ Login erfolgreich:', loginResult);
-            alert(loginResult.message);
-            // Nur bei erfolgreicher Anmeldung das Modal schließen
-            dropdown.classList.add('hidden');
-            anonymousForm.reset();
-            // Auth-Button aktualisieren
-            createAuthButton();
-            return;
+        // WICHTIG: Zuerst prüfen ob der Benutzer existiert
+        // Versuche zuerst einen Login
+        try {
+          console.log('🔄 Versuche Login mit vorhandenem Account...');
+          const loginResult = await supabaseAuth.loginWithAnonymousUsername(username, password);
+          console.log('✅ Login erfolgreich:', loginResult);
+          alert('Willkommen zurück, ' + username + '!');
+          dropdown.classList.add('hidden');
+          anonymousForm.reset();
+          createAuthButton();
+          return; // Wichtig: Hier beenden wenn Login erfolgreich
         } catch (loginError) {
           const loginErrorMessage = (loginError as Error).message;
-          console.log('ℹ️ Login fehlgeschlagen, versuche Registrierung:', loginErrorMessage);
           
-          // Wenn Login fehlschlägt, versuche Registrierung
-          if (loginErrorMessage.includes('Benutzername oder Passwort falsch')) {
-            console.log('🔄 Versuche Registrierung...');
-            submitButton.textContent = 'Registrierung läuft...';
+          // Nur wenn der Login fehlschlägt weil der Account nicht existiert, 
+          // versuchen wir eine Registrierung
+          if (loginErrorMessage.includes('Benutzername oder Passwort falsch') || 
+              loginErrorMessage.includes('Invalid login credentials')) {
+            console.log('🔄 Account existiert nicht, versuche Registrierung...');
+            submitButton.textContent = 'Registriere...';
             
             try {
               const result = await supabaseAuth.signInWithAnonymousUsername(username, password);
               console.log('✅ Registrierung erfolgreich:', result);
-              alert(result.message);
-              // Nur bei erfolgreicher Anmeldung das Modal schließen
+              alert('Willkommen, ' + username + '! Dein Account wurde erstellt.');
               dropdown.classList.add('hidden');
               anonymousForm.reset();
-              // Auth-Button aktualisieren
               createAuthButton();
             } catch (registerError) {
               const registerErrorMessage = (registerError as Error).message;
               console.error('❌ Registrierung fehlgeschlagen:', registerErrorMessage);
               
               if (registerErrorMessage.includes('Benutzername bereits vergeben')) {
-                alert('Benutzername bereits vergeben. Bitte verwende ein anderes Passwort oder einen anderen Benutzernamen.');
+                alert('Dieser Benutzername ist bereits vergeben. Bitte wähle einen anderen.');
               } else {
                 alert('Fehler bei der Registrierung: ' + registerErrorMessage);
               }
             }
           } else {
+            // Anderer Login-Fehler (falsches Passwort etc.)
+            console.error('❌ Login fehlgeschlagen:', loginErrorMessage);
             alert('Login fehlgeschlagen: ' + loginErrorMessage);
           }
         }
+      } catch (error) {
+        console.error('❌ Unerwarteter Fehler:', error);
+        alert('Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später erneut.');
       } finally {
-        // Button wieder aktivieren
         submitButton.disabled = false;
-        submitButton.textContent = originalText;
+        submitButton.textContent = originalText || 'Registrieren';
       }
     };
 
