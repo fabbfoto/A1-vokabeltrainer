@@ -6,8 +6,8 @@ import {createWordId, createVocabulary } from './src/core/types/vocabulary';
 export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
     "Essen und Trinken": {
 
-        // --- NEUE KATEGORIE: Obst & Gemüse ---
-        "Obst & Gemüse": [
+        // --- NEUE KATEGORIE: Obst, Gemüse ---
+"Obst, Gemüse": [
             {
                 id: createWordId("essen-trinken-lebensmittel-001"),
                 wordType: "noun",
@@ -124,8 +124,8 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
             } as Noun
         ],
 
-        // --- NEUE KATEGORIE: Grundnahrungsmittel & Tierprodukte ---
-        "Grundnahrungsmittel & Tierprodukte": [
+        // --- NEUE KATEGORIE: Grundnahrungsmittel, Tierprodukte ---
+"Grundnahrungsmittel, Tierprodukte": [
             {
                 id: createWordId("essen-trinken-lebensmittel-003"),
                 wordType: "noun",
@@ -392,8 +392,8 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
             } as Noun
         ],
 
-        // --- NEUE KATEGORIE: Getränke & Süßes ---
-        "Getränke & Süßes": [
+        // --- NEUE KATEGORIE: Getränke, Süßes ---
+"Getränke, Süßes": [
             {
                 id: createWordId("essen-trinken-lebensmittel-011"),
                 wordType: "noun",
@@ -614,8 +614,8 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
             } as Noun
         ],
 
-        // --- NEUE KATEGORIE: Geschirr & Zutaten ---
-        "Geschirr & Zutaten": [
+        // --- NEUE KATEGORIE: Geschirr, Zutaten ---
+"Geschirr, Zutaten": [
             {
                 id: createWordId("essen-trinken-lebensmittel-015"),
                 wordType: "noun",
@@ -872,7 +872,7 @@ export const vokabularEssenTrinken: VocabularyStructure = createVocabulary({
         ],
 
         // --- UNTER-THEMA: Mahlzeiten/Lokale --- (UNVERÄNDERT)
-        "Mahlzeiten & Restaurant": [
+        "Mahlzeiten, Restaurant": [
             {
                 id: createWordId("essen-trinken-mahlzeitenlokale-001"),
                 wordType: "noun",

@@ -14,8 +14,8 @@ import { createWordId, createVocabulary } from './src/core/types/vocabulary';
 export const vokabularLernen: VocabularyStructure = createVocabulary({
     "Lernen": {
 
-        // --- SUB-TOPIC: Orte, Personen & Fächer ---
-        "Orte, Personen & Fächer": [
+        // --- SUB-TOPIC: Orte, Personen, Fächer ---
+"Orte, Personen, Fächer": [
             {
                 id: createWordId("lernen-schuleunterricht-001"),
                 wordType: 'noun',
@@ -419,8 +419,8 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
             } as Noun
         ],
 
-        // --- SUB-TOPIC: Materialien & Aufgaben ---
-        "Materialien & Aufgaben": [
+        // --- SUB-TOPIC: Materialien, Aufgaben ---
+"Materialien, Aufgaben": [
             {
                 id: createWordId("lernen-schuleunterricht-006"),
                 wordType: 'noun',
@@ -1165,8 +1165,8 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
             } as Verb
         ],
 
-        // --- SUB-TOPIC: Konzepte & Prüfung ---
-        "Konzepte & Prüfung": [
+        // --- SUB-TOPIC: Konzepte, Prüfung ---
+"Konzepte, Prüfung": [
             {
                 id: createWordId("lernen-sprachenlernen-011"),
                 wordType: 'noun',
