@@ -61,8 +61,8 @@ function createTestButton(
 ): HTMLButtonElement {
     const button = document.createElement('button');
     button.id = id;
-    // Tailwind-Klassen basierend auf Variante - REDUZIERTE HÖHE für bessere Proportionen
-    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-2 px-4 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2 min-h-[45px] max-h-[50px]';
+    // Tailwind-Klassen basierend auf Variante - DEUTLICH REDUZIERTE HÖHE für bessere Proportionen
+    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-1 px-3 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2 min-h-[35px] max-h-[40px]';
     if (variant === 'chaos') {
         button.className = `${baseClasses} bg-de-red hover:bg-de-red/90 text-white`;
     } else {
@@ -74,8 +74,8 @@ function createTestButton(
     });
     // Inhalt mit Icon
     button.innerHTML = `
-        <span class="text-lg">${icon}</span>
-        <span class="text-sm">${text}</span>
+        <span class="text-base">${icon}</span>
+        <span class="text-xs">${text}</span>
     `;
     return button;
 }
