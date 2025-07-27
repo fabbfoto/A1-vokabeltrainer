@@ -50,9 +50,9 @@ function optimizeSubTopicGrid(container: HTMLElement): void {
 }
 
 /**
- * Erstellt einen Test-Button mit Icon
+ * Erstellt einen globalen Test-Button (kleiner für Hauptnavigation)
  */
-function createTestButton(
+function createGlobalTestButton(
     id: string,
     text: string,
     icon: string,
@@ -61,7 +61,7 @@ function createTestButton(
 ): HTMLButtonElement {
     const button = document.createElement('button');
     button.id = id;
-    // Tailwind-Klassen basierend auf Variante - DEUTLICH REDUZIERTE HÖHE für bessere Proportionen
+    // KLEINERE Buttons für globale Tests
     const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-1 px-3 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2 min-h-[35px] max-h-[40px]';
     if (variant === 'chaos') {
         button.className = `${baseClasses} bg-de-red hover:bg-de-red/90 text-white`;
@@ -76,6 +76,37 @@ function createTestButton(
     button.innerHTML = `
         <span class="text-base">${icon}</span>
         <span class="text-xs">${text}</span>
+    `;
+    return button;
+}
+
+/**
+ * Erstellt einen themen-spezifischen Test-Button (größer für Unterthemen)
+ */
+function createTopicTestButton(
+    id: string,
+    text: string,
+    icon: string,
+    variant: 'chaos' | 'structured',
+    dataset: Record<string, string>
+): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.id = id;
+    // GRÖSSERE Buttons für themen-spezifische Tests
+    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-2 px-4 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2 min-h-[45px] max-h-[50px]';
+    if (variant === 'chaos') {
+        button.className = `${baseClasses} bg-de-red hover:bg-de-red/90 text-white`;
+    } else {
+        button.className = `${baseClasses} bg-de-blue hover:bg-de-blue/90 text-white`;
+    }
+    // Dataset attributes
+    Object.entries(dataset).forEach(([key, value]) => {
+        button.dataset[key] = value;
+    });
+    // Inhalt mit Icon
+    button.innerHTML = `
+        <span class="text-lg">${icon}</span>
+        <span class="text-sm">${text}</span>
     `;
     return button;
 }
@@ -120,7 +151,7 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
     const testContainer = document.createElement('div');
     testContainer.className = 'col-span-full grid grid-cols-1 md:grid-cols-2 gap-4 mt-2';
     // Chaos-Test Button
-    const globalChaosTest = createTestButton(
+    const globalChaosTest = createGlobalTestButton(
         'global-chaos-test',
         'Globaler Chaos-Test',
         '🎲',
@@ -128,7 +159,7 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
         { testVariant: 'chaos', testScope: 'global' }
     );
     // Struktur-Test Button
-    const globalStructuredTest = createTestButton(
+    const globalStructuredTest = createGlobalTestButton(
         'global-structured-test',
         'Globaler Struktur-Test',
         '📋',
@@ -194,7 +225,7 @@ export function displaySubTopics(dom: DOMElements, state: TrainerState, vokabula
     const testContainer = document.createElement('div');
     testContainer.className = 'col-span-full grid grid-cols-1 md:grid-cols-2 gap-4 mt-2';
     // Chaos-Test Button
-    const chaosTest = createTestButton(
+    const chaosTest = createTopicTestButton(
         `${mainTopicName}-chaos-test`,
         `${mainTopicName} Chaos-Test`,
         '🎲',
@@ -202,7 +233,7 @@ export function displaySubTopics(dom: DOMElements, state: TrainerState, vokabula
         { testVariant: 'chaos', testScope: 'mainTopic', topicId: mainTopicName }
     );
     // Struktur-Test Button
-    const structuredTest = createTestButton(
+    const structuredTest = createTopicTestButton(
         `${mainTopicName}-structured-test`,
         `${mainTopicName} Struktur-Test`,
         '📋',
