@@ -35,6 +35,10 @@ import { ErrorCounterManager } from './src/services/error-counter-manager';
 // import { validateVocabulary } from './validate-vocabulary'; // TEMPORÄR DEAKTIVIERT
 import { supabase, supabaseAuth, supabaseProgress } from './src/services/supabase';
 
+// Performance Monitoring
+import { performanceMonitor, startPerformanceMonitoring } from './src/utils/performance-monitor';
+import { memoryManager } from './src/utils/memory-manager';
+
 let currentUser: unknown = null;
 
 // ========== SUPABASE AUTH BUTTON ==========
@@ -2039,5 +2043,27 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // Initial Auth-Button erstellen
     createAuthButton();
+
+    // Initialisiere Performance-Monitoring
+    startPerformanceMonitoring();
+
+    // Performance-Monitoring für kritische Operationen
+    performanceMonitor.startTimer('app-initialization');
+
+    // Initialansicht
+    ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
+
+    // Lade Progress nach der Navigation-Initialisierung
+    loadProgress().catch(error => {
+        console.error('❌ Fehler beim Laden des Progress:', error);
+    });
+
+    // Initialen Fehlerzählerstand anzeigen
+    if (typeof ui?.updateErrorCounts === 'function') {
+        ui.updateErrorCounts(dom, state, learningModes);
+    }
+
+    // Performance-Monitoring beenden
+    performanceMonitor.endTimer('app-initialization');
 
 });

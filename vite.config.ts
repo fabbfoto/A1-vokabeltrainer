@@ -9,16 +9,16 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
       },
+      external: ['fsevents'],
       output: {
         manualChunks: {
-          // Core functionality
+          'vendor': ['vite'],
           'core': [
             './src/core/types/trainer.ts',
             './src/core/types/vocabulary.ts',
             './src/core/types/ui.ts',
             './src/core/events/navigation-events.ts'
           ],
-          // Services
           'services': [
             './src/services/error-counter-manager.ts',
             './src/services/mode-manager.ts',
@@ -26,29 +26,32 @@ export default defineConfig({
             './src/services/navigation-state-manager.ts',
             './src/services/supabase.ts'
           ],
-          // UI components
-          'ui': [
+          'ui-core': [
             './src/ui/views/index.ts',
             './src/ui/views/navigation.ts',
-            './src/ui/views/statistics.ts',
-            './src/ui/components/test-result-modal.ts',
-            './src/ui/components/ranking-ui.ts'
+            './src/ui/views/statistics.ts'
           ],
-          // Utils
+          'ui-components': [
+            './src/ui/components/test-result-modal.ts',
+            './src/ui/components/ranking-ui.ts',
+            './src/ui/views/umlaut-buttons.ts'
+          ],
           'utils': [
             './src/utils/helfer.ts',
             './src/utils/test-generator.ts',
             './src/utils/trainer-helpers.ts',
             './src/utils/error-analysis.ts',
-            './src/utils/performance-optimizer.ts'
+            './src/utils/performance-optimizer.ts',
+            './src/utils/memory-manager.ts',
+            './src/utils/performance-monitor.ts'
           ]
         }
       },
-      external: ['fsevents'] // Exclude fsevents from build
     },
-    chunkSizeWarningLimit: 1000, // Erhöhe Limit für bessere Kontrolle
-    sourcemap: false, // Deaktiviere Sourcemaps für Production
-    minify: 'esbuild' // Verwende esbuild für bessere Komprimierung
+    chunkSizeWarningLimit: 1000,
+    sourcemap: false,
+    minify: 'esbuild',
+    target: 'es2020'
   },
   resolve: {
     alias: {
@@ -60,8 +63,12 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    strictPort: false, // Erlaubt automatische Port-Wechsel wenn 5173 belegt ist
-    host: true, // Erlaubt Netzwerk-Zugriff
-    open: false // Öffnet Browser nicht automatisch
+    strictPort: false,
+    host: true,
+    open: false
+  },
+  optimizeDeps: {
+    include: ['vite'],
+    exclude: ['fsevents']
   }
 });
