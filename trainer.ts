@@ -577,9 +577,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         }
                     });
                     
-                    // UI aktualisieren
-                    if (typeof ui?.showTrainingModes === 'function') {
-                        ui.showTrainingModes(dom, state);
+                    // UI aktualisieren - nur wenn bereits in Trainings-Ansicht
+                    if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
+                        if (typeof ui?.showTrainingModes === 'function') {
+                            ui.showTrainingModes(dom, state);
+                        }
                     }
                     return; // Cloud-Daten erfolgreich geladen
                 }
@@ -638,8 +640,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 console.log('✅ Lokaler Progress geladen:', Object.keys(state.progress.globalProgress).length, 'Themen');
                 
                 // UI aktualisieren um den geladenen Progress anzuzeigen
-                if (typeof ui?.showTrainingModes === 'function') {
-                    ui.showTrainingModes(dom, state);
+                // Nur wenn bereits in Trainings-Ansicht
+                if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
+                    if (typeof ui?.showTrainingModes === 'function') {
+                        ui.showTrainingModes(dom, state);
+                    }
                 }
             } catch (e) {
                 console.error('❌ Fehler beim Laden des Progress:', e);
@@ -842,9 +847,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     // Teste Verbindung beim Start
     testSupabaseConnection();
 
-            loadProgress().catch(error => {
-            console.error('❌ Fehler beim Laden des Progress:', error);
-        });
+    // Lade gespeicherte Daten
     loadMasteredWords();
     // loadWordsToRepeat() wird jetzt durch errorManager.loadFromStorage() ersetzt
     loadLastTestScores();
@@ -1821,6 +1824,11 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     
     // Initialansicht
     ui.showMainTopicNavigation(dom, state, vokabular, learningModes);
+
+    // Lade Progress nach der Navigation-Initialisierung
+    loadProgress().catch(error => {
+        console.error('❌ Fehler beim Laden des Progress:', error);
+    });
 
     // Initialen Fehlerzählerstand anzeigen
     updateRepeatButtons();
