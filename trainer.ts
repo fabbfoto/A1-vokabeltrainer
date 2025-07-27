@@ -452,7 +452,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     supabaseAuth.onAuthStateChange(async (user) => {
       currentUser = user;
       if (user) {
-        console.log('✅ Angemeldet als:', user.email);
+        console.log('✅ Angemeldet als:', (user as any).email);
         // Progress von Supabase laden
         try {
           const cloudProgress = await supabaseProgress.load();
@@ -465,9 +465,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 state.progress.globalProgress[topicKey] = {};
               }
               
-              Object.keys(cloudProgress[topicKey]).forEach(mode => {
-                const cloudData = cloudProgress[topicKey][mode];
-                const localData = state.progress.globalProgress[topicKey][mode as ModeId];
+              Object.keys((cloudProgress as any)[topicKey]).forEach(mode => {
+                const cloudData = (cloudProgress as any)[topicKey][mode];
+                const localData = (state.progress.globalProgress as any)[topicKey][mode as ModeId];
                 
                 if (Array.isArray(cloudData)) {
                   // Merge Cloud und lokale Daten
@@ -562,10 +562,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     // Konvertiere Arrays zurück zu Sets
                     state.progress.globalProgress = {};
                     Object.keys(cloudProgress).forEach(topicKey => {
-                        state.progress.globalProgress[topicKey] = {};
-                        if (typeof cloudProgress[topicKey] === 'object' && cloudProgress[topicKey] !== null) {
-                            Object.keys(cloudProgress[topicKey]).forEach(mode => {
-                                const data = cloudProgress[topicKey][mode];
+                        (state.progress.globalProgress as any)[topicKey] = {};
+                        if (typeof (cloudProgress as any)[topicKey] === 'object' && (cloudProgress as any)[topicKey] !== null) {
+                            Object.keys((cloudProgress as any)[topicKey]).forEach(mode => {
+                                const data = (cloudProgress as any)[topicKey][mode];
                                 if (Array.isArray(data)) {
                                     state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
                                 } else if (data instanceof Set) {
@@ -1590,8 +1590,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         const scoreCalculation = calculateTestScore(
             state.training.correctInCurrentRound,
             state.training.attemptedInCurrentRound,
-            totalTestTime,
-            2 // 2 Punkte Abzug pro Sekunde
+            totalTestTime
         );
         
         if (!state.test.lastTestScores) state.test.lastTestScores = {};
@@ -2026,7 +2025,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     supabaseAuth.onAuthStateChange(async (user) => {
         console.log('🔐 Auth-State geändert:', user ? 'Angemeldet' : 'Abgemeldet');
         if (user) {
-            console.log('👤 Benutzer:', user.user_metadata?.anonymous_username || user.email);
+            console.log('👤 Benutzer:', (user as any).user_metadata?.anonymous_username || (user as any).email);
             // Lade Progress aus der Cloud, wenn sich jemand anmeldet
             try {
                 await loadProgress();

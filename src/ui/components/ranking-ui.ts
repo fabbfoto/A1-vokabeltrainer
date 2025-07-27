@@ -98,7 +98,7 @@ export class RankingUI {
     if (!this.container) return;
     
     this.showLoading('Lade deine Statistiken...');
-    const user = this.rankingService['authService'].currentUser; // Assuming authService is part of rankingService
+    const user = (this.rankingService as any)['authService']?.currentUser; // Assuming authService is part of rankingService
     if (!user) {
       this.showError('Du musst angemeldet sein, um deine Statistiken zu sehen.');
       return;

@@ -105,7 +105,7 @@ export class NavigationService implements INavigationService {
 
 export class ErrorManagementService implements IErrorManagementService {
   addError(_state: TrainerState, _wordId: string): void {
-    const currentMode = ModeManager.getCurrentMode(state);
+    const currentMode = ModeManager.getCurrentMode(_state);
     
     // Nur im Lernmodus Fehler hinzufügen
     if (currentMode === 'learning' || currentMode === 'correcting') {
@@ -114,7 +114,7 @@ export class ErrorManagementService implements IErrorManagementService {
   }
 
   removeError(_state: TrainerState, _wordId: string): void {
-    const currentMode = ModeManager.getCurrentMode(state);
+    const currentMode = ModeManager.getCurrentMode(_state);
     
     // Nur im Lernmodus Fehler entfernen
     if (currentMode === 'learning' || currentMode === 'correcting') {

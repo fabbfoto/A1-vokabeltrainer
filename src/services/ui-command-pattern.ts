@@ -11,7 +11,7 @@ interface UICommand {
 // Konkrete Commands für verschiedene Aktionen
 export class ShowSuccessFeedbackCommand implements UICommand {
   execute(_state: TrainerState, dom: DOMElements): void {
-    const currentMode = ModeManager.getCurrentMode(state);
+    const currentMode = ModeManager.getCurrentMode(_state);
     
     switch (currentMode) {
       case 'learning':
@@ -50,7 +50,7 @@ export class ShowErrorFeedbackCommand implements UICommand {
   constructor(private correctAnswer?: string) {}
 
   execute(_state: TrainerState, dom: DOMElements): void {
-    const currentMode = ModeManager.getCurrentMode(state);
+    const currentMode = ModeManager.getCurrentMode(_state);
     
     switch (currentMode) {
       case 'learning':
@@ -89,7 +89,7 @@ export class ShowErrorFeedbackCommand implements UICommand {
 
 export class ContinueToNextTaskCommand implements UICommand {
   execute(_state: TrainerState, dom: DOMElements): void {
-    const currentMode = ModeManager.getCurrentMode(state);
+    const currentMode = ModeManager.getCurrentMode(_state);
     
     switch (currentMode) {
       case 'learning':
@@ -106,7 +106,7 @@ export class ContinueToNextTaskCommand implements UICommand {
       case 'correcting':
         // Im Korrekturmodus: UI zurücksetzen und nächste Aufgabe
         this.resetUI(dom);
-        state.training.isCorrectionMode = false;
+        _state.training.isCorrectionMode = false;
         // loadNextTask() aufrufen
         break;
     }

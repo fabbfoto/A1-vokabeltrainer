@@ -42,14 +42,14 @@ export function showTestResultModal(testResult: TestResult, _testConfig?: Record
       : 0;
 
   // Prüfe ob es ein Globaler Chaos-Test ist (für Ranking)
-  const isGlobalChaosTest = testConfig?.variant === 'chaos' && testConfig?.testType === 'global';
+  const isGlobalChaosTest = _testConfig?.variant === 'chaos' && _testConfig?.testType === 'global';
 
   modal.innerHTML = `
               <div class="bg-gradient-to-br from-white to-[#F2AE2E]/[0.03] rounded-2xl shadow-de-gray-400/50 p-6 max-w-4xl w-full mx-4 my-8 max-h-[90vh] overflow-y-auto">
           <!-- Header -->
           <div class="text-center mb-6">
               <h2 class="text-3xl font-bold text-blue-700 mb-2">Test-Auswertung</h2>
-              <div class="text-lg text-gray-600">${testConfig?.testTitle || 'Test'}</div>
+              <div class="text-lg text-gray-600">${_testConfig?.testTitle || 'Test'}</div>
           </div>
           
           <!-- Hauptergebnis -->
@@ -85,11 +85,11 @@ export function showTestResultModal(testResult: TestResult, _testConfig?: Record
                               <div class="bg-de-red/10 border border-de-red/20 rounded-lg p-3">
                                   <div class="flex justify-between items-start">
                                       <div class="flex-1">
-                                          <div class="font-medium">${result.word?.english || 'N/A'}</div>
+                                          <div class="font-medium">${(result.word as any)?.english || 'N/A'}</div>
                                           <div class="text-sm text-gray-600 mt-1">
                                               <span class="text-de-red">Deine Antwort: ${result.userAnswer || '(keine Antwort)'}</span>
                                               <br>
-                                              <span class="text-de-green font-medium">Richtig: ${result.correctAnswer || result.word?.german || 'N/A'}</span>
+                                              <span class="text-de-green font-medium">Richtig: ${result.correctAnswer || (result.word as any)?.german || 'N/A'}</span>
                                           </div>
                                       </div>
                                       <div class="text-sm text-gray-500">${result.timeSpent.toFixed(1)}s</div>
@@ -108,8 +108,8 @@ export function showTestResultModal(testResult: TestResult, _testConfig?: Record
                           <div class="bg-de-green/10 border border-de-green/20 rounded-lg p-2">
                               <div class="flex justify-between items-center">
                                   <div>
-                                      <div class="font-medium text-sm">${result.word?.english || 'N/A'}</div>
-                                      <div class="text-xs text-gray-600">${result.word?.german || 'N/A'}</div>
+                                      <div class="font-medium text-sm">${(result.word as any)?.english || 'N/A'}</div>
+                                      <div class="text-xs text-gray-600">${(result.word as any)?.german || 'N/A'}</div>
                                   </div>
                                   <div class="text-xs text-gray-500">${result.timeSpent.toFixed(1)}s</div>
                               </div>
@@ -232,7 +232,7 @@ export function showTestResultModal(testResult: TestResult, _testConfig?: Record
         correct: r.correct,
         timeSpent: r.timeSpent
       })),
-      config: testConfig
+      config: _testConfig
     });
     
     // Maximal 100 Tests speichern
@@ -250,8 +250,8 @@ export function showTestResultModal(testResult: TestResult, _testConfig?: Record
           try {
             await window.rankingService.submitTestResult(
               testResult,
-              testConfig?.variant as string,
-              testConfig?.selectedCategory as string
+              _testConfig?.variant as string,
+              _testConfig?.selectedCategory as string
             );
           
           // Erfolgs-Feedback
