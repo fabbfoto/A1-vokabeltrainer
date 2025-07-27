@@ -289,7 +289,7 @@ export interface LearningEvent extends CustomUIEvent {
 }
 
 // ========== UTILITY TYPES ==========
-export type ElementRef<T extends keyof HTMLElementTagNameMap> = HTMLElementTagNameMap[T];
+export type ElementRef = HTMLElement;
 
 export type ComponentProps<T = {}> = T & {
   className?: string;

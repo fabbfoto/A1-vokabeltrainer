@@ -209,7 +209,7 @@ export function updatePracticeStats(dom: DOMElements, state: TrainerState, learn
  * Aktualisiert die Test-Statistiken während eines Tests.
  */
 export function updateTestStats(dom: DOMElements, state: TrainerState): void {
-    const correct = state.training.correctInCurrentRound;
+    const _correct = state.training.correctInCurrentRound;
     const total = state.training.shuffledWordsForMode.length;
     const attempted = state.training.attemptedInCurrentRound;
     const progress = calculateProgressPercentage(attempted, total);

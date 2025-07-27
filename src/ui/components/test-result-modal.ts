@@ -2,7 +2,7 @@
 import type { TestResult, WordTestResult } from '../../core/types/trainer';
 
 interface ExtendedWordTestResult extends WordTestResult {
-    word?: any; // Word type
+    word?: unknown; // Word type
     userAnswer?: string;
     correctAnswer?: string;
 }
@@ -19,7 +19,7 @@ declare global {
   }
 }
 
-export function showTestResultModal(testResult: TestResult, testConfig?: Record<string, unknown>) {
+export function showTestResultModal(testResult: TestResult, _testConfig?: Record<string, unknown>) {
   if (document.getElementById('test-result-modal')) return;
 
   const modal = document.createElement('div');

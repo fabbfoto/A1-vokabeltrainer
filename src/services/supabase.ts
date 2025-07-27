@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Automatische Umgebungs-Erkennung für Supabase
-const isLocalhost = typeof window !== 'undefined' && window.location.hostname.startsWith('localhost');
+// const isLocalhost = typeof window !== 'undefined' && window.location.hostname.startsWith('localhost'); // unused
 
 const SUPABASE_URL = 'https://ezjihsafleestqanpgdc.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV6amloc2FmbGVlc3RxYW5wZ2RjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyNzIxNDIsImV4cCI6MjA2ODg0ODE0Mn0.6q6K2PyQ0nnVNTIMwD0B1NnkoXx5rsayJJ_Ovd79JCE';
@@ -252,7 +252,7 @@ export const supabaseAuth = {
     }
   },
 
-  onAuthStateChange(callback: (user: any) => void) {
+  onAuthStateChange(callback: (user: unknown) => void) {
     return supabase.auth.onAuthStateChange((event, session) => {
       callback(session?.user || null);
     });
@@ -261,7 +261,7 @@ export const supabaseAuth = {
 
 // Progress-Funktionen mit robustem Error Handling
 export const supabaseProgress = {
-  async save(progressData: any) {
+  async save(progressData: unknown) {
     try {
       const user = await supabaseAuth.getUser();
       if (!user) {
@@ -340,7 +340,7 @@ export const supabaseProgress = {
     }
   },
 
-  async load(): Promise<any> {
+  async load(): Promise<unknown> {
     try {
       const user = await supabaseAuth.getUser();
       if (!user) {
@@ -602,7 +602,7 @@ export const supabaseProgress = {
     }
   },
 
-  subscribeToChanges(callback: (data: any) => void) {
+  subscribeToChanges(callback: (data: unknown) => void) {
     const channel = supabase
       .channel('progress-changes')
       .on('postgres_changes', 
@@ -613,7 +613,7 @@ export const supabaseProgress = {
         }, 
         (payload) => {
           console.log('Progress Update:', payload);
-          const newData = payload.new as Record<string, any>;
+          const newData = payload.new as Record<string, unknown>;
           if (newData?.progress_data) {
             callback(newData.progress_data);
           }

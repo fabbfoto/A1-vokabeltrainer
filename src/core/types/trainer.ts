@@ -123,7 +123,7 @@ export function calculateTestScore(
   correct: number, 
   total: number, 
   timeInSeconds: number, 
-  timePenaltyPerSecond: number = 2
+  // _timePenaltyPerSecond: number = 2 // unused parameter
 ): { baseScore: number; timePenalty: number; finalScore: number } {
   const percentCorrect = total > 0 ? (correct / total) * 100 : 0;
   const baseScore = Math.round(percentCorrect);

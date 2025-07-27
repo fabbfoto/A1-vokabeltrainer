@@ -75,7 +75,7 @@ export function generateTestQuestions(
   }
   
   // 1. Sammle alle relevanten Wörter
-  let allWords: Word[] = [];
+  const allWords: Word[] = [];
   
   if (scope === 'global') {
     Object.keys(vokabular).forEach(mainTopicKey => {
@@ -247,7 +247,7 @@ function generateGlobalRankingTest(
 }
 
 // NEU: Hilfsfunktion zur Kategorie-Zuordnung
-function getCategoryFromTopic(mainTopic: string, subTopic: string): string {
+function getCategoryFromTopic(mainTopic: string, _subTopic: string): string {
   const categoryMap: Record<string, string> = {
     'einkaufen': 'Einkaufen',
     'essen_trinken': 'Essen & Trinken',

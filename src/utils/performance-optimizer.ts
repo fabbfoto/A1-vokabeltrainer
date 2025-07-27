@@ -1,12 +1,12 @@
 // shared/utils/performance-optimizer.ts
 // Performance-Optimierungen für bessere Benutzererfahrung
 
-import type { Word, WordId } from '../core/types/trainer';
+import type { Word } from '../core/types/trainer';
 
 /**
  * Debounce-Funktion für häufige Operationen
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
     func: T,
     wait: number
 ): (...args: Parameters<T>) => void {
@@ -21,7 +21,7 @@ export function debounce<T extends (...args: any[]) => any>(
 /**
  * Throttle-Funktion für UI-Updates
  */
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
     func: T,
     limit: number
 ): (...args: Parameters<T>) => void {
@@ -39,7 +39,7 @@ export function throttle<T extends (...args: any[]) => any>(
 /**
  * Memoization für teure Berechnungen
  */
-export function memoize<T extends (...args: any[]) => any>(
+export function memoize<T extends (...args: unknown[]) => unknown>(
     func: T,
     keyGenerator?: (...args: Parameters<T>) => string
 ): T {

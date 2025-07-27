@@ -12,7 +12,7 @@ interface WordsToRepeat {
 }
 
 // Use the proper TrainerState from shared/types/trainer
-import type { TrainerState } from '../core/types/trainer';
+// import type { TrainerState } from '../core/types/trainer'; // unused
 
 /**
  * Analysiert die gespeicherten Fehlerzähler im localStorage
@@ -28,9 +28,9 @@ export function analyzeErrorCounts(): void {
 
     // Prüfe ob die Fehler-IDs in den aktuellen Vokabeln existieren
     Object.entries(wordsToRepeat).forEach(([mode, ids]) => {
-        const matching = ids.filter(id => 
-            currentVocab.some(word => word.id === id)
-        );
+            const _matching = ids.filter(id => 
+        currentVocab.some(word => word.id === id)
+    );
 
     });
 
@@ -65,11 +65,10 @@ export function getErrorCountForMode(mode: string): number {
  * Zeigt eine Zusammenfassung aller Fehlerzähler
  */
 export function showErrorSummary(): void {
-    const wordsToRepeat: WordsToRepeat = JSON.parse(
+    const _wordsToRepeat: WordsToRepeat = JSON.parse(
         localStorage.getItem('trainer-words-to-repeat') || '{}'
     );
-    
-
+    // TODO: Implement error summary display
 }
 
 // Automatische Ausführung wenn die Datei direkt geladen wird

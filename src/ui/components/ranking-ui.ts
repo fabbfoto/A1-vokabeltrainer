@@ -13,10 +13,10 @@ export interface RankingUIConfig {
 
 export class RankingUI {
   private container: HTMLElement | null = null;
-  private rankingService: any; // Removed RankingService import
+  private rankingService: unknown; // Removed RankingService import
   private config: RankingUIConfig;
 
-  constructor(rankingService: any, config: RankingUIConfig) { // Removed RankingService import
+  constructor(rankingService: unknown, config: RankingUIConfig) { // Removed RankingService import
     this.rankingService = rankingService;
     this.config = config;
     this.container = document.getElementById(config.containerId);

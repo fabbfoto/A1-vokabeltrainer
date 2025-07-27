@@ -1,4 +1,4 @@
-import type { ModeId, WordId, TrainerState } from '../core/types/trainer';
+import type { ModeId, WordId } from '../core/types/trainer';
 
 export class ErrorCounterManager {
     private state: TrainerState;

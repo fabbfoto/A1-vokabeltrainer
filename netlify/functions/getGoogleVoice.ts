@@ -9,9 +9,9 @@ interface NetlifyEvent {
     body: string;
 }
 
-interface NetlifyContext {
-    // Add context properties as needed
-}
+// interface NetlifyContext {
+//     // Add context properties as needed
+// }
 
 interface TextToSpeechRequest {
     text: string;
@@ -36,7 +36,7 @@ const client = new TextToSpeechClient({
     projectId: process.env.GOOGLE_PROJECT_ID || '',
 });
 
-export const handler = async (event: NetlifyEvent, context: NetlifyContext): Promise<{
+export const handler = async (event: NetlifyEvent): Promise<{
     statusCode: number;
     headers?: Record<string, string>;
     body: string;

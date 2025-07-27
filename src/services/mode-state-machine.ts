@@ -17,7 +17,7 @@ export class ModeStateMachine {
       from: 'learning',
       to: 'correcting',
       condition: (state: TrainerState) => !state.test.isTestModeActive && state.training.isCorrectionMode,
-      action: (state: TrainerState) => {
+      action: (_state: TrainerState) => {
         // Korrekturmodus-spezifische Aktionen
         console.log('[StateMachine] Wechsel: learning -> correcting');
       }
@@ -28,7 +28,7 @@ export class ModeStateMachine {
       from: 'correcting',
       to: 'learning',
       condition: (state: TrainerState) => !state.training.isCorrectionMode && !state.test.isTestModeActive,
-      action: (state: TrainerState) => {
+      action: (_state: TrainerState) => {
         console.log('[StateMachine] Wechsel: correcting -> learning');
       }
     },
@@ -38,7 +38,7 @@ export class ModeStateMachine {
       from: 'learning',
       to: 'testing',
       condition: (state: TrainerState) => state.test.isTestModeActive,
-      action: (state: TrainerState) => {
+      action: (_state: TrainerState) => {
         console.log('[StateMachine] Wechsel: learning -> testing');
       }
     },
@@ -48,7 +48,7 @@ export class ModeStateMachine {
       from: 'testing',
       to: 'learning',
       condition: (state: TrainerState) => !state.test.isTestModeActive,
-      action: (state: TrainerState) => {
+      action: (_state: TrainerState) => {
         console.log('[StateMachine] Wechsel: testing -> learning');
       }
     }

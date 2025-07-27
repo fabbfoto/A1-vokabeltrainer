@@ -126,7 +126,7 @@ function initializeDOM(): DOMElements {
         // In Produktion: Warnung ausgeben, aber weitermachen
         console.warn('Continuing with missing DOM elements. Some functionality may be broken.');
     } else {
-        console.log('✅ All required DOM elements found and validated.');
+        // console.log('✅ All required DOM elements found and validated.'); // Debug-Code entfernt
     }
 
     // Exportiert das zentrale DOM-Objekt, das mit den Elementen aus dem HTML befüllt wird.

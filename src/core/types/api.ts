@@ -1,7 +1,7 @@
 // shared/types/api.ts
 // Professional API and Supabase integration types
 
-import type { WordId, TopicId, SubTopicId } from './vocabulary';
+import type { TopicId } from './vocabulary';
 import type { Progress, TestScore, SessionStats, ModeId } from './trainer';
 
 // ========== BRANDED TYPES ==========

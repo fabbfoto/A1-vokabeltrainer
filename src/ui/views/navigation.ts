@@ -3,7 +3,7 @@
 
 import type { DOMElements } from '../../core/types/ui';
 import type { TrainerState, VocabularyStructure, LearningModes, UICallbacks, TopicId, SubTopicId, ModeId, TestConfiguration, TestId } from '../../core/types/trainer';
-import type { TestCategory } from '../../core/types/trainer';
+// import type { TestCategory } from '../../core/types/trainer'; // unused
 
 import { NavigationEvents } from '../../core/events/navigation-events';
 import { createTopicButton, createActionButton } from '../components/button-factory';

@@ -1,6 +1,6 @@
 // shared/services/mode-dependency-injection.ts
 import type { TrainerState, DOMElements } from '../core/types/trainer';
-import { ModeManager, AppMode } from './mode-manager';
+import { ModeManager } from './mode-manager';
 
 // Service Interfaces
 interface IFeedbackService {
@@ -93,7 +93,7 @@ export class NavigationService implements INavigationService {
     }
   }
 
-  resetUI(state: TrainerState, dom: DOMElements): void {
+  resetUI(_state: TrainerState, dom: DOMElements): void {
     // Alle visuellen Fehleranzeigen entfernen
     document.querySelectorAll('.feedback-incorrect').forEach(el => el.remove());
     document.querySelectorAll('.border-red-500, .bg-de-red/10').forEach(el => {
@@ -104,7 +104,7 @@ export class NavigationService implements INavigationService {
 }
 
 export class ErrorManagementService implements IErrorManagementService {
-  addError(state: TrainerState, wordId: string): void {
+  addError(_state: TrainerState, _wordId: string): void {
     const currentMode = ModeManager.getCurrentMode(state);
     
     // Nur im Lernmodus Fehler hinzufügen
@@ -113,7 +113,7 @@ export class ErrorManagementService implements IErrorManagementService {
     }
   }
 
-  removeError(state: TrainerState, wordId: string): void {
+  removeError(_state: TrainerState, _wordId: string): void {
     const currentMode = ModeManager.getCurrentMode(state);
     
     // Nur im Lernmodus Fehler entfernen
@@ -122,7 +122,7 @@ export class ErrorManagementService implements IErrorManagementService {
     }
   }
 
-  getErrorCount(state: TrainerState): number {
+  getErrorCount(_state: TrainerState): number {
     // Fehleranzahl zurückgeben
     return 0; // Placeholder
   }

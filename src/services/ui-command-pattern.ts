@@ -1,6 +1,6 @@
 // shared/services/ui-command-pattern.ts
 import type { TrainerState, DOMElements } from '../core/types/trainer';
-import { ModeManager, AppMode } from './mode-manager';
+import { ModeManager } from './mode-manager';
 
 // Command Interface
 interface UICommand {
@@ -10,7 +10,7 @@ interface UICommand {
 
 // Konkrete Commands für verschiedene Aktionen
 export class ShowSuccessFeedbackCommand implements UICommand {
-  execute(state: TrainerState, dom: DOMElements): void {
+  execute(_state: TrainerState, dom: DOMElements): void {
     const currentMode = ModeManager.getCurrentMode(state);
     
     switch (currentMode) {
@@ -49,7 +49,7 @@ export class ShowSuccessFeedbackCommand implements UICommand {
 export class ShowErrorFeedbackCommand implements UICommand {
   constructor(private correctAnswer?: string) {}
 
-  execute(state: TrainerState, dom: DOMElements): void {
+  execute(_state: TrainerState, dom: DOMElements): void {
     const currentMode = ModeManager.getCurrentMode(state);
     
     switch (currentMode) {
@@ -88,7 +88,7 @@ export class ShowErrorFeedbackCommand implements UICommand {
 }
 
 export class ContinueToNextTaskCommand implements UICommand {
-  execute(state: TrainerState, dom: DOMElements): void {
+  execute(_state: TrainerState, dom: DOMElements): void {
     const currentMode = ModeManager.getCurrentMode(state);
     
     switch (currentMode) {

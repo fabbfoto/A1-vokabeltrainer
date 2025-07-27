@@ -35,7 +35,7 @@ import { ErrorCounterManager } from './src/services/error-counter-manager';
 // import { validateVocabulary } from './validate-vocabulary'; // TEMPORÄR DEAKTIVIERT
 import { supabase, supabaseAuth, supabaseProgress } from './src/services/supabase';
 
-let currentUser: any = null;
+let currentUser: unknown = null;
 
 // ========== SUPABASE AUTH BUTTON ==========
 async function createAuthButton() {

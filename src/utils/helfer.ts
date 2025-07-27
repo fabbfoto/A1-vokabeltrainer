@@ -117,7 +117,7 @@ export function setUIMode(modeId: string): void {
   }
 }
 
-let currentColorTheme = localStorage.getItem('vokabeltrainer-theme') || 'german';
+const currentColorTheme = localStorage.getItem('vokabeltrainer-theme') || 'german';
 
 export function calculateProgressPercentage(completed: number, total: number): number {
   if (total === 0) return 0;
