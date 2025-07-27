@@ -280,6 +280,12 @@ export function showMainTopicNavigation(dom: DOMElements, state: TrainerState, v
     // Standard-Titel für Trainings-Ansicht setzen
     dom.currentTrainingTitleEl.textContent = 'Thema auswählen';
     
+    // Auth-Button Container anzeigen (nur im Root)
+    const authContainer = document.getElementById('auth-button-container');
+    if (authContainer) {
+        authContainer.classList.remove('hidden');
+    }
+    
     // KORREKTUR: Ruft die Anzeigefunktion mit allen nötigen Parametern auf.
     displayMainTopics(dom, state, vokabular, learningModes);
 }
@@ -294,6 +300,13 @@ export function showSubTopicNavigation(dom: DOMElements, state: TrainerState, vo
     dom.trainerMainViewEl.classList.add('hidden');
     dom.navigationTitleEl.textContent = mainTopic;
     dom.backToMainTopicsButton.classList.remove('hidden');
+    
+    // Auth-Button Container verstecken (nicht im Root)
+    const authContainer = document.getElementById('auth-button-container');
+    if (authContainer) {
+        authContainer.classList.add('hidden');
+    }
+    
     // KORREKTUR: Ruft die Anzeigefunktion auf, um die Buttons tatsächlich zu rendern.
     displaySubTopics(dom, state, vokabular, mainTopic, learningModes);
 }
