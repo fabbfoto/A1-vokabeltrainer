@@ -17,7 +17,7 @@ function fillGridWithPlaceholders(container: HTMLElement, currentItemCount: numb
     const missingSlots = maxGridSlots - currentItemCount;
     for (let i = 0; i < missingSlots; i++) {
         const placeholder = document.createElement('div');
-        placeholder.className = 'min-h-[90px] max-h-[110px] opacity-0 pointer-events-none';
+        placeholder.className = 'min-h-[85px] max-h-[95px] opacity-0 pointer-events-none';
         placeholder.setAttribute('data-placeholder', 'true');
         container.appendChild(placeholder);
     }
@@ -40,8 +40,11 @@ function getProgressColorClass(completed: number, total: number): string {
 function optimizeSubTopicGrid(container: HTMLElement): void {
     const buttons = container.querySelectorAll('button');
     buttons.forEach(button => {
-        if (!button.className.includes('min-h-[90px]')) {
-            button.classList.add('min-h-[90px]', 'max-h-[110px]');
+        // Entferne alte, inkonsistente Höhen-Constraints
+        button.classList.remove('min-h-[90px]', 'max-h-[110px]');
+        // Verwende die einheitlichen Höhen aus der Button-Factory
+        if (!button.className.includes('min-h-[85px]')) {
+            button.classList.add('min-h-[85px]', 'max-h-[95px]');
         }
     });
 }
@@ -58,8 +61,8 @@ function createTestButton(
 ): HTMLButtonElement {
     const button = document.createElement('button');
     button.id = id;
-    // Tailwind-Klassen basierend auf Variante
-    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-3 px-4 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2';
+    // Tailwind-Klassen basierend auf Variante - REDUZIERTE HÖHE für bessere Proportionen
+    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-2 px-4 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2 min-h-[45px] max-h-[50px]';
     if (variant === 'chaos') {
         button.className = `${baseClasses} bg-de-red hover:bg-de-red/90 text-white`;
     } else {
@@ -71,8 +74,8 @@ function createTestButton(
     });
     // Inhalt mit Icon
     button.innerHTML = `
-        <span class="text-xl">${icon}</span>
-        <span>${text}</span>
+        <span class="text-lg">${icon}</span>
+        <span class="text-sm">${text}</span>
     `;
     return button;
 }
@@ -189,7 +192,7 @@ export function displaySubTopics(dom: DOMElements, state: TrainerState, vokabula
     
     // Container für Test-Buttons
     const testContainer = document.createElement('div');
-    testContainer.className = 'col-span-full grid grid-cols-1 md:grid-cols-2 gap-4 mt-4';
+    testContainer.className = 'col-span-full grid grid-cols-1 md:grid-cols-2 gap-4 mt-2';
     // Chaos-Test Button
     const chaosTest = createTestButton(
         `${mainTopicName}-chaos-test`,
