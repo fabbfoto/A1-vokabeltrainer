@@ -118,7 +118,7 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
 
     // Container für Test-Buttons
     const testContainer = document.createElement('div');
-    testContainer.className = 'col-span-full grid grid-cols-1 md:grid-cols-2 gap-4 mt-4';
+    testContainer.className = 'col-span-full grid grid-cols-1 md:grid-cols-2 gap-4 mt-2';
     // Chaos-Test Button
     const globalChaosTest = createTestButton(
         'global-chaos-test',
