@@ -61,12 +61,12 @@ function createGlobalTestButton(
 ): HTMLButtonElement {
     const button = document.createElement('button');
     button.id = id;
-    // KLEINERE Buttons für globale Tests
-    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-1 px-3 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2 min-h-[35px] max-h-[40px]';
+    // KLEINERE Buttons für globale Tests - Mobile optimiert
+    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 active:scale-95 rounded-lg py-1 px-3 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2 min-h-[35px] max-h-[40px] touch-manipulation';
     if (variant === 'chaos') {
-        button.className = `${baseClasses} bg-de-red hover:bg-de-red/90 text-white`;
+        button.className = `${baseClasses} bg-de-red hover:bg-de-red/90 active:bg-de-red/80 text-white`;
     } else {
-        button.className = `${baseClasses} bg-de-blue hover:bg-de-blue/90 text-white`;
+        button.className = `${baseClasses} bg-de-blue hover:bg-de-blue/90 active:bg-de-blue/80 text-white`;
     }
     // Dataset attributes
     Object.entries(dataset).forEach(([key, value]) => {
@@ -74,7 +74,7 @@ function createGlobalTestButton(
     });
     // Inhalt mit Icon
     button.innerHTML = `
-        <span class="text-base">${icon}</span>
+        <span class="text-sm sm:text-base">${icon}</span>
         <span class="text-xs">${text}</span>
     `;
     return button;
@@ -92,12 +92,12 @@ function createTopicTestButton(
 ): HTMLButtonElement {
     const button = document.createElement('button');
     button.id = id;
-    // GRÖSSERE Buttons für themen-spezifische Tests
-    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 rounded-lg py-2 px-4 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2 min-h-[45px] max-h-[50px]';
+    // GRÖSSERE Buttons für themen-spezifische Tests - Mobile optimiert
+    const baseClasses = 'relative overflow-hidden transition-all duration-200 transform hover:scale-105 active:scale-95 rounded-lg py-2 px-4 font-medium shadow-de-gray-300/50 hover:shadow-de-gray-400/50 flex items-center justify-center gap-2 min-h-[45px] max-h-[50px] touch-manipulation';
     if (variant === 'chaos') {
-        button.className = `${baseClasses} bg-de-red hover:bg-de-red/90 text-white`;
+        button.className = `${baseClasses} bg-de-red hover:bg-de-red/90 active:bg-de-red/80 text-white`;
     } else {
-        button.className = `${baseClasses} bg-de-blue hover:bg-de-blue/90 text-white`;
+        button.className = `${baseClasses} bg-de-blue hover:bg-de-blue/90 active:bg-de-blue/80 text-white`;
     }
     // Dataset attributes
     Object.entries(dataset).forEach(([key, value]) => {
@@ -105,8 +105,8 @@ function createTopicTestButton(
     });
     // Inhalt mit Icon
     button.innerHTML = `
-        <span class="text-lg">${icon}</span>
-        <span class="text-sm">${text}</span>
+        <span class="text-base sm:text-lg">${icon}</span>
+        <span class="text-xs sm:text-sm">${text}</span>
     `;
     return button;
 }
@@ -184,6 +184,20 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
     });
     
     dom.navigationContainerEl.appendChild(rankingButton);
+
+    // NEU: Mobile-Einstellungen Button (nur auf Mobile sichtbar)
+    const mobileSettingsButton = createActionButton('mobile-settings', '⚙️ Einstellungen');
+    mobileSettingsButton.className = '';
+    mobileSettingsButton.classList.add('col-span-full', 'lg:col-span-3', 'sm:col-span-2', 'mt-2', 'bg-gray-600', 'hover:bg-gray-700', 'text-white', 'md:hidden');
+    
+    // Event Listener für Mobile-Einstellungen
+    mobileSettingsButton.addEventListener('click', () => {
+        if ((window as any).mobileSettings) {
+            (window as any).mobileSettings.showSettings();
+        }
+    });
+    
+    dom.navigationContainerEl.appendChild(mobileSettingsButton);
     
     // Copyright Footer
     const existingFooter = dom.navigationViewEl.querySelector('.copyright-footer');

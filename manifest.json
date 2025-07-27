@@ -1,12 +1,42 @@
 {
   "name": "A1 Vokabeltrainer",
   "short_name": "A1 Vokabeltrainer",
-  "description": "Ein interaktiver Vokabeltrainer für den A1 Wortschatz.",
+  "description": "Ein interaktiver Vokabeltrainer für den A1 Wortschatz - Perfekt für unterwegs!",
   "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#3b82f6",
+  "theme_color": "#6089BF",
   "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "de",
+  "categories": ["education", "productivity"],
+  "prefer_related_applications": false,
+  "shortcuts": [
+    {
+      "name": "Globaler Test",
+      "short_name": "Test",
+      "description": "Starte einen globalen Vokabeltest",
+      "url": "/index.html?shortcut=global-test",
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Letztes Thema",
+      "short_name": "Thema",
+      "description": "Öffne das letzte verwendete Thema",
+      "url": "/index.html?shortcut=last-topic",
+      "icons": [
+        {
+          "src": "icons/icon-96x96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
   "icons": [
     {
       "src": "icons/icon-72x72.png",

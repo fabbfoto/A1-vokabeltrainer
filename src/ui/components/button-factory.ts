@@ -2,7 +2,7 @@
 
 export function createTopicButton(text: string, percentage: number, progressColorClass: string): HTMLButtonElement {
     const button = document.createElement('button');
-    button.className = 'relative flex flex-col items-center justify-center p-4 text-center cursor-pointer font-semibold transition-all duration-300 rounded-2xl whitespace-normal break-words bg-gradient-to-br from-white via-[#F2AE2E]/[0.02] to-[#F2AE2E]/[0.04] border-2 border-gray-300 shadow-md hover:shadow-lg hover:-translate-y-1 min-h-[85px] max-h-[95px] hover:border-gray-400';
+    button.className = 'relative flex flex-col items-center justify-center p-3 sm:p-4 text-center cursor-pointer font-semibold transition-all duration-300 rounded-2xl whitespace-normal break-words bg-gradient-to-br from-white via-[#F2AE2E]/[0.02] to-[#F2AE2E]/[0.04] border-2 border-gray-300 shadow-md hover:shadow-lg hover:-translate-y-1 min-h-[75px] sm:min-h-[85px] max-h-[85px] sm:max-h-[95px] hover:border-gray-400 active:scale-95 touch-manipulation';
     
     // Progress-Container (grauer Hintergrund)
     const progressContainer = document.createElement('div');
@@ -15,7 +15,7 @@ export function createTopicButton(text: string, percentage: number, progressColo
     
     // Text
     const textSpan = document.createElement('span');
-    textSpan.className = 'relative z-10 text-sm mb-2';
+    textSpan.className = 'relative z-10 text-xs sm:text-sm mb-2';
     textSpan.textContent = text;
     
     // Struktur zusammenbauen
@@ -23,14 +23,28 @@ export function createTopicButton(text: string, percentage: number, progressColo
     button.appendChild(textSpan);
     button.appendChild(progressContainer);
     
+    // Haptic Feedback hinzufügen
+    button.addEventListener('click', () => {
+        if ((window as any).mobileSettings) {
+            (window as any).mobileSettings.buttonClick();
+        }
+    });
+    
     return button;
 }
 
 export function createActionButton(id: string, text: string): HTMLButtonElement {
     const button = document.createElement('button');
     button.id = id;
-    button.className = 'bg-de-blue hover:bg-de-blue/90 text-white font-medium py-2 px-4 rounded transition-colors duration-200';
+    button.className = 'bg-de-blue hover:bg-de-blue/90 active:bg-de-blue/80 text-white font-medium py-2 px-4 rounded transition-colors duration-200 touch-manipulation min-h-[44px]';
     button.textContent = text;
+    
+    // Haptic Feedback hinzufügen
+    button.addEventListener('click', () => {
+        if ((window as any).mobileSettings) {
+            (window as any).mobileSettings.buttonClick();
+        }
+    });
     
     return button;
 } 

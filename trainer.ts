@@ -39,7 +39,26 @@ import { supabase, supabaseAuth, supabaseProgress } from './src/services/supabas
 import { performanceMonitor, startPerformanceMonitoring } from './src/utils/performance-monitor';
 import { memoryManager } from './src/utils/memory-manager';
 
+// Mobile Features
+import { GestureHandler } from './src/utils/gesture-handler';
+import { MobileSettings } from './src/ui/components/mobile-settings';
+
+// Service Worker registrieren
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/src/utils/sw.js')
+      .then((registration) => {
+        console.log('SW registered: ', registration);
+      })
+      .catch((registrationError) => {
+        console.log('SW registration failed: ', registrationError);
+      });
+  });
+}
+
 let currentUser: unknown = null;
+let gestureHandler: GestureHandler;
+let mobileSettings: MobileSettings;
 
 // ========== SUPABASE AUTH BUTTON ==========
 async function createAuthButton() {
@@ -2065,5 +2084,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
     // Performance-Monitoring beenden
     performanceMonitor.endTimer('app-initialization');
+
+    startPerformanceMonitoring();
+    
+    // Mobile Features initialisieren
+    gestureHandler = new GestureHandler();
+    mobileSettings = new MobileSettings();
+    
+    // Mobile Features global verfügbar machen
+    (window as any).mobileSettings = mobileSettings;
+    
+    performanceMonitor.startTimer('app-initialization');
 
 });

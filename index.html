@@ -2,8 +2,27 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#6089BF">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="A1 Vokabeltrainer">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-TileColor" content="#6089BF">
+    <meta name="msapplication-config" content="/browserconfig.xml">
+    
     <title>A1 Vokabeltrainer</title>
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-192x192.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-96x96.png">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       // Zentrale Farb-Konfiguration für Tailwind
@@ -39,25 +58,23 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <link rel="manifest" href="manifest.json"> 
-    <meta name="theme-color" content="#3b82f6">
-    <!-- CSS-Link entfernt wegen MIME-Type Problemen -->
+    <link rel="manifest" href="manifest.json">
     
     <!-- Supabase wird über TypeScript-Module geladen -->
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 font-['Inter'] flex flex-col justify-start items-center min-h-screen p-4">
+<body class="bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 font-['Inter'] flex flex-col justify-start items-center min-h-screen p-2 sm:p-4 safe-area-inset">
 
     <!-- NAVIGATION VIEW -->
-    <div id="navigation-view" class="p-4 max-w-2xl mx-auto">
-        <header id="navigation-header" class="flex items-center mb-6">
-            <button id="back-to-main-topics" class="hidden mr-4 px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium hover:bg-gray-100">&larr; Zurück</button>
-            <h1 id="navigation-title" class="text-2xl font-bold text-gray-700">Themen</h1>
+    <div id="navigation-view" class="p-2 sm:p-4 max-w-2xl mx-auto w-full">
+        <header id="navigation-header" class="flex items-center mb-4 sm:mb-6">
+            <button id="back-to-main-topics" class="hidden mr-3 sm:mr-4 px-2 sm:px-3 py-1 sm:py-1.5 border border-gray-300 rounded-md text-xs sm:text-sm font-medium hover:bg-gray-100 active:bg-gray-200 touch-manipulation">&larr; Zurück</button>
+            <h1 id="navigation-title" class="text-xl sm:text-2xl font-bold text-gray-700">Themen</h1>
         </header>
-        <div id="navigation-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div id="navigation-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
             <!-- Navigation Buttons werden hier dynamisch eingefügt -->
         </div>
-        <div id="auth-button-container" class="mt-4 w-full"></div>
-        <div id="ranking-container" class="mt-4 w-full"></div>
+        <div id="auth-button-container" class="mt-3 sm:mt-4 w-full"></div>
+        <div id="ranking-container" class="mt-3 sm:mt-4 w-full"></div>
     </div>
 
     <!-- TRAINER MAIN VIEW -->
