@@ -17,8 +17,8 @@ declare global {
     getErrorCountForMode?: (mode: string) => number;
     showErrorSummary?: () => void;
     
-    // Firebase Services
-    firebaseSyncService?: {
+    // Supabase Services (Legacy Firebase entfernt)
+supabaseSyncService?: {
       saveProgress: (data: unknown) => void;
       startRealtimeSync: (userId: string) => void;
       stopRealtimeSync: () => void;

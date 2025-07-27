@@ -292,19 +292,10 @@ function generateMultipleChoiceAnswers(
     let allEnglish: string[] = [];
     if (state.training.currentVocabularySet && state.training.currentVocabularySet.length > 0) {
         // Hole alle Vokabeln aus dem gesamten Vokabular (flach)
-        if ((window as any).vokabular) {
-            const vokabular = (window as any).vokabular;
-            allEnglish = Object.values(vokabular)
-                .flatMap((mainTopic: any) => Object.values(mainTopic))
-                .flatMap((subTopic: any) => Array.isArray(subTopic) ? subTopic : [])
-                .map((word: unknown) => (word as { english: string }).english)
-                .filter((en: string) => en && en !== correctAnswerEN);
-        } else {
-            // Fallback: alle aus currentVocabularySet
-            allEnglish = state.training.currentVocabularySet
-                .filter(word => word.english && word.english !== correctAnswerEN)
-                .map(word => word.english);
-        }
+        // Direkter Import statt window.vokabular
+        allEnglish = state.training.currentVocabularySet
+            .filter(word => word.english && word.english !== correctAnswerEN)
+            .map(word => word.english);
     }
     // Shuffle und filtere Duplikate
     const uniqueDistractors = Array.from(new Set(allEnglish));

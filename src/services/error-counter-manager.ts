@@ -90,7 +90,7 @@ export class ErrorCounterManager {
         }, 500); // 500ms debounce
     }
     
-    // Private: Speichern in localStorage und Firebase
+            // Private: Speichern in localStorage und Supabase
     private saveToStorage(): void {
         try {
             // localStorage
@@ -103,11 +103,8 @@ export class ErrorCounterManager {
             localStorage.setItem('trainer-words-to-repeat', JSON.stringify(toSave));
             console.log('[ErrorManager] Saved to localStorage');
             
-            // Firebase (falls verfügbar)
-            if ((window as any).firebaseSyncService) {
-                (window as any).firebaseSyncService.saveProgress(toSave);
-                console.log('[ErrorManager] Saved to Firebase');
-            }
+                    // Supabase (falls verfügbar)
+        // TODO: Implementiere Supabase-Sync wenn benötigt
         } catch (error) {
             console.error('[ErrorManager] Failed to save:', error);
         }

@@ -26,18 +26,10 @@ export function resetErrorCountsForNewExercise(
             state.progress.wordsToRepeatByMode[modeId] = new Set();
             saveWordsToRepeat();
         }
-        // 3. localStorage direkt löschen (da Firebase-Services keine saveWordsToRepeat haben)
+        // 3. localStorage direkt löschen
         localStorage.removeItem('trainer-words-to-repeat');
-        // 4. Firebase Progress zurücksetzen (falls verfügbar)
-        if (window.firebaseSyncService) {
-            try {
-                // Leeren Progress an Firebase senden
-                const emptyProgress = {};
-                window.firebaseSyncService.saveProgress(emptyProgress);
-            } catch (error) {
-                console.warn('⚠️ Fehler beim Firebase-Reset:', error);
-            }
-        }
+        // 4. Supabase Progress zurücksetzen (falls verfügbar)
+        // TODO: Implementiere Supabase-Reset wenn benötigt
     }
 }
 
@@ -66,16 +58,8 @@ export function resetAllErrorCounts(
     // 3. Speichern
     saveWordsToRepeat();
     
-    // 4. Firebase zurücksetzen (falls verfügbar)
-    if (window.firebaseSyncService) {
-        try {
-            const emptyProgress = {};
-            window.firebaseSyncService.saveProgress(emptyProgress);
-    
-        } catch (error) {
-            console.warn('⚠️ Fehler beim Firebase-Reset:', error);
-        }
-    }
+        // 4. Supabase zurücksetzen (falls verfügbar)
+    // TODO: Implementiere Supabase-Reset wenn benötigt
     
 
 }

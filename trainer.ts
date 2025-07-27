@@ -330,7 +330,7 @@ async function createAuthButton() {
 
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
 
-    // NEU: Firebase Auth initialisieren
+    // NEU: Supabase Auth initialisieren
     let authUI: AuthUI = {
         show: () => {},
         hide: () => {},
@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
     let rankingService: any; // RankingService wurde entfernt
 
     try {
-        // Firebase Auth initialisieren
+        // Supabase Auth initialisieren
         
         authUI = {
             show: () => { },
@@ -593,22 +593,22 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         console.log('💾 Lade Progress aus localStorage...');
         let saved = localStorage.getItem('trainer-progress');
         
-        // Falls nicht vorhanden, versuche Firebase-Key
+        // Falls nicht vorhanden, versuche Legacy-Key
         if (!saved) {
-            const firebaseSaved = localStorage.getItem('a1ThemenProgress');
-            if (firebaseSaved) {
+            const legacySaved = localStorage.getItem('a1ThemenProgress');
+            if (legacySaved) {
                 try {
-                    const firebaseData = JSON.parse(firebaseSaved);
+                    const legacyData = JSON.parse(legacySaved);
                     const converted: Record<string, Record<string, string[]>> = {};
-                    for (const hauptthema in firebaseData) {
-                        for (const unterthema in firebaseData[hauptthema]) {
+                    for (const hauptthema in legacyData) {
+                        for (const unterthema in legacyData[hauptthema]) {
                             const key = `${hauptthema}|${unterthema}`;
-                            converted[key] = firebaseData[hauptthema][unterthema];
+                            converted[key] = legacyData[hauptthema][unterthema];
                         }
                     }
                     saved = JSON.stringify(converted);
                 } catch (e) {
-                    console.error('❌ Fehler bei Firebase-Konvertierung:', e);
+                    console.error('❌ Fehler bei Legacy-Konvertierung:', e);
                 }
             }
         }
@@ -650,44 +650,10 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
     }
 
-    function reloadProgressFromFirebase(): void {
-        console.log('🔄 Versuche Progress von Firebase neu zu laden...');
-        // Warte kurz, bis Firebase bereit ist
-        setTimeout(() => {
-            const firebaseSaved = localStorage.getItem('trainer-progress-firebase');
-            if (firebaseSaved) {
-                try {
-                    const parsed = JSON.parse(firebaseSaved);
-                    console.log('📥 Firebase-Progress gefunden, merge mit lokalem State...');
-                    // Merge Firebase-Daten mit existierendem State
-                    Object.keys(parsed).forEach(topicKey => {
-                        if (!state.progress.globalProgress[topicKey]) {
-                            state.progress.globalProgress[topicKey] = {};
-                        }
-                        if (typeof parsed[topicKey] === 'object' && parsed[topicKey] !== null) {
-                            Object.keys(parsed[topicKey]).forEach(mode => {
-                                const data = parsed[topicKey][mode];
-                                if (Array.isArray(data) && data.length > 0) {
-                                    // Merge Arrays - behalte alle einzigartigen Werte
-                                    const existingSet = state.progress.globalProgress[topicKey][mode as ModeId] || new Set();
-                                    const newSet = new Set([...existingSet, ...data]);
-                                    state.progress.globalProgress[topicKey][mode as ModeId] = newSet;
-                                }
-                            });
-                        }
-                    });
-                    // Speichere gemergten Progress
-                    saveProgress();
-                    console.log('✅ Firebase-Progress erfolgreich gemerged');
-                    // UI aktualisieren - aber nur wenn bereits in Trainings-Ansicht
-                    if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
-                        ui.showTrainingModes(dom, state);
-                    }
-                } catch (e) {
-                    console.error('❌ Fehler beim Mergen des Firebase-Progress:', e);
-                }
-            }
-        }, 2000); // 2 Sekunden warten
+    function reloadProgressFromSupabase(): void {
+        console.log('🔄 Versuche Progress von Supabase neu zu laden...');
+        // TODO: Implementiere Supabase-Sync wenn benötigt
+        // Aktuell verwenden wir nur localStorage
     }
 
     function saveProgress(): void {
@@ -1521,16 +1487,8 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
             // Fehlerzähler für diesen Modus zurücksetzen
             errorManager.clearErrors(modeId);
             
-            // Firebase Progress zurücksetzen (falls verfügbar)
-            if ((window as unknown as { firebaseSyncService?: { saveProgress: (data: Record<string, unknown>) => void } }).firebaseSyncService) {
-                try {
-                    // Leeren Progress an Firebase senden
-                    const emptyProgress: Record<string, unknown> = {};
-                    (window as unknown as { firebaseSyncService: { saveProgress: (data: Record<string, unknown>) => void } }).firebaseSyncService.saveProgress(emptyProgress);
-                } catch (error) {
-                    console.warn('⚠️ Fehler beim Firebase-Reset:', error);
-                }
-            }
+            // Supabase Progress zurücksetzen (falls verfügbar)
+            // TODO: Implementiere Supabase-Reset wenn benötigt
         }
         
         state.training.currentMode = modeId;
@@ -1903,37 +1861,16 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         // Die TypeScript-Implementierung in ui/umlaut-buttons.ts übernimmt jetzt alles
     };
 
-    // Firebase Progress Event Listener
-    window.addEventListener('firebase-progress-updated', (event: any) => {
-        console.log('🔄 Firebase-Progress-Update empfangen');
-        if (event.detail && event.detail.progress) {
-            // Merge Firebase-Daten mit lokalem State
-            const firebaseProgress = event.detail.progress;
-            Object.keys(firebaseProgress).forEach(topicKey => {
-                if (!state.progress.globalProgress[topicKey]) {
-                    state.progress.globalProgress[topicKey] = {};
-                }
-                Object.keys(firebaseProgress[topicKey]).forEach(mode => {
-                    const data = firebaseProgress[topicKey][mode];
-                    if (Array.isArray(data)) {
-                        state.progress.globalProgress[topicKey][mode] = new Set(data);
-                    }
-                });
-            });
-            // UI aktualisieren - aber nur wenn bereits in Trainings-Ansicht
-            if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
-                ui.showTrainingModes(dom, state);
-            }
-        }
-    });
+    // Supabase Progress Event Listener (TODO: Implementiere wenn benötigt)
+    // window.addEventListener('supabase-progress-updated', (event: any) => {
+    //     console.log('🔄 Supabase-Progress-Update empfangen');
+    //     // TODO: Implementiere Supabase-Sync
+    // });
 
-    window.addEventListener('firebase-auth-success', () => {
-        console.log('🔐 Firebase-Auth erfolgreich, lade Progress neu...');
-        // Nur laden wenn bereits in Trainings-Ansicht
-        if (state.navigation.currentMainTopic && state.navigation.currentSubTopic) {
-            reloadProgressFromFirebase();
-        }
-    });
+    // window.addEventListener('supabase-auth-success', () => {
+    //     console.log('🔐 Supabase-Auth erfolgreich, lade Progress neu...');
+    //     // TODO: Implementiere Supabase-Sync
+    // });
 
     console.log('🎉 Trainer erfolgreich initialisiert!');
     console.log('📊 Verfügbare Themen:', Object.keys(vokabular));

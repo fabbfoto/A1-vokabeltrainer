@@ -4,8 +4,8 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ES2020",
     "moduleResolution": "bundler",
-    "allowJs": true,
-    "checkJs": true,
+    "allowJs": false,
+    "checkJs": false,
     "outDir": "./dist",
     "sourceMap": true,
     "strict": true,
@@ -63,7 +63,7 @@
   "exclude": [
     "node_modules",
     "dist",
-    "shared"  // Falls noch vorhanden
+    "packages"
   ],
   "ts-node": {
     "esm": true,

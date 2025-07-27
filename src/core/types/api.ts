@@ -1,5 +1,5 @@
 // shared/types/api.ts
-// Professional API and Firebase integration types
+// Professional API and Supabase integration types
 
 import type { WordId, TopicId, SubTopicId } from './vocabulary';
 import type { Progress, TestScore, SessionStats, ModeId } from './trainer';
