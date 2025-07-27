@@ -134,7 +134,7 @@ interface BaseWord {
 // ========== DISCRIMINATED UNION WORD TYPES ==========
 export interface Noun extends BaseWord {
   wordType: 'noun';
-  article: Article;
+  article?: Article; // Optional für Unterrichtsfächer ohne Artikel
   plural: string | null;
 }
 

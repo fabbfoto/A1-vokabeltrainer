@@ -225,7 +225,7 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 id: createWordId("lernen-schuleunterricht-028"),
                 wordType: 'noun',
                 german: "Sozialkunde",
-                article: "die",
+                article: undefined, // Unterrichtsfächer haben keinen Artikel
                 plural: null, // oft ohne Plural
                 english: "social studies",
                 exampleGerman: [
@@ -244,7 +244,7 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 id: createWordId("lernen-schuleunterricht-029"),
                 wordType: 'noun',
                 german: "Kunst",
-                article: "die",
+                article: undefined, // Unterrichtsfächer haben keinen Artikel
                 plural: "Künste",
                 english: "art",
                 exampleGerman: [
@@ -263,7 +263,7 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 id: createWordId("lernen-schuleunterricht-030"),
                 wordType: 'noun',
                 german: "Sport",
-                article: "der",
+                article: undefined, // Unterrichtsfächer haben keinen Artikel
                 plural: null, // oft ohne Plural
                 english: "sports / P.E.",
                 exampleGerman: [
@@ -284,7 +284,7 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 id: createWordId("lernen-schuleunterricht-031"),
                 wordType: 'noun',
                 german: "Physik",
-                article: "die",
+                article: undefined, // Unterrichtsfächer haben keinen Artikel
                 plural: null, // oft ohne Plural
                 english: "physics",
                 exampleGerman: [
@@ -303,7 +303,7 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 id: createWordId("lernen-schuleunterricht-032"),
                 wordType: 'noun',
                 german: "Chemie",
-                article: "die",
+                article: undefined, // Unterrichtsfächer haben keinen Artikel
                 plural: null, // oft ohne Plural
                 english: "chemistry",
                 exampleGerman: [
@@ -324,7 +324,7 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 id: createWordId("lernen-schuleunterricht-033"),
                 wordType: 'noun',
                 german: "Geschichte",
-                article: "die",
+                article: undefined, // Unterrichtsfächer haben keinen Artikel
                 plural: "Geschichten",
                 english: "history",
                 exampleGerman: [
@@ -343,7 +343,7 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 id: createWordId("lernen-schuleunterricht-034"),
                 wordType: 'noun',
                 german: "Geografie",
-                article: "die",
+                article: undefined, // Unterrichtsfächer haben keinen Artikel
                 plural: null, // oft ohne Plural
                 english: "geography",
                 exampleGerman: [
@@ -364,7 +364,7 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 id: createWordId("lernen-schuleunterricht-035"),
                 wordType: 'noun',
                 german: "Mathematik",
-                article: "die",
+                article: undefined, // Unterrichtsfächer haben keinen Artikel
                 plural: null, // oft ohne Plural
                 english: "mathematics",
                 exampleGerman: [
@@ -383,7 +383,7 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 id: createWordId("lernen-schuleunterricht-036"),
                 wordType: 'noun',
                 german: "Englisch",
-                article: "das",
+                article: undefined, // Unterrichtsfächer haben keinen Artikel
                 plural: null, // oft ohne Plural
                 english: "English",
                 exampleGerman: [
@@ -402,7 +402,7 @@ export const vokabularLernen: VocabularyStructure = createVocabulary({
                 id: createWordId("lernen-schuleunterricht-037"),
                 wordType: 'noun',
                 german: "Deutsch",
-                article: "das",
+                article: undefined, // Unterrichtsfächer haben keinen Artikel
                 plural: null, // oft ohne Plural
                 english: "German",
                 exampleGerman: [
