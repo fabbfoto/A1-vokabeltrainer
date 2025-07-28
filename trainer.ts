@@ -256,13 +256,16 @@ async function createAuthButton() {
     emailBtn.className = 'w-full flex items-center gap-2 px-3 py-2 rounded hover:bg-blue-700 transition-colors';
     emailBtn.innerHTML = `<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 12H8m8 0a4 4 0 11-8 0 4 4 0 018 0zm8 0a8 8 0 11-16 0 8 8 0 0116 0z"/></svg><span>Mit E-Mail anmelden</span>`;
 
-    // E-Mail-Login-Formular (wird beim Klick auf emailBtn angezeigt)
+    // E-Mail-Login/Registrierung-Formular (wird beim Klick auf emailBtn angezeigt)
     const emailForm = document.createElement('form');
     emailForm.className = 'flex flex-col gap-2 mt-2';
     emailForm.innerHTML = `
       <input type="email" name="email" placeholder="E-Mail" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
       <input type="password" name="password" placeholder="Passwort" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
-      <button type="submit" class="bg-blue-700 hover:bg-blue-800 rounded px-3 py-2 mt-1">Login</button>
+      <div class="flex gap-2">
+        <button type="submit" name="action" value="login" class="flex-1 bg-blue-700 hover:bg-blue-800 rounded px-3 py-2">Login</button>
+        <button type="submit" name="action" value="signup" class="flex-1 bg-green-700 hover:bg-green-800 rounded px-3 py-2">Registrieren</button>
+      </div>
       <button type="button" class="text-xs text-blue-200 hover:underline mt-1" id="cancel-email-login">Abbrechen</button>
     `;
     emailForm.style.display = 'none';
@@ -272,13 +275,51 @@ async function createAuthButton() {
       const formData = new FormData(emailForm);
       const email = formData.get('email') as string;
       const password = formData.get('password') as string;
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        alert('Login fehlgeschlagen: ' + error.message);
-      } else {
-        dropdown.classList.add('hidden');
-        emailForm.reset();
-        createAuthButton();
+      const action = formData.get('action') as string;
+      
+      try {
+        if (action === 'signup') {
+          // Registrierung
+          const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+              emailRedirectTo: window.location.origin
+            }
+          });
+          
+          if (error) {
+            alert('Registrierung fehlgeschlagen: ' + error.message);
+          } else {
+            if (data.user && data.session) {
+              // Sofort angemeldet
+              alert('Registrierung erfolgreich! Du bist jetzt angemeldet.');
+              dropdown.classList.add('hidden');
+              emailForm.reset();
+              createAuthButton();
+            } else {
+              // E-Mail-Bestätigung erforderlich
+              alert('Registrierung erfolgreich! Bitte überprüfe deine E-Mails und bestätige deinen Account.');
+              dropdown.classList.add('hidden');
+              emailForm.reset();
+              createAuthButton();
+            }
+          }
+        } else {
+          // Login
+          const { error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) {
+            alert('Login fehlgeschlagen: ' + error.message);
+          } else {
+            alert('Login erfolgreich!');
+            dropdown.classList.add('hidden');
+            emailForm.reset();
+            createAuthButton();
+          }
+        }
+      } catch (error) {
+        console.error('Auth Fehler:', error);
+        alert('Fehler bei der Authentifizierung: ' + (error as Error).message);
       }
     };
     emailForm.querySelector('#cancel-email-login')!.addEventListener('click', () => {
