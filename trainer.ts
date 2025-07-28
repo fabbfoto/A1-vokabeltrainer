@@ -260,7 +260,7 @@ async function createAuthButton() {
     const emailForm = document.createElement('form');
     emailForm.className = 'flex flex-col gap-2 mt-2';
     emailForm.innerHTML = `
-      <input type="email" name="email" placeholder="E-Mail" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
+      <input type="text" name="email" placeholder="E-Mail oder Benutzername" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
       <input type="password" name="password" placeholder="Passwort" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
       <div class="flex gap-2">
         <button type="submit" name="action" value="login" class="flex-1 bg-blue-700 hover:bg-blue-800 rounded px-3 py-2">Login</button>
@@ -278,10 +278,16 @@ async function createAuthButton() {
       const action = formData.get('action') as string;
       
       try {
+        // Prüfe ob es sich um einen anonymen Benutzername handelt
+        const isAnonymousUsername = !email.includes('@') || email.endsWith('@gmail.com');
+        
+        // Wenn es ein anonymer Benutzername ist, füge @gmail.com hinzu
+        const actualEmail = isAnonymousUsername && !email.includes('@') ? `${email}@gmail.com` : email;
+        
         if (action === 'signup') {
           // Registrierung
           const { data, error } = await supabase.auth.signUp({
-            email: email,
+            email: actualEmail,
             password: password,
             options: {
               emailRedirectTo: window.location.origin
@@ -289,7 +295,21 @@ async function createAuthButton() {
           });
           
           if (error) {
-            alert('Registrierung fehlgeschlagen: ' + error.message);
+            // Prüfe ob es ein "User already registered" Fehler ist
+            if (error.message.includes('User already registered') || error.message.includes('already registered')) {
+              // Versuche Login statt Registrierung
+              const { error: loginError } = await supabase.auth.signInWithPassword({ email: actualEmail, password });
+              if (loginError) {
+                alert('Account existiert bereits, aber Login fehlgeschlagen: ' + loginError.message);
+              } else {
+                alert('Account existiert bereits! Du wurdest erfolgreich angemeldet.');
+                dropdown.classList.add('hidden');
+                emailForm.reset();
+                createAuthButton();
+              }
+            } else {
+              alert('Registrierung fehlgeschlagen: ' + error.message);
+            }
           } else {
             if (data.user && data.session) {
               // Sofort angemeldet
@@ -307,9 +327,37 @@ async function createAuthButton() {
           }
         } else {
           // Login
-          const { error } = await supabase.auth.signInWithPassword({ email, password });
+          const { error } = await supabase.auth.signInWithPassword({ email: actualEmail, password });
           if (error) {
-            alert('Login fehlgeschlagen: ' + error.message);
+            // Prüfe ob es ein "User not found" Fehler ist
+            if (error.message.includes('Invalid login credentials') || error.message.includes('not found')) {
+              // Versuche Registrierung statt Login
+              const { data, error: signupError } = await supabase.auth.signUp({
+                email: actualEmail,
+                password: password,
+                options: {
+                  emailRedirectTo: window.location.origin
+                }
+              });
+              
+              if (signupError) {
+                alert('Login fehlgeschlagen: ' + error.message);
+              } else {
+                if (data.user && data.session) {
+                  alert('Account erstellt! Du bist jetzt angemeldet.');
+                  dropdown.classList.add('hidden');
+                  emailForm.reset();
+                  createAuthButton();
+                } else {
+                  alert('Account erstellt! Bitte überprüfe deine E-Mails und bestätige deinen Account.');
+                  dropdown.classList.add('hidden');
+                  emailForm.reset();
+                  createAuthButton();
+                }
+              }
+            } else {
+              alert('Login fehlgeschlagen: ' + error.message);
+            }
           } else {
             alert('Login erfolgreich!');
             dropdown.classList.add('hidden');
