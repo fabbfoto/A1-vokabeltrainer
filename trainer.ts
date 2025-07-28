@@ -260,7 +260,7 @@ async function createAuthButton() {
     const emailForm = document.createElement('form');
     emailForm.className = 'flex flex-col gap-2 mt-2';
     emailForm.innerHTML = `
-      <input type="text" name="email" placeholder="E-Mail oder Benutzername" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
+      <input type="email" name="email" placeholder="E-Mail oder Benutzername" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
       <input type="password" name="password" placeholder="Passwort" required class="px-3 py-2 rounded bg-blue-900 text-white placeholder-blue-300 focus:outline-none" />
       <div class="flex gap-2">
         <button type="submit" name="action" value="login" class="flex-1 bg-blue-700 hover:bg-blue-800 rounded px-3 py-2">Login</button>
@@ -282,7 +282,17 @@ async function createAuthButton() {
         const isAnonymousUsername = !email.includes('@') || email.endsWith('@gmail.com');
         
         // Wenn es ein anonymer Benutzername ist, füge @gmail.com hinzu
-        const actualEmail = isAnonymousUsername && !email.includes('@') ? `${email}@gmail.com` : email;
+        // Bei echten E-Mail-Adressen: Konvertiere zu Kleinbuchstaben
+        // Bei anonymen Benutzernamen: Behalte die ursprüngliche Schreibweise
+        let actualEmail: string;
+        if (isAnonymousUsername && !email.includes('@')) {
+          actualEmail = `${email}@gmail.com`;
+        } else if (email.includes('@')) {
+          // Echte E-Mail-Adresse: Konvertiere zu Kleinbuchstaben
+          actualEmail = email.toLowerCase();
+        } else {
+          actualEmail = email;
+        }
         
         if (action === 'signup') {
           // Registrierung
