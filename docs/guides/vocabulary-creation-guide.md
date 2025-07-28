@@ -4,19 +4,202 @@
 
 Diese Anleitung ermöglicht es Claude, neue Vokabular-Dateien zu erstellen, die exakt dem bestehenden Format entsprechen. Dadurch können neue Trainer-Themen einfach durch Austausch der Vokabular-Dateien erstellt werden.
 
-## 📁 Benötigte Dateien für Claude
+## 📁 TypeScript-Definitionen (KRITISCH)
 
-### 1. TypeScript-Definitionen (KRITISCH)
-- `src/core/types/vocabulary.ts` - Hauptdefinition aller Typen und Interfaces
-- `src/core/types/trainer.ts` - Trainer-spezifische Typen und Konstanten
+### Core Vocabulary Types
+```typescript
+// src/core/types/vocabulary.ts - WICHTIGSTE DEFINITIONEN
 
-### 2. Beispiel-Vokabular-Dateien
-- `vokabular_person.ts` - Komplexe Datei mit allen Worttypen (Nomen, Verben, Adjektive)
-- `vokabular_lernen.ts` - Mittlere Komplexität mit vielen Verben und Konjugationen
-- `vokabular_Kommunikationsmittel.ts` - Einfachere Struktur mit verschiedenen Worttypen
+// ========== BRANDED TYPES FOR TYPE SAFETY ==========
+export type WordId = string & { __brand: 'WordId' };
+export type TopicId = string & { __brand: 'TopicId' };
+export type SubTopicId = string & { __brand: 'SubTopicId' };
 
-### 3. Hilfsfunktionen
-- `src/utils/helfer.ts` - Hilfsfunktionen für Antwortvergleich und Textverarbeitung
+// ========== CORE VOCABULARY ENUMS ==========
+export type WordType = 
+  | 'noun' 
+  | 'verb' 
+  | 'adjective' 
+  | 'adverb' 
+  | 'preposition' 
+  | 'pronoun' 
+  | 'conjunction' 
+  | 'interjection';
+
+export type Article = 'der' | 'die' | 'das' | 'der/die' | 'der/das' | 'die/das';
+export type AuxiliaryVerb = 'haben' | 'sein';
+export type CaseType = 'nominativ' | 'akkusativ' | 'dativ' | 'genitiv' | 'verb' | 'none';
+
+// ========== EXAMPLE SENTENCE INTERFACES ==========
+export interface ExampleSentencePart {
+  id?: WordId;
+  text: string;
+  case?: CaseType;
+  kasus?: CaseType; // Legacy-Kompatibilität
+}
+
+export interface ExampleSentenceData {
+  exampleGerman?: ExampleSentencePart[] | string;
+  exampleEnglish?: string;
+  example_de?: ExampleSentencePart[] | string;
+  example_en?: string;
+}
+
+// ========== CONJUGATION INTERFACES ==========
+export interface Conjugation {
+  ich?: string;
+  du?: string;
+  er?: string;
+  wir?: string;
+  ihr?: string;
+  sie?: string;
+}
+
+export interface Imperative {
+  du?: string;
+  ihr?: string;
+  Sie?: string;
+}
+
+// ========== BASE WORD INTERFACE ==========
+interface BaseWord {
+  id: WordId;
+  german: string;
+  english: string;
+  deutsch?: string; // Legacy-Kompatibilität
+  beispiel?: string; // Legacy-Kompatibilität
+  artikel?: string; // Für Artikel-Training
+  exampleGerman?: ExampleSentencePart[];
+  exampleEnglish?: string;
+  clozeParts?: string[];
+  clozeAnswers?: string[];
+}
+
+// ========== DISCRIMINATED UNION WORD TYPES ==========
+export interface Noun extends BaseWord {
+  wordType: 'noun';
+  article?: Article; // Optional für Unterrichtsfächer ohne Artikel
+  plural: string | null;
+}
+
+export interface Verb extends BaseWord {
+  wordType: 'verb';
+  separable: boolean;
+  auxiliaryVerb?: AuxiliaryVerb;
+  pastParticiple?: string;
+  presentConjugation?: Conjugation;
+  imperative?: Imperative;
+}
+
+export interface Adjective extends BaseWord {
+  wordType: 'adjective';
+}
+
+export interface Adverb extends BaseWord {
+  wordType: 'adverb';
+}
+
+export interface Preposition extends BaseWord {
+  wordType: 'preposition';
+}
+
+export interface Pronoun extends BaseWord {
+  wordType: 'pronoun';
+}
+
+export interface Conjunction extends BaseWord {
+  wordType: 'conjunction';
+}
+
+export interface Interjection extends BaseWord {
+  wordType: 'interjection';
+}
+
+// ========== DISCRIMINATED UNION ==========
+export type Word = 
+  | Noun 
+  | Verb 
+  | Adjective 
+  | Adverb 
+  | Preposition 
+  | Pronoun 
+  | Conjunction 
+  | Interjection;
+
+// ========== VOCABULARY STRUCTURE ==========
+export type SubTopic = Word[];
+export interface MainTopic {
+  [subTopicName: string]: SubTopic;
+}
+export interface VocabularyStructure {
+  [mainTopicName: string]: MainTopic;
+}
+
+// ========== UTILITY FUNCTIONS ==========
+export function createWordId(id: string): WordId {
+  return id as WordId;
+}
+
+export function createVocabulary<T extends VocabularyStructure>(vocabulary: T): T {
+  return vocabulary;
+}
+```
+
+### Trainer Constants
+```typescript
+// src/core/types/trainer.ts - KRITISCHE KONSTANTEN
+
+export const TRAINER_CONSTANTS = {
+  // Antwort-Vergleich
+  ANSWER_COMPARISON: {
+    DEFAULT_CASE_SENSITIVE: false,
+    SPELLING_MODE_CASE_SENSITIVE: true,
+    CLOZE_MODE_CASE_SENSITIVE: true,
+    SENTENCE_MODE_CASE_SENSITIVE: true,
+    IGNORE_PUNCTUATION_DEFAULT: false
+  },
+  
+  // Umlaute und Sonderzeichen
+  SPECIAL_CHARS: {
+    UMLAUTS: {
+      'ä': 'ae', 'ö': 'oe', 'ü': 'ue',
+      'Ä': 'AE', 'Ö': 'OE', 'Ü': 'UE',
+      'ß': 'ss'
+    },
+    // WICHTIG: ß und ss sind NICHT äquivalent
+    SS_BETA_DISTINCT: true
+  }
+} as const;
+```
+
+### Hilfsfunktionen für Antwortvergleich
+```typescript
+// src/utils/helfer.ts - WICHTIGE FUNKTIONEN
+
+export function vergleicheAntwort(userAnswer: string, correctAnswer: string, { ignorePunctuation = false, caseSensitive = false } = {}): boolean {
+  let processedUserAnswer = userAnswer.trim();
+  let processedCorrectAnswer = correctAnswer.trim();
+  
+  // Nur zu Kleinbuchstaben konvertieren, wenn caseSensitive = false
+  if (!caseSensitive) {
+    processedUserAnswer = processedUserAnswer.toLowerCase();
+    processedCorrectAnswer = processedCorrectAnswer.toLowerCase();
+  }
+  
+  // Artikel am Anfang entfernen (der, die, das, ein, eine, einen, einem, einer, eines)
+  const artikelRegex = /^(der|die|das|ein|eine|einen|einem|einer|eines)\s+/i;
+  processedUserAnswer = processedUserAnswer.replace(artikelRegex, '');
+  processedCorrectAnswer = processedCorrectAnswer.replace(artikelRegex, '');
+  
+  if (ignorePunctuation) {
+    const punctuationRegex = /[.,;:!?'"„"»«]/g;
+    processedUserAnswer = processedUserAnswer.replace(punctuationRegex, "");
+    processedCorrectAnswer = processedCorrectAnswer.replace(punctuationRegex, "");
+  }
+  
+  return processedUserAnswer === processedCorrectAnswer;
+}
+```
 
 ## 🏗️ Struktur einer Vokabular-Datei
 
@@ -201,90 +384,147 @@ export const vokabular[Thema]: VocabularyStructure = createVocabulary({
 - [ ] Datei kann in den Trainer importiert werden
 - [ ] Wörter werden korrekt angezeigt
 
-## 🎯 Beispiel: Komplette Vokabular-Datei
+## 🎯 Echte Beispiele aus bestehenden Vokabular-Dateien
 
+### Beispiel 1: Nomen aus vokabular_person.ts
 ```typescript
-// vokabular_berufe.ts
-import type { VocabularyStructure, Word, Noun, Verb, Adjective, WordId } from './src/core/types/vocabulary';
-import { createWordId, createVocabulary } from './src/core/types/vocabulary';
+{
+    id: createWordId("person-name-001"),
+    wordType: 'noun',
+    german: "Name",
+    article: "der",
+    plural: "Namen",
+    english: "name",
+    exampleGerman: [
+        { text: "Wie", case: "none" },
+        { text: " ", case: "none" },
+        { text: "ist", case: "verb" },
+        { text: " ", case: "none" },
+        { text: "dein Name", case: "nominativ" },
+        { text: "?", case: "none" }
+    ],
+    exampleEnglish: "What is your name?",
+    clozeParts: ["Wie ist dein ", "?"],
+    clozeAnswers: ["Name"]
+} as Noun
+```
 
-export const vokabularBerufe: VocabularyStructure = createVocabulary({
-    "Berufe": {
-        "Medizinische Berufe": [
-            {
-                id: createWordId("berufe-medizin-001"),
-                wordType: 'noun',
-                german: "Arzt",
-                article: "der",
-                plural: "Ärzte",
-                english: "doctor",
-                exampleGerman: [
-                    { text: "Der", case: "none" },
-                    { text: " ", case: "none" },
-                    { text: "Arzt", case: "nominativ" },
-                    { text: " ", case: "none" },
-                    { text: "hilft", case: "verb" },
-                    { text: " ", case: "none" },
-                    { text: "dem", case: "none" },
-                    { text: " ", case: "none" },
-                    { text: "Patienten", case: "dativ" },
-                    { text: ".", case: "none" }
-                ],
-                exampleEnglish: "The doctor helps the patient.",
-                clozeParts: ["Der ", " hilft dem Patienten."],
-                clozeAnswers: ["Arzt"]
-            } as Noun,
-            {
-                id: createWordId("berufe-medizin-002"),
-                wordType: 'noun',
-                german: "Krankenschwester",
-                article: "die",
-                plural: "Krankenschwestern",
-                english: "nurse",
-                exampleGerman: [
-                    { text: "Die", case: "none" },
-                    { text: " ", case: "none" },
-                    { text: "Krankenschwester", case: "nominativ" },
-                    { text: " ", case: "none" },
-                    { text: "arbeitet", case: "verb" },
-                    { text: " ", case: "none" },
-                    { text: "im", case: "none" },
-                    { text: " ", case: "none" },
-                    { text: "Krankenhaus", case: "dativ" },
-                    { text: ".", case: "none" }
-                ],
-                exampleEnglish: "The nurse works in the hospital.",
-                clozeParts: ["Die ", " arbeitet im Krankenhaus."],
-                clozeAnswers: ["Krankenschwester"]
-            } as Noun
-        ],
-        "Lehrende Berufe": [
-            {
-                id: createWordId("berufe-lehre-001"),
-                wordType: 'noun',
-                german: "Lehrer",
-                article: "der",
-                plural: "Lehrer",
-                english: "teacher",
-                exampleGerman: [
-                    { text: "Der", case: "none" },
-                    { text: " ", case: "none" },
-                    { text: "Lehrer", case: "nominativ" },
-                    { text: " ", case: "none" },
-                    { text: "erklärt", case: "verb" },
-                    { text: " ", case: "none" },
-                    { text: "die", case: "none" },
-                    { text: " ", case: "none" },
-                    { text: "Grammatik", case: "akkusativ" },
-                    { text: ".", case: "none" }
-                ],
-                exampleEnglish: "The teacher explains the grammar.",
-                clozeParts: ["Der ", " erklärt die Grammatik."],
-                clozeAnswers: ["Lehrer"]
-            } as Noun
-        ]
-    }
-});
+### Beispiel 2: Verb aus vokabular_lernen.ts
+```typescript
+{
+    id: createWordId("lernen-sprachenlernen-005"),
+    wordType: 'verb',
+    german: "schreiben",
+    english: "to write",
+    separable: false,
+    auxiliaryVerb: "haben",
+    pastParticiple: "geschrieben",
+    presentConjugation: { 
+        ich: "schreibe", 
+        du: "schreibst", 
+        er: "schreibt", 
+        wir: "schreiben", 
+        ihr: "schreibt", 
+        sie: "schreiben" 
+    },
+    imperative: { 
+        du: "Schreib!", 
+        ihr: "Schreibt!" 
+    },
+    exampleGerman: [
+        { text: "Ich", case: "nominativ" },
+        { text: " ", case: "none" },
+        { text: "schreibe", case: "verb" },
+        { text: " ", case: "none" },
+        { text: "einen", case: "none" },
+        { text: " ", case: "none" },
+        { text: "Brief", case: "akkusativ" },
+        { text: ".", case: "none" }
+    ],
+    exampleEnglish: "I am writing a letter.",
+    clozeParts: ["Ich ", " einen Brief."],
+    clozeAnswers: ["schreibe"]
+} as Verb
+```
+
+### Beispiel 3: Trennbare Verben aus vokabular_person.ts
+```typescript
+{
+    id: createWordId("person-telefon-003"),
+    wordType: 'verb',
+    german: "anrufen",
+    english: "to call (by phone)",
+    separable: true,
+    auxiliaryVerb: "haben",
+    pastParticiple: "angerufen",
+    exampleGerman: [
+        { text: "Ich", case: "nominativ" },
+        { text: " ", case: "none" },
+        { text: "rufe", case: "verb" },
+        { text: " ", case: "none" },
+        { text: "dich", case: "akkusativ" },
+        { text: " ", case: "none" },
+        { text: "morgen", case: "none" },
+        { text: " ", case: "none" },
+        { text: "an", case: "verb" },
+        { text: ".", case: "none" }
+    ],
+    exampleEnglish: "I will call you tomorrow.",
+    clozeParts: ["Ich rufe dich morgen ", "."],
+    clozeAnswers: ["an"]
+} as Verb
+```
+
+### Beispiel 4: Adjektive aus vokabular_person.ts
+```typescript
+{
+    id: createWordId("person-alter-001"),
+    wordType: 'adjective',
+    german: "alt",
+    english: "old",
+    exampleGerman: [
+        { text: "Wie", case: "none" },
+        { text: " ", case: "none" },
+        { text: "alt", case: "none" },
+        { text: " ", case: "none" },
+        { text: "bist", case: "verb" },
+        { text: " ", case: "none" },
+        { text: "du", case: "nominativ" },
+        { text: "?", case: "none" }
+    ],
+    exampleEnglish: "How old are you?",
+    clozeParts: ["Wie ", " bist du?"],
+    clozeAnswers: ["alt"]
+} as Adjective
+```
+
+### Beispiel 5: Nomen ohne Plural aus vokabular_lernen.ts
+```typescript
+{
+    id: createWordId("lernen-schuleunterricht-002"),
+    wordType: 'noun',
+    german: "Unterricht",
+    article: "der",
+    plural: null, // oft ohne Plural
+    english: "lesson(s) / class",
+    exampleGerman: [
+        { text: "Wir", case: "nominativ" },
+        { text: " ", case: "none" },
+        { text: "haben", case: "verb" },
+        { text: " ", case: "none" },
+        { text: "bis", case: "none" },
+        { text: " ", case: "none" },
+        { text: "ein", case: "none" },
+        { text: " ", case: "none" },
+        { text: "Uhr", case: "none" },
+        { text: " ", case: "none" },
+        { text: "Unterricht", case: "akkusativ" },
+        { text: ".", case: "none" }
+    ],
+    exampleEnglish: "We have lessons until one o'clock.",
+    clozeParts: ["Wir haben bis ein Uhr ", "."],
+    clozeAnswers: ["Unterricht"]
+} as Noun
 ```
 
 ## 🔄 Integration in den Trainer
