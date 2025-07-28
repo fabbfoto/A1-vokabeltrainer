@@ -50,12 +50,27 @@ export async function speak(text: string, lang: string = 'de-DE'): Promise<void>
   }
 }
 
+import { TRAINER_CONSTANTS } from '../core/types/trainer';
+
 export function vergleicheAntwort(userAnswer: string, correctAnswer: string, { ignorePunctuation = false, caseSensitive = false } = {}): boolean {
+  // KRITISCHER SCHUTZ: Verwende Konstanten für Standardwerte
+  const defaultCaseSensitive = TRAINER_CONSTANTS.ANSWER_COMPARISON.DEFAULT_CASE_SENSITIVE;
+  const defaultIgnorePunctuation = TRAINER_CONSTANTS.ANSWER_COMPARISON.IGNORE_PUNCTUATION_DEFAULT;
+  
+  // Verwende Standardwerte falls nicht explizit gesetzt
+  const finalCaseSensitive = caseSensitive ?? defaultCaseSensitive;
+  const finalIgnorePunctuation = ignorePunctuation ?? defaultIgnorePunctuation;
+  
+  // WARNUNG: Überwache kritische Einstellungen
+  if (finalCaseSensitive === false) {
+    console.warn('⚠️ ACHTUNG: caseSensitive ist false - Groß-/Kleinschreibung wird ignoriert!');
+  }
+  
   let processedUserAnswer = userAnswer.trim();
   let processedCorrectAnswer = correctAnswer.trim();
   
   // Nur zu Kleinbuchstaben konvertieren, wenn caseSensitive = false
-  if (!caseSensitive) {
+  if (!finalCaseSensitive) {
     processedUserAnswer = processedUserAnswer.toLowerCase();
     processedCorrectAnswer = processedCorrectAnswer.toLowerCase();
   }
@@ -65,10 +80,16 @@ export function vergleicheAntwort(userAnswer: string, correctAnswer: string, { i
   processedUserAnswer = processedUserAnswer.replace(artikelRegex, '');
   processedCorrectAnswer = processedCorrectAnswer.replace(artikelRegex, '');
   
-  if (ignorePunctuation) {
+  if (finalIgnorePunctuation) {
     const punctuationRegex = /[.,;:!?'"„"»«]/g;
     processedUserAnswer = processedUserAnswer.replace(punctuationRegex, "");
     processedCorrectAnswer = processedCorrectAnswer.replace(punctuationRegex, "");
+  }
+  
+  // KRITISCHER SCHUTZ: ß und ss sind NICHT äquivalent
+  if (TRAINER_CONSTANTS.SPECIAL_CHARS.SS_BETA_DISTINCT) {
+    // Keine automatische Konvertierung zwischen ß und ss
+    // Sie müssen exakt übereinstimmen
   }
   
   return processedUserAnswer === processedCorrectAnswer;

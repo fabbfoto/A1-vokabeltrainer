@@ -456,3 +456,57 @@ export type DOMElement = HTMLElement;
 export interface DOMElements {
   [key: string]: HTMLElement | null;
 }
+
+// ========== KRITISCHE TRAINER-KONSTANTEN ==========
+// Diese Konstanten sollten NIEMALS überschrieben werden
+export const TRAINER_CONSTANTS = {
+  // Authentifizierung
+  AUTH: {
+    MIN_USERNAME_LENGTH: 6,
+    MIN_PASSWORD_LENGTH: 6,
+    ANONYMOUS_EMAIL_SUFFIX: '@gmail.com'
+  },
+  
+  // Antwort-Vergleich
+  ANSWER_COMPARISON: {
+    DEFAULT_CASE_SENSITIVE: false,
+    SPELLING_MODE_CASE_SENSITIVE: true,
+    CLOZE_MODE_CASE_SENSITIVE: true,
+    SENTENCE_MODE_CASE_SENSITIVE: true,
+    IGNORE_PUNCTUATION_DEFAULT: false
+  },
+  
+  // Umlaute und Sonderzeichen
+  SPECIAL_CHARS: {
+    UMLAUTS: {
+      'ä': 'ae',
+      'ö': 'oe', 
+      'ü': 'ue',
+      'Ä': 'AE',
+      'Ö': 'OE',
+      'Ü': 'UE',
+      'ß': 'ss'
+    },
+    // WICHTIG: ß und ss sind NICHT äquivalent
+    SS_BETA_DISTINCT: true
+  },
+  
+  // Test-Modi
+  TEST_MODES: {
+    LEARNING_MODE: 'learning',
+    TEST_MODE: 'test',
+    EVALUATION_MODE: 'evaluation'
+  },
+  
+  // Progress-Speicherung
+  PROGRESS: {
+    AUTO_SAVE_INTERVAL: 30000, // 30 Sekunden
+    FORCE_SAVE_ON_MODE_CHANGE: true,
+    BACKUP_LOCAL_STORAGE: true
+  }
+} as const;
+
+// Type für die Konstanten (readonly)
+export type TrainerConstants = typeof TRAINER_CONSTANTS;
+
+// ========== ENDE KRITISCHE TRAINER-KONSTANTEN ==========

@@ -43,6 +43,10 @@ import { memoryManager } from './src/utils/memory-manager';
 import { GestureHandler } from './src/utils/gesture-handler';
 import { MobileSettings } from './src/ui/components/mobile-settings';
 
+// KRITISCHER SCHUTZ: Konfigurations-Validator
+import { ConfigValidator } from './src/utils/config-validator';
+import { TRAINER_CONSTANTS } from './src/core/types/trainer';
+
 // Service Worker registrieren
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -451,6 +455,16 @@ async function createAuthButton() {
 // ========== ENDE AUTH BUTTON ==========
 
 document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
+
+    // KRITISCHER SCHUTZ: Validiere kritische Einstellungen beim Start
+    try {
+        ConfigValidator.enforceCriticalSettings();
+        console.log('✅ Kritische Einstellungen validiert');
+    } catch (error) {
+        console.error('❌ KRITISCHER FEHLER: Kritische Einstellungen wurden überschrieben!', error);
+        alert('KRITISCHER FEHLER: Kritische Einstellungen wurden überschrieben! Bitte prüfe die Konfiguration.');
+        return;
+    }
 
     // NEU: Supabase Auth initialisieren
     let authUI: AuthUI = {
