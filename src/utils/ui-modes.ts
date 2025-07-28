@@ -496,9 +496,9 @@ export function setupSpellingMode(
 
             
             // Separate Prüfung für jedes Feld
-            const isArticleCorrect = needsArticleForWord ? vergleicheAntwort(userInputArticle, correctArticle) : true;
-            const isSingularCorrect = vergleicheAntwort(userInputSingular, correctSingular);
-            const isPluralCorrect = vergleicheAntwort(userInputPlural, correctPlural);
+            const isArticleCorrect = needsArticleForWord ? vergleicheAntwort(userInputArticle, correctArticle, { caseSensitive: true }) : true;
+            const isSingularCorrect = vergleicheAntwort(userInputSingular, correctSingular, { caseSensitive: true });
+            const isPluralCorrect = vergleicheAntwort(userInputPlural, correctPlural, { caseSensitive: true });
             
             // NEU: Benutzerantwort für Test-Protokollierung
             const userAnswer = needsArticleForWord ? 
@@ -674,7 +674,7 @@ export function setupSpellingMode(
                 userInputLength: userInput.length,
                 correctAnswerLength: correctAnswer.length
             });
-            const isCorrect = vergleicheAntwort(userInput, correctAnswer);
+            const isCorrect = vergleicheAntwort(userInput, correctAnswer, { caseSensitive: true });
             console.log('→ vergleicheAntwort Ergebnis:', isCorrect);
             
 
@@ -904,7 +904,7 @@ function generateClozeUI(
         inputs.forEach((input, index) => {
             const userAnswer = input.value.trim();
             const correctAnswer = clozeAnswers[index];
-            const isCorrect = vergleicheAntwort(userAnswer, correctAnswer);
+            const isCorrect = vergleicheAntwort(userAnswer, correctAnswer, { caseSensitive: true });
             
             // 4.4 Cloze: Farbfeedback nur im Lern-Modus
             if (!state.test.isTestModeActive) {
