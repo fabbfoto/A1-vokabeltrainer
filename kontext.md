@@ -247,3 +247,160 @@ Folgende Wörter wurden bei "Räume und Gebäude" gefunden, gehören aber in and
 
 **Letzte Aktualisierung:** Start der Reorganisation
 **Nächster Meilenstein:** Erste Kategorie "Alltag, Wohnen" fertigstellen
+# A2 Wortliste Konvertierungsplan
+
+## 🎯 Ziel
+Konvertierung der Excel-Datei `A2Wortliste.xlsx` (1400+ Wörter) in ein TypeScript-basiertes System, das Claude nutzen kann um daraus Vokabular-Dateien für den Deutsch-Trainer zu erstellen.
+
+## 📋 Ausgangslage
+
+### Was wir haben:
+- **Excel-Datei** `A2Wortliste.xlsx` mit 2 Sheets:
+  - Sheet 1 "A2-a-z": 1207 Wörter alphabetisch
+  - Sheet 2 "a2-Wortgruppen 2": 200+ zusätzliche Wörter
+- **Spalten-Struktur:**
+  - Wort
+  - Artikel (bei Nomen) / 3. Person Singular (bei Verben)  
+  - Plural (bei Nomen) / Perfekt (bei Verben)
+  - Wortart
+  - Englisch
+  - Beispielsatz Deutsch
+  - Beispielsatz Englisch
+  - Thema
+  - Verwendet (TRUE/FALSE)
+
+### Das Problem:
+- Claude kann Excel-Dateien nicht direkt einsehen
+- Die Datei ist zu groß für ständige Neubearbeitung
+- Wir müssen nachverfolgen, welche Wörter bereits verwendet wurden
+
+## 💡 Die Lösung: Master-Datei + Tracking-System
+
+### 1. Master-Datei (`a2-master.ts`)
+Eine große TypeScript-Datei mit ALLEN Wörtern:
+```typescript
+export interface A2Word {
+  id: number;
+  wort: string;
+  artikel?: string;
+  plural?: string;
+  wortart: string;
+  englisch: string;
+  beispielDeutsch: string;
+  beispielEnglisch: string;
+  thema: string;
+}
+
+export const A2_MASTER: A2Word[] = [
+  {
+    id: 1,
+    wort: "abholen",
+    artikel: "holt ab",
+    plural: "hat abgeholt",
+    wortart: "Verb",
+    englisch: "to pick up",
+    beispielDeutsch: "Wann kann ich die Sachen bei dir abholen?",
+    beispielEnglisch: "When can I pick up the things from you?",
+    thema: "Alltag"
+  },
+  // ... weitere 1400+ Einträge
+];
+```
+
+### 2. Tracking-Datei (`verwendet.ts`)
+Eine kleine Datei, die nur die IDs der verwendeten Wörter enthält:
+```typescript
+export const verwendeteWoerterIDs: number[] = [1, 5, 23, 89, ...];
+```
+
+## 🔄 Workflow
+
+### Phase 1: Initiale Konvertierung
+1. **Claude liest Excel mit Analysis-Tool**
+2. **Konvertiert zu TypeScript** (in mehreren Teilen wegen Größe)
+3. **User speichert `a2-master.ts`** ins Projekt
+4. **User erstellt leere `verwendet.ts`** mit `[]`
+
+### Phase 2: Vokabular-Erstellung
+1. **User lädt beide Dateien hoch** (Master + Tracking)
+2. **Claude filtert unbenutzte Wörter** nach Thema
+3. **Claude erstellt neue Vokabular-Datei** (z.B. `vokabular_sicherheit.ts`)
+4. **Claude aktualisiert `verwendet.ts`** mit den neuen IDs
+5. **User speichert beide Dateien**
+
+### Phase 3: Wiederholung
+- Bei jedem neuen Vokabular-Modul wiederholt sich Phase 2
+- Die Master-Datei bleibt unverändert
+- Nur die kleine Tracking-Datei wird aktualisiert
+
+## 📊 Vorteile dieser Lösung
+
+1. **Effizienz**: Master-Datei nur einmal konvertieren
+2. **Übersicht**: Immer klar, welche Wörter noch fehlen
+3. **Klein**: Nur kleine Tracking-Datei muss aktualisiert werden
+4. **Skalierbar**: Funktioniert auch bei 5000+ Wörtern
+
+## 🚀 Nächste Schritte
+
+### Schritt 1: Excel-Konvertierung
+Claude führt aus:
+```javascript
+// 1. Excel einlesen
+// 2. Beide Sheets verarbeiten
+// 3. IDs vergeben (durchnummeriert)
+// 4. TypeScript-Struktur erstellen
+// 5. In Teilen ausgeben (max 500 Einträge pro Ausgabe)
+```
+
+### Schritt 2: Dateien vorbereiten
+User:
+- Speichert alle Teile zu einer `a2-master.ts`
+- Erstellt `verwendet.ts` mit leerem Array
+- Lädt beide ins Projekt
+
+### Schritt 3: Vokabular-Module erstellen
+Claude kann dann:
+- Nach Themen filtern
+- Passende Wörter auswählen
+- Konjugationen ergänzen
+- Beispielsätze in ExampleSentenceParts zerlegen
+- Cloze-Übungen generieren
+
+## ⚠️ Wichtige Hinweise
+
+### Token-Limit
+- Die Master-Datei wird ~1400 Einträge haben
+- Das sind geschätzt 15.000-20.000 Tokens
+- Claude kann das verarbeiten, aber nicht alles auf einmal ausgeben
+
+### Konvertierungs-Details
+Bei der Konvertierung muss Claude:
+1. Umlaute korrekt behandeln (UTF-8)
+2. Anführungszeichen escapen
+3. Fehlende Daten mit `undefined` markieren
+4. IDs fortlaufend vergeben
+
+### Backup
+User sollte:
+- Die Original-Excel behalten
+- Regelmäßig die `verwendet.ts` sichern
+- Bei Problemen von vorne beginnen können
+
+## 📝 Für den Nachfolger-Claude
+
+Wenn du dieses Projekt übernimmst:
+1. Lies diese Dokumentation vollständig
+2. Frage nach `a2-master.ts` und `verwendet.ts`
+3. Check welche IDs bereits verwendet wurden
+4. Erstelle neue Vokabular-Module nach dem beschriebenen Workflow
+5. Vergiss nicht, die `verwendet.ts` zu aktualisieren!
+
+Der User erwartet:
+- Keine händischen Änderungen
+- Automatische Konvertierung
+- Tracking aller verwendeten Wörter
+- Professionelle Vokabular-Dateien im vorgegebenen Format
+
+---
+
+**Status**: Bereit zur Excel-Konvertierung
