@@ -24,7 +24,8 @@ export function getProgressForMode(state: TrainerState, progressKey: string): Se
     if (!state.progress.globalProgress[progressKey][state.training.currentMode!]) {
         state.progress.globalProgress[progressKey][state.training.currentMode!] = new Set();
     }
-    return state.progress.globalProgress[progressKey][state.training.currentMode!];
+    const progress = state.progress.globalProgress[progressKey][state.training.currentMode!];
+    return progress || new Set();
 }
 
 export function setProgressForMode(state: TrainerState, progressKey: string, progress: Set<WordId>): void {
@@ -90,17 +91,21 @@ export function addToErrorList(state: TrainerState): void {
     if (!state.progress.wordsToRepeatByMode[state.training.currentMode]) {
         state.progress.wordsToRepeatByMode[state.training.currentMode] = new Set();
     }
-    state.progress.wordsToRepeatByMode[state.training.currentMode].add(state.training.currentWord.id);
+    const errorSet = state.progress.wordsToRepeatByMode[state.training.currentMode];
+    if (errorSet) {
+        errorSet.add(state.training.currentWord.id);
+    }
 }
 
 export function removeFromErrorList(state: TrainerState): void {
     if (!state.training.currentWord || !state.training.currentMode) return;
     
-    if (state.progress.wordsToRepeatByMode[state.training.currentMode]) {
-        state.progress.wordsToRepeatByMode[state.training.currentMode].delete(state.training.currentWord.id);
+    const errorSet = state.progress.wordsToRepeatByMode[state.training.currentMode];
+    if (errorSet) {
+        errorSet.delete(state.training.currentWord.id);
         
         // Leere Sets entfernen
-        if (state.progress.wordsToRepeatByMode[state.training.currentMode].size === 0) {
+        if (errorSet.size === 0) {
             delete state.progress.wordsToRepeatByMode[state.training.currentMode];
         }
     }
@@ -138,7 +143,9 @@ export function shuffleArray<T>(array: T[]): T[] {
     const shuffled = [...array];
     for (let i = shuffled.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        const temp = shuffled[i]!;
+        shuffled[i] = shuffled[j]!;
+        shuffled[j] = temp;
     }
     return shuffled;
 }

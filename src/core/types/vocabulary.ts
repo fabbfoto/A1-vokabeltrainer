@@ -17,7 +17,7 @@ export type WordType =
   | 'conjunction' 
   | 'interjection';
 
-export type Article = 'der' | 'die' | 'das' | 'der/die' | 'der/das' | 'die/das';
+export type Article = 'der' | 'die' | 'das' | 'der/die' | 'der/das' | 'die/das' | undefined;
 
 export type AuxiliaryVerb = 'haben' | 'sein';
 
@@ -261,8 +261,14 @@ export function getAllWords(vocabulary: VocabularyStructure): Word[] {
   const allWords: Word[] = [];
   
   for (const mainTopic of Object.keys(vocabulary)) {
-    for (const subTopic of Object.keys(vocabulary[mainTopic])) {
-      allWords.push(...vocabulary[mainTopic][subTopic]);
+    const mainTopicData = vocabulary[mainTopic];
+    if (mainTopicData) {
+      for (const subTopic of Object.keys(mainTopicData)) {
+        const subTopicData = mainTopicData[subTopic];
+        if (subTopicData) {
+          allWords.push(...subTopicData);
+        }
+      }
     }
   }
   

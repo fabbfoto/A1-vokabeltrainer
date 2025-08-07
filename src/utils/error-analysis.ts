@@ -46,7 +46,7 @@ export function hasErrorsForMode(mode: string): boolean {
     const wordsToRepeat: WordsToRepeat = JSON.parse(
         localStorage.getItem('trainer-words-to-repeat') || '{}'
     );
-    return wordsToRepeat[mode] && wordsToRepeat[mode].length > 0;
+    return !!(wordsToRepeat[mode] && wordsToRepeat[mode].length > 0);
 }
 
 /**

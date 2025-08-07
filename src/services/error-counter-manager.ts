@@ -97,7 +97,10 @@ export class ErrorCounterManager {
             const toSave: Record<string, WordId[]> = {};
             Object.keys(this.state.progress.wordsToRepeatByMode).forEach(key => {
                 const modeId = key as ModeId;
-                toSave[modeId] = Array.from(this.state.progress.wordsToRepeatByMode[modeId]);
+                const modeData = this.state.progress.wordsToRepeatByMode[modeId];
+                if (modeData) {
+                    toSave[modeId] = Array.from(modeData);
+                }
             });
             
             localStorage.setItem('trainer-words-to-repeat', JSON.stringify(toSave));

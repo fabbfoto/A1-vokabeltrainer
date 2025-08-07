@@ -112,7 +112,7 @@ export function setupUmlautButtons(dom: DOMElements, state: TrainerState): void 
                     } else {
                         const visibleInputs = Array.from(document.querySelectorAll('input[type="text"]:not([disabled])'))
                             .filter(inp => (inp as HTMLElement).offsetParent !== null) as HTMLInputElement[];
-                        if (visibleInputs.length === 1) input = visibleInputs[0];
+                        if (visibleInputs.length === 1) input = visibleInputs[0] || null;
                     }
                 }
                 

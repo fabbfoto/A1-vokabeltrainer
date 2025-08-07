@@ -34,10 +34,10 @@ export function createExampleGermanFromCloze(clozeParts: string[], clozeAnswers:
     // Cloze-Answers und weitere Parts
     for (let i = 0; i < clozeAnswers.length && i < clozeParts.length - 1; i++) {
         if (clozeAnswers[i]) {
-            result.push({ text: clozeAnswers[i], case: "none" });
+            result.push({ text: clozeAnswers[i] || '', case: "none" });
         }
         if (clozeParts[i + 1]) {
-            result.push({ text: clozeParts[i + 1], case: "none" });
+            result.push({ text: clozeParts[i + 1] || '', case: "none" });
         }
     }
     

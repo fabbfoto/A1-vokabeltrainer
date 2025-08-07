@@ -172,7 +172,7 @@ export function updateCategoryStats(dom: DOMElements, state: TrainerState, learn
         // Text-Label
         const label = document.createElement('span');
         label.className = 'text-base font-medium text-gray-700 min-w-[120px]';
-        label.textContent = `${modeInfo.name}: ${masteredCount} / ${totalItemsInSet}`;
+        label.textContent = `${modeInfo?.name || modeId}: ${masteredCount} / ${totalItemsInSet}`;
         
         // Balken-Container (grauer Hintergrund) - größer gemacht
         const barContainer = document.createElement('div');

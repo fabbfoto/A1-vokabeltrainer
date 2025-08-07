@@ -106,7 +106,7 @@ function ensureInputsEnabled() {
 }
 
 // Hilfsfunktion für Länder-Artikel-Logik
-function needsArticle(word: { german: string; article?: string }): boolean {
+function needsArticle(word: { german: string; article?: string | undefined }): boolean {
     // Länder mit Artikel: Schweiz, Türkei, Ukraine, Niederlande, etc.
     const countriesWithArticle = [
         'Schweiz', 'Türkei', 'Ukraine', 'Niederlande', 'Philippinen', 'Bahamas',
@@ -416,7 +416,7 @@ export function setupSpellingMode(
     }
 
     // Zeige das englische Wort oben
-    dom.questionDisplayEl.textContent = currentWord.english.split(',')[0].trim();
+    dom.questionDisplayEl.textContent = currentWord.english?.split(',')[0]?.trim() || '';
 
     // Zeige den englischen Beispielsatz darunter
     const englishExample = (currentWord as { exampleEnglish?: string; example_en?: string }).exampleEnglish || (currentWord as { exampleEnglish?: string; example_en?: string }).example_en || "";
@@ -904,7 +904,7 @@ function generateClozeUI(
         inputs.forEach((input, index) => {
             const userAnswer = input.value.trim();
             const correctAnswer = clozeAnswers[index];
-            const isCorrect = vergleicheAntwort(userAnswer, correctAnswer, { caseSensitive: true });
+            const isCorrect = vergleicheAntwort(userAnswer, correctAnswer || '', { caseSensitive: true });
             
             // 4.4 Cloze: Farbfeedback nur im Lern-Modus
             if (!state.test.isTestModeActive) {

@@ -99,7 +99,9 @@ export function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    const temp = shuffled[i]!;
+    shuffled[i] = shuffled[j]!;
+    shuffled[j] = temp;
   }
   return shuffled;
 }
@@ -203,10 +205,10 @@ export function parseNounString(nounString: string): ParsedNoun | null {
     return null;
   }
   
-  const firstPart = parts[0].trim();
+  const firstPart = parts[0]?.trim() || '';
   const genus = firstPart.charAt(0);
   const singular = firstPart.substring(1).trim();
-  const pluralInfo = parts[1].trim();
+  const pluralInfo = parts[1]?.trim() || '';
   return { genus, singular, pluralInfo, isPluralOnly: false };
 }
 

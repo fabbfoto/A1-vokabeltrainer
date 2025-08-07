@@ -1885,15 +1885,17 @@ export const vokabularPerson: VocabularyStructure = createVocabulary({
     const stats = {
         totalWords: 0,
         wordsByType: {} as Record<string, number>,
-        subTopics: Object.keys(vokabularPerson.Person)
+        subTopics: vokabularPerson.Person ? Object.keys(vokabularPerson.Person) : []
     };
  
-    Object.values(vokabularPerson.Person).forEach(subTopic => {
-        stats.totalWords += subTopic.length;
-        subTopic.forEach(word => {
-            stats.wordsByType[word.wordType] = (stats.wordsByType[word.wordType] || 0) + 1;
+    if (vokabularPerson.Person) {
+        Object.values(vokabularPerson.Person).forEach(subTopic => {
+            stats.totalWords += subTopic.length;
+            subTopic.forEach(word => {
+                stats.wordsByType[word.wordType] = (stats.wordsByType[word.wordType] || 0) + 1;
+            });
         });
-    });
+    }
  
     return stats;
  };

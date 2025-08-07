@@ -25,7 +25,7 @@ export interface ErrorLog {
     category: ErrorCategory;
     message: string;
     details?: any;
-    stack?: string;
+    stack?: string | undefined;
     context?: Record<string, any>;
     userId?: string;
     sessionId?: string;
@@ -65,7 +65,7 @@ export class ErrorHandler {
             category,
             message,
             details,
-            stack: new Error().stack,
+            stack: new Error().stack || undefined,
             context: {
                 ...context,
                 url: window.location.href,

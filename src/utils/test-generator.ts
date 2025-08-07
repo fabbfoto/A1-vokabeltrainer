@@ -40,7 +40,9 @@ function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    const temp = shuffled[i]!;
+    shuffled[i] = shuffled[j]!;
+    shuffled[j] = temp;
   }
   return shuffled;
 }
@@ -80,12 +82,14 @@ export function generateTestQuestions(
   if (scope === 'global') {
     Object.keys(vokabular).forEach(mainTopicKey => {
       const mainTopic = vokabular[mainTopicKey];
-      Object.keys(mainTopic).forEach(subTopicKey => {
-        const subTopic = mainTopic[subTopicKey];
-        if (Array.isArray(subTopic)) {
-          allWords.push(...(subTopic as Word[]));
-        }
-      });
+      if (mainTopic) {
+        Object.keys(mainTopic).forEach(subTopicKey => {
+          const subTopic = mainTopic[subTopicKey];
+          if (Array.isArray(subTopic)) {
+            allWords.push(...(subTopic as Word[]));
+          }
+        });
+      }
     });
     console.log(`Globaler Test: ${allWords.length} Wörter gefunden`);
   } else if (scope === 'mainTopic' && topicId) {
@@ -114,8 +118,10 @@ export function generateTestQuestions(
     // Erstelle Rotation für Chaos-Modus
     Object.keys(modeDistribution).forEach(mode => {
       const count = modeDistribution[mode as ModeId];
-      for (let i = 0; i < count; i++) {
-        modeRotation.push(mode as ModeId);
+      if (count) {
+        for (let i = 0; i < count; i++) {
+          modeRotation.push(mode as ModeId);
+        }
       }
     });
     modeRotation = shuffleArray(modeRotation);
@@ -156,16 +162,18 @@ function generateGlobalRankingTest(
   
   Object.keys(vokabular).forEach(mainTopicKey => {
     const mainTopic = vokabular[mainTopicKey];
-    Object.keys(mainTopic).forEach(subTopicKey => {
-      const subTopic = mainTopic[subTopicKey];
-      if (Array.isArray(subTopic)) {
-        const category = getCategoryFromTopic(mainTopicKey, subTopicKey);
-        if (!wordsByCategory[category]) {
-          wordsByCategory[category] = [];
+    if (mainTopic) {
+      Object.keys(mainTopic).forEach(subTopicKey => {
+        const subTopic = mainTopic[subTopicKey];
+        if (Array.isArray(subTopic)) {
+          const category = getCategoryFromTopic(mainTopicKey, subTopicKey);
+          if (!wordsByCategory[category]) {
+            wordsByCategory[category] = [];
+          }
+          wordsByCategory[category].push(...(subTopic as Word[]));
         }
-        wordsByCategory[category].push(...(subTopic as Word[]));
-      }
-    });
+      });
+    }
   });
   
   console.log('Debug: Gefundene Kategorien:', Object.keys(wordsByCategory));
@@ -189,12 +197,14 @@ function generateGlobalRankingTest(
     const allWords: Word[] = [];
     Object.keys(vokabular).forEach(mainTopicKey => {
       const mainTopic = vokabular[mainTopicKey];
-      Object.keys(mainTopic).forEach(subTopicKey => {
-        const subTopic = mainTopic[subTopicKey];
-        if (Array.isArray(subTopic)) {
-          allWords.push(...(subTopic as Word[]));
-        }
-      });
+      if (mainTopic) {
+        Object.keys(mainTopic).forEach(subTopicKey => {
+          const subTopic = mainTopic[subTopicKey];
+          if (Array.isArray(subTopic)) {
+            allWords.push(...(subTopic as Word[]));
+          }
+        });
+      }
     });
     const shuffled = shuffleArray(allWords);
     selectedWords.push(...shuffled.slice(0, totalQuestions));
@@ -228,7 +238,9 @@ function generateGlobalRankingTest(
   
   finalMapping.forEach(({ testMode }) => {
     const mode = CATEGORY_MODE_MAP[testMode];
-    modeDistribution[mode]++;
+    if (mode && modeDistribution[mode] !== undefined) {
+      modeDistribution[mode]++;
+    }
   });
   
   console.log('✅ Globaler Ranglisten-Test generiert:');
@@ -286,15 +298,20 @@ function distributeAcrossSubtopics(words: Word[], count: number): Word[] {
   
   subtopics.forEach(subtopic => {
     const subtopicWords = wordsBySubtopic[subtopic];
-    const shuffled = shuffleArray(subtopicWords);
-    selected.push(...shuffled.slice(0, wordsPerSubtopic));
+    if (subtopicWords) {
+      const shuffled = shuffleArray(subtopicWords);
+      selected.push(...shuffled.slice(0, wordsPerSubtopic));
+    }
   });
   
   // Fülle auf falls nötig
   while (selected.length < count && words.length > selected.length) {
     const remaining = words.filter(w => !selected.some(selectedWord => selectedWord.id === w.id));
     if (remaining.length > 0) {
-      selected.push(remaining[Math.floor(Math.random() * remaining.length)]);
+      const randomWord = remaining[Math.floor(Math.random() * remaining.length)];
+      if (randomWord) {
+        selected.push(randomWord);
+      }
     } else {
       break;
     }

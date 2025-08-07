@@ -316,10 +316,16 @@ export function fromFirestoreTimestamp(timestamp: Date): Date {
 export function convertProgressToFirestore(progress: Record<string, Record<string, Set<string>>>): Record<string, Record<string, string[]>> {
     const result: Record<string, Record<string, string[]>> = {};
     Object.keys(progress).forEach(topicKey => {
-        result[topicKey] = {};
-        Object.keys(progress[topicKey]).forEach(mode => {
-            result[topicKey][mode] = Array.from(progress[topicKey][mode]);
-        });
+        const topicData = progress[topicKey];
+        if (topicData) {
+            result[topicKey] = {};
+            Object.keys(topicData).forEach(mode => {
+                const modeData = topicData[mode];
+                if (modeData && result[topicKey]) {
+                    result[topicKey][mode] = Array.from(modeData);
+                }
+            });
+        }
     });
     return result;
 }
@@ -327,10 +333,16 @@ export function convertProgressToFirestore(progress: Record<string, Record<strin
 export function convertProgressFromFirestore(progress: Record<string, Record<string, string[]>>): Record<string, Record<string, Set<string>>> {
     const result: Record<string, Record<string, Set<string>>> = {};
     Object.keys(progress).forEach(topicKey => {
-        result[topicKey] = {};
-        Object.keys(progress[topicKey]).forEach(mode => {
-            result[topicKey][mode] = new Set(progress[topicKey][mode]);
-        });
+        const topicData = progress[topicKey];
+        if (topicData) {
+            result[topicKey] = {};
+            Object.keys(topicData).forEach(mode => {
+                const modeData = topicData[mode];
+                if (modeData && result[topicKey]) {
+                    result[topicKey][mode] = new Set(modeData);
+                }
+            });
+        }
     });
     return result;
 }

@@ -17,8 +17,8 @@ export class GestureHandler {
 
   private handleTouchStart(event: TouchEvent): void {
     if (event.touches.length === 1) {
-      this.startX = event.touches[0].clientX;
-      this.startY = event.touches[0].clientY;
+      this.startX = event.touches[0]?.clientX || 0;
+      this.startY = event.touches[0]?.clientY || 0;
       this.isTracking = true;
     }
   }
@@ -26,8 +26,8 @@ export class GestureHandler {
   private handleTouchMove(event: TouchEvent): void {
     if (!this.isTracking) return;
     
-    const currentX = event.touches[0].clientX;
-    const currentY = event.touches[0].clientY;
+    const currentX = event.touches[0]?.clientX || 0;
+    const currentY = event.touches[0]?.clientY || 0;
     
     const deltaX = Math.abs(currentX - this.startX);
     const deltaY = Math.abs(currentY - this.startY);
@@ -41,8 +41,8 @@ export class GestureHandler {
   private handleTouchEnd(event: TouchEvent): void {
     if (!this.isTracking) return;
     
-    const endX = event.changedTouches[0].clientX;
-    const endY = event.changedTouches[0].clientY;
+    const endX = event.changedTouches[0]?.clientX || 0;
+    const endY = event.changedTouches[0]?.clientY || 0;
     
     const deltaX = endX - this.startX;
     const deltaY = endY - this.startY;

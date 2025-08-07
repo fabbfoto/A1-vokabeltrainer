@@ -617,7 +617,9 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                   // Füge Cloud-Daten hinzu
                   cloudData.forEach(id => mergedSet.add(id as WordId));
                   
-                  state.progress.globalProgress[topicKey][mode as ModeId] = mergedSet;
+                  if (state.progress.globalProgress[topicKey]) {
+                      state.progress.globalProgress[topicKey][mode as ModeId] = mergedSet;
+                  }
                   console.log(`Merged ${topicKey}/${mode}: ${mergedSet.size} Wörter`);
                 }
               });
@@ -695,19 +697,24 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 
                 if (cloudProgress) {
                     console.log('✅ Cloud-Progress geladen:', cloudProgress);
-                    // Konvertiere Arrays zurück zu Sets
+                                        // Konvertiere Arrays zurück zu Sets
                     state.progress.globalProgress = {};
                     Object.keys(cloudProgress).forEach(topicKey => {
-                        (state.progress.globalProgress as any)[topicKey] = {};
-                        if (typeof (cloudProgress as any)[topicKey] === 'object' && (cloudProgress as any)[topicKey] !== null) {
-                            Object.keys((cloudProgress as any)[topicKey]).forEach(mode => {
-                                const data = (cloudProgress as any)[topicKey][mode];
-                                if (Array.isArray(data)) {
-                                    state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
-                                } else if (data instanceof Set) {
-                                    state.progress.globalProgress[topicKey][mode as ModeId] = data;
-                                } else {
-                                    state.progress.globalProgress[topicKey][mode as ModeId] = new Set();
+                        if (!state.progress.globalProgress[topicKey]) {
+                            state.progress.globalProgress[topicKey] = {};
+                        }
+                        const topicData = (cloudProgress as any)[topicKey];
+                        if (topicData && typeof topicData === 'object') {
+                            Object.keys(topicData).forEach(mode => {
+                                const data = topicData[mode];
+                                if (state.progress.globalProgress[topicKey]) {
+                                    if (Array.isArray(data)) {
+                                        state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
+                                    } else if (data instanceof Set) {
+                                        state.progress.globalProgress[topicKey][mode as ModeId] = data;
+                                    } else {
+                                        state.progress.globalProgress[topicKey][mode as ModeId] = new Set();
+                                    }
                                 }
                             });
                         }
@@ -761,12 +768,14 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                     if (typeof parsed[topicKey] === 'object' && parsed[topicKey] !== null) {
                         Object.keys(parsed[topicKey]).forEach(mode => {
                             const data = parsed[topicKey][mode];
-                            if (Array.isArray(data)) {
-                                state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
-                            } else if (data instanceof Set) {
-                                state.progress.globalProgress[topicKey][mode as ModeId] = data;
-                            } else {
-                                state.progress.globalProgress[topicKey][mode as ModeId] = new Set();
+                            if (state.progress.globalProgress[topicKey]) {
+                                if (Array.isArray(data)) {
+                                    state.progress.globalProgress[topicKey][mode as ModeId] = new Set(data);
+                                } else if (data instanceof Set) {
+                                    state.progress.globalProgress[topicKey][mode as ModeId] = data;
+                                } else {
+                                    state.progress.globalProgress[topicKey][mode as ModeId] = new Set();
+                                }
                             }
                         });
                     } else {
@@ -808,15 +817,18 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                 // Konvertiere Sets zu Arrays für JSON
                 const progressToSave: any = {};
                 Object.keys(state.progress.globalProgress).forEach(topicKey => {
-                    progressToSave[topicKey] = {};
-                    Object.keys(state.progress.globalProgress[topicKey]).forEach(mode => {
-                        const data = state.progress.globalProgress[topicKey][mode];
-                        if (data instanceof Set) {
-                            progressToSave[topicKey][mode] = Array.from(data);
-                        } else {
-                            progressToSave[topicKey][mode] = data;
-                        }
-                    });
+                    const topicData = state.progress.globalProgress[topicKey];
+                    if (topicData) {
+                        progressToSave[topicKey] = {};
+                        Object.keys(topicData).forEach(mode => {
+                            const data = topicData[mode];
+                            if (data instanceof Set) {
+                                progressToSave[topicKey][mode] = Array.from(data);
+                            } else {
+                                progressToSave[topicKey][mode] = data;
+                            }
+                        });
+                    }
                 });
                 
                 // Async speichern mit Rückgabewert-Verarbeitung
@@ -1447,10 +1459,15 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
                         if (state.progress.perfectRunsByMode[state.training.currentMode] === undefined) {
                             state.progress.perfectRunsByMode[state.training.currentMode] = 0;
                         }
-                        state.progress.perfectRunsByMode[state.training.currentMode]++;
+                        if (state.training.currentMode) {
+                            const currentRuns = state.progress.perfectRunsByMode[state.training.currentMode];
+                            if (currentRuns !== undefined) {
+                                state.progress.perfectRunsByMode[state.training.currentMode] = currentRuns + 1;
+                            }
+                        }
                         savePerfectRuns();
                         
-                        const runCount = state.progress.perfectRunsByMode[state.training.currentMode];
+                        const runCount = state.training.currentMode ? state.progress.perfectRunsByMode[state.training.currentMode] : 0;
                         const runText = runCount === 1 ? '1. Durchlauf' : `${runCount}. Durchlauf`;
                         ui.showSuccessPopup(dom, state);
                     } else {
@@ -1465,13 +1482,15 @@ document.addEventListener('DOMContentLoaded', async (): Promise<void> => {
         }
         
         // Hole nächstes Wort
-        state.training.currentWord = state.training.shuffledWordsForMode[state.training.currentWordIndex];
+        const nextWord = state.training.shuffledWordsForMode[state.training.currentWordIndex];
+        state.training.currentWord = nextWord || null;
         
         // Mode-Rotation NUR für Chaos-Test
         if (state.test.isTestModeActive && state.test.currentTest) {
             if (state.test.currentTest.variant === 'chaos') {
                 // Chaos-Test: Rotation durch verschiedene Modi
-                state.training.currentMode = state.test.testModeRotation[state.test.currentTestModeIndex % state.test.testModeRotation.length];
+                const nextMode = state.test.testModeRotation[state.test.currentTestModeIndex % state.test.testModeRotation.length];
+                state.training.currentMode = nextMode || null;
                 state.test.currentTestModeIndex++;
                 console.log('🎯 Chaos-Test Modus:', state.training.currentMode);
             } else if (state.test.currentTest.variant === 'structured' && state.test.currentTest.selectedCategory) {

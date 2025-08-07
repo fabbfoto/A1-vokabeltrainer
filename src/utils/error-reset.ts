@@ -73,7 +73,7 @@ export function resetAllErrorCounts(
  */
 export function hasErrorCounts(state: { progress: { wordsToRepeatByMode: Record<string, Set<string>> } }, modeId: ModeId): boolean {
     const errorSet = state.progress.wordsToRepeatByMode[modeId];
-    return errorSet && errorSet.size > 0;
+    return !!(errorSet && errorSet.size > 0);
 }
 
 /**

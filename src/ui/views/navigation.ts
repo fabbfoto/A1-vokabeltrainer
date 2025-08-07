@@ -125,11 +125,14 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
     Object.keys(vokabular).forEach(mainTopicName => {
         let totalWords = 0;
         let totalMastered = 0;
-        Object.keys(vokabular[mainTopicName]).forEach(subTopicName => {
-            const words = vokabular[mainTopicName][subTopicName];
-            const progressKey = `${mainTopicName}|${subTopicName}`;
-            const progressForKey = state.progress.globalProgress[progressKey] || {};
-            totalWords += words.length * numberOfModes;
+        const mainTopicData = vokabular[mainTopicName];
+        if (mainTopicData) {
+            Object.keys(mainTopicData).forEach(subTopicName => {
+                const words = mainTopicData[subTopicName];
+                if (words) {
+                    const progressKey = `${mainTopicName}|${subTopicName}`;
+                    const progressForKey = state.progress.globalProgress[progressKey] || {};
+                    totalWords += words.length * numberOfModes;
             Object.keys(learningModes).forEach(modeId => {
                 const masteredSet = progressForKey[modeId as ModeId];
                 if (masteredSet instanceof Set) {
@@ -138,7 +141,9 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
                     totalMastered += (masteredSet as string[]).length;
                 }
             });
-        });
+                }
+            });
+        }
 
         const percentage = calculateProgressPercentage(totalMastered, totalWords);
         const progressColorClass = getProgressColorClass(totalMastered, totalWords);
@@ -216,11 +221,15 @@ export function displayMainTopics(dom: DOMElements, state: TrainerState, vokabul
 export function displaySubTopics(dom: DOMElements, state: TrainerState, vokabular: VocabularyStructure, mainTopicName: TopicId, learningModes: LearningModes): void {
     dom.navigationContainerEl.innerHTML = '';
     dom.navigationContainerEl.className = 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-max';
-    const subTopics = Object.keys(vokabular[mainTopicName]);
+    const mainTopicData = vokabular[mainTopicName];
+    if (!mainTopicData) return;
+    
+    const subTopics = Object.keys(mainTopicData);
     const numberOfModes = Object.keys(learningModes).length;
 
     subTopics.forEach(subTopicName => {
-        const words = vokabular[mainTopicName][subTopicName];
+        const words = mainTopicData[subTopicName];
+        if (!words) return;
         const totalPossibleTasks = words.length * numberOfModes;
         const progressKey = `${mainTopicName}|${subTopicName}`;
         const progressForKey = state.progress.globalProgress[progressKey] || {};
