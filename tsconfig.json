@@ -38,7 +38,7 @@
     "exactOptionalPropertyTypes": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": false,
+    "noUncheckedIndexedAccess": true,
     "noPropertyAccessFromIndexSignature": false,
     "verbatimModuleSyntax": false,
     "isolatedModules": true,
@@ -54,7 +54,6 @@
     "emitDecoratorMetadata": true,
     "useDefineForClassFields": true,
     "noImplicitOverride": true,
-    "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true
   },
   "include": [
