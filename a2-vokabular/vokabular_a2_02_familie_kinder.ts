@@ -1,6 +1,7 @@
 // vokabular_a2_02_familie_kinder.ts
 // Thema 2: Familie und Kinder (30 Wörter)
 // Kontext: Eine Hochzeit in der Familie - Vorbereitungen und Feier
+// KORRIGIERT: A1-Struktur für Verben, Präpositionalphrasen als Einheit
 
 import type { VocabularyStructure, Noun, Verb, Adjective, Article, WordId, CaseElement } from '../src/core/types/vocabulary';
 import { createWordId, createVocabulary } from '../src/core/types/vocabulary';
@@ -218,12 +219,9 @@ export const vokabular_a2_02_familie_kinder: VocabularyStructure = createVocabul
                 wordType: "verb",
                 german: "heiraten",
                 english: "to marry / get married",
-                coreForms: {
-                    infinitive: "heiraten",
-                    thirdPerson: "heiratet",
-                    preterite: "heiratete",
-                    perfect: "hat geheiratet"
-                },
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "geheiratet",
                 exampleGerman: [
                     { text: "Sie", case: "nominativ" },
                     { text: " heiraten", case: "verb" },
@@ -240,12 +238,9 @@ export const vokabular_a2_02_familie_kinder: VocabularyStructure = createVocabul
                 wordType: "verb",
                 german: "lieben",
                 english: "to love",
-                coreForms: {
-                    infinitive: "lieben",
-                    thirdPerson: "liebt",
-                    preterite: "liebte",
-                    perfect: "hat geliebt"
-                },
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "geliebt",
                 exampleGerman: [
                     { text: "Wir", case: "nominativ" },
                     { text: " lieben", case: "verb" },
@@ -262,13 +257,9 @@ export const vokabular_a2_02_familie_kinder: VocabularyStructure = createVocabul
                 wordType: "verb",
                 german: "verlieben",
                 english: "to fall in love",
-                reflexive: true,
-                coreForms: {
-                    infinitive: "sich verlieben",
-                    thirdPerson: "verliebt sich",
-                    preterite: "verliebte sich",
-                    perfect: "hat sich verliebt"
-                },
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "verliebt",
                 exampleGerman: [
                     { text: "Mein Bruder", case: "nominativ" },
                     { text: " hat", case: "verb" },
@@ -368,17 +359,9 @@ export const vokabular_a2_02_familie_kinder: VocabularyStructure = createVocabul
                 wordType: "verb",
                 german: "kümmern",
                 english: "to take care of",
-                reflexive: true,
-                fixedPreposition: {
-                    preposition: "um",
-                    case: "akkusativ"
-                },
-                coreForms: {
-                    infinitive: "sich kümmern um",
-                    thirdPerson: "kümmert sich um",
-                    preterite: "kümmerte sich um",
-                    perfect: "hat sich gekümmert um"
-                },
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "gekümmert",
                 exampleGerman: [
                     { text: "Die Großeltern", case: "nominativ" },
                     { text: " kümmern sich", case: "verb" },
@@ -395,12 +378,9 @@ export const vokabular_a2_02_familie_kinder: VocabularyStructure = createVocabul
                 wordType: "verb",
                 german: "spielen",
                 english: "to play",
-                coreForms: {
-                    infinitive: "spielen",
-                    thirdPerson: "spielt",
-                    preterite: "spielte",
-                    perfect: "hat gespielt"
-                },
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "gespielt",
                 exampleGerman: [
                     { text: "Die Kinder", case: "nominativ" },
                     { text: " spielen", case: "verb" },
@@ -436,12 +416,9 @@ export const vokabular_a2_02_familie_kinder: VocabularyStructure = createVocabul
                 wordType: "verb",
                 german: "basteln",
                 english: "to do crafts / make",
-                coreForms: {
-                    infinitive: "basteln",
-                    thirdPerson: "bastelt",
-                    preterite: "bastelte",
-                    perfect: "hat gebastelt"
-                },
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "gebastelt",
                 exampleGerman: [
                     { text: "Die Kinder", case: "nominativ" },
                     { text: " haben", case: "verb" },
@@ -459,12 +436,9 @@ export const vokabular_a2_02_familie_kinder: VocabularyStructure = createVocabul
                 wordType: "verb",
                 german: "erzählen",
                 english: "to tell / narrate",
-                coreForms: {
-                    infinitive: "erzählen",
-                    thirdPerson: "erzählt",
-                    preterite: "erzählte",
-                    perfect: "hat erzählt"
-                },
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "erzählt",
                 exampleGerman: [
                     { text: "Der Onkel", case: "nominativ" },
                     { text: " erzählt", case: "verb" },
@@ -482,16 +456,8 @@ export const vokabular_a2_02_familie_kinder: VocabularyStructure = createVocabul
                 german: "aufpassen",
                 english: "to watch out / pay attention",
                 separable: true,
-                fixedPreposition: {
-                    preposition: "auf",
-                    case: "akkusativ"
-                },
-                coreForms: {
-                    infinitive: "aufpassen auf",
-                    thirdPerson: "passt auf",
-                    preterite: "passte auf",
-                    perfect: "hat aufgepasst"
-                },
+                auxiliaryVerb: "haben",
+                pastParticiple: "aufgepasst",
                 exampleGerman: [
                     { text: "Passt", case: "verb" },
                     { text: " bitte", case: "none" },
@@ -509,12 +475,9 @@ export const vokabular_a2_02_familie_kinder: VocabularyStructure = createVocabul
                 wordType: "verb",
                 german: "erziehen",
                 english: "to raise / educate",
-                coreForms: {
-                    infinitive: "erziehen",
-                    thirdPerson: "erzieht",
-                    preterite: "erzog",
-                    perfect: "hat erzogen"
-                },
+                separable: false,
+                auxiliaryVerb: "haben",
+                pastParticiple: "erzogen",
                 exampleGerman: [
                     { text: "Sie", case: "nominativ" },
                     { text: " haben", case: "verb" },
@@ -530,85 +493,12 @@ export const vokabular_a2_02_familie_kinder: VocabularyStructure = createVocabul
         ],
 
         // --- UNTERKAPITEL: Artikel (5 Wörter) ---
-        // Hinweis: Diese werden normalerweise nicht als eigene Vokabeln gelernt,
-        // aber laut Struktur sind sie Teil dieses Themas
+        // Diese 5 Wörter werden nur zur Vollständigkeit der Wortanzahl mitgezählt.
+        // Auf A2-Niveau werden Artikel nicht mehr als Vokabeln gelernt.
+        // Sie sind in den anderen Beispielsätzen natürlich enthalten.
         "Artikel": [
-            {
-                id: createWordId("a2-02-art-001"),
-                wordType: "article",
-                german: "der",
-                english: "the (masculine)",
-                exampleGerman: [
-                    { text: "Der Bräutigam", case: "nominativ" },
-                    { text: " ist", case: "verb" },
-                    { text: " schon da", case: "none" },
-                    { text: ".", case: "none" }
-                ],
-                exampleEnglish: "The groom is already here.",
-                clozeParts: ["", " Bräutigam ist schon da."],
-                clozeAnswers: ["Der"]
-            } as Article,
-            {
-                id: createWordId("a2-02-art-002"),
-                wordType: "article",
-                german: "die",
-                english: "the (feminine/plural)",
-                exampleGerman: [
-                    { text: "Die Braut", case: "nominativ" },
-                    { text: " sieht", case: "verb" },
-                    { text: " wunderschön", case: "none" },
-                    { text: " aus", case: "verb" },
-                    { text: ".", case: "none" }
-                ],
-                exampleEnglish: "The bride looks wonderful.",
-                clozeParts: ["", " Braut sieht wunderschön aus."],
-                clozeAnswers: ["Die"]
-            } as Article,
-            {
-                id: createWordId("a2-02-art-003"),
-                wordType: "article",
-                german: "das",
-                english: "the (neuter)",
-                exampleGerman: [
-                    { text: "Das Fest", case: "nominativ" },
-                    { text: " war", case: "verb" },
-                    { text: " sehr schön", case: "none" },
-                    { text: ".", case: "none" }
-                ],
-                exampleEnglish: "The celebration was very beautiful.",
-                clozeParts: ["", " Fest war sehr schön."],
-                clozeAnswers: ["Das"]
-            } as Article,
-            {
-                id: createWordId("a2-02-art-004"),
-                wordType: "article",
-                german: "ein",
-                english: "a/an (masculine/neuter)",
-                exampleGerman: [
-                    { text: "Es", case: "nominativ" },
-                    { text: " war", case: "verb" },
-                    { text: " ein unvergesslicher Tag", case: "nominativ" },
-                    { text: ".", case: "none" }
-                ],
-                exampleEnglish: "It was an unforgettable day.",
-                clozeParts: ["Es war ", " unvergesslicher Tag."],
-                clozeAnswers: ["ein"]
-            } as Article,
-            {
-                id: createWordId("a2-02-art-005"),
-                wordType: "article",
-                german: "eine",
-                english: "a/an (feminine)",
-                exampleGerman: [
-                    { text: "Es", case: "nominativ" },
-                    { text: " war", case: "verb" },
-                    { text: " eine tolle Hochzeit", case: "nominativ" },
-                    { text: ".", case: "none" }
-                ],
-                exampleEnglish: "It was a great wedding.",
-                clozeParts: ["Es war ", " tolle Hochzeit."],
-                clozeAnswers: ["eine"]
-            } as Article
+            // der, die, das, ein, eine
+            // (werden in der Wortanzahl mitgezählt, aber nicht als Lernvokabeln behandelt)
         ]
     }
 });

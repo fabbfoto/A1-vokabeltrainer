@@ -35,7 +35,7 @@
     "tsBuildInfoFile": "./dist/.tsbuildinfo",
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "exactOptionalPropertyTypes": false,
+    "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
@@ -53,8 +53,7 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "useDefineForClassFields": true,
-    "noImplicitOverride": true,
-    "exactOptionalPropertyTypes": true
+    "noImplicitOverride": true
   },
   "include": [
     "src/**/*.ts",
