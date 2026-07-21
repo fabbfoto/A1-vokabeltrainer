@@ -33,8 +33,61 @@
     <link rel="stylesheet" href="./shared/styles/minimal-legacy.css">
     
     <!-- Firebase wird über TypeScript-Module geladen -->
+<style>
+/* FB-THEME-TOGGLE */
+.theme-toggle { position: fixed; top: 14px; right: 14px; width: 38px; height: 38px; border-radius: 50%;
+  background: rgba(102,126,234,0.45); border: 1px solid rgba(255,255,255,0.4); color: white;
+  font-size: 1.05em; cursor: pointer; line-height: 1; transition: background 0.2s; z-index: 50; }
+.theme-toggle:hover { background: rgba(102,126,234,0.7); }
+@media (prefers-color-scheme: dark) {
+/* ===== FB-DARK-MODE (manuell, Tailwind-App) ===== */
+:root:not([data-theme="light"]) body { background: linear-gradient(to bottom right, #171a28, #1c1f33, #221d36) !important; }
+:root:not([data-theme="light"]) .bg-white { background-color: #23263a !important; color: #d6d8e8; }
+:root:not([data-theme="light"]) .bg-gray-200 { background-color: #2e3250 !important; }
+:root:not([data-theme="light"]) .text-gray-900, :root:not([data-theme="light"]) .text-gray-800 { color: #e2e4f0 !important; }
+:root:not([data-theme="light"]) .text-gray-700 { color: #c6cade !important; }
+:root:not([data-theme="light"]) .text-gray-600 { color: #9ba0bd !important; }
+:root:not([data-theme="light"]) .border-gray-300, :root:not([data-theme="light"]) .border-gray-400 { border-color: #3a3e58 !important; }
+:root:not([data-theme="light"]) .bg-btn-bg { background-color: #2e3250 !important; color: #c6cade !important; }
+}
+
+/* ===== FB-DARK-MODE (manuell, Tailwind-App) ===== */
+html[data-theme="dark"] body { background: linear-gradient(to bottom right, #171a28, #1c1f33, #221d36) !important; }
+html[data-theme="dark"] .bg-white { background-color: #23263a !important; color: #d6d8e8; }
+html[data-theme="dark"] .bg-gray-200 { background-color: #2e3250 !important; }
+html[data-theme="dark"] .text-gray-900, html[data-theme="dark"] .text-gray-800 { color: #e2e4f0 !important; }
+html[data-theme="dark"] .text-gray-700 { color: #c6cade !important; }
+html[data-theme="dark"] .text-gray-600 { color: #9ba0bd !important; }
+html[data-theme="dark"] .border-gray-300, html[data-theme="dark"] .border-gray-400 { border-color: #3a3e58 !important; }
+html[data-theme="dark"] .bg-btn-bg { background-color: #2e3250 !important; color: #c6cade !important; }
+</style>
+<script>/* FB-THEME-INIT */
+(function(){
+  var saved = null;
+  try { saved = localStorage.getItem('fb-theme'); } catch(e) {}
+  if (saved === 'dark' || saved === 'light') document.documentElement.dataset.theme = saved;
+  function effDark() {
+    var t = document.documentElement.dataset.theme;
+    if (t === 'dark') return true;
+    if (t === 'light') return false;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+  function paint() {
+    var b = document.getElementById('themeToggle');
+    if (b) b.textContent = effDark() ? '☀️' : '🌙';
+  }
+  window.fbToggleTheme = function() {
+    var next = effDark() ? 'light' : 'dark';
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem('fb-theme', next); } catch(e) {}
+    paint();
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paint); else paint();
+})();
+</script>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-100 to-purple-100 font-['Inter'] flex flex-col justify-start items-center min-h-screen p-4">
+<button class="theme-toggle" id="themeToggle" onclick="fbToggleTheme()" aria-label="Hell/Dunkel umschalten">🌙</button>
 
     <!-- NAVIGATION VIEW -->
     <div id="navigation-view" class="p-4 max-w-2xl mx-auto">
